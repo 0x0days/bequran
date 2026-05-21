@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Big Bang · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #f9a8d4;
+      --accent-light: #fce7f3;
+      --accent-dim:   rgba(249,168,212,0.12);
+      --accent-ring:  rgba(249,168,212,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(20px, 4.5vw, 28px); line-height: 2.4; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 15px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Claim row ── */
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5.5vw, 40px); font-weight: 700; line-height: 1; color: var(--accent-light); text-shadow: 0 0 40px rgba(249,168,212,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(20px, 4vw, 30px); color: var(--muted); }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── S2: Three-reveal ── */
+    .reveal-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .reveal-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .reveal-btn.used { opacity: .45; pointer-events: none; }
+    .rb-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--accent-dim); border: 1px solid var(--accent-ring); font-size: 20px; }
+    .scale-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: none; animation: rise .35s ease; }
+    .scale-result.show { display: flex; align-items: center; gap: 16px; }
+    .sr-icon { font-size: 28px; flex-shrink: 0; width: 48px; text-align: center; }
+    .sr-info { flex: 1; }
+    .sr-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .sr-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 20px; color: var(--accent-light); margin-bottom: 4px; }
+    .sr-stat { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--accent-light); margin-bottom: 3px; }
+    .sr-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .conv-panel { background: linear-gradient(135deg, rgba(249,168,212,0.08) 0%, rgba(249,168,212,0.02) 100%); border: 1px solid rgba(249,168,212,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 10px; font-weight: 600; }
+    .conv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 22px; color: var(--accent-light); font-weight: 700; margin-bottom: 8px; line-height: 2.2; }
+    .conv-sub { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(249,168,212,0.05); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-age-of-universe.html" class="nav-back">&larr; Age of Universe</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Big Bang</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Cosmology</p>
+    <h1 class="hero-title">A single verse in the Quran describes the singularity, the expansion, and water-based life — three 20th-century discoveries in one sentence.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 21:30 — Surah Al-Anbiya &middot; The Prophets</div>
+      <div class="iv-ar">
+        أَوَلَمْ يَرَ الَّذِينَ كَفَرُوا أَنَّ السَّمَاوَاتِ وَالْأَرْضَ كَانَتَا <span class="hl">رَتْقًا فَفَتَقْنَاهُمَا</span> ۖ وَجَعَلْنَا مِنَ <span class="hl">الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</span>
+      </div>
+      <div class="iv-tr">"Do those who disbelieve not see that the heavens and the Earth were <span class="hl">meshed together then We ripped them apart</span>? And that We made from <span class="hl">water every living thing</span>?"</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">رَتْقًا</div>
+        <div class="cr-lbl">Compact singularity → Big Bang</div>
+      </div>
+      <div class="cr-eq">+</div>
+      <div class="cr-block">
+        <div class="cr-num">فَتَقْنَا</div>
+        <div class="cr-lbl">Torn apart → Dark Energy</div>
+      </div>
+    </div>
+
+    <p class="body-text">The Big Bang theory — confirmed by cosmic background radiation in 1964 — describes the universe beginning as an infinitely compressed singularity, then exploding outward. The Quran uses two precise Arabic words: <em>ratq</em> (رَتْقًا) meaning "tight and compact, meshed together," and <em>fatq</em> (فَتَقْنَاهُمَا) meaning "torn apart by pulling in opposite directions" — the exact mechanism of dark energy, which stretches the fabric of spacetime outward in all directions.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#040810">Begin the lesson &rarr;</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3</p>
+    <p class="prompt">What does رَتْقًا (ratq) mean in Arabic?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Burning hot — matter at extreme temperature</div>
+        <div class="ac-sub">The early universe was extremely hot, so "ratq" must refer to heat</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Tight and compact, meshed together — everything squeezed into one point</div>
+        <div class="ac-sub">The same word used for stitched, sealed fabric — material so compressed it forms a single mass</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Spinning — rotating at high speed</div>
+        <div class="ac-sub">The early universe rotated, generating centrifugal force</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 — Three-reveal ── -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3</p>
+    <p class="prompt">Quran 21:30 contains three discoveries. Reveal them all.</p>
+
+    <button class="reveal-btn" id="btnR1" onclick="revealBang(0)">
+      <div class="rb-icon">💥</div>
+      <div>
+        <div style="font-weight:600">رَتْقًا — The singularity</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Heavens and Earth compressed into one point</div>
+      </div>
+    </button>
+    <div class="scale-result" id="br0">
+      <div class="sr-icon">💥</div>
+      <div class="sr-info">
+        <div class="sr-ar">رَتْقًا</div>
+        <div class="sr-stat">The Big Bang singularity</div>
+        <div class="sr-note">Before the Big Bang, all matter and energy in the universe occupied a single, infinitely compressed point — a singularity. <em>Ratq</em> means "sealed, tight, and compact, meshed as one." The Quran says the heavens and Earth were in this state before creation.</div>
+      </div>
+    </div>
+
+    <button class="reveal-btn" id="btnR2" onclick="revealBang(1)">
+      <div class="rb-icon">🌌</div>
+      <div>
+        <div style="font-weight:600">فَتَقْنَاهُمَا — Torn in opposite directions</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">The specific mechanism of expansion</div>
+      </div>
+    </button>
+    <div class="scale-result" id="br1">
+      <div class="sr-icon">🌌</div>
+      <div class="sr-info">
+        <div class="sr-ar">فَتَقْنَاهُمَا</div>
+        <div class="sr-stat">Dark Energy — pulling spacetime apart</div>
+        <div class="sr-note"><em>Fatq</em> means to tear cloth by pulling the fabric in opposite directions — not an explosion, but a stretching. This is precisely how dark energy works: it does not push matter outward, it stretches the fabric of spacetime itself in all directions simultaneously.</div>
+      </div>
+    </div>
+
+    <button class="reveal-btn" id="btnR3" onclick="revealBang(2)">
+      <div class="rb-icon">💧</div>
+      <div>
+        <div style="font-weight:600">مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ — Water and life</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">The same verse — a third discovery</div>
+      </div>
+    </button>
+    <div class="scale-result" id="br2">
+      <div class="sr-icon">💧</div>
+      <div class="sr-info">
+        <div class="sr-ar">مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</div>
+        <div class="sr-stat">All living things are water-based</div>
+        <div class="sr-note">"We made from water every living thing." This is the same verse — Quran 21:30. The discovery that all known life requires liquid water, that cells are mostly water, and that water is the universal solvent of biology was confirmed in the 19th and 20th centuries.</div>
+      </div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-lbl">Three discoveries. One verse.</div>
+      <div class="conv-ar">أَنَّ السَّمَاوَاتِ وَالْأَرْضَ كَانَتَا رَتْقًا فَفَتَقْنَاهُمَا</div>
+      <div class="conv-sub">The singularity, the expansion, and water-based life — all three confirmed by modern science, all three in Quran 21:30.</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <p class="prompt">The word فَتَقْنَاهُمَا specifically means "torn apart by pulling in opposite directions." Which force does this best describe?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Gravity — it pulls objects toward each other</div>
+        <div class="ac-sub">The dominant force that forms stars, planets, and galaxies</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Dark Energy — it pulls the fabric of spacetime apart in all directions</div>
+        <div class="ac-sub">Driving the accelerating expansion of the universe — confirmed in 1998 by supernova observations</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Nuclear fusion — it pushes energy outward from inside a star</div>
+        <div class="ac-sub">The process powering the sun and other stars</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The singularity, the expansion, water-based life — <span style="color:var(--accent-light)">three</span> 20th-century discoveries described in <span style="color:var(--gold-light)">one</span> 7th-century verse.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num" id="mv0" style="color:var(--accent-light);text-shadow:0 0 40px rgba(249,168,212,0.4)">0</div>
+        <div class="match-lbl">years before Big Bang confirmed (1964)</div>
+      </div>
+      <div class="match-sep">&middot;</div>
+      <div class="match-block">
+        <div class="match-num" id="mv1" style="color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.4);font-size:clamp(36px,7vw,52px)">0</div>
+        <div class="match-lbl">discoveries in one verse</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Quran 21:30 — Arabic word</th><th>Meaning</th><th>Modern science</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td style="font-family:'Amiri',serif;direction:rtl;font-size:18px">رَتْقًا</td>
+          <td class="td-v">Tight, compact, meshed</td>
+          <td class="td-v">The singularity</td>
+        </tr>
+        <tr class="hl">
+          <td style="font-family:'Amiri',serif;direction:rtl;font-size:18px">فَفَتَقْنَاهُمَا</td>
+          <td class="td-v">Torn in opposite directions</td>
+          <td class="td-v">Dark Energy expansion</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Amiri',serif;direction:rtl;font-size:16px">مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</td>
+          <td class="td-v">Water makes all life</td>
+          <td class="td-v">Water-based biology</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why "fatq" is not just "separation":</strong> Arabic has many words for separating or moving apart. The word <em>fatq</em> specifically describes the action of tearing a garment by pulling its fabric in opposite directions — stretching and ripping. This is not an explosion pushing things outward; it is a stretching of the fabric itself. This is precisely the mechanism of dark energy, which stretches spacetime rather than pushing matter.
+    </div>
+
+    <div class="insight-box">
+      <strong>The water claim in context:</strong> In 7th-century Arabia, most scholars held that fire and earth were the primary elements of life. The Quran's claim that water is the basis of all life contradicted the common understanding — and was confirmed by modern biology. Every living cell requires water. The discovery of water on other planets is now a primary indicator in the search for extraterrestrial life.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"The heavens and the Earth were meshed together, then We ripped them apart." The singularity and the expansion — in one sentence, from the 7th century.</div>
+      <div class="gs">Georges Lemaître proposed the Big Bang in 1927. Arno Penzias and Robert Wilson confirmed it with cosmic microwave background radiation in 1964. The Quran described the same event 1,300 years earlier using vocabulary that matches the physics with remarkable precision.</div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+      <a href="quran-age-of-universe.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Age of Universe</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Big Bang',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('big-bang');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1300, 1600, null);
+        animFrom(document.getElementById('mv1'), 0, 3, 800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Ratq means tight, compact, meshed together — all matter sealed into one. This is the Big Bang singularity: everything compressed into a single point before creation.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+var doneBang = [false, false, false];
+function revealBang(i) {
+  if (doneBang[i]) return;
+  doneBang[i] = true;
+  document.getElementById('br' + i).classList.add('show');
+  document.getElementById('btnR' + (i + 1)).classList.add('used');
+  if (doneBang[0] && doneBang[1] && doneBang[2]) {
+    document.getElementById('convPanel').classList.add('show');
+    setTimeout(function() {
+      showOk('Three modern scientific discoveries — singularity, dark energy expansion, water-based life — all described in a single 7th-century verse.', function() { go(3); });
+    }, 1200);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Correct. Fatq means tearing by pulling in opposite directions — stretching the fabric, not pushing matter. Dark energy stretches spacetime itself. This was confirmed in 1998.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero Canvas: Big Bang — singularity then particle explosion ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W / 2, cy = H / 2;
+
+  var seed = 77;
+  function rng() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; }
+
+  const TOTAL    = 280;
+  const BANG_AT  = 22;
+  const NUM_PART = 70;
+
+  /* Pre-generate particles */
+  var particles = [];
+  for (var i = 0; i < NUM_PART; i++) {
+    var angle = rng() * Math.PI * 2;
+    var speed = rng() * 1.8 + 0.5;
+    var size  = rng() * 1.8 + 0.4;
+    var kind  = rng();
+    particles.push({ angle: angle, speed: speed, size: size, kind: kind });
+  }
+
+  var frame = 0;
+
+  function draw() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    if (frame < BANG_AT) {
+      /* Singularity phase — bright pulsing dot */
+      var pulse = 0.5 + 0.5 * Math.sin(frame / BANG_AT * Math.PI);
+      var r = 6 + pulse * 12;
+      var grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 2.5);
+      grd.addColorStop(0,   'rgba(255,255,255,' + (0.5 + pulse * 0.5) + ')');
+      grd.addColorStop(0.3, 'rgba(249,168,212,' + (0.4 + pulse * 0.4) + ')');
+      grd.addColorStop(1,   'transparent');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+    } else {
+      var age = frame - BANG_AT;
+      var maxAge = TOTAL - BANG_AT;
+      var progress = age / maxAge;
+
+      /* Flash burst at moment of bang */
+      if (age < 18) {
+        var flash = (1 - age / 18) * 0.85;
+        var fGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.55);
+        fGrd.addColorStop(0,   'rgba(255,255,255,' + flash + ')');
+        fGrd.addColorStop(0.15,'rgba(249,168,212,' + (flash * 0.6) + ')');
+        fGrd.addColorStop(0.5, 'rgba(196,181,253,' + (flash * 0.2) + ')');
+        fGrd.addColorStop(1,   'transparent');
+        ctx.fillStyle = fGrd;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      /* Particles spreading outward — ease-out deceleration */
+      var spreadP = 1 - Math.pow(1 - Math.min(progress * 1.3, 1), 2.5);
+
+      particles.forEach(function(p) {
+        var maxDist = p.speed * 320;
+        var dist    = spreadP * maxDist;
+        var px = cx + Math.cos(p.angle) * dist;
+        var py = cy + Math.sin(p.angle) * dist;
+
+        /* Fade out in last 30% of cycle */
+        var alpha = progress < 0.7
+          ? 0.85
+          : (1 - (progress - 0.7) / 0.3) * 0.85;
+        alpha = Math.max(0, alpha);
+
+        var color;
+        if (p.kind > 0.65) {
+          color = 'rgba(249,168,212,' + alpha.toFixed(2) + ')';
+        } else if (p.kind > 0.35) {
+          color = 'rgba(196,181,253,' + (alpha * 0.85).toFixed(2) + ')';
+        } else {
+          color = 'rgba(255,255,255,' + (alpha * 0.55).toFixed(2) + ')';
+        }
+
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      });
+
+      /* Residual central glow */
+      if (progress < 0.4) {
+        var glow = (1 - progress / 0.4) * 0.55;
+        var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 18);
+        g.addColorStop(0, 'rgba(255,255,255,' + glow + ')');
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    frame++;
+    if (frame >= TOTAL) frame = 0;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

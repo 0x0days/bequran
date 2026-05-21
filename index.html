@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Quranic Numerics — Discover the Patterns</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0b1622;
+      --surface: #111e2e;
+      --surface2:#182840;
+      --border:  rgba(255,255,255,0.07);
+      --text:    #e2ddd4;
+      --muted:   #7a8fa3;
+      --gold:    #f59e0b;
+      --gold-lt: #fcd34d;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; overflow-x:hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .site-header {
+      position:sticky; top:0; z-index:200;
+      height:54px;
+      background:rgba(11,22,34,0.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 20px;
+    }
+    .brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .brand-mark {
+      width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+    }
+    .brand-name {
+      font-family:'Playfair Display',serif; font-size:16px; font-weight:700;
+      color:var(--text); line-height:1;
+    }
+    .brand-sub { font-size:10px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-top:1px; }
+    .header-pills { display:flex; align-items:center; gap:8px; }
+    .pill {
+      display:inline-flex; align-items:center; gap:5px;
+      border-radius:100px; padding:5px 12px;
+      font-size:12px; font-weight:600;
+    }
+    .pill-xp   { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.22); color:var(--gold); }
+    .pill-fire { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#fca5a5; }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero {
+      position:relative; overflow:hidden;
+      height:clamp(280px,42vh,380px);
+      display:flex; align-items:center; justify-content:center;
+    }
+    #bgCanvas { position:absolute; inset:0; width:100%; height:100%; }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 60%,rgba(11,22,34,0.18) 0%,rgba(5,10,20,0.82) 100%);
+    }
+    .hero-content {
+      position:relative; z-index:2;
+      text-align:center; padding:0 24px;
+      max-width:620px;
+    }
+    .hero-eyebrow {
+      font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--gold); margin-bottom:14px; font-weight:500;
+    }
+    .hero-hl {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(26px,5.5vw,44px);
+      line-height:1.16; margin-bottom:14px;
+      color:#f0ede8;
+      text-shadow:0 2px 24px rgba(0,0,0,0.55);
+    }
+    .hero-sub {
+      font-size:14px; line-height:1.8; color:var(--muted);
+      margin-bottom:26px; max-width:480px; margin-left:auto; margin-right:auto;
+    }
+    .hero-cta {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--gold); color:#1a0c00;
+      padding:12px 26px; border-radius:8px;
+      font-size:14px; font-weight:700; text-decoration:none;
+      box-shadow:0 4px 28px rgba(245,158,11,0.32);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .hero-cta:hover { transform:translateY(-2px); box-shadow:0 8px 36px rgba(245,158,11,0.42); }
+
+    /* ── STATS BAR ───────────────────────────────── */
+    .stats-bar {
+      display:flex; justify-content:center;
+      background:var(--surface); border-bottom:1px solid var(--border);
+    }
+    .stat-block {
+      flex:1; max-width:220px; padding:16px 18px; text-align:center;
+      border-right:1px solid var(--border);
+    }
+    .stat-block:last-child { border-right:none; }
+    .stat-n {
+      font-family:'Playfair Display',serif; font-size:24px; font-weight:700;
+      color:var(--gold-lt); line-height:1;
+    }
+    .stat-lbl { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+    .progress-track {
+      height:3px; background:var(--surface2); border-radius:100px;
+      margin-top:7px; overflow:hidden;
+    }
+    .progress-fill {
+      height:100%; border-radius:100px;
+      background:linear-gradient(90deg,var(--gold),var(--gold-lt));
+      transition:width .9s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── BISMILLAH ───────────────────────────────── */
+    .bismillah {
+      text-align:center; padding:40px 20px 6px;
+    }
+    .bismillah-ar {
+      font-family:'Amiri',serif; font-size:clamp(20px,4.5vw,30px);
+      color:var(--gold); letter-spacing:.04em; line-height:2.2;
+    }
+    .bismillah-en {
+      font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--muted); margin-top:2px;
+    }
+    .ornament {
+      display:flex; align-items:center; justify-content:center; gap:14px;
+      margin:14px auto 0; max-width:220px;
+    }
+    .ornament-line { flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(245,158,11,0.2),transparent); }
+    .ornament-dot  { width:5px; height:5px; border-radius:50%; background:rgba(245,158,11,0.3); }
+
+    /* ── MAIN ────────────────────────────────────── */
+    .main { max-width:1120px; margin:0 auto; padding:0 20px 80px; }
+    .section-head {
+      display:flex; align-items:baseline; justify-content:space-between;
+      margin:36px 0 20px; flex-wrap:wrap; gap:8px;
+    }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(19px,3vw,24px); }
+    .section-sub   { font-size:12px; color:var(--muted); }
+    #lessons { scroll-margin-top:68px; }
+
+    /* ── FILTER TABS ─────────────────────────────── */
+    .filter-row {
+      display:flex; gap:7px; overflow-x:auto; margin-bottom:26px;
+      padding-bottom:2px; scrollbar-width:none;
+    }
+    .filter-row::-webkit-scrollbar { display:none; }
+    .ftab {
+      flex-shrink:0; padding:7px 17px; border-radius:100px;
+      border:1px solid var(--border);
+      background:transparent; color:var(--muted);
+      font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+      cursor:pointer; white-space:nowrap;
+      transition:all .18s;
+    }
+    .ftab:hover { border-color:rgba(255,255,255,0.2); color:var(--text); }
+    .ftab.active { background:var(--gold); color:#1a0c00; border-color:var(--gold); font-weight:700; }
+
+    /* ── CARDS GRID ──────────────────────────────── */
+    .cards-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+      gap:14px;
+    }
+
+    /* ── LESSON CARD ─────────────────────────────── */
+    .lcard {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-bottom:4px solid rgba(0,0,0,0.32);
+      border-radius:16px;
+      padding:20px 19px 16px;
+      text-decoration:none; color:inherit;
+      display:flex; flex-direction:column;
+      position:relative; overflow:hidden;
+      transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+      opacity:0; transform:translateY(14px);
+    }
+    .lcard.visible { opacity:1; transform:none; transition:opacity .42s ease, transform .42s ease; }
+    .lcard::after {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:var(--accent,var(--gold)); opacity:0; transition:opacity .22s;
+    }
+    .lcard:hover {
+      transform:translateY(-4px);
+      box-shadow:0 14px 44px var(--shadow,rgba(245,158,11,0.09));
+      border-color:var(--accent-border,rgba(245,158,11,0.28));
+    }
+    .lcard:hover::after { opacity:1; }
+
+    .card-row1 {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:15px;
+    }
+    .cat-pill {
+      font-size:9px; letter-spacing:.11em; text-transform:uppercase; font-weight:700;
+      padding:3px 9px; border-radius:4px;
+    }
+    .card-meta { display:flex; align-items:center; gap:9px; }
+    .lesson-num { font-size:11px; color:var(--muted); font-style:italic; }
+    .check-ring {
+      width:18px; height:18px; border-radius:50%; flex-shrink:0;
+      border:1.5px solid rgba(255,255,255,0.14);
+      display:flex; align-items:center; justify-content:center;
+      transition:background .2s, border-color .2s;
+    }
+    .check-ring.done { background:rgba(34,197,94,0.18); border-color:#22c55e; }
+
+    .hook {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(30px,6.5vw,44px); font-weight:700; line-height:1;
+      margin-bottom:11px;
+      transition:text-shadow .22s;
+    }
+    .lcard:hover .hook { text-shadow:0 0 28px var(--accent,rgba(245,158,11,0.5)); }
+
+    .teaser {
+      font-size:12.5px; line-height:1.65; color:var(--muted);
+      font-style:italic; flex:1; margin-bottom:11px;
+    }
+    .card-title { font-size:15px; font-weight:600; margin-bottom:2px; }
+    .card-ar { font-family:'Amiri',serif; font-size:13px; color:var(--muted); direction:rtl; }
+
+    .card-footer {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-top:14px; padding-top:12px;
+      border-top:1px solid var(--border);
+    }
+    .card-time { font-size:10px; color:var(--muted); letter-spacing:.05em; }
+    .card-go {
+      display:flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:600;
+      transition:gap .18s;
+    }
+    .lcard:hover .card-go { gap:7px; }
+
+    /* ── FIRST CARD HIGHLIGHT ────────────────────── */
+    .lcard.start-here { border-color:rgba(245,158,11,0.22); }
+    .start-badge {
+      font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+      color:#22c55e; font-weight:700; margin-left:6px;
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    .site-footer {
+      background:var(--surface); border-top:1px solid var(--border);
+      padding:28px 20px; text-align:center;
+    }
+    .site-footer p { font-size:13px; color:var(--muted); line-height:1.8; max-width:580px; margin:0 auto; }
+    .site-footer strong { color:var(--text); }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width:600px) {
+      .hero { height:clamp(240px,55vw,300px); }
+      .hero-hl { font-size:clamp(22px,7vw,30px); }
+      .cards-grid { grid-template-columns:1fr; }
+      .stat-block { max-width:none; }
+      .stat-n { font-size:20px; }
+      .pill-fire { display:none; }
+    }
+  </style>
+</head>
+<body class="page-index">
+
+<!-- ── HEADER ───────────────────────────────────── -->
+<header class="site-header">
+  <a class="brand" href="#">
+    <div class="brand-mark">
+      <!-- Islamic 8-pointed star -->
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path d="M15 2 L17.1 11.9 L27 9.8 L20.2 17 L27 20.2 L17.1 18.1 L15 28 L12.9 18.1 L3 20.2 L9.8 17 L3 9.8 L12.9 11.9Z"
+              stroke="rgba(245,158,11,0.75)" stroke-width="1.1" stroke-linejoin="round" fill="none"/>
+        <circle cx="15" cy="15" r="2.5" fill="rgba(245,158,11,0.55)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Quranic Numerics</div>
+      <div class="brand-sub">Mathematical Discoveries</div>
+    </div>
+  </a>
+  <div class="header-pills">
+    <div class="pill pill-fire">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="#fca5a5"><path d="M12 2c0 0-6 8-6 13a6 6 0 0012 0c0-5-6-13-6-13z"/></svg>
+      <span id="streakN">0</span>
+    </div>
+    <div class="pill pill-xp">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span id="xpN">0</span>&thinsp;XP
+    </div>
+    <div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+      <button class="tt-btn" data-theme-val="dark" title="Dark">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="tt-btn" data-theme-val="system" title="System">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </button>
+      <button class="tt-btn" data-theme-val="light" title="Light">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ─────────────────────────────────────── -->
+<section class="hero">
+  <canvas id="bgCanvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">19 Discoveries · Verified by Modern Science</p>
+    <h1 class="hero-hl">Patterns hidden<br>for 1,400 years.</h1>
+    <p class="hero-sub">Mathematical and scientific discoveries encoded in the Quran — each confirmed by physics, biology, or astronomy developed centuries later. Each lesson takes 5 minutes.</p>
+    <a href="#lessons" class="hero-cta">
+      Begin exploring
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ── STATS BAR ─────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="stat-block">
+    <div class="stat-n">19</div>
+    <div class="stat-lbl">Total Lessons</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-n" id="completedN">0</div>
+    <div class="stat-lbl">Completed</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-n" id="xpTotal">0</div>
+    <div class="stat-lbl">XP Earned</div>
+  </div>
+</div>
+
+<!-- ── BISMILLAH ─────────────────────────────────── -->
+<div class="bismillah">
+  <div class="bismillah-ar">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+  <div class="bismillah-en">In the Name of God, the Most Gracious, the Most Merciful</div>
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-dot"></div>
+    <div class="ornament-line"></div>
+  </div>
+</div>
+
+<!-- ── LESSONS ────────────────────────────────────── -->
+<main class="main" id="lessons">
+  <div class="section-head">
+    <h2 class="section-title">Choose your discovery</h2>
+    <span class="section-sub">Each lesson · ~5 min · +30 XP</span>
+  </div>
+
+  <div class="filter-row" id="filterRow">
+    <button class="ftab active" data-cat="all">All &thinsp;19</button>
+    <button class="ftab" data-cat="biology">Biology</button>
+    <button class="ftab" data-cat="balance">Balance</button>
+    <button class="ftab" data-cat="astronomy">Astronomy</button>
+    <button class="ftab" data-cat="physics">Physics</button>
+    <button class="ftab" data-cat="numerics">Numerics</button>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid"></div>
+</main>
+
+<!-- ── FOOTER ────────────────────────────────────── -->
+<footer class="site-footer">
+  <p>All counts use the <strong>Ḥafṣ ʿUthmānī</strong> text — the standard recitation used by 95% of Muslims worldwide. Scientific values are from peer-reviewed journals and space agencies. Verse positions follow the universal <strong>6,236-verse numbering</strong>.</p>
+</footer>
+
+<script>
+/* ── LESSON DATA ─────────────────────────────────── */
+var lessons = [
+  { id:'sea-land',   n:1,  title:'Sea & Land',             ar:'البحر والبر',
+    hook:'71%',       teaser:'Two Arabic words written 1,400 years ago encode Earth\'s ocean‑to‑land ratio with surprising precision.',
+    cat:'biology',  catLabel:'Earth Science', accent:'#0ea5e9', url:'quran-sea-land.html' },
+
+  { id:'chromosomes', n:2, title:'The Bee & 16',           ar:'النحل والكروموسومات',
+    hook:'16 · 32',  teaser:'Surah 16 is named "The Bee." A drone bee has 16 chromosomes. A female bee has 32. The surah has 128 verses.',
+    cat:'biology',  catLabel:'Biology',     accent:'#f59e0b', url:'quran-chromosomes.html' },
+
+  { id:'bee-female',  n:3, title:'Female Bee',             ar:'النحلة الأنثى',
+    hook:'كُلِى',   teaser:'The Quran commands its bees with a feminine Arabic verb — 970 years before science confirmed worker bees are female.',
+    cat:'biology',  catLabel:'Biology',     accent:'#fbbf24', url:'quran-bee-female.html' },
+
+  { id:'fish',        n:4, title:'The Fish Verse',         ar:'آية السمك',
+    hook:'50',        teaser:'One verse about a fish contains exactly 50 letters — matching the chromosome count of carp, goldfish, and zebrafish.',
+    cat:'biology',  catLabel:'Biology',     accent:'#06b6d4', url:'quran-fish.html' },
+
+  { id:'man-woman',   n:5, title:'Man & Woman',            ar:'الرجل والمرأة',
+    hook:'23 = 23',  teaser:'The word for "man" appears 23 times. The word for "woman" appears 23 times. Every counting method confirms it.',
+    cat:'biology',  catLabel:'Biology',     accent:'#818cf8', url:'quran-man-woman.html' },
+
+  { id:'man-woman-chromosomes', n:6, title:'Chromosomes Split', ar:'توازن الكروموسومات',
+    hook:'23 + 23',  teaser:'A father contributes 23 chromosomes. A mother contributes 23. The Quran uses "man" 23 times and "woman" 23 times.',
+    cat:'biology',  catLabel:'Biology',     accent:'#a78bfa', url:'quran-man-woman-chromosomes.html' },
+
+  { id:'adam-jesus',  n:7, title:'Adam & Jesus',           ar:'آدم وعيسى',
+    hook:'25 = 25',  teaser:'Adam is named 25 times in the Quran. Jesus is named 25 times. The verse linking them makes this structural.',
+    cat:'balance',  catLabel:'Balance',     accent:'#34d399', url:'quran-adam-jesus.html' },
+
+  { id:'hell-paradise', n:8, title:'Hell & Paradise',      ar:'النار والجنة',
+    hook:'77 · 78',  teaser:'Hell is mentioned 77 times. Paradise 78 times. The difference of one encodes a Quranic teaching about their gates.',
+    cat:'balance',  catLabel:'Balance',     accent:'#f97316', url:'quran-hell-paradise.html' },
+
+  { id:'life-death',  n:9, title:'Life & Death',           ar:'الحياة والموت',
+    hook:'105 = 105', teaser:'Every noun form of "life" and every noun form of "death," counted across 6,236 verses, land on the same number.',
+    cat:'balance',  catLabel:'Balance',     accent:'#22c55e', url:'quran-life-death.html' },
+
+  { id:'angels-devils', n:10, title:'Angels & Devils',     ar:'الملائكة والشياطين',
+    hook:'88 = 88',  teaser:'Angels appear in nominal form 88 times. The word for their adversaries — also exactly 88 times.',
+    cat:'balance',  catLabel:'Balance',     accent:'#c084fc', url:'quran-angels-devils.html' },
+
+  { id:'lightning-1313', n:11, title:'Lightning 13:13',    ar:'الرعد ١٣:١٣',
+    hook:'1 in 2.4T', teaser:'Five independent events — date, time, age, surah number, verse number — all converge on 13 on a single day.',
+    cat:'numerics', catLabel:'Numerics',    accent:'#38bdf8', url:'quran-lightning-1313.html' },
+
+  { id:'calendar-cycles', n:12, title:'Calendar Cycles',   ar:'دورات التقويم',
+    hook:'365·354·29', teaser:'The Arabic word for "day" appears 478 times. Its grammatical forms separate perfectly into three complete calendar systems.',
+    cat:'astronomy',catLabel:'Astronomy',   accent:'#818cf8', url:'quran-calendar-cycles.html' },
+
+  { id:'world-hereafter', n:13, title:'World & Hereafter', ar:'الدنيا والآخرة',
+    hook:'115 = 115', teaser:'"This world" and "the Hereafter" — two opposite realities — mentioned an identical number of times.',
+    cat:'balance',  catLabel:'Balance',     accent:'#a3e635', url:'quran-world-hereafter.html' },
+
+  { id:'sun-temperature', n:14, title:'Sun Temperature',   ar:'حرارة الشمس',
+    hook:'5,778 K',  teaser:'Count the verses between the first and last mention of the word "sun." That number is the Sun\'s surface temperature in Kelvin.',
+    cat:'astronomy',catLabel:'Astronomy',   accent:'#fb923c', url:'quran-sun-temperature.html' },
+
+  { id:'silver-melting', n:15, title:'Silver Melting',     ar:'انصهار الفضة',
+    hook:'961°C',    teaser:'Two independent verse paths, both starting at the same anchor, both end at silver\'s exact melting point.',
+    cat:'physics',  catLabel:'Physics',     accent:'#94a3b8', url:'quran-silver-melting.html' },
+
+  { id:'gold-melting', n:16, title:'Gold Melting',         ar:'انصهار الذهب',
+    hook:'1,064°C',  teaser:'Two completely different counting paths through the Quran both converge at gold\'s melting point in Celsius.',
+    cat:'physics',  catLabel:'Physics',     accent:'#fbbf24', url:'quran-gold-melting.html' },
+
+  { id:'sirius-distance', n:17, title:'Sirius Distance',   ar:'مسافة الشعرى',
+    hook:'8.6 ly',   teaser:'In Surah 53 ("The Star"), the distance to Sirius is encoded twice — once in letters, once in words — both exact.',
+    cat:'astronomy',catLabel:'Astronomy',   accent:'#93c5fd', url:'quran-sirius-distance.html' },
+
+  { id:'moon-landing', n:18, title:'Moon Landing',         ar:'الهبوط على القمر',
+    hook:'1389 AH',  teaser:'Count the verses after the moon‑split verse (54:1). That number is the Hijri year Apollo 11 landed on the moon.',
+    cat:'astronomy',catLabel:'Astronomy',   accent:'#c7d2fe', url:'quran-moon-landing.html' },
+
+  { id:'carbon-creation', n:19, title:'Carbon Creation',   ar:'خلق الكربون',
+    hook:'6 · 12',   teaser:'The Quran describes 6 distinct creation materials — carbon\'s atomic number. Its clay word appears exactly 12 times — carbon\'s mass number.',
+    cat:'physics',  catLabel:'Physics',     accent:'#86efac', url:'quran-carbon-creation.html' },
+
+  { id:'wind-atmosphere', n:20, title:'Wind & Atmosphere',  ar:'الرِّيَاح وَالْغَلَاف الْجَوِّي',
+    hook:'100 km',  teaser:'A 7th-century text restricts wind to "between the sky and earth" — precisely where modern science drew the atmospheric boundary 1,400 years later.',
+    cat:'astronomy',catLabel:'Astronomy',   accent:'#2dd4bf', url:'quran-wind-atmosphere.html' },
+
+  { id:'prime-numbers', n:21, title:'Prime Numbers',        ar:'الأعداد الأولية',
+    hook:'5 primes', teaser:'Al-Fatiha\'s verse count, word count, and letter count are each prime. "Allah" appears 2,699 times (prime). The Quran\'s 326,159 total letters: also prime.',
+    cat:'numerics', catLabel:'Numerics',    accent:'#f472b6', url:'quran-prime-numbers.html' },
+
+  { id:'pulsar-navigation', n:22, title:'Pulsar Navigation',   ar:'الملاحة بالنجوم',
+    hook:'1,408 yrs', teaser:'The Quran says humans navigate by stars — dismissed as a mistake. NASA confirmed in 2018 that pulsars (a type of star) are the universe\'s GPS, accurate to ±5 km.',
+    cat:'astronomy', catLabel:'Astronomy',  accent:'#fb7185', url:'quran-pulsar-navigation.html' },
+
+  { id:'human-embryo', n:23, title:'Human Embryo',           ar:'الجنين البشري',
+    hook:'2 words', teaser:'Two Arabic words — "leech" and "chewed" — describe the embryo\'s microscopic appearance at days 23–24 and week 6. No microscope existed in 7th-century Arabia.',
+    cat:'biology',  catLabel:'Biology',     accent:'#fdba74', url:'quran-human-embryo.html' },
+
+  { id:'red-giant', n:24, title:'Sun Swallows Earth',       ar:'الشَّمْسُ تَبْتَلِعُ الْأَرْضَ',
+    hook:'200×', teaser:'The Quran says the sun and moon will be joined. Science confirms the sun will expand 200× and engulf both Earth and Moon in ~5 billion years.',
+    cat:'astronomy', catLabel:'Astronomy',  accent:'#e11d48', url:'quran-red-giant.html' },
+
+  { id:'wormholes', n:25, title:'Wormholes',               ar:'الْمَعَارِجُ',
+    hook:'50,000 yrs', teaser:'The Quran names Ma\'arej — ascending pathways angels use for long-distance travel. Einstein called the same mechanism "bridges in spacetime." The Quran gives a precise time-dilation ratio: 1 day inside = 50,000 years outside.',
+    cat:'physics',  catLabel:'Physics',     accent:'#67e8f9', url:'quran-wormholes.html' },
+
+  { id:'pulsars-blackholes', n:26, title:'Pulsars &amp; Black Holes', ar:'النَّجْمُ الثَّاقِبُ',
+    hook:'1 verse', teaser:'Quran 86:3 calls a star "the knocker" and "the hole-maker" in the same breath. Pulsars knock with radio pulses; neutron stars collapse into black holes. Both discoveries described 1,400 years before astronomers found them.',
+    cat:'astronomy', catLabel:'Astronomy',  accent:'#facc15', url:'quran-pulsars-blackholes.html' },
+
+  { id:'age-of-universe', n:27, title:'Age of Universe',       ar:'عُمْرُ الْكَوْنِ',
+    hook:'1/3', teaser:'The Quran says Earth existed for 2 out of 6 creation days (2/6 = ⅓). Cosmologists measure Earth at 4.6 billion years and the universe at 13.8 billion years — exactly one third. Same ratio, different clocks.',
+    cat:'cosmology', catLabel:'Cosmology',  accent:'#c4b5fd', url:'quran-age-of-universe.html' },
+
+  { id:'big-bang', n:28, title:'Big Bang',                     ar:'الانفجار العظيم',
+    hook:'3 facts', teaser:'One verse in the Quran (21:30) describes the singularity (ratq), the expansion (fatq — torn in opposite directions), and water-based life — three 20th-century discoveries in a single 7th-century sentence.',
+    cat:'cosmology', catLabel:'Cosmology',  accent:'#f9a8d4', url:'quran-big-bang.html' },
+];
+
+/* ── CATEGORY COLORS ─────────────────────────────── */
+var catStyles = {
+  biology:   { bg:'rgba(16,185,129,0.13)',  color:'#34d399' },
+  balance:   { bg:'rgba(167,139,250,0.13)', color:'#a78bfa' },
+  astronomy: { bg:'rgba(129,140,248,0.13)', color:'#818cf8' },
+  physics:   { bg:'rgba(251,191,36,0.13)',  color:'#fbbf24' },
+  numerics:  { bg:'rgba(56,189,248,0.13)',  color:'#38bdf8' },
+  cosmology: { bg:'rgba(124,58,237,0.13)',  color:'#8b5cf6' },
+};
+
+/* ── LOCALSTORAGE STATE ───────────────────────────── */
+var done  = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+var xp    = parseInt(localStorage.getItem('qn_xp')     || '0');
+var streak= parseInt(localStorage.getItem('qn_streak') || '0');
+
+/* ── BUILD CARDS ─────────────────────────────────── */
+var grid = document.getElementById('cardsGrid');
+lessons.forEach(function(l, i) {
+  var cs  = catStyles[l.cat] || catStyles.numerics;
+  var isDone = done.has(l.id);
+  var card = document.createElement('a');
+  card.href = l.url;
+  card.className = 'lcard' + (i === 0 ? ' start-here' : '');
+  card.dataset.cat = l.cat;
+  card.style.cssText = [
+    '--accent:' + l.accent,
+    '--accent-border:' + l.accent + '50',
+    '--shadow:' + l.accent + '18',
+  ].join(';');
+
+  card.innerHTML =
+    '<div class="card-row1">' +
+      '<span class="cat-pill" style="background:' + cs.bg + ';color:' + cs.color + '">' + l.catLabel + '</span>' +
+      '<div class="card-meta">' +
+        (i === 0 ? '<span class="start-badge">Start here</span>' : '') +
+        '<span class="lesson-num">Lesson ' + l.n + '</span>' +
+        '<div class="check-ring' + (isDone ? ' done' : '') + '">' +
+          (isDone ? '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="hook" style="color:' + l.accent + '">' + l.hook + '</div>' +
+    '<p class="teaser">' + l.teaser + '</p>' +
+    '<div class="card-title">' + l.title + '</div>' +
+    '<div class="card-ar">' + l.ar + '</div>' +
+    '<div class="card-footer">' +
+      '<span class="card-time">~5 min · +30 XP</span>' +
+      '<span class="card-go" style="color:' + l.accent + '">' +
+        (isDone ? 'Review' : 'Begin') +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+      '</span>' +
+    '</div>';
+
+  grid.appendChild(card);
+});
+
+/* ── STAGGER ENTRANCE ────────────────────────────── */
+(function() {
+  var cards = document.querySelectorAll('.lcard');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        var i = Array.from(cards).indexOf(e.target);
+        setTimeout(function() { e.target.classList.add('visible'); }, i * 42);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+  cards.forEach(function(c) { observer.observe(c); });
+})();
+
+/* ── FILTER ──────────────────────────────────────── */
+document.getElementById('filterRow').addEventListener('click', function(e) {
+  var tab = e.target.closest('.ftab');
+  if (!tab) return;
+  document.querySelectorAll('.ftab').forEach(function(t) { t.classList.remove('active'); });
+  tab.classList.add('active');
+  var cat = tab.dataset.cat;
+  var cards = document.querySelectorAll('.lcard');
+  var visible = 0;
+  cards.forEach(function(c) {
+    var show = cat === 'all' || c.dataset.cat === cat;
+    if (!show) {
+      c.style.transition = 'opacity .15s ease';
+      c.style.opacity = '0';
+      setTimeout(function() { c.style.display = 'none'; }, 150);
+    } else {
+      c.style.display = '';
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(10px)';
+      c.style.transition = 'none';
+      var delay = 50 + visible * 38;
+      (function(card, d) {
+        setTimeout(function() {
+          card.style.transition = 'opacity .35s ease, transform .35s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, d);
+      })(c, delay);
+      visible++;
+    }
+  });
+});
+
+/* ── STATS ANIMATION ─────────────────────────────── */
+function countUp(el, target, ms) {
+  if (target === 0) { el.textContent = '0'; return; }
+  var start = null;
+  var ease = function(t) { return 1 - Math.pow(1 - t, 3); };
+  (function run(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / ms, 1);
+    el.textContent = Math.round(ease(p) * target).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+  })(0);
+  requestAnimationFrame(function(ts) {
+    start = ts;
+    (function run(ts) {
+      var p = Math.min((ts - start) / ms, 1);
+      el.textContent = Math.round(ease(p) * target).toLocaleString();
+      if (p < 1) requestAnimationFrame(run);
+    })(ts);
+  });
+}
+
+document.getElementById('streakN').textContent = streak;
+document.getElementById('xpN').textContent = xp.toLocaleString();
+
+setTimeout(function() {
+  countUp(document.getElementById('completedN'), done.size, 900);
+  countUp(document.getElementById('xpTotal'), xp, 1200);
+  document.getElementById('progressFill').style.width = (done.size / 19 * 100).toFixed(1) + '%';
+}, 300);
+
+/* ── HERO CANVAS — Islamic Geometric Constellation ─ */
+(function() {
+  var c = document.getElementById('bgCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var t = 0;
+  var W, H, cx, cy, starR;
+  var outerPts = [], innerPts = [], bgPts = [];
+
+  function setSize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = c.offsetWidth; H = c.offsetHeight;
+    c.width  = W * dpr;
+    c.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W * 0.5; cy = H * 0.5;
+    starR = Math.min(W, H) * 0.28;
+    buildPts();
+  }
+
+  function buildPts() {
+    outerPts = []; innerPts = []; bgPts = [];
+    // 12 outer + 12 inner = 24-point Islamic star
+    for (var i = 0; i < 12; i++) {
+      var a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+      outerPts.push({ a: a, r: starR,        ph: i * 0.52, x: 0, y: 0 });
+      innerPts.push({ a: a + Math.PI / 12, r: starR * 0.38, ph: i * 0.52 + 0.26, x: 0, y: 0 });
+    }
+    // Background constellation nodes (golden ratio scatter)
+    var count = Math.min(48, Math.floor(W * H / 9500));
+    for (var j = 0; j < count; j++) {
+      bgPts.push({
+        x: ((j * 137.508) % (W - 40)) + 20,
+        y: ((j * 89.3)    % (H - 30)) + 15,
+        ph: j * 0.41, sz: 0.5 + (j % 3) * 0.25
+      });
+    }
+  }
+
+  setSize();
+  window.addEventListener('resize', function() { setSize(); });
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background gradient
+    var bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#03070d');
+    bg.addColorStop(0.5, '#05090f');
+    bg.addColorStop(1, '#03070d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    var rot = t * 0.00038;
+
+    // Update star positions
+    outerPts.forEach(function(p) {
+      p.x = cx + Math.cos(p.a + rot) * p.r;
+      p.y = cy + Math.sin(p.a + rot) * p.r;
+    });
+    innerPts.forEach(function(p) {
+      p.x = cx + Math.cos(p.a + rot) * p.r;
+      p.y = cy + Math.sin(p.a + rot) * p.r;
+    });
+
+    // Interleave outer/inner for star outline
+    var allStar = [];
+    for (var i = 0; i < 12; i++) {
+      allStar.push(outerPts[i]);
+      allStar.push(innerPts[i]);
+    }
+
+    // Star outline path
+    var starA = 0.13 + Math.sin(t * 0.55) * 0.04;
+    ctx.beginPath();
+    allStar.forEach(function(p, i) {
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(245,158,11,' + starA + ')';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    // Star internal chords (outer-to-outer, skip 3 — creates internal star)
+    for (var i = 0; i < outerPts.length; i++) {
+      var j = (i + 4) % outerPts.length;
+      var ca = (0.06 + Math.sin(t * 0.35 + i * 0.5) * 0.025);
+      ctx.beginPath();
+      ctx.moveTo(outerPts[i].x, outerPts[i].y);
+      ctx.lineTo(outerPts[j].x, outerPts[j].y);
+      ctx.strokeStyle = 'rgba(245,158,11,' + ca + ')';
+      ctx.lineWidth = 0.55;
+      ctx.stroke();
+    }
+
+    // Outer nodes with glow
+    outerPts.forEach(function(p, i) {
+      var pulse = 0.45 + Math.sin(t * 1.1 + p.ph) * 0.35;
+      var r = 1.6 + pulse * 1.1;
+      var a = 0.4 + pulse * 0.3;
+      // Glow halo
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245,158,11,' + (a * 0.07) + ')';
+      ctx.fill();
+      // Core
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245,158,11,' + a + ')';
+      ctx.fill();
+    });
+    // Inner nodes (subtle)
+    innerPts.forEach(function(p) {
+      var pulse = 0.3 + Math.sin(t * 0.9 + p.ph) * 0.2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 0.7 + pulse * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245,158,11,' + (0.18 + pulse * 0.12) + ')';
+      ctx.fill();
+    });
+    // Center glow
+    var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, starR * 0.22);
+    cg.addColorStop(0, 'rgba(245,158,11,0.06)');
+    cg.addColorStop(1, 'transparent');
+    ctx.fillStyle = cg;
+    ctx.fillRect(cx - starR, cy - starR, starR * 2, starR * 2);
+
+    // Background constellation lines
+    for (var i = 0; i < bgPts.length; i++) {
+      for (var j = i + 1; j < bgPts.length; j++) {
+        var dx = bgPts[i].x - bgPts[j].x;
+        var dy = bgPts[i].y - bgPts[j].y;
+        var d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 78) {
+          var la = (0.025 + Math.sin(t * 0.28 + i * 0.19) * 0.01) * (1 - d / 78);
+          ctx.beginPath();
+          ctx.moveTo(bgPts[i].x, bgPts[i].y);
+          ctx.lineTo(bgPts[j].x, bgPts[j].y);
+          ctx.strokeStyle = 'rgba(147,197,253,' + la + ')';
+          ctx.lineWidth = 0.35;
+          ctx.stroke();
+        }
+      }
+    }
+    // Bg nodes
+    bgPts.forEach(function(p) {
+      var pulse = 0.3 + Math.sin(t * 0.8 + p.ph) * 0.25;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.sz * (0.8 + pulse * 0.4), 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(147,197,253,' + (0.1 + pulse * 0.08) + ')';
+      ctx.fill();
+    });
+
+    // Radial vignette for text readability
+    var vig = ctx.createRadialGradient(cx, cy * 0.9, H * 0.08, cx, cy * 0.9, H * 0.9);
+    vig.addColorStop(0, 'rgba(11,22,34,0.08)');
+    vig.addColorStop(0.55, 'rgba(8,17,28,0.42)');
+    vig.addColorStop(1, 'rgba(5,10,18,0.88)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    t += 1;
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+})();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+/* ═══════════════════════════════════════════════════════════════
+   Quranic Numerics — Shared Theme System
+   Load order: <link href="theme.css"> BEFORE the page's <style>
+   Selector html[data-theme="light"] has specificity (0,1,1) which
+   beats per-page :root {} (0,1,0) — so overrides win regardless
+   of source order.
+═══════════════════════════════════════════════════════════════ */
+
+/* Browser chrome (scrollbars, inputs) respects the color scheme */
+html                     { color-scheme: dark; }
+html[data-theme="dark"]  { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+
+/* ── LIGHT THEME TOKEN OVERRIDES ─────────────────────────────────
+   Only tokens that change in light mode are listed.
+   Per-page --accent / --accent-dim stay as-is; only --accent-light
+   and --accent-ring are overridden below.
+──────────────────────────────────────────────────────────────── */
+html[data-theme="light"] {
+  /* Warm parchment — manuscript / Islamic book feel */
+  --bg:           #f5f1ea;
+  --surface:      #ffffff;
+  --surface2:     #ece8e0;
+  --border:       rgba(26,36,51,0.12);
+  --text:         #1c2b3a;
+  --muted:        #5e6e7e;
+
+  /* Gold: deep amber — WCAG AA on parchment */
+  --gold:         #b45309;
+  --gold-light:   #92400e;
+  --gold-lt:      #92400e;   /* index page alias */
+
+  /* OK / error palettes — swap to light variants */
+  --ok:           #15803d;
+  --ok-bg:        #f0fdf4;
+  --ok-border:    #86efac;
+  --err-light:    #dc2626;
+  --err-bg:       #fef2f2;
+  --err-border:   #fca5a5;
+
+  /* Accent variants: darken per-page accent for light bg readability.
+     color-mix(in oklch) gives perceptually uniform darkening across
+     any hue — even pastels like #c7d2fe become readable on parchment. */
+  --accent-light: color-mix(in oklch, var(--accent) 62%, black 38%);
+  --accent-ring:  color-mix(in oklch, var(--accent) 45%, white 55%);
+}
+
+
+/* ── COMPONENT FIXES ─────────────────────────────────────────────
+   Hardcoded rgba(255,255,255,...) values that break on light bg.
+──────────────────────────────────────────────────────────────── */
+
+/* Answer cards: hardcoded white border → use semantic token */
+html[data-theme="light"] .answer-card {
+  border-color: var(--border);
+  border-bottom-color: rgba(26,36,51,0.16);
+}
+
+/* Feedback panel sub-text: was rgba(255,255,255,0.6) → dark */
+html[data-theme="light"] .fb-sub {
+  color: rgba(0,0,0,0.55);
+}
+
+/* Big display numbers: remove yellow glow */
+html[data-theme="light"] .cr-num,
+html[data-theme="light"] .match-num,
+html[data-theme="light"] .stat-n {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+html[data-theme="light"] .calc-result-num.lit {
+  text-shadow: 0 2px 8px rgba(146,64,14,0.2);
+}
+
+/* Lesson heroCanvas: add subtle shadow on light bg */
+html[data-theme="light"] #heroCanvas {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+}
+
+/* Gold box: the .gt headline uses hardcoded #fcd34d which is invisible on parchment */
+html[data-theme="light"] .gold-box {
+  background: linear-gradient(135deg, rgba(180,83,9,0.08) 0%, rgba(180,83,9,0.03) 100%);
+  border-color: rgba(180,83,9,0.28);
+}
+html[data-theme="light"] .gold-box .gt { color: #7c2d12; }
+html[data-theme="light"] .gold-box .gs { color: var(--muted); }
+
+/* ── Index page hero — light mode ──────────────────────────────
+   The canvas draws a permanent dark sky. In light mode the
+   .hero-overlay fades it out downward into parchment so the
+   hero section blends into the page rather than staying a
+   dark island.  Text switches to dark colors on the parchment.
+──────────────────────────────────────────────────────────────── */
+html[data-theme="light"] .hero-overlay {
+  background: linear-gradient(180deg,
+    rgba(245,241,234,0.05) 0%,
+    rgba(245,241,234,0.62) 42%,
+    rgba(245,241,234,0.96) 72%,
+    rgba(245,241,234,1)    100%
+  );
+}
+html[data-theme="light"] .hero-hl {
+  color: #1c2b3a;
+  text-shadow: none;
+}
+html[data-theme="light"] .hero-sub     { color: var(--muted); }
+html[data-theme="light"] .hero-eyebrow { color: var(--gold); }
+html[data-theme="light"] .hero-cta     { box-shadow: 0 4px 28px rgba(180,83,9,0.28); }
+
+/* Index hook numbers and card-go arrows: override inline colors
+   set by JS — see index.html CSS for the .hook + .card-go rules */
+html[data-theme="light"] .hook {
+  color: color-mix(in oklch, var(--accent) 62%, black 38%) !important;
+  text-shadow: none !important;
+}
+html[data-theme="light"] .lcard:hover .hook {
+  text-shadow: 0 0 18px color-mix(in oklch, var(--accent) 40%, transparent) !important;
+}
+html[data-theme="light"] .card-go {
+  color: color-mix(in oklch, var(--accent) 62%, black 38%) !important;
+}
+
+
+/* ── THEME TRANSITION ─────────────────────────────────────────────
+   Added by theme.js briefly on toggle. NOT on initial load (avoids
+   flash of transition).  Fallback when View Transitions API absent.
+──────────────────────────────────────────────────────────────── */
+html.theme-fx,
+html.theme-fx * {
+  transition:
+    background-color 0.28s ease,
+    color            0.20s ease,
+    border-color     0.22s ease,
+    box-shadow       0.22s ease !important;
+}
+
+/* View Transitions API: radial reveal expanding from click origin.
+   --vt-x / --vt-y are set by theme.js before the transition fires. */
+::view-transition-old(root) {
+  animation: 180ms ease-out both qn-vt-out;
+}
+::view-transition-new(root) {
+  animation: 360ms ease-out both qn-vt-in;
+}
+@keyframes qn-vt-out {
+  to { opacity: 0; }
+}
+@keyframes qn-vt-in {
+  from { clip-path: circle(0%   at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  to   { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+}
+
+
+/* ── THEME TOGGLE WIDGET ─────────────────────────────────────────
+   Three-option pill: dark / system / light.
+   Fixed on lesson pages; static in the index header.
+──────────────────────────────────────────────────────────────── */
+.theme-toggle {
+  display:     inline-flex;
+  align-items: center;
+  gap:         2px;
+  padding:     3px;
+  background:  var(--surface);
+  border:      1px solid var(--border);
+  border-radius: 100px;
+  box-shadow:  0 2px 16px rgba(0,0,0,0.22);
+  /* Fixed position for standalone lesson pages */
+  position: fixed;
+  top:      12px;
+  right:    16px;
+  z-index:  500;
+}
+
+/* On the index page (body.page-index), toggle is inside the header */
+body.page-index .theme-toggle {
+  position:   static;
+  box-shadow: none;
+}
+
+.tt-btn {
+  width:         28px;
+  height:        28px;
+  border-radius: 100px;
+  border:        none;
+  background:    transparent;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  color:       var(--muted);
+  padding:     0;
+  transition:  background 0.18s ease, color 0.16s ease, transform 0.14s ease;
+}
+
+.tt-btn:hover:not(.active) {
+  background: var(--surface2);
+  color:      var(--text);
+}
+.tt-btn:active {
+  transform: scale(0.86);
+}
+.tt-btn.active {
+  background: var(--gold);
+  color:      #fff;
+}
+html[data-theme="light"] .tt-btn.active {
+  color: #1a0c00;
+}
+
+
+/* ── FIXED HOME BUTTON (lesson pages only) ───────────────────────
+   Persistent top-left link back to the lesson index.
+   Mirrors the theme toggle pill on the opposite corner.
+   Hidden on the index page (body.page-index has its own nav).
+──────────────────────────────────────────────────────────────── */
+.nav-home-fixed {
+  position: fixed;
+  top:  12px;
+  left: 16px;
+  z-index: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+  transition: color .18s, background .18s, border-color .18s;
+}
+.nav-home-fixed:hover {
+  color: var(--text);
+  background: var(--surface2);
+  border-color: rgba(255,255,255,0.16);
+}
+html[data-theme="light"] .nav-home-fixed:hover {
+  border-color: rgba(26,36,51,0.22);
+}
+body.page-index .nav-home-fixed { display: none; }

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Pulsar Navigation · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #fb7185;
+      --accent-light: #fda4af;
+      --accent-dim:   rgba(251,113,133,0.12);
+      --accent-ring:  rgba(251,113,133,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Typography ── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Intro verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(20px, 4.5vw, 28px); line-height: 2.2; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Skeptic vs discovery card ── */
+    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 24px 0; }
+    @media (max-width: 480px) { .compare-row { grid-template-columns: 1fr; } }
+    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .cc-label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+    .cc-label.bad  { color: var(--err-light); }
+    .cc-label.good { color: var(--ok); }
+    .cc-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── S2: Two-path explorer ── */
+    .path-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .path-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .path-btn.used { opacity: .5; pointer-events: none; }
+    .path-btn .pb-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .path-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; display: none; animation: rise .35s ease; }
+    .path-result.show { display: block; }
+    .pr-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 10px; font-weight: 600; }
+    .pr-stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .pr-stat { background: var(--surface2); border-radius: 8px; padding: 10px 14px; text-align: center; flex: 1; min-width: 100px; }
+    .pr-stat-n { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--accent-light); }
+    .pr-stat-l { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+    .pr-text { font-size: 14px; color: var(--muted); line-height: 1.75; }
+    .pr-text strong { color: var(--text); }
+    .conv-panel { background: linear-gradient(135deg, rgba(251,113,133,0.08) 0%, rgba(251,113,133,0.03) 100%); border: 1px solid rgba(251,113,133,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 8px; font-weight: 600; }
+    .conv-year { font-family: 'Playfair Display', serif; font-size: clamp(36px, 8vw, 54px); font-weight: 700; color: var(--accent-light); display: block; text-shadow: 0 0 40px rgba(251,113,133,0.4); }
+    .conv-sub { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-prime-numbers.html" class="nav-back">&larr; Prime Numbers</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Pulsar Navigation</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Navigation &amp; Astronomy</p>
+    <h1 class="hero-title">The Quran says humans navigate by stars. Scientists recently discovered exactly which type of star makes that possible.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 16:16 — Surah An-Nahl &middot; The Bee</div>
+      <div class="iv-ar">
+        وَعَلَامَاتٍ ۚ <span class="hl">وَبِالنَّجْمِ هُمْ يَهْتَدُونَ</span>
+      </div>
+      <div class="iv-tr">
+        "And landmarks. And <span class="hl">by the star they guide themselves.</span>"
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="compare-card">
+        <div class="cc-label" style="color:var(--muted)">Ordinary stars</div>
+        <div class="cc-text">Drift slowly across the sky over thousands of years. Emit no regular signal. Useful for rough direction, but not precise enough to calculate an exact location.</div>
+      </div>
+      <div class="compare-card">
+        <div class="cc-label good">Pulsars</div>
+        <div class="cc-text">A type of star that spins up to 700 times per second, emitting X-ray pulses as regular as an atomic clock. NASA confirmed in 2018 that these pulses can navigate spacecraft to ±5 km.</div>
+      </div>
+    </div>
+
+    <p class="body-text">Pulsars are rapidly spinning neutron stars — the collapsed cores of dead massive stars. They rotate hundreds of times per second and beam X-ray pulses with the precision of an atomic clock. These signals travel across the galaxy and can pinpoint a spacecraft's location without any satellite infrastructure. The Quran said "by the star they guide themselves." The word نَّجْمِ (najm) means a star. Pulsars are stars.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#1a0007">Begin the lesson &rarr;</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3</p>
+    <p class="prompt">Ordinary stars drift slowly across the sky over thousands of years. What specific property makes pulsars different — and capable of precise navigation?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Pulsars are much closer to Earth</div>
+        <div class="ac-sub">Their proximity keeps their position appearing fixed in the sky</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Pulsars spin hundreds of times per second and emit ultra-precise timing signals</div>
+        <div class="ac-sub">Like a natural atomic clock — the signal timing reveals exact position anywhere in space</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Pulsars always align with Earth's North Pole</div>
+        <div class="ac-sub">This gives them a fixed direction that never changes</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 — Two-path explorer ── -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3</p>
+    <p class="prompt">Compare regular stars with pulsars — then see why only one can guide navigation.</p>
+
+    <button class="path-btn" id="btnA" onclick="revealPath('a')">
+      <div class="pb-icon" style="background:rgba(148,163,184,0.12);color:#94a3b8">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">Ordinary stars for navigation</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">What happens when you try to navigate by a typical star?</div>
+      </div>
+    </button>
+
+    <div class="path-result" id="resultA">
+      <div class="pr-label">Ordinary stars — the problem</div>
+      <div class="pr-stat-row">
+        <div class="pr-stat">
+          <div class="pr-stat-n" style="color:#94a3b8">~0.01°</div>
+          <div class="pr-stat-l">apparent drift / year</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat-n" style="color:#94a3b8">Variable</div>
+          <div class="pr-stat-l">brightness &amp; position</div>
+        </div>
+      </div>
+      <div class="pr-text">Stars appear to drift slowly due to Earth's <strong>precession</strong> — the wobble of Earth's axis over 26,000 years. They also vary in brightness, move relative to each other, and emit no regular timing signal. You can estimate a rough compass direction from them, but you <strong>cannot calculate an exact location</strong> the way GPS does.</div>
+    </div>
+
+    <button class="path-btn" id="btnB" onclick="revealPath('b')">
+      <div class="pb-icon" style="background:var(--accent-dim);color:var(--accent-light)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">Pulsars for navigation</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">What makes a pulsar different from an ordinary star?</div>
+      </div>
+    </button>
+
+    <div class="path-result" id="resultB">
+      <div class="pr-label">Pulsars — the cosmic GPS</div>
+      <div class="pr-stat-row">
+        <div class="pr-stat">
+          <div class="pr-stat-n">700×/s</div>
+          <div class="pr-stat-l">rotations per second</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat-n">±5 km</div>
+          <div class="pr-stat-l">navigation accuracy</div>
+        </div>
+      </div>
+      <div class="pr-text">A pulsar is a <strong>neutron star</strong> — the dense remnant of a collapsed giant star — spinning hundreds of times per second. Its rotating magnetic field sweeps two beams of X-ray radiation through space like a lighthouse. The pulse timing is so precise it rivals atomic clocks. A spacecraft compares received pulses against a database to calculate <strong>exact position anywhere in deep space</strong>.</div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-lbl">First experimental demonstration of pulsar navigation</div>
+      <span class="conv-year" id="convYear">0</span>
+      <div class="conv-sub">NASA's NICER instrument on the International Space Station confirmed XNAV — <strong style="color:var(--accent-light)">pulsar-based navigation works</strong>, accurate to ±5 km, with no satellite infrastructure required.</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <p class="prompt">How does XNAV (pulsar-based navigation) determine a spacecraft's exact position?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">It measures the brightness of pulsars</div>
+        <div class="ac-sub">Brighter = closer, so distance can be estimated</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">It compares the timing of pulsar signals against a known database</div>
+        <div class="ac-sub">Like GPS uses satellites, XNAV uses pulsar pulse timing to calculate exact 3D position</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">It uses the direction pulsars are pointing</div>
+        <div class="ac-sub">Pulsars rotate, so they point in different directions and map out a grid</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The Quran said stars guide navigation. Science said that was impossible. Then science discovered pulsars.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num" id="mv0" style="color:var(--accent-light);text-shadow:0 0 40px rgba(251,113,133,0.4)">0</div>
+        <div class="match-lbl">years before XNAV</div>
+      </div>
+      <div class="match-sep">&rarr;</div>
+      <div class="match-block">
+        <div class="match-num" id="mv1" style="color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.4);font-size:clamp(36px,8vw,54px)">0</div>
+        <div class="match-lbl">year confirmed by NASA</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Fact</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td>Quran 16:16 written</td>
+          <td class="td-v">~610 CE</td>
+        </tr>
+        <tr>
+          <td>Pulsars discovered</td>
+          <td class="td-v">1967</td>
+        </tr>
+        <tr>
+          <td>Pulsars identified as neutron stars</td>
+          <td class="td-v">1968</td>
+        </tr>
+        <tr>
+          <td>XNAV concept proposed</td>
+          <td class="td-v">1981</td>
+        </tr>
+        <tr class="hl">
+          <td>XNAV experimentally confirmed (NASA NICER)</td>
+          <td class="td-v">2018</td>
+        </tr>
+        <tr class="hl">
+          <td>Gap between Quran and confirmation</td>
+          <td class="td-v">~1,408 years</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why pulsars solve the "moving stars" objection:</strong> The skeptic was thinking of ordinary stars, whose slow drift makes precise navigation impossible. But pulsars are a specific class of star — neutron stars — whose rotation is so stable they function as natural atomic clocks. The Quran used the word نَّجْمِ (najm, "star") — and pulsars are, by definition, stars.
+    </div>
+
+    <div class="insight-box">
+      <strong>Why pulsars matter for the future:</strong> GPS satellites can be jammed, hacked, or destroyed in conflict. Pulsars cannot. They are free, permanent, and unreachable. XNAV works anywhere in deep space — including regions no satellite signal reaches. Scientists call it the GPS of the universe.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"By the star they guide themselves." Written in the 7th century. Dismissed as a mistake by skeptics. Confirmed as scientifically precise by NASA in 2018.</div>
+      <div class="gs">No 7th-century human knew that stars could be classified into types — let alone that one type would spin 700 times per second and emit signals precise enough to navigate by. The claim was either an extraordinary guess, or something else entirely.</div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+      <a href="quran-prime-numbers.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Prime Numbers</a>
+      <a href="quran-human-embryo.html" class="btn" style="background:var(--accent);color:#1a0007">Next &middot; Human Embryo &rarr;</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Pulsar Navigation',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('pulsar-navigation');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1408, 1600, null);
+        animFrom(document.getElementById('mv1'), 0, 2018, 2000, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* Stage 1 */
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Correct — the timing precision is the key. A pulsar\'s rotation rate is so stable it rivals atomic clocks, making its signals usable as a cosmic positioning system.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* Stage 2 — two-path explorer */
+var doneA = false, doneB = false;
+
+function revealPath(which) {
+  if (which === 'a' && !doneA) {
+    doneA = true;
+    document.getElementById('resultA').classList.add('show');
+    document.getElementById('btnA').classList.add('used');
+    checkBothPaths();
+  }
+  if (which === 'b' && !doneB) {
+    doneB = true;
+    document.getElementById('resultB').classList.add('show');
+    document.getElementById('btnB').classList.add('used');
+    checkBothPaths();
+  }
+}
+
+function checkBothPaths() {
+  if (!doneA || !doneB) return;
+  var panel = document.getElementById('convPanel');
+  panel.classList.add('show');
+  animFrom(document.getElementById('convYear'), 2010, 2018, 1200, function() {
+    setTimeout(function() {
+      showOk('NASA\'s 2018 XNAV demonstration proved that pulsar timing signals can navigate spacecraft to within ±5 km — no satellites needed.', function() { go(3); });
+    }, 500);
+  });
+}
+
+/* Stage 3 */
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('XNAV works exactly like GPS: compare received signals (pulsar pulses instead of satellite signals) against a database to calculate position mathematically.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero Canvas: rotating pulsar with sweeping beams ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W * 0.5, cy = H * 0.5;
+
+  /* Faint background star field */
+  const stars = [];
+  for (let i = 0; i < 80; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.1,
+      a: 0.2 + Math.random() * 0.4
+    });
+  }
+
+  /* Pulse rings that expand from the pulsar */
+  const rings = [];
+  let ringTimer = 0;
+
+  let angle = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Stars */
+    stars.forEach(function(s) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(226,221,212,${s.a})`;
+      ctx.fill();
+    });
+
+    /* Expanding pulse rings */
+    ringTimer++;
+    if (ringTimer >= 28) {
+      ringTimer = 0;
+      rings.push({ r: 0, alpha: 0.5 });
+    }
+    for (let i = rings.length - 1; i >= 0; i--) {
+      rings[i].r += 1.8;
+      rings[i].alpha -= 0.013;
+      if (rings[i].alpha <= 0) { rings.splice(i, 1); continue; }
+      ctx.beginPath();
+      ctx.arc(cx, cy, rings[i].r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(253,164,175,${rings[i].alpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    /* Two sweeping beams (opposite directions) */
+    const beamLen = Math.max(W, H) * 0.95;
+    [0, Math.PI].forEach(function(offset) {
+      const bAngle = angle + offset;
+      const dx = Math.cos(bAngle);
+      const dy = Math.sin(bAngle);
+
+      const grad = ctx.createLinearGradient(cx, cy, cx + dx * beamLen, cy + dy * beamLen);
+      grad.addColorStop(0, 'rgba(251,113,133,0.55)');
+      grad.addColorStop(0.25, 'rgba(251,113,133,0.18)');
+      grad.addColorStop(1, 'rgba(251,113,133,0)');
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(bAngle);
+
+      /* Cone shape */
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(beamLen, -beamLen * 0.09);
+      ctx.lineTo(beamLen,  beamLen * 0.09);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+    });
+
+    /* Pulsar core */
+    const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 18);
+    coreGlow.addColorStop(0, 'rgba(255,255,255,0.95)');
+    coreGlow.addColorStop(0.3, 'rgba(253,164,175,0.7)');
+    coreGlow.addColorStop(1, 'rgba(251,113,133,0)');
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+    ctx.fillStyle = coreGlow;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    angle += 0.035;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

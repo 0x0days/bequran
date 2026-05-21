@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Hell &amp; Paradise · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #0b1622;
+      --surface:     #111e2e;
+      --surface2:    #182840;
+      --border:      rgba(255,255,255,0.08);
+      --text:        #e2ddd4;
+      --muted:       #7a8fa3;
+      --hell:        #dc2626;
+      --hell-light:  #f87171;
+      --hell-dim:    rgba(220,38,38,0.10);
+      --hell-ring:   rgba(248,113,113,0.22);
+      --para:        #059669;
+      --para-light:  #34d399;
+      --para-dim:    rgba(5,150,105,0.10);
+      --para-ring:   rgba(52,211,153,0.22);
+      --gold:        #f59e0b;
+      --gold-light:  #fcd34d;
+      --gold-dim:    rgba(245,158,11,0.08);
+      --gold-ring:   rgba(245,158,11,0.22);
+      --ok:          #22c55e;
+      --ok-bg:       #052e16;
+      --ok-border:   #166534;
+      --err-light:   #f87171;
+      --err-bg:      #2d0707;
+      --err-border:  #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    /* Answer cards */
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 18px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    /* Gates intro */
+    .gates-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .gate-group { text-align: center; }
+    .gate-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; font-weight: 500; }
+    .gate-label.hell-lbl { color: var(--hell-light); }
+    .gate-label.para-lbl { color: var(--para-light); }
+    .gate-arches { display: flex; gap: 5px; justify-content: center; align-items: flex-end; margin-bottom: 14px; }
+    .arch { width: 18px; height: 52px; border-radius: 9px 9px 0 0; border-width: 2px; border-style: solid; border-bottom: none; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s; }
+    .arch.hell-arch { border-color: var(--hell-light); background: var(--hell-dim); box-shadow: 0 0 10px var(--hell-dim); }
+    .arch.para-arch { border-color: var(--para-light); background: var(--para-dim); box-shadow: 0 0 10px var(--para-dim); }
+    .arch.visible { opacity: 1; transform: none; }
+    .gate-big { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .gate-big.hell-n { color: var(--hell-light); text-shadow: 0 0 28px rgba(220,38,38,0.3); }
+    .gate-big.para-n { color: var(--para-light); text-shadow: 0 0 28px rgba(5,150,105,0.3); }
+    .gate-lbl { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .gate-src { font-size: 11px; color: var(--muted); background: var(--surface); border-radius: 8px; padding: 8px 10px; line-height: 1.55; font-style: italic; }
+
+    .verse-strip { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--hell-light); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; }
+    .vs-ref { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--hell-light); margin-bottom: 10px; }
+    .vs-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(17px, 2.8vw, 21px); line-height: 2.2; color: var(--text); margin-bottom: 10px; }
+    .vs-tr { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; }
+
+    /* Stage 2 — dual counter */
+    .count-duel { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .cd-side { text-align: center; }
+    .cd-arabic { font-family: 'Amiri', serif; font-size: 40px; direction: rtl; margin-bottom: 6px; line-height: 1.2; }
+    .cd-arabic.hell-a { color: var(--hell-light); }
+    .cd-arabic.para-a { color: var(--para-light); }
+    .cd-roman { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+    .cd-num { font-family: 'Playfair Display', serif; font-size: clamp(64px, 12vw, 88px); font-weight: 700; line-height: 1; }
+    .cd-num.hell-n { color: var(--hell-light); }
+    .cd-num.para-n { color: var(--para-light); }
+    .cd-sub { font-size: 11px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: .05em; }
+    .cd-sep { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--muted); text-align: center; }
+
+    .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--gold); color: #1a0e00; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .calc-btn.used { opacity: 0.5; pointer-events: none; }
+
+    /* Digit lock cards */
+    .digit-lock { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .dl-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; text-align: center; opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+    .dl-card.show { opacity: 1; transform: none; }
+    .dl-card.hell-card { border-top: 3px solid var(--hell-light); }
+    .dl-card.para-card { border-top: 3px solid var(--para-light); }
+    .dl-top { padding: 18px 14px 14px; }
+    .dl-gates-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .dl-gate-num { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+    .dl-gate-num.h { color: var(--hell-light); }
+    .dl-gate-num.p { color: var(--para-light); }
+    .dl-gate-src { font-size: 11px; color: var(--muted); }
+    .dl-arrow { padding: 6px; color: var(--muted); font-size: 20px; }
+    .dl-bottom { padding: 14px; background: rgba(255,255,255,0.02); border-top: 1px solid var(--border); }
+    .dl-word-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .dl-word-num { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; line-height: 1; }
+    .dl-count-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* Digit underline highlight */
+    .dh { position: relative; display: inline-block; }
+    .dh::after { content: ''; position: absolute; bottom: 4px; left: 0; right: 0; height: 3px; border-radius: 2px; }
+    .dh-hell::after { background: var(--hell-light); }
+    .dh-para::after { background: var(--para-light); }
+
+    /* Mercy bar chart */
+    .mercy-bars { display: flex; align-items: flex-end; gap: 20px; justify-content: center; margin: 4px 0 24px; }
+    .mb-col { text-align: center; }
+    .mb-bar { width: 90px; border-radius: 6px 6px 0 0; margin: 0 auto 10px; transition: height 1.2s cubic-bezier(.22,1,.36,1); }
+    .mb-bar.hell-bar { background: linear-gradient(180deg, var(--hell-light), var(--hell)); height: 0; }
+    .mb-bar.para-bar { background: linear-gradient(180deg, var(--para-light), var(--para)); height: 0; }
+    .mb-num { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; }
+    .mb-num.h { color: var(--hell-light); }
+    .mb-num.p { color: var(--para-light); }
+    .mb-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .mb-vs { font-size: 24px; color: var(--muted); padding-bottom: 52px; font-family: 'Playfair Display', serif; }
+
+    /* One-more badge */
+    .one-more { display: flex; align-items: center; gap: 16px; background: var(--para-dim); border: 1px solid var(--para-ring); border-radius: 14px; padding: 18px 22px; margin-bottom: 20px; }
+    .om-num { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--para-light); line-height: 1; flex-shrink: 0; }
+    .om-lbl { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    .om-lbl strong { color: var(--text); }
+
+    /* Insight/confirm box */
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--gold); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+    .insight-box strong { color: var(--text); }
+    .insight-box em { font-style: normal; color: var(--gold-light); }
+
+    /* Methodology cards */
+    .meth-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .meth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; opacity: 0; transform: translateX(-8px); transition: opacity .45s ease, transform .45s ease; }
+    .meth-card.show { opacity: 1; transform: none; }
+    .meth-card.included { border-left: 3px solid var(--para-light); }
+    .meth-card.excluded { border-left: 3px solid rgba(255,255,255,0.1); opacity: 0 !important; }
+    .meth-card.excluded.show { opacity: 0.45 !important; }
+    .mc-ar { font-family: 'Amiri', serif; font-size: 17px; direction: rtl; }
+    .mc-en { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .mc-yes { font-size: 13px; font-weight: 600; color: var(--para-light); white-space: nowrap; }
+    .mc-no  { font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+    /* Prob block */
+    .prob-block { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+    .prob-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+    .prob-row:last-of-type { border-bottom: none; }
+    .pr-l { color: var(--muted); }
+    .pr-r { color: var(--text); font-weight: 500; }
+    .pr-r.hl { color: var(--gold-light); }
+    .prob-footer { padding: 16px 18px; background: var(--gold-dim); border-top: 1px solid var(--gold-ring); }
+    .prob-footer .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .prob-footer .val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--gold-light); }
+
+    /* Gold box */
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    /* XP badge */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    /* Feedback panel */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  All lessons
+<\/a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-adam-jesus.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Pattern 5 · Adam &amp; Jesus
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · Hell &amp; Paradise</div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 0 · THE GATES
+  ══════════════════════════════════════ -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--gold-light)">Pattern 6 · Hell &amp; Paradise</div>
+    <h1 class="hero-title">Hell has <span style="color:var(--hell-light)">7 gates.</span> Paradise has <span style="color:var(--para-light)">8 gates.</span> Count how many times each word appears in the Quran — and the gate numbers appear inside the counts.</h1>
+    <p class="body-text">The gate counts are not a researcher's observation. They are stated directly in scripture. The word frequency encodes them.</p>
+
+    <div class="gates-row">
+      <div class="gate-group">
+        <div class="gate-label hell-lbl">Hell · جهنم</div>
+        <div class="gate-arches" id="hell-arches">
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+          <div class="arch hell-arch"></div>
+        </div>
+        <div class="gate-big hell-n">7</div>
+        <div class="gate-lbl">gates</div>
+        <div class="gate-src">Quran 15:44 — "It has seven gates; for each gate is an assigned portion."</div>
+      </div>
+      <div class="gate-group">
+        <div class="gate-label para-lbl">Paradise · الجنة</div>
+        <div class="gate-arches" id="para-arches">
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+          <div class="arch para-arch"></div>
+        </div>
+        <div class="gate-big para-n">8</div>
+        <div class="gate-lbl">gates</div>
+        <div class="gate-src">Hadith Bukhari 3257 — "Paradise has eight gates, one is called Ar-Rayyan."</div>
+      </div>
+    </div>
+
+    <div class="verse-strip">
+      <div class="vs-ref">Quran 15:44 — seven gates of Hell</div>
+      <div class="vs-ar">لَهَا سَبْعَةُ أَبْوَٰبٍ لِّكُلِّ بَابٍ مِّنْهُمْ جُزْءٌ مَّقْسُومٌ</div>
+      <div class="vs-tr">"It has seven gates; for each gate is an assigned portion of them."</div>
+    </div>
+
+    <button class="btn" style="background:var(--gold);color:#1a0e00" onclick="go(1)">
+      Take the lesson
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0e00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 1 · EXERCISE 1
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <div class="step-lbl">Exercise 1 of 3</div>
+    <div class="prompt">How many times does the word جهنم (Jahannam — Hell) appear in the entire Quran?</div>
+    <p class="body-text" style="margin-bottom:20px">Count every grammatical form of the word across all 114 chapters. Make your best guess before we count together.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">44</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">62</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,true)">77</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">93</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 2 · EXERCISE 2 — DUAL COUNTER
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s2">
+    <div class="step-lbl">Exercise 2 of 3</div>
+    <div class="prompt">Count both words side by side — and watch what the numbers reveal.</div>
+    <p class="body-text" style="margin-bottom:16px">Run the count for both جهنم (Hell) and الجنة (Paradise) simultaneously. Look closely at the digits.</p>
+
+    <div class="count-duel">
+      <div class="cd-side">
+        <div class="cd-arabic hell-a">جهنم</div>
+        <div class="cd-roman">Jahannam · Hell</div>
+        <div class="cd-num hell-n" id="n-hell">0</div>
+        <div class="cd-sub">mentions</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-side">
+        <div class="cd-arabic para-a">الجنة</div>
+        <div class="cd-roman">Al-Janna · Paradise</div>
+        <div class="cd-num para-n" id="n-para">0</div>
+        <div class="cd-sub">mentions</div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="countBothBtn" onclick="runDual()">Count both words</button>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 3 · EXERCISE 3
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <div class="step-lbl">Exercise 3 of 3</div>
+    <div class="prompt">Paradise appears 78 times — one more than Hell's 77. In the Quran and Hadith, this asymmetry represents…</div>
+    <div class="answers-grid">
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">A transcription rounding</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">The counts are essentially equal — the difference is noise</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,true)">
+        <strong style="color:var(--text)">Mercy precedes wrath</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">A principle stated explicitly in both Quran and Hadith</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">Paradise has more gates</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">The extra mention matches the extra gate (8 vs 7)</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">The difference is coincidental</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">No theological meaning — just how the words fell</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 4 · VERDICT
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">Hell: 77 mentions — both digits are 7. Paradise: 78 mentions — the last digit is 8. The gate counts are written into the word counts.</h2>
+
+    <div class="digit-lock">
+      <div class="dl-card hell-card" id="dlc0">
+        <div class="dl-top">
+          <div class="dl-gates-lbl">Gates of Hell</div>
+          <div class="dl-gate-num h">7</div>
+          <div class="dl-gate-src">Quran 15:44</div>
+          <div class="dl-arrow">↓</div>
+        </div>
+        <div class="dl-bottom">
+          <div class="dl-word-lbl">جهنم appears</div>
+          <div class="dl-word-num" style="color:var(--hell-light)"><span class="dh dh-hell">7</span><span class="dh dh-hell">7</span></div>
+          <div class="dl-count-lbl">times — digit 7 in every position</div>
+        </div>
+      </div>
+      <div class="dl-card para-card" id="dlc1">
+        <div class="dl-top">
+          <div class="dl-gates-lbl">Gates of Paradise</div>
+          <div class="dl-gate-num p">8</div>
+          <div class="dl-gate-src">Hadith Bukhari 3257</div>
+          <div class="dl-arrow">↓</div>
+        </div>
+        <div class="dl-bottom">
+          <div class="dl-word-lbl">الجنة appears</div>
+          <div class="dl-word-num" style="color:var(--para-light)">7<span class="dh dh-para">8</span></div>
+          <div class="dl-count-lbl">times — final digit is 8</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>77:</strong> Both digits are 7. Hell has <em>7</em> gates. Seventy-seven doubles the gate count inside its own digit structure — the digit 7 is impossible to miss.<br><br>
+      <strong>78:</strong> The units digit is 8. Paradise has <em>8</em> gates. The word for Paradise appears seventy-eight times — where 8 is the final digit, the last word on the count.
+    </div>
+
+    <p class="body-text" style="margin-bottom:10px">The counts are not equal. Paradise exceeds Hell by exactly one:</p>
+
+    <div class="mercy-bars">
+      <div class="mb-col">
+        <div class="mb-bar hell-bar" id="hell-bar"></div>
+        <div class="mb-num h">77</div>
+        <div class="mb-lbl">Hell · جهنم</div>
+      </div>
+      <div class="mb-vs">vs</div>
+      <div class="mb-col">
+        <div class="mb-bar para-bar" id="para-bar"></div>
+        <div class="mb-num p">78</div>
+        <div class="mb-lbl">Paradise · الجنة</div>
+      </div>
+    </div>
+
+    <div class="one-more">
+      <div class="om-num">+1</div>
+      <div class="om-lbl">
+        <strong>Paradise mentioned one more time.</strong><br>
+        Not equal. Not less. Exactly one more — consistent with the Quranic principle stated in both text and Hadith.
+      </div>
+    </div>
+
+    <div class="insight-box" style="border-left-color:var(--para-light)">
+      <strong>Hadith Qudsi (Bukhari 7553):</strong> Allah said, <em>"My mercy precedes my wrath."</em><br><br>
+      <strong>Quran 7:156:</strong> <em>"My punishment — I afflict with it whom I will. But My mercy encompasses all things."</em>
+    </div>
+
+    <p class="body-text" style="margin-bottom:10px">The complete count methodology — nothing omitted, nothing added:</p>
+
+    <div class="meth-cards">
+      <div class="meth-card included" id="mc0">
+        <div><div class="mc-ar" style="color:var(--hell-light)">جَهَنَّم</div><div class="mc-en">All grammatical forms of Jahannam (Hell)</div></div>
+        <div class="mc-yes">✓ 77 mentions</div>
+      </div>
+      <div class="meth-card included" id="mc1">
+        <div><div class="mc-ar" style="color:var(--para-light)">الجنة · جنات عدن · جنات النعيم</div><div class="mc-en">Definite + Paradise proper names (Eden, Bliss, Firdaws)</div></div>
+        <div class="mc-yes">✓ 78 mentions</div>
+      </div>
+      <div class="meth-card excluded" id="mc2">
+        <div><div class="mc-ar" style="color:var(--muted)">النار · سقر · لظى · سعير</div><div class="mc-en">Other Hell names — separate words, separate counts</div></div>
+        <div class="mc-no">✗ Not included</div>
+      </div>
+      <div class="meth-card excluded" id="mc3">
+        <div><div class="mc-ar" style="color:var(--muted)">جنات تجري · جنات وعيون</div><div class="mc-en">Generic garden descriptions with rivers or springs</div></div>
+        <div class="mc-no">✗ Not included</div>
+      </div>
+    </div>
+
+    <div class="prob-block">
+      <div class="prob-row"><span class="pr-l">Probability جهنم lands exactly at 77</span><span class="pr-r">~1 in 150</span></div>
+      <div class="prob-row"><span class="pr-l">Probability الجنة lands exactly at 78</span><span class="pr-r">~1 in 150</span></div>
+      <div class="prob-row"><span class="pr-l">Gate numbers encoded in digit structure</span><span class="pr-r hl">77 = 7 in every digit · 78 ends in 8</span></div>
+      <div class="prob-row"><span class="pr-l">Paradise exceeds Hell by exactly one</span><span class="pr-r hl">Matches: mercy precedes wrath</span></div>
+      <div class="prob-footer">
+        <div class="lbl">Combined probability (both exact values)</div>
+        <div class="val">~1 in 22,500</div>
+      </div>
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">The gate structure is written into the word counts. The asymmetry is written into a principle older than the counting.</div>
+      <div class="gs">Hell has 7 gates (Quran 15:44). The word جهنم appears 77 times — both digits are 7. Paradise has 8 gates (Hadith Bukhari 3257). The word الجنة appears 78 times — the final digit is 8. Paradise is mentioned one more time than Hell, consistent with every Quranic and Hadith statement that divine mercy precedes divine wrath. The probability of both word counts landing on these exact values by chance: approximately 1 in 22,500.</div>
+    </div>
+
+    <a href="quran-life-death.html" class="btn" style="background:var(--gold);color:#1a0e00;margin-bottom:12px">
+      Next pattern · Life &amp; Death
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0e00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div></div>
+    <a href="quran-adam-jesus.html" class="btn" style="background:transparent;color:var(--muted);border:1px solid var(--border);font-size:13px;padding:10px 20px;margin-top:8px">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back · Adam &amp; Jesus
+    </a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon">✓</div>
+    <div>
+      <div class="fb-title">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" onclick="hideFb()">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var fbCb = null;
+var dualDone = false;
+
+var barMap  = { 0:'0%', 1:'25%', 2:'50%', 3:'75%', 4:'100%' };
+var metaMap = { 0:'Lesson · Hell & Paradise', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete · +30 XP' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('lbar').style.width = barMap[n] || '0%';
+  document.getElementById('lmeta').textContent = metaMap[n] || '';
+  if (n === 4) { saveProgress('hell-paradise'); initVerdict(); }
+}
+
+function showOk(sub, cb) {
+  fbCb = cb;
+  document.getElementById('fbSub').textContent = sub;
+  var panel = document.getElementById('fbPanel');
+  panel.className = 'fb-panel fb-ok show';
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').classList.remove('show');
+  if (fbCb) { var f = fbCb; fbCb = null; f(); }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(tick);
+    else if (cb) cb();
+  })(performance.now());
+}
+
+/* Stage 0 — gate arches */
+function animateGates() {
+  var hellArches = document.querySelectorAll('#hell-arches .arch');
+  var paraArches = document.querySelectorAll('#para-arches .arch');
+  hellArches.forEach(function(a, i) { setTimeout(function() { a.classList.add('visible'); }, 140 + i * 90); });
+  paraArches.forEach(function(a, i) { setTimeout(function() { a.classList.add('visible'); }, 140 + i * 80); });
+}
+
+/* Exercise 1 */
+function pickEx1(el, correct) {
+  if (el.classList.contains('ac-correct') || el.classList.contains('ac-disabled')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
+    showOk('77 — and the word for Paradise appears 78 times. Now watch the digit pattern those two numbers contain.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* Exercise 2 — dual counter */
+function runDual() {
+  if (dualDone) return;
+  dualDone = true;
+  document.getElementById('countBothBtn').classList.add('used');
+  var hellEl  = document.getElementById('n-hell');
+  var paraEl  = document.getElementById('n-para');
+  var done    = 0;
+  function onDone() {
+    done++;
+    if (done === 2) {
+      setTimeout(function() {
+        showOk('Hell: 77 — both digits are 7, Hell\'s gate count. Paradise: 78 — the final digit is 8, Paradise\'s gate count. The gates are encoded in the word frequencies.', function() { go(3); });
+      }, 600);
+    }
+  }
+  setTimeout(function() {
+    animFrom(hellEl, 0, 77, 1500, onDone);
+    animFrom(paraEl, 0, 78, 1600, onDone);
+  }, 300);
+}
+
+/* Exercise 3 */
+function pickEx3(el, correct) {
+  if (el.classList.contains('ac-correct') || el.classList.contains('ac-disabled')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
+    showOk('Hadith Qudsi (Bukhari 7553): "My mercy precedes my wrath." The word for Paradise appears one more time than the word for Hell — mercy leads by exactly one.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* Verdict */
+function initVerdict() {
+  setTimeout(function() { document.getElementById('xpBadge').classList.add('show'); }, 300);
+  setTimeout(function() { document.getElementById('dlc0').classList.add('show'); }, 500);
+  setTimeout(function() { document.getElementById('dlc1').classList.add('show'); }, 800);
+  setTimeout(function() {
+    document.getElementById('hell-bar').style.height = '148px';
+    document.getElementById('para-bar').style.height = '156px';
+  }, 1100);
+  var methIds = ['mc0','mc1','mc2','mc3'];
+  methIds.forEach(function(id, i) {
+    setTimeout(function() { document.getElementById(id).classList.add('show'); }, 1500 + i * 180);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', animateGates);
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var fire = Array.from({length:28}, function() {
+    return {x:Math.random()*W*0.47,y:H+Math.random()*H,sp:0.8+Math.random()*1.8,sz:2+Math.random()*5,life:Math.random()};
+  });
+  var stars = Array.from({length:22}, function() {
+    return {x:W*0.55+Math.random()*W*0.44,y:Math.random()*H,ph:Math.random()*6.28,sz:1+Math.random()*2};
+  });
+  function frame() {
+    ctx.clearRect(0,0,W,H);
+    var gl=ctx.createLinearGradient(0,0,W*0.48,0);
+    gl.addColorStop(0,'#1a0400'); gl.addColorStop(1,'#250700');
+    ctx.fillStyle=gl; ctx.fillRect(0,0,W*0.5,H);
+    var gr=ctx.createLinearGradient(W*0.52,0,W,0);
+    gr.addColorStop(0,'#0a1628'); gr.addColorStop(1,'#0e1f3a');
+    ctx.fillStyle=gr; ctx.fillRect(W*0.5,0,W*0.5,H);
+    var gd=ctx.createLinearGradient(W*0.46,0,W*0.54,0);
+    gd.addColorStop(0,'rgba(36,8,0,0)'); gd.addColorStop(0.5,'rgba(15,10,18,0.6)'); gd.addColorStop(1,'rgba(14,31,58,0)');
+    ctx.fillStyle=gd; ctx.fillRect(W*0.46,0,W*0.08,H);
+    fire.forEach(function(p) {
+      p.y-=p.sp; p.life+=0.014;
+      if(p.y<-10){p.y=H+5;p.x=Math.random()*W*0.46;p.life=0;}
+      var a=Math.max(0,0.75-p.life);
+      ctx.beginPath(); ctx.arc(p.x+Math.sin(t*3+p.life*5)*3,p.y,p.sz*(1-p.life*0.5),0,Math.PI*2);
+      ctx.fillStyle='rgba('+(p.life<0.3?'255,110,15':'255,55,0')+','+a+')'; ctx.fill();
+    });
+    stars.forEach(function(s) {
+      var tw=0.4+Math.sin(t*2.2+s.ph)*0.55;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.sz*tw,0,Math.PI*2);
+      ctx.fillStyle='rgba(252,211,77,'+(tw*0.85)+')'; ctx.fill();
+      if(s.sz>1.5){ctx.beginPath();ctx.arc(s.x,s.y,s.sz*tw*2.8,0,Math.PI*2);ctx.fillStyle='rgba(252,211,77,0.06)';ctx.fill();}
+    });
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

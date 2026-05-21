@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>The Fish Verse · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #0d9488;
+      --accent-light: #34d399;
+      --accent-dim:   rgba(13,148,136,0.12);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    .verse-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent-light); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+    .verse-ref { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .verse-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(20px, 3.5vw, 26px); line-height: 2.1; color: var(--text); margin-bottom: 16px; }
+    .fish-kw { color: var(--accent-light); font-weight: 700; }
+    .verse-tr { font-size: 14px; line-height: 1.75; color: var(--muted); border-top: 1px solid var(--border); padding-top: 14px; font-style: italic; }
+
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 18px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    .scan-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 20px 22px; margin-bottom: 20px; }
+    .scan-counter { text-align: center; margin-bottom: 18px; }
+    .scan-num { font-family: 'Playfair Display', serif; font-size: 72px; font-weight: 700; color: var(--muted); line-height: 1; transition: color .4s; }
+    .scan-num.filling { color: var(--accent-light); }
+    .scan-lbl { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: .06em; text-transform: uppercase; }
+    .scan-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 14px; }
+    .scan-fill { height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); transition: width .18s; }
+    .scan-verse { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(17px, 3vw, 22px); line-height: 2.5; border-top: 1px solid var(--border); padding-top: 18px; }
+    .fw { transition: color .25s, text-shadow .25s; color: rgba(226,221,212,0.4); }
+    .fw.active { color: #fff; text-shadow: 0 0 24px rgba(52,211,153,0.85); }
+    .fw.counted { color: var(--accent-light); text-shadow: 0 0 10px rgba(52,211,153,0.22); }
+    .fw.counted.fish-kw { color: #fff; font-weight: 700; text-shadow: 0 0 30px rgba(52,211,153,0.9); }
+
+    .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .calc-btn.used { opacity: 0.5; pointer-events: none; }
+
+    .letter-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-bottom: 24px; }
+    .letter-tile { aspect-ratio: 1; border-radius: 6px; background: var(--surface2); border: 1px solid rgba(255,255,255,0.04); opacity: 0; transform: scale(0.7); transition: opacity .22s, transform .22s, background .22s, border-color .22s, box-shadow .22s; }
+    .letter-tile.lit { opacity: 1; transform: scale(1); background: rgba(13,148,136,0.28); border-color: rgba(52,211,153,0.32); }
+    .letter-tile.fish-tile.lit { background: rgba(52,211,153,0.55); border-color: var(--accent-light); box-shadow: 0 0 10px rgba(52,211,153,0.38); }
+
+    .verdict-num-wrap { text-align: center; margin-bottom: 28px; opacity: 0; transform: scale(0.88); transition: opacity .7s ease, transform .7s ease; }
+    .verdict-num-wrap.show { opacity: 1; transform: none; }
+    .verdict-num { font-family: 'Playfair Display', serif; font-size: clamp(80px, 16vw, 120px); font-weight: 700; line-height: 1; color: var(--accent-light); text-shadow: 0 0 80px rgba(52,211,153,0.38); }
+    .verdict-lbl { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+    .ftable { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px; }
+    .ftable th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 14px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .ftable td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .ftable tr.hl td { color: var(--accent-light); background: var(--accent-dim); }
+    .ftable .avg-row td { border-top: 1px solid var(--border); border-bottom: none; font-weight: 500; }
+
+    .insight-box { background: var(--surface); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; color: var(--muted); line-height: 1.75; border-left: 3px solid var(--accent); }
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  All lessons
+<\/a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-bee-female.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    The Female Worker · Pattern 2b
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · The Fish Verse</div>
+
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--accent-light)">Pattern 3 · The Fish Verse</div>
+    <h1 class="hero-title">One verse about a fish — containing exactly the chromosome number of the fish it describes.</h1>
+    <p class="body-text">In the story of Moses and his companion, one verse turns on the moment they forget their fish. Count the base letters in that verse. The modal chromosome count for the largest group of fish on Earth is the same number.</p>
+    <div class="verse-card">
+      <div class="verse-ref">Quran 18:61</div>
+      <div class="verse-ar">فَلَمَّا بَلَغَا مَجْمَعَ بَيْنِهِمَا نَسِيَا <span class="fish-kw">حُوتَهُمَا</span> فَٱتَّخَذَ سَبِيلَهُۥ فِى ٱلْبَحْرِ سَرَبًا</div>
+      <div class="verse-tr">"But when they reached the junction between them, they forgot their <strong style="color:var(--accent-light)">fish</strong>, and it took its course into the sea, slipping away."</div>
+    </div>
+    <button class="btn" style="background:var(--accent);color:#fff" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="stage" id="s1">
+    <div class="step-lbl">Exercise 1 of 3</div>
+    <div class="prompt">How many base letters does verse 18:61 contain?</div>
+    <p class="body-text" style="margin-bottom:20px">Count only the base letters — no diacritics, no vowel marks above or below. Make your best guess before we count together.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx1(this,false)">30</div>
+      <div class="answer-card" onclick="pickEx1(this,false)">40</div>
+      <div class="answer-card" onclick="pickEx1(this,true)">50</div>
+      <div class="answer-card" onclick="pickEx1(this,false)">65</div>
+    </div>
+  </div>
+
+  <div class="stage" id="s2">
+    <div class="step-lbl">Exercise 2 of 3</div>
+    <div class="prompt">Count every letter in the verse — one word at a time.</div>
+    <div class="scan-panel">
+      <div class="scan-counter">
+        <div class="scan-num" id="scanNum">0</div>
+        <div class="scan-lbl">letters counted</div>
+        <div class="scan-track"><div class="scan-fill" id="scanFill"></div></div>
+      </div>
+      <div class="scan-verse">
+        <span class="fw" data-n="4">فلما</span>&ensp;<span class="fw" data-n="4">بلغا</span>&ensp;<span class="fw" data-n="4">مجمع</span>&ensp;<span class="fw" data-n="6">بينهما</span>&ensp;<span class="fw" data-n="4">نسيا</span>&ensp;<span class="fw fish-kw" data-n="6">حوتهما</span>&ensp;<span class="fw" data-n="5">فاتخذ</span>&ensp;<span class="fw" data-n="6">سبيلهۥ</span>&ensp;<span class="fw" data-n="2">فى</span>&ensp;<span class="fw" data-n="5">البحر</span>&ensp;<span class="fw" data-n="4">سربا</span>
+      </div>
+    </div>
+    <button class="calc-btn" id="countBtn" onclick="runScanner()">Count the letters</button>
+  </div>
+
+  <div class="stage" id="s3">
+    <div class="step-lbl">Exercise 3 of 3</div>
+    <div class="prompt">How many chromosomes does a common carp have?</div>
+    <p class="body-text" style="margin-bottom:20px">Carp, goldfish, and zebrafish are among the most studied fish in biology. This number was first confirmed by geneticists in the 1960s.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx3(this,false)">36</div>
+      <div class="answer-card" onclick="pickEx3(this,false)">46</div>
+      <div class="answer-card" onclick="pickEx3(this,true)">50</div>
+      <div class="answer-card" onclick="pickEx3(this,false)">64</div>
+    </div>
+  </div>
+
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">Verse 18:61 contains exactly 50 letters. The modal chromosome count of fish is 50.</h2>
+
+    <div class="letter-grid" id="letterGrid"></div>
+
+    <div class="verdict-num-wrap" id="verdictWrap">
+      <div class="verdict-num">50</div>
+      <div class="verdict-lbl">letters in verse 18:61 · exact, no rounding</div>
+    </div>
+
+    <table class="ftable">
+      <thead><tr><th>Species</th><th>Chromosomes (2n)</th><th></th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>Common Carp</td><td>50</td><td style="color:var(--ok)">Exact match</td></tr>
+        <tr class="hl"><td>Goldfish</td><td>50</td><td style="color:var(--ok)">Exact match</td></tr>
+        <tr class="hl"><td>Zebrafish</td><td>50</td><td style="color:var(--ok)">Exact match</td></tr>
+        <tr><td>Catfish</td><td>52</td><td style="color:var(--muted)">Near</td></tr>
+        <tr><td>Salmon</td><td>58–80</td><td style="color:var(--muted)">Varies</td></tr>
+        <tr class="avg-row"><td>Average teleost fish</td><td>~50</td><td style="color:var(--accent-light)">Modal value</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">50 letters in the verse about the fish. 50 chromosomes in the fish. No rounding. No approximation. No selection.</div>
+      <div class="gs">50 is the chromosome count of carp, goldfish, and zebrafish — and the modal number across teleost fish, the largest vertebrate group on Earth. The verse was fixed in the 7th century. Fish chromosome counts were not confirmed until 1956. The number was already in the text.</div>
+    </div>
+
+    <div class="insight-box">
+      <strong>Why حوتهما?</strong> The root حوت (ḥūt) means a large fish. In 18:61, حوتهما (their fish) is the narrative pivot — the moment the fish escapes marks exactly where Moses must turn back. It is the only verse in the Quran where a fish plays a direct, central narrative role. And it contains exactly 50 letters.
+    </div>
+
+    <a href="quran-bee-female.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to The Female Worker</a>
+    <a href="quran-man-woman.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Man &amp; Woman →</a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let scanDone = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+const barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+const metaMap = { 0:'Lesson · The Fish Verse', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('fish');
+    buildLetterGrid();
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(fillLetterGrid, 600);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Exactly 50 letters — no diacritics, no vowel marks counted. We will verify every word now.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runScanner() {
+  if (scanDone) return;
+  scanDone = true;
+  document.getElementById('countBtn').classList.add('used');
+  const words  = document.querySelectorAll('#s2 .fw');
+  const numEl  = document.getElementById('scanNum');
+  const fillEl = document.getElementById('scanFill');
+  numEl.classList.add('filling');
+  let running = 0, wi = 0;
+
+  function nextWord() {
+    if (wi >= words.length) {
+      showOk('50 letters confirmed — every word highlighted, every letter counted.', function() { go(3); });
+      return;
+    }
+    const word = words[wi];
+    const n    = parseInt(word.dataset.n);
+    const from = running;
+    const dur  = 260 + n * 55;
+    let t0 = null;
+    word.classList.add('active');
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      const p   = Math.min((ts - t0) / dur, 1);
+      const cur = from + Math.round(p * n);
+      numEl.textContent  = cur;
+      fillEl.style.width = (cur / 50 * 100) + '%';
+      if (p < 1) { requestAnimationFrame(tick); return; }
+      running = from + n;
+      word.classList.remove('active');
+      word.classList.add('counted');
+      wi++;
+      setTimeout(nextWord, 150);
+    })(performance.now());
+  }
+
+  setTimeout(nextWord, 350);
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Common carp: 50. Goldfish: 50. Zebrafish: 50. The modal chromosome number for teleost fish is 50.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function buildLetterGrid() {
+  const grid = document.getElementById('letterGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 50; i++) {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile';
+    if (i >= 22 && i <= 27) tile.classList.add('fish-tile');
+    grid.appendChild(tile);
+  }
+}
+
+function fillLetterGrid() {
+  const tiles = document.querySelectorAll('#letterGrid .letter-tile');
+  tiles.forEach(function(tile, i) {
+    setTimeout(function() {
+      tile.classList.add('lit');
+      if (i === 49) {
+        setTimeout(function() {
+          document.getElementById('verdictWrap').classList.add('show');
+        }, 320);
+      }
+    }, i * 38);
+  });
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var fish = Array.from({length:5}, function(_, i) {
+    return {x: Math.random()*W, y: H*0.3+Math.random()*H*0.45, sp: 0.5+Math.random()*0.7, sz: 5+Math.random()*7, ph: i*1.3};
+  });
+  function frame() {
+    ctx.clearRect(0,0,W,H);
+    var g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#071428'); g.addColorStop(1,'#0a1e3a');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    [0.38,0.52,0.67].forEach(function(yf,i) {
+      ctx.beginPath(); ctx.moveTo(0,H);
+      for (var x=0;x<=W;x+=3) {
+        var wy = H*yf+Math.sin(x*0.017+t*0.7+i)*9+Math.sin(x*0.031+t*1.1+i*2)*5;
+        x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);
+      }
+      ctx.lineTo(W,H); ctx.closePath();
+      ctx.fillStyle=['rgba(13,71,120,0.45)','rgba(8,50,90,0.55)','rgba(5,30,60,0.75)'][i];
+      ctx.fill();
+    });
+    fish.forEach(function(f) {
+      f.x+=f.sp; f.y+=Math.sin(t*1.8+f.ph)*0.4;
+      if(f.x>W+20){f.x=-20;f.y=H*0.3+Math.random()*H*0.4;}
+      ctx.save(); ctx.translate(f.x,f.y);
+      ctx.beginPath(); ctx.ellipse(0,0,f.sz,f.sz*0.45,0,0,Math.PI*2);
+      ctx.fillStyle='rgba(52,211,153,0.6)'; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-f.sz,0); ctx.lineTo(-f.sz*1.7,-f.sz*0.5); ctx.lineTo(-f.sz*1.7,f.sz*0.5); ctx.closePath();
+      ctx.fillStyle='rgba(52,211,153,0.4)'; ctx.fill();
+      ctx.restore();
+    });
+    t+=0.018; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

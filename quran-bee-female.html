@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>The Female Worker · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #d97706;
+      --accent-light: #fbbf24;
+      --accent-dim:   rgba(217,119,6,0.12);
+      --accent-ring:  rgba(251,191,36,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    .verse-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent-light); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+    .verse-ref { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .verse-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(19px, 3.2vw, 24px); line-height: 2.2; color: var(--text); margin-bottom: 16px; }
+    .fem-v { color: var(--accent-light); font-weight: 700; }
+    .verse-tr { font-size: 14px; line-height: 1.75; color: var(--muted); border-top: 1px solid var(--border); padding-top: 14px; font-style: italic; }
+
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 16px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; font-size: 15px; font-weight: 500; line-height: 1.4; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    .grammar-demo { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 22px; }
+    .grammar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .grammar-row:last-child { margin-bottom: 0; }
+    .grammar-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 28px; color: var(--text); min-width: 90px; text-align: right; }
+    .grammar-label { flex: 1; }
+    .grammar-form { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .grammar-explain { font-size: 12px; color: var(--muted); }
+    .grammar-badge { font-size: 11px; padding: 3px 10px; border-radius: 8px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+    .badge-masc { background: rgba(99,102,241,0.14); border: 1px solid rgba(99,102,241,0.28); color: #a5b4fc; }
+    .badge-fem  { background: var(--accent-dim); border: 1px solid var(--accent-ring); color: var(--accent-light); }
+
+    .flip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+    .flip-card { cursor: pointer; perspective: 700px; }
+    .flip-inner { position: relative; height: 180px; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.4,0,.2,1); }
+    .flip-card.done .flip-inner { transform: rotateY(180deg); }
+    .flip-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 14px 10px; }
+    .flip-front { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); }
+    .flip-back { background: var(--accent-dim); border: 2px solid var(--accent-ring); border-bottom: 4px solid rgba(120,53,15,0.4); transform: rotateY(180deg); }
+    .fc-hint { animation: hintPulse 2.2s ease-in-out infinite; font-size: 10px; color: var(--muted); margin-top: 8px; }
+    @keyframes hintPulse { 0%,100%{opacity:.3} 50%{opacity:.85} }
+    .flip-count-row { text-align: center; margin-bottom: 18px; }
+    .flip-count { font-size: 14px; color: var(--muted); }
+    .flip-count strong { color: var(--ok); transition: color .3s; }
+    .flip-count.all-done strong { color: var(--ok); }
+
+    .imp-reveal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+    .imp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 12px; text-align: center; opacity: 0; transform: translateY(10px); transition: opacity .55s, transform .55s, border-color .55s; }
+    .imp-card.show { opacity: 1; transform: none; border-color: var(--accent-ring); }
+    .imp-arabic { font-family: 'Amiri', serif; direction: rtl; font-size: 28px; color: var(--accent-light); line-height: 1.3; margin-bottom: 6px; }
+    .imp-roman { font-size: 12px; color: var(--muted); margin-bottom: 4px; font-style: italic; }
+    .imp-en { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+    .imp-badge { display: inline-block; background: var(--accent-dim); border: 1px solid var(--accent-ring); border-radius: 8px; padding: 3px 10px; font-size: 10px; color: var(--accent-light); letter-spacing: .04em; }
+
+    .contrast-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .contrast-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .contrast-label { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .contrast-body { font-size: 14px; line-height: 1.65; }
+    .contrast-card.wrong-card { border-color: rgba(248,113,113,0.3); }
+    .contrast-card.right-card { border-color: var(--accent-ring); }
+    .wrong-label { color: #f87171; }
+    .right-label { color: var(--accent-light); }
+
+    .insight-box { background: var(--surface); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; color: var(--muted); line-height: 1.75; border-left: 3px solid var(--accent); }
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  All lessons
+<\/a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-chromosomes.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    The Bee Surah · Pattern 2a
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · The Female Worker</div>
+
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--accent-light)">Pattern 2b · The Female Worker</div>
+    <h1 class="hero-title">The Quran commands its bees in the feminine. In 7th-century Arabia, hive workers were assumed to be male.</h1>
+    <p class="body-text">Arabic grammar marks gender on every verb and command. When the Quran speaks directly to the bee in Surah 16:68–69, it uses three imperatives. All three are in the feminine form — which happens to be exactly what biology later confirmed about who does the work inside a hive.</p>
+    <div class="verse-card">
+      <div class="verse-ref">Quran 16:68–69 · feminine imperatives highlighted</div>
+      <div class="verse-ar">وَأَوْحَىٰ رَبُّكَ إِلَى ٱلنَّحْلِ أَنِ <span class="fem-v">ٱتَّخِذِى</span> مِنَ ٱلْجِبَالِ بُيُوتًا وَمِنَ ٱلشَّجَرِ وَمِمَّا يَعْرِشُونَ ﴿٦٨﴾ ثُمَّ <span class="fem-v">كُلِى</span> مِن كُلِّ ٱلثَّمَرَٰتِ فَ<span class="fem-v">ٱسْلُكِى</span> سُبُلَ رَبِّكِ ذُلُلًا ﴿٦٩﴾</div>
+      <div class="verse-tr">"And your Lord inspired the bee: <strong style="color:var(--accent-light)">Take</strong> for yourself houses in the mountains and trees. Then <strong style="color:var(--accent-light)">eat</strong> from all fruits and <strong style="color:var(--accent-light)">follow</strong> the ways of your Lord made easy."</div>
+    </div>
+    <button class="btn" style="background:var(--accent);color:#fff" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="stage" id="s1">
+    <div class="step-lbl">Exercise 1 of 3</div>
+    <div class="prompt">Inside a beehive, which bees collect nectar, build the honeycomb, and produce honey?</div>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-size:15px;font-weight:600;margin-bottom:3px">Male drones</div>
+        <div style="font-size:12px;color:var(--muted)">Fertilise the queen</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-size:15px;font-weight:600;margin-bottom:3px">Both equally</div>
+        <div style="font-size:12px;color:var(--muted)">Share all duties</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,true)">
+        <div style="font-size:15px;font-weight:600;margin-bottom:3px">Female workers</div>
+        <div style="font-size:12px;color:var(--muted)">Build, forage, produce</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-size:15px;font-weight:600;margin-bottom:3px">The queen alone</div>
+        <div style="font-size:12px;color:var(--muted)">Directs all activity</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="s2">
+    <div class="step-lbl">Exercise 2 of 3</div>
+    <div class="prompt">In Arabic, the word نَحْل (naḥl — "bee") is grammatically...</div>
+    <p class="body-text" style="margin-bottom:20px">Arabic nouns have grammatical gender, just like French or Spanish. Every noun is either masculine or feminine. This matters because verbs and commands must agree with it.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx2(this,true)">
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px">Masculine</div>
+        <div style="font-size:12px;color:var(--muted)">Commands would use the male form</div>
+      </div>
+      <div class="answer-card" onclick="pickEx2(this,false)">
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px">Feminine</div>
+        <div style="font-size:12px;color:var(--muted)">Commands would use the female form</div>
+      </div>
+    </div>
+    <div class="grammar-demo" id="grammarDemo" style="opacity:0;transition:opacity .6s">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;letter-spacing:.06em;text-transform:uppercase">What this means for the commands in 16:68–69</div>
+      <div class="grammar-row">
+        <div class="grammar-ar" style="color:#a5b4fc">كُلْ</div>
+        <div class="grammar-label">
+          <div class="grammar-form">kul — "eat" (masculine imperative)</div>
+          <div class="grammar-explain">What a conventional author would write for a grammatically masculine noun</div>
+        </div>
+        <div class="grammar-badge badge-masc">Masculine</div>
+      </div>
+      <div class="grammar-row">
+        <div class="grammar-ar" style="color:var(--accent-light)">كُلِى</div>
+        <div class="grammar-label">
+          <div class="grammar-form">kulī — "eat" (feminine imperative)</div>
+          <div class="grammar-explain">What the Quran actually uses — the feminine form, with the -ī suffix</div>
+        </div>
+        <div class="grammar-badge badge-fem">Feminine</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="s3">
+    <div class="step-lbl">Exercise 3 of 3</div>
+    <div class="prompt">Tap each command to decode its grammar.</div>
+    <p class="body-text" style="margin-bottom:16px">Each of the three commands given to the bee in 16:68–69 carries a grammatical marker. Tap to reveal what each one tells us.</p>
+
+    <div class="flip-count-row">
+      <span class="flip-count" id="flipCount"><strong id="fcN">0</strong> / 3 commands decoded</span>
+    </div>
+
+    <div class="flip-grid">
+      <div class="flip-card" id="fc0" onclick="flipCard(this,'fc0')">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div style="font-family:'Amiri',serif;font-size:30px;direction:rtl;color:var(--accent-light);line-height:1.2">ٱتَّخِذِى</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">ittakhidhī</div>
+            <div class="fc-hint">tap to decode</div>
+          </div>
+          <div class="flip-face flip-back">
+            <div style="font-size:13px;color:var(--accent-light);font-weight:700;margin-bottom:6px">Take</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-style:italic">ittakhidhī</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">Suffix <strong style="color:var(--accent-light)">-ī</strong> marks<br>feminine singular<br>imperative</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" id="fc1" onclick="flipCard(this,'fc1')">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div style="font-family:'Amiri',serif;font-size:30px;direction:rtl;color:var(--accent-light);line-height:1.2">كُلِى</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">kulī</div>
+            <div class="fc-hint">tap to decode</div>
+          </div>
+          <div class="flip-face flip-back">
+            <div style="font-size:13px;color:var(--accent-light);font-weight:700;margin-bottom:6px">Eat</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-style:italic">kulī</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">Suffix <strong style="color:var(--accent-light)">-ī</strong> marks<br>feminine singular<br>imperative</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" id="fc2" onclick="flipCard(this,'fc2')">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div style="font-family:'Amiri',serif;font-size:30px;direction:rtl;color:var(--accent-light);line-height:1.2">فَٱسْلُكِى</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">faslukī</div>
+            <div class="fc-hint">tap to decode</div>
+          </div>
+          <div class="flip-face flip-back">
+            <div style="font-size:13px;color:var(--accent-light);font-weight:700;margin-bottom:6px">Follow</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-style:italic">faslukī</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">Suffix <strong style="color:var(--accent-light)">-ī</strong> marks<br>feminine singular<br>imperative</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">Three commands. All feminine. The Quran addressed the worker bee correctly — 1,000 years before science confirmed who the workers are.</h2>
+
+    <div class="imp-reveal">
+      <div class="imp-card" id="ic0">
+        <div class="imp-arabic">ٱتَّخِذِى</div>
+        <div class="imp-roman">ittakhidhī</div>
+        <div class="imp-en">Take</div>
+        <div class="imp-badge">feminine imperative</div>
+      </div>
+      <div class="imp-card" id="ic1">
+        <div class="imp-arabic">كُلِى</div>
+        <div class="imp-roman">kulī</div>
+        <div class="imp-en">Eat</div>
+        <div class="imp-badge">feminine imperative</div>
+      </div>
+      <div class="imp-card" id="ic2">
+        <div class="imp-arabic">فَٱسْلُكِى</div>
+        <div class="imp-roman">faslukī</div>
+        <div class="imp-en">Follow</div>
+        <div class="imp-badge">feminine imperative</div>
+      </div>
+    </div>
+
+    <div class="contrast-grid">
+      <div class="contrast-card wrong-card">
+        <div class="contrast-label wrong-label">7th-century assumption</div>
+        <div class="contrast-body">Hive workers were believed to be male — like soldiers in a human army. A human author would have used masculine commands.</div>
+      </div>
+      <div class="contrast-card right-card">
+        <div class="contrast-label right-label">What the Quran says</div>
+        <div class="contrast-body">Every command addressed to the bee uses the feminine form. The text treats the worker bee as female — three times, consistently.</div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>When was this confirmed?</strong> The sex of worker bees was first established by Dutch naturalist Jan Swammerdam around 1673, and conclusively confirmed in the 18th century. It was not common knowledge in 7th-century Arabia. Arab culture associated organised work-groups with males.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">The noun نَحْل (bee) is grammatically masculine in Arabic. A 7th-century human author following convention would write masculine commands. The Quran writes feminine ones — and is biologically correct.</div>
+      <div class="gs">Not once, not ambiguously. Three consecutive commands, all using the feminine imperative suffix -ī, all addressed to the bee that actually builds, forages, and produces honey. The text carries a biological accuracy that could not have been assumed from the culture it was revealed into.</div>
+    </div>
+
+    <a href="quran-chromosomes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Bee Chromosomes</a>
+    <a href="quran-fish.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · The Fish Verse →</a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let flipped = new Set();
+
+const barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+const metaMap = { 0:'Lesson · The Female Worker', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('bee-female');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(revealImperatives, 500);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('All worker bees are female. Male drones exist only to mate with the queen — they never forage or build.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    document.getElementById('grammarDemo').style.opacity = '1';
+    showOk('The word for bee is masculine in Arabic. A conventional author would use masculine commands. The Quran does not.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function flipCard(el, id) {
+  if (el.classList.contains('done')) return;
+  el.classList.add('done');
+  flipped.add(id);
+  document.getElementById('fcN').textContent = flipped.size;
+  if (flipped.size === 3) {
+    document.getElementById('flipCount').classList.add('all-done');
+    setTimeout(function() {
+      showOk('All three commands use the feminine imperative. Not once — three times, consistently, in a single passage.', function() { go(4); });
+    }, 400);
+  }
+}
+
+function revealImperatives() {
+  ['ic0','ic1','ic2'].forEach(function(id, i) {
+    setTimeout(function() {
+      document.getElementById(id).classList.add('show');
+    }, i * 350);
+  });
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var R = 17;
+  var hexes = [];
+  for(var row=0;row<5;row++){
+    for(var col=0;col<14;col++){
+      hexes.push({x:col*R*1.73+(row%2)*R*0.87-R,y:row*R*1.5-R,ph:Math.random()*6.28});
+    }
+  }
+  var bee = {x:0, y:H*0.42};
+  function hexPath(cx,cy,r){
+    ctx.beginPath();
+    for(var i=0;i<6;i++){var a=Math.PI/3*i-Math.PI/6;i===0?ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
+    ctx.closePath();
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0e0800'); g.addColorStop(1,'#1a1000');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    hexes.forEach(function(h){
+      var glow=0.28+Math.sin(t*1.5+h.ph)*0.22;
+      hexPath(h.x,h.y,R-2);
+      ctx.fillStyle='rgba(160,85,0,'+(glow*0.4)+')'; ctx.fill();
+      ctx.strokeStyle='rgba(245,158,11,'+(glow*0.65)+')'; ctx.lineWidth=1.2; ctx.stroke();
+    });
+    bee.x+=1.1; bee.y=H*0.45+Math.sin(t*2.2)*18;
+    if(bee.x>W+15)bee.x=-15;
+    ctx.beginPath(); ctx.ellipse(bee.x,bee.y,7,5,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(245,200,20,0.85)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(bee.x-3,bee.y-4,5,3,-0.4,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,230,255,0.35)'; ctx.fill();
+    t+=0.025; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

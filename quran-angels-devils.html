@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+<title>Angels &amp; Devils · Quranic Numerics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0b1622;--surface:#111e2e;--surface2:#182840;
+  --border:rgba(255,255,255,0.08);--text:#e2ddd4;--muted:#7a8fa3;
+  --angel:#ca8a04;--angel-light:#fde047;
+  --angel-dim:rgba(202,138,4,0.12);--angel-ring:rgba(253,224,71,0.28);
+  --devil:#b91c1c;--devil-light:#f87171;
+  --devil-dim:rgba(185,28,28,0.12);--devil-ring:rgba(248,113,113,0.28);
+  --match:#10b981;--match-light:#34d399;
+  --match-dim:rgba(16,185,129,0.12);--match-ring:rgba(52,211,153,0.28);
+  --gold:#f59e0b;--gold-light:#fcd34d;
+  --gold-dim:rgba(245,158,11,0.12);--gold-ring:rgba(252,211,77,0.28);
+  --ok:#22c55e;--ok-bg:#052e16;--ok-border:#166534;
+  --err-light:#f87171;
+}
+
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:44px 20px 160px;display:flex;align-items:flex-start;justify-content:center}
+.container{width:100%;max-width:660px}
+
+/* ── Lesson bar ── */
+.lesson-bar-wrap{height:8px;background:var(--surface2);border-radius:4px;margin-bottom:8px;overflow:hidden}
+.lesson-bar-fill{height:100%;width:0%;background:var(--ok);border-radius:4px;transition:width .5s cubic-bezier(0.34,1.56,0.64,1)}
+.bar-meta{font-size:11px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:32px;min-height:16px}
+
+/* ── Stage transitions ── */
+.stage{display:none}
+.stage.active{display:block;animation:rise .4s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── Typography ── */
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:16px;color:var(--gold-light)}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(22px,5vw,34px);line-height:1.22;margin-bottom:18px}
+.acc-angel{color:var(--angel-light)}.acc-devil{color:var(--devil-light)}.acc-match{color:var(--match-light)}
+.step-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.body-text{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:24px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:9px;padding:12px 26px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn:active{transform:scale(0.97)}
+.btn-gold{background:var(--gold);color:#1a0e00}.btn-gold:hover{background:var(--gold-light)}
+.btn-match{background:var(--match);color:#fff}.btn-match:hover{background:var(--match-light);color:#022c22}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
+
+/* ── Answer cards ── */
+.answer-card{background:var(--surface);border:1px solid var(--border);border-bottom:4px solid var(--border);border-radius:10px;padding:15px 20px;cursor:pointer;margin-bottom:10px;font-size:15px;transition:border-color .15s,background .15s,transform .15s;user-select:none}
+.answer-card:hover{border-color:rgba(255,255,255,0.22);transform:translateY(-1px)}
+.answer-card.ac-correct{border-color:var(--ok);border-bottom-color:var(--ok-border);background:rgba(34,197,94,0.08);pointer-events:none;color:var(--ok)}
+.answer-card.ac-wrong{animation:shake .4s ease;border-color:var(--err-light)!important}
+.answer-card.ac-disabled{opacity:0.38;pointer-events:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.q-label{font-size:13px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.q-text{font-size:17px;line-height:1.5;font-weight:500;margin-bottom:22px}
+
+/* ── Feedback panel ── */
+.fb-panel{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:18px 20px 32px;transform:translateY(110%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fb-panel.show{transform:translateY(0)}
+.fb-panel.fb-ok{background:var(--ok-bg);border-top:3px solid var(--ok)}
+.fb-left{display:flex;align-items:center;gap:14px}
+.fb-icon{width:36px;height:36px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ok-bg)}
+.fb-title{font-weight:700;font-size:15px;color:var(--ok);margin-bottom:2px}
+.fb-sub{font-size:13px;color:var(--muted);line-height:1.5;max-width:360px}
+.fb-btn{padding:14px 30px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.fb-panel.fb-ok .fb-btn{background:var(--ok);color:var(--ok-bg)}
+
+/* ── Nav back ── */
+.nav-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+.dot-field{position:fixed;top:0;right:0;width:260px;height:260px;opacity:.02;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:20px 20px;pointer-events:none}
+
+/* ── XP badge ── */
+.xp-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-dim);border:1px solid var(--gold-ring);border-radius:20px;padding:8px 20px;margin-bottom:28px;font-size:13px;font-weight:500;color:var(--gold-light);opacity:0;transform:scale(0.85);transition:opacity .4s,transform .4s}
+.xp-badge.show{opacity:1;transform:scale(1)}
+
+/* ── Stage 0: Pair cards ── */
+.pair-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.pair-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 14px;text-align:center;position:relative;overflow:hidden}
+.pair-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pc-angel::after{background:linear-gradient(90deg,#92400e,var(--angel-light))}
+.pc-devil::after{background:linear-gradient(90deg,#7f1d1d,var(--devil-light))}
+.pc-arabic{font-family:'Amiri',serif;font-size:40px;direction:rtl;margin-bottom:4px;line-height:1.2}
+.pc-arabic.angel{color:var(--angel-light)}.pc-arabic.devil{color:var(--devil-light)}
+.pc-name{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.pc-role{font-size:12px;color:var(--muted);line-height:1.6}
+.pc-role strong{color:var(--text)}
+
+.verse-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;margin-bottom:22px;border-left:3px solid var(--gold-light)}
+.vc-ref{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);margin-bottom:12px}
+.vc-ar{font-family:'Amiri',serif;direction:rtl;text-align:right;font-size:clamp(17px,3vw,22px);line-height:2.2;margin-bottom:12px}
+.vc-ar .ah{color:var(--angel-light);font-weight:700}.vc-ar .dh{color:var(--devil-light);font-weight:700}
+.vc-tr{font-size:13px;line-height:1.75;color:var(--muted);font-style:italic}
+.vc-tr strong{font-style:normal;color:var(--text)}
+
+/* ── Stage 2: Dual builder ── */
+.dual-build{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 14px}
+.db-side{text-align:center}
+.db-word{font-family:'Amiri',serif;font-size:28px;direction:rtl;margin-bottom:2px;line-height:1.2}
+.db-word.angel{color:var(--angel-light)}.db-word.devil{color:var(--devil-light)}
+.db-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.db-num{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,60px);font-weight:700;line-height:1;margin-bottom:8px;transition:color .4s,text-shadow .4s}
+.db-num.angel-n{color:var(--angel-light)}
+.db-num.devil-n{color:var(--devil-light)}
+.db-num.complete{color:var(--match-light)!important;text-shadow:0 0 50px rgba(52,211,153,0.4)!important;animation:numPop .4s ease}
+@keyframes numPop{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.db-progress{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.db-fill{height:100%;width:0;border-radius:3px;transition:width .4s cubic-bezier(0.34,1.56,0.64,1)}
+.db-fill-angel{background:linear-gradient(90deg,var(--angel),var(--angel-light))}
+.db-fill-devil{background:linear-gradient(90deg,var(--devil),var(--devil-light))}
+.db-eq{font-family:'Playfair Display',serif;font-size:28px;color:var(--muted);text-align:center;transition:color .6s,text-shadow .6s}
+.db-eq.lit{color:var(--match-light);text-shadow:0 0 40px rgba(52,211,153,0.5)}
+
+/* ── Form cards ── */
+.forms-section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.form-cards{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.form-card{background:var(--surface);border:1px solid var(--border);border-bottom:3px solid var(--border);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;opacity:0;transform:translateX(-10px);transition:border-color .25s,background .25s,opacity .3s,transform .3s}
+.form-card.show{opacity:1;transform:none}
+.form-card:hover:not(.locked){border-color:var(--angel-ring);transform:translateX(2px)}
+.form-card.locked{background:rgba(202,138,4,0.07);border-color:rgba(253,224,71,0.2);border-bottom-color:rgba(253,224,71,0.2);cursor:default}
+.form-card.devil-card:hover:not(.locked){border-color:var(--devil-ring);transform:translateX(2px)}
+.form-card.devil-card.locked{background:rgba(185,28,28,0.07);border-color:rgba(248,113,113,0.2);border-bottom-color:rgba(248,113,113,0.2)}
+.fc-arabic{font-family:'Amiri',serif;font-size:22px;direction:rtl;color:var(--angel-light);min-width:70px;text-align:right;flex-shrink:0}
+.fc-arabic.devil-a{color:var(--devil-light)}
+.fc-info{flex:1}
+.fc-form{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.fc-desc{font-size:12px;color:var(--muted)}
+.fc-add{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--angel-light);min-width:40px;text-align:right;flex-shrink:0;transition:color .3s}
+.fc-add.devil-a{color:var(--devil-light)}
+.fc-add.done{color:var(--match-light)}
+
+/* ── Devil section reveal ── */
+.devil-section{display:none}
+.devil-section.show{display:block;animation:rise .5s ease}
+
+/* ── Stage 4: Verdict ── */
+.verdict-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:26px}
+.vp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 12px;text-align:center;position:relative;overflow:hidden}
+.vp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.vpc-angel::after{background:linear-gradient(90deg,#92400e,var(--angel-light))}
+.vpc-devil::after{background:linear-gradient(90deg,#7f1d1d,var(--devil-light))}
+.vp-word{font-family:'Amiri',serif;font-size:26px;direction:rtl;line-height:1.2;margin-bottom:2px}
+.vpc-angel .vp-word{color:var(--angel-light)}.vpc-devil .vp-word{color:var(--devil-light)}
+.vp-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.vp-num{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,64px);font-weight:700;line-height:1}
+.vpc-angel .vp-num{color:var(--angel-light);text-shadow:0 0 50px rgba(202,138,4,0.35)}
+.vpc-devil .vp-num{color:var(--devil-light);text-shadow:0 0 50px rgba(185,28,28,0.35)}
+.vp-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.vp-eq{font-family:'Playfair Display',serif;font-size:28px;color:var(--muted);text-align:center;transition:color .6s,text-shadow .6s}
+.vp-eq.lit{color:var(--match-light);text-shadow:0 0 40px rgba(52,211,153,0.5)}
+
+.sec-hdg{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;margin-top:4px}
+.breakdown-table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px}
+.breakdown-table th{text-align:left;color:var(--muted);font-weight:400;padding:7px 12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.breakdown-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.breakdown-table .ar-cell{font-family:'Amiri',serif;font-size:18px;direction:rtl}
+.breakdown-table .num-cell{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;text-align:right}
+.breakdown-table .total-row td{border-top:1px solid var(--border);border-bottom:none;font-weight:500;color:var(--text)}
+.angel-tbl .ar-cell{color:var(--angel-light)}.angel-tbl .num-cell{color:var(--angel-light)}
+.devil-tbl .ar-cell{color:var(--devil-light)}.devil-tbl .num-cell{color:var(--devil-light)}
+.angel-tbl .total-row .num-cell{color:var(--angel-light);font-size:18px}
+.devil-tbl .total-row .num-cell{color:var(--devil-light);font-size:18px}
+.breakdown-table tr{opacity:0;transform:translateY(5px);transition:opacity .3s,transform .3s}
+.breakdown-table thead tr{opacity:1;transform:none}
+.breakdown-table tr.show{opacity:1;transform:translateY(0)}
+
+.vowel-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.vowel-pair.show{opacity:1;transform:translateY(0)}
+.vow-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center}
+.vow-card.counted{border-color:var(--angel-ring)}
+.vow-card.excluded{opacity:.55}
+.vow-arabic{font-family:'Amiri',serif;font-size:36px;direction:rtl;margin-bottom:6px;line-height:1.2}
+.vow-arabic.counted{color:var(--angel-light)}.vow-arabic.excluded{color:var(--muted)}
+.vow-vowel{font-size:11px;color:var(--muted);letter-spacing:.05em;margin-bottom:6px}
+.vow-meaning{font-size:14px;font-weight:500;margin-bottom:6px}
+.vow-meaning.counted{color:var(--angel-light)}.vow-meaning.excluded{color:var(--muted)}
+.vow-tag{display:inline-block;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500}
+.vow-tag.yes{background:var(--angel-dim);border:1px solid var(--angel-ring);color:var(--angel-light)}
+.vow-tag.no{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted)}
+
+.prob-block{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:22px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.prob-block.show{opacity:1;transform:translateY(0)}
+.prob-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px}
+.prob-row:last-of-type{border-bottom:none}
+.pr-l{color:var(--muted)}.pr-r{color:var(--text);font-weight:500}.pr-r.hl{color:var(--match-light)}
+.prob-footer{padding:14px 16px;background:var(--match-dim);border-top:1px solid var(--match-ring)}
+.prob-footer .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.prob-footer .val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--match-light)}
+
+.gold-box{background:var(--surface);border-radius:14px;border:1px solid var(--border);border-top:3px solid var(--gold-light);padding:26px 22px;text-align:center;margin-bottom:28px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.gold-box.show{opacity:1;transform:translateY(0)}
+.gold-box h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:12px}
+.gold-box p{font-size:14px;color:var(--muted);line-height:1.8}
+.gold-box strong{color:var(--text)}.gold-box em{font-style:normal;color:var(--gold-light)}
+
+.verdict-nav{display:flex;gap:12px;flex-wrap:wrap;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.verdict-nav.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  All lessons
+<\/a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-life-death.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Pattern 7 · Life &amp; Death
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="barFill"></div></div>
+  <div class="bar-meta" id="barMeta"></div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 0 · INTRO
+  ════════════════════════════════ -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow">Pattern 8 · Angels &amp; Devils</div>
+    <h1 class="hero-title">
+      The Quran&#39;s two opposing forces.<br>
+      <span class="acc-angel">Angels</span> and <span class="acc-devil">devils</span> — the eternal duality.
+    </h1>
+
+    <div class="pair-grid">
+      <div class="pair-card pc-angel">
+        <div class="pc-arabic angel">مَلَك</div>
+        <div class="pc-name">Malak · Angels</div>
+        <div class="pc-role"><strong>Divine messengers.</strong> Guardians of creation, bearers of revelation, recorders of deeds — they guide humanity toward the straight path.</div>
+      </div>
+      <div class="pair-card pc-devil">
+        <div class="pc-arabic devil">شَيْطَان</div>
+        <div class="pc-name">Shaytan · Devils</div>
+        <div class="pc-role"><strong>Cosmic tempters.</strong> Dedicated to misleading, whispering doubt, adorning evil — the adversary at every turn of human life.</div>
+      </div>
+    </div>
+
+    <div class="verse-card">
+      <div class="vc-ref">Quran 2:98 — both named together</div>
+      <div class="vc-ar">مَن كَانَ عَدُوًّا لِّلَّهِ وَ<span class="ah">مَلَٰٓئِكَتِهِۦ</span> وَرُسُلِهِۦ وَجِبْرِيلَ وَمِيكَىٰلَ فَإِنَّ ٱللَّهَ عَدُوٌّ لِّلْكَٰفِرِينَ</div>
+      <div class="vc-tr">"Whoever is an enemy to Allah and His <strong>angels</strong> and His messengers and Gabriel and Michael — then indeed, Allah is an enemy to the disbelievers."</div>
+    </div>
+
+    <p class="body-text">These two forces appear on nearly every page of the Quran — one urging righteousness, one pulling toward temptation. Count how many times each appears in nominal form across all 114 chapters.</p>
+
+    <button class="btn btn-gold" onclick="go(1)">
+      Take the lesson
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0e00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 1 · MC: Angel count
+  ════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <div class="step-lbl">Question 1 of 2</div>
+    <p class="q-label">Multiple choice</p>
+    <p class="q-text">How many times does the word "angel" (مَلَك and all its grammatical forms) appear in the Quran?</p>
+
+    <div class="answer-card" onclick="pickEx1(0)">44 occurrences</div>
+    <div class="answer-card" onclick="pickEx1(1)">66 occurrences</div>
+    <div class="answer-card" onclick="pickEx1(2)">88 occurrences</div>
+    <div class="answer-card" onclick="pickEx1(3)">110 occurrences</div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 2 · DUAL FORM BUILDER
+  ════════════════════════════════ -->
+  <div class="stage" id="s2">
+    <div class="step-lbl">Interactive · Build the Count</div>
+
+    <div class="dual-build">
+      <div class="db-side">
+        <div class="db-word angel">مَلَك</div>
+        <div class="db-label">Angels built</div>
+        <div class="db-num angel-n" id="angelNum">0</div>
+        <div class="db-progress"><div class="db-fill db-fill-angel" id="angelFill"></div></div>
+      </div>
+      <div class="db-eq" id="dbEq">=</div>
+      <div class="db-side">
+        <div class="db-word devil">شَيْطَان</div>
+        <div class="db-label">Devils built</div>
+        <div class="db-num devil-n" id="devilNum">0</div>
+        <div class="db-progress"><div class="db-fill db-fill-devil" id="devilFill"></div></div>
+      </div>
+    </div>
+
+    <p class="forms-section-label">Angel forms — click each to add to the count</p>
+    <div class="form-cards" id="angelCards">
+      <div class="form-card" id="afc-0" onclick="addAngel(0)">
+        <div class="fc-arabic">مَلَٰٓئِكَة</div>
+        <div class="fc-info">
+          <div class="fc-form">Standard plural (malā'ika)</div>
+          <div class="fc-desc">The main plural — "angels" — used throughout the Quran</div>
+        </div>
+        <div class="fc-add" id="fa-0">72</div>
+      </div>
+      <div class="form-card" id="afc-1" onclick="addAngel(1)">
+        <div class="fc-arabic">مَّلَٰٓئِكَة</div>
+        <div class="fc-info">
+          <div class="fc-form">Shadda plural variant</div>
+          <div class="fc-desc">Same word, assimilated consonant — occurs once (43:60)</div>
+        </div>
+        <div class="fc-add" id="fa-1">1</div>
+      </div>
+      <div class="form-card" id="afc-2" onclick="addAngel(2)">
+        <div class="fc-arabic">مَلَكٌ / مَلَكًا / مَلَكٍ</div>
+        <div class="fc-info">
+          <div class="fc-form">Singular indefinite (all case endings)</div>
+          <div class="fc-desc">"An angel" — nominative, accusative, genitive forms</div>
+        </div>
+        <div class="fc-add" id="fa-2">9</div>
+      </div>
+      <div class="form-card" id="afc-3" onclick="addAngel(3)">
+        <div class="fc-arabic">مَّلَكُ / مَّلَكٍ</div>
+        <div class="fc-info">
+          <div class="fc-form">Shadda singular variants</div>
+          <div class="fc-desc">Assimilated form — 32:11 and 53:26</div>
+        </div>
+        <div class="fc-add" id="fa-3">2</div>
+      </div>
+      <div class="form-card" id="afc-4" onclick="addAngel(4)">
+        <div class="fc-arabic">ٱلْمَلَكُ</div>
+        <div class="fc-info">
+          <div class="fc-form">Definite singular (al-malaku)</div>
+          <div class="fc-desc">"The angel" — at 69:17 and 89:22</div>
+        </div>
+        <div class="fc-add" id="fa-4">2</div>
+      </div>
+      <div class="form-card" id="afc-5" onclick="addAngel(5)">
+        <div class="fc-arabic">مَلَكَيْنِ / ٱلْمَلَكَيْنِ</div>
+        <div class="fc-info">
+          <div class="fc-form">Dual forms (two angels)</div>
+          <div class="fc-desc">Indefinite (7:20) and definite (2:102)</div>
+        </div>
+        <div class="fc-add" id="fa-5">2</div>
+      </div>
+    </div>
+
+    <div class="devil-section" id="devilSection">
+      <p class="forms-section-label" style="color:var(--devil-light)">Devil forms — now build the other side</p>
+      <div class="form-cards" id="devilCards">
+        <div class="form-card devil-card" id="dfc-0" onclick="addDevil(0)">
+          <div class="fc-arabic devil-a">شَيْطَان</div>
+          <div class="fc-info">
+            <div class="fc-form">Singular (shayṭān)</div>
+            <div class="fc-desc">The singular form — appears with various prefixes (و, ف, ب, ل)</div>
+          </div>
+          <div class="fc-add devil-a" id="da-0">70</div>
+        </div>
+        <div class="form-card devil-card" id="dfc-1" onclick="addDevil(1)">
+          <div class="fc-arabic devil-a">شَيَاطِين</div>
+          <div class="fc-info">
+            <div class="fc-form">Plural (shayāṭīn)</div>
+            <div class="fc-desc">"Devils / demons" — the broken plural form</div>
+          </div>
+          <div class="fc-add devil-a" id="da-1">18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 3 · MC: Vowel distinction
+  ════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <div class="step-lbl">Question 2 of 2</div>
+    <p class="q-label">Multiple choice</p>
+    <p class="q-text">The word مَلِك (with a kasra on the middle letter) looks almost identical to مَلَك (angel). It is excluded from the angel count of 88. Why is this NOT arbitrary?</p>
+
+    <div class="answer-card" onclick="pickEx3(0)">It was included first, then subtracted to force the 88:88 balance</div>
+    <div class="answer-card" onclick="pickEx3(1)">A single vowel mark changes the word entirely — fatḥa-fatḥa = angel (مَلَك), fatḥa-kasra = king (مَلِك). Different roots, different meanings</div>
+    <div class="answer-card" onclick="pickEx3(2)">Kings are considered a type of angel in Islamic theology</div>
+    <div class="answer-card" onclick="pickEx3(3)">The word for king only appears in later Medinan surahs</div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 4 · VERDICT
+  ════════════════════════════════ -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">+10 XP &nbsp;·&nbsp; Pattern Complete</div>
+
+    <div class="eyebrow">Pattern 8 · Verified</div>
+    <h2 class="hero-title" style="font-size:clamp(20px,4vw,28px);margin-bottom:24px">
+      <span class="acc-angel">88</span> angel nouns &nbsp;=&nbsp; <span class="acc-devil">88</span> devil nouns
+    </h2>
+
+    <div class="verdict-pair">
+      <div class="vp-card vpc-angel">
+        <div class="vp-word">مَلَك</div>
+        <div class="vp-label">Angels</div>
+        <div class="vp-num" id="vAngelNum">0</div>
+        <div class="vp-sub">6 grammatical forms</div>
+      </div>
+      <div class="vp-eq" id="vEq">=</div>
+      <div class="vp-card vpc-devil">
+        <div class="vp-word">شَيْطَان</div>
+        <div class="vp-label">Devils</div>
+        <div class="vp-num" id="vDevilNum">0</div>
+        <div class="vp-sub">2 grammatical forms</div>
+      </div>
+    </div>
+
+    <div class="sec-hdg">Angel count — 6 forms, total 88</div>
+    <table class="breakdown-table angel-tbl" id="vAngelTable">
+      <thead><tr><th>Form</th><th>Arabic</th><th>Type</th><th style="text-align:right">Count</th></tr></thead>
+      <tbody>
+        <tr id="var0"><td>malā'ika</td><td class="ar-cell">مَلَٰٓئِكَة</td><td>Standard plural</td><td class="num-cell">72</td></tr>
+        <tr id="var1"><td>malā'ika (shadda)</td><td class="ar-cell">مَّلَٰٓئِكَة</td><td>Shadda variant</td><td class="num-cell">1</td></tr>
+        <tr id="var2"><td>malak (indef.)</td><td class="ar-cell">مَلَكٌ / مَلَكًا</td><td>Singular indefinite</td><td class="num-cell">9</td></tr>
+        <tr id="var3"><td>malak (shadda)</td><td class="ar-cell">مَّلَكُ / مَّلَكٍ</td><td>Shadda singular</td><td class="num-cell">2</td></tr>
+        <tr id="var4"><td>al-malak</td><td class="ar-cell">ٱلْمَلَكُ</td><td>Definite singular</td><td class="num-cell">2</td></tr>
+        <tr id="var5"><td>malakayn</td><td class="ar-cell">مَلَكَيْنِ</td><td>Dual forms</td><td class="num-cell">2</td></tr>
+        <tr id="var6" class="total-row"><td colspan="3" style="color:var(--text);font-weight:600">Total angel nouns</td><td class="num-cell">88</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sec-hdg">Devil count — 2 forms, total 88</div>
+    <table class="breakdown-table devil-tbl" id="vDevilTable">
+      <thead><tr><th>Form</th><th>Arabic</th><th>Type</th><th style="text-align:right">Count</th></tr></thead>
+      <tbody>
+        <tr id="vdr0"><td>shayṭān</td><td class="ar-cell">شَيْطَان</td><td>Singular</td><td class="num-cell">70</td></tr>
+        <tr id="vdr1"><td>shayāṭīn</td><td class="ar-cell">شَيَاطِين</td><td>Plural</td><td class="num-cell">18</td></tr>
+        <tr id="vdr2" class="total-row"><td colspan="3" style="color:var(--text);font-weight:600">Total devil nouns</td><td class="num-cell">88</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sec-hdg">The one exclusion — angel vs king</div>
+    <div class="vowel-pair" id="vVowPair">
+      <div class="vow-card counted">
+        <div class="vow-arabic counted">مَلَك</div>
+        <div class="vow-vowel">fatḥa · fatḥa (a-a)</div>
+        <div class="vow-meaning counted">Angel</div>
+        <div class="vow-tag yes">Counted — 88 times</div>
+      </div>
+      <div class="vow-card excluded">
+        <div class="vow-arabic excluded">مَلِك</div>
+        <div class="vow-vowel">fatḥa · kasra (a-i)</div>
+        <div class="vow-meaning excluded">King</div>
+        <div class="vow-tag no">Not counted — different word</div>
+      </div>
+    </div>
+
+    <div class="prob-block" id="vProb">
+      <div class="prob-row"><span class="pr-l">Angel noun forms — grammatical types</span><span class="pr-r">6 distinct forms</span></div>
+      <div class="prob-row"><span class="pr-l">Devil noun forms — grammatical types</span><span class="pr-r">2 distinct forms</span></div>
+      <div class="prob-row"><span class="pr-l">Exclusion from angel count</span><span class="pr-r hl">مَلِك (king) — different voweling, different root</span></div>
+      <div class="prob-row"><span class="pr-l">Exclusion from devil count</span><span class="pr-r hl">Zero — nothing excluded</span></div>
+      <div class="prob-row"><span class="pr-l">Probability any two words share an exact count</span><span class="pr-r">~1 in 121</span></div>
+      <div class="prob-row"><span class="pr-l">Probability of exact match at 88 specifically</span><span class="pr-r hl">~1 in 14,641</span></div>
+      <div class="prob-footer">
+        <div class="lbl">These are the theological opposites — zero ambiguity about the pair</div>
+        <div class="val">p &lt; 0.01% — statistically extraordinary</div>
+      </div>
+    </div>
+
+    <div class="gold-box" id="vGold">
+      <h3>What you have just confirmed</h3>
+      <p>
+        You built both counts yourself, form by form. <strong>Angels</strong> (مَلَك): six grammatical forms totalling <em>88</em>. <strong>Devils</strong> (شَيْطَان): two forms totalling <em>88</em>. The cosmic opposites — the force that guides humanity and the force that misleads — appear in exact numerical equilibrium across 114 chapters and 6,236 verses of a text composed over 23 years. The only exclusion is "king" (مَلِك), a different word by any Arabic dictionary. <em>The eternal rivals are balanced to the count.</em>
+      </p>
+    </div>
+
+    <div class="verdict-nav" id="vNav">
+      <a href="quran-life-death.html" class="btn btn-ghost">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pattern 7 · Life &amp; Death
+      </a>
+      <a href="quran-lightning-1313.html" class="btn btn-gold">
+        Pattern 9 · The 13:13 Lightning
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0e00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon">✓</div>
+    <div>
+      <div class="fb-title">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" onclick="hideFb()">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var fbCb = null;
+var barMap  = {0:'0%', 1:'22%', 2:'52%', 3:'78%', 4:'100%'};
+var metaMap = {0:'', 1:'Question 1 of 2', 2:'Interactive · Build the Count', 3:'Question 2 of 2', 4:'Verdict'};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('barFill').style.width = barMap[n];
+  document.getElementById('barMeta').textContent = metaMap[n];
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (n === 2) initStage2();
+  if (n === 4) { saveProgress('angels-devils'); initVerdict(); }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(step);
+    else if (cb) cb();
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── Feedback panel ── */
+function showOk(sub, cb) {
+  fbCb = cb;
+  document.getElementById('fbSub').textContent = sub;
+  document.getElementById('fbPanel').className = 'fb-panel fb-ok show';
+}
+function hideFb() {
+  document.getElementById('fbPanel').classList.remove('show');
+  if (fbCb) { var f = fbCb; fbCb = null; f(); }
+}
+
+/* ── MC 1: Angel count ── */
+var answerLocked1 = false;
+function pickEx1(idx) {
+  if (answerLocked1) return;
+  var correct = 2;
+  var cards = document.querySelectorAll('#s1 .answer-card');
+  if (idx === correct) {
+    answerLocked1 = true;
+    cards[idx].classList.add('ac-correct');
+    cards.forEach(function(c, i) { if (i !== correct) c.classList.add('ac-disabled'); });
+    showOk('Exactly 88 times — across six distinct grammatical forms. Now build that count yourself, and discover what the devil count lands on.', function() { go(2); });
+  } else {
+    cards[idx].classList.add('ac-wrong');
+    setTimeout(function() { cards[idx].classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* ── Stage 2: Form builder ── */
+var angelForms = [72, 1, 9, 2, 2, 2];
+var devilForms = [70, 18];
+var angelTotal = 0;
+var devilTotal = 0;
+var angelDone = [false, false, false, false, false, false];
+var devilDone = [false, false];
+var bothBuilt = false;
+
+function initStage2() {
+  var cards = document.querySelectorAll('#angelCards .form-card');
+  cards.forEach(function(c, i) {
+    setTimeout(function() { c.classList.add('show'); }, 120 + i * 90);
+  });
+}
+
+function addAngel(idx) {
+  if (angelDone[idx]) return;
+  angelDone[idx] = true;
+  document.getElementById('afc-' + idx).classList.add('locked');
+  document.getElementById('fa-' + idx).classList.add('done');
+  var prev = angelTotal;
+  angelTotal += angelForms[idx];
+  document.getElementById('angelFill').style.width = (angelTotal / 88 * 100) + '%';
+  animFrom(document.getElementById('angelNum'), prev, angelTotal, 450, function() {
+    if (angelTotal === 88) {
+      document.getElementById('angelNum').classList.add('complete');
+      setTimeout(revealDevilSection, 600);
+    }
+  });
+}
+
+function revealDevilSection() {
+  var sec = document.getElementById('devilSection');
+  sec.classList.add('show');
+  var cards = document.querySelectorAll('#devilCards .form-card');
+  cards.forEach(function(c, i) {
+    setTimeout(function() { c.classList.add('show'); }, 200 + i * 140);
+  });
+}
+
+function addDevil(idx) {
+  if (devilDone[idx]) return;
+  devilDone[idx] = true;
+  document.getElementById('dfc-' + idx).classList.add('locked');
+  document.getElementById('da-' + idx).classList.add('done');
+  var prev = devilTotal;
+  devilTotal += devilForms[idx];
+  document.getElementById('devilFill').style.width = (devilTotal / 88 * 100) + '%';
+  animFrom(document.getElementById('devilNum'), prev, devilTotal, 450, function() {
+    if (devilTotal === 88 && !bothBuilt) {
+      bothBuilt = true;
+      document.getElementById('devilNum').classList.add('complete');
+      setTimeout(function() {
+        document.getElementById('dbEq').classList.add('lit');
+        setTimeout(function() {
+          showOk('Angels 88, Devils 88 — built form by form from scratch. The cosmic opposites are in perfect numerical equilibrium.', function() { go(3); });
+        }, 600);
+      }, 400);
+    }
+  });
+}
+
+/* ── MC 3: Vowel distinction ── */
+var answerLocked3 = false;
+function pickEx3(idx) {
+  if (answerLocked3) return;
+  var correct = 1;
+  var cards = document.querySelectorAll('#s3 .answer-card');
+  if (idx === correct) {
+    answerLocked3 = true;
+    cards[idx].classList.add('ac-correct');
+    cards.forEach(function(c, i) { if (i !== correct) c.classList.add('ac-disabled'); });
+    showOk('Exactly. A single vowel mark separates angel from king: malak (a-a) vs malik (a-i). Different roots, different meanings — basic Arabic morphology, not an arbitrary choice.', function() { go(4); });
+  } else {
+    cards[idx].classList.add('ac-wrong');
+    setTimeout(function() { cards[idx].classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* ── Verdict ── */
+function initVerdict() {
+  setTimeout(function() { document.getElementById('xpBadge').classList.add('show'); }, 300);
+  var aEl = document.getElementById('vAngelNum');
+  var dEl = document.getElementById('vDevilNum');
+  var eqEl = document.getElementById('vEq');
+  var done = 0;
+  function onDone() {
+    done++;
+    if (done === 2) {
+      setTimeout(function() {
+        eqEl.classList.add('lit');
+        setTimeout(buildVerdictCascade, 500);
+      }, 200);
+    }
+  }
+  setTimeout(function() {
+    animFrom(aEl, 0, 88, 1100, onDone);
+    animFrom(dEl, 0, 88, 1100, onDone);
+  }, 600);
+}
+
+function buildVerdictCascade() {
+  var aRows = document.querySelectorAll('#vAngelTable tbody tr');
+  aRows.forEach(function(r, i) {
+    setTimeout(function() { r.classList.add('show'); }, i * 160);
+  });
+  var aEnd = aRows.length * 160 + 200;
+
+  var dRows = document.querySelectorAll('#vDevilTable tbody tr');
+  dRows.forEach(function(r, i) {
+    setTimeout(function() { r.classList.add('show'); }, aEnd + i * 160);
+  });
+  var dEnd = aEnd + dRows.length * 160 + 200;
+
+  setTimeout(function() { document.getElementById('vVowPair').classList.add('show'); }, dEnd);
+  setTimeout(function() { document.getElementById('vProb').classList.add('show'); }, dEnd + 300);
+  setTimeout(function() { document.getElementById('vGold').classList.add('show'); }, dEnd + 620);
+  setTimeout(function() { document.getElementById('vNav').classList.add('show'); }, dEnd + 900);
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var angelPs = Array.from({length:20}, function(_,i) {
+    return {x:Math.random()*W*0.44,y:H*0.5+Math.random()*H*0.5,sp:0.4+Math.random()*0.8,ph:i*0.7};
+  });
+  var devilPs = Array.from({length:20}, function(_,i) {
+    return {x:W*0.56+Math.random()*W*0.44,y:Math.random()*H*0.5,sp:0.4+Math.random()*0.8,ph:i*0.7};
+  });
+  function frame() {
+    ctx.clearRect(0,0,W,H);
+    var gl=ctx.createLinearGradient(0,0,W*0.48,0);
+    gl.addColorStop(0,'#0d1a2e'); gl.addColorStop(1,'#121f35');
+    ctx.fillStyle=gl; ctx.fillRect(0,0,W*0.5,H);
+    var gr=ctx.createLinearGradient(W*0.52,0,W,0);
+    gr.addColorStop(0,'#180c0c'); gr.addColorStop(1,'#120808');
+    ctx.fillStyle=gr; ctx.fillRect(W*0.5,0,W*0.5,H);
+    angelPs.forEach(function(p) {
+      p.y-=p.sp; p.x+=Math.sin(t*1.5+p.ph)*0.5;
+      if(p.y<-5){p.y=H+5;p.x=Math.random()*W*0.43;}
+      var a=Math.max(0,Math.min(0.8,(H-p.y)/H*1.5));
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.8,0,Math.PI*2);
+      ctx.fillStyle='rgba(253,224,71,'+a+')'; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2);
+      ctx.fillStyle='rgba(253,224,71,0.07)'; ctx.fill();
+    });
+    devilPs.forEach(function(p) {
+      p.y+=p.sp; p.x+=Math.sin(t*1.2+p.ph)*0.4;
+      if(p.y>H+5){p.y=-5;p.x=W*0.57+Math.random()*W*0.43;}
+      var a=Math.max(0,Math.min(0.75,p.y/H*1.5));
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.8,0,Math.PI*2);
+      ctx.fillStyle='rgba(248,113,113,'+a+')'; ctx.fill();
+    });
+    var gv=ctx.createLinearGradient(W*0.47,0,W*0.53,0);
+    gv.addColorStop(0,'transparent'); gv.addColorStop(0.5,'rgba(255,255,255,0.06)'); gv.addColorStop(1,'transparent');
+    ctx.fillStyle=gv; ctx.fillRect(W*0.47,0,W*0.06,H);
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

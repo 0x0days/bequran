@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>World &amp; Hereafter · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #0b1622;
+      --surface:     #111e2e;
+      --surface2:    #182840;
+      --border:      rgba(255,255,255,0.08);
+      --text:        #e2ddd4;
+      --muted:       #7a8fa3;
+      --accent:      #7c3aed;
+      --accent-light:#a78bfa;
+      --accent-dim:  rgba(124,58,237,0.10);
+      --accent-ring: rgba(167,139,250,0.22);
+      --dunya:       #d97706;
+      --dunya-light: #fbbf24;
+      --akhira:      #7c3aed;
+      --akhira-light:#a78bfa;
+      --gold:        #f59e0b;
+      --gold-light:  #fcd34d;
+      --ok:          #22c55e;
+      --ok-bg:       #052e16;
+      --ok-border:   #166534;
+      --err-light:   #f87171;
+      --err-bg:      #2d0707;
+      --err-border:  #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 660px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .45s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 16px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.hidden { opacity: 0; pointer-events: none; }
+    .verse-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+    .verse-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(18px, 3vw, 24px); line-height: 2.2; color: var(--text); margin-bottom: 14px; }
+    .verse-tr { font-size: 14px; line-height: 1.75; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; font-style: italic; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── Duolingo progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Balance equation (s0) ── */
+    .balance-eq { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 32px 0; }
+    .bal-side { text-align: center; }
+    .bal-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(22px, 5vw, 30px); line-height: 1.6; margin-bottom: 6px; }
+    .bal-num { font-family: 'Playfair Display', serif; font-size: clamp(64px, 16vw, 108px); font-weight: 700; line-height: 1; }
+    .bal-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+    .bal-dunya .bal-num { color: var(--dunya-light); text-shadow: 0 0 60px rgba(217,119,6,0.4); }
+    .bal-dunya .bal-ar { color: var(--dunya-light); }
+    .bal-akhira .bal-num { color: var(--akhira-light); text-shadow: 0 0 60px rgba(124,58,237,0.4); }
+    .bal-akhira .bal-ar { color: var(--akhira-light); }
+    .bal-eq { font-family: 'Playfair Display', serif; font-size: clamp(36px, 8vw, 56px); color: #f59e0b; text-shadow: 0 0 40px rgba(245,158,11,0.4); opacity: 0; transition: opacity .6s; flex-shrink: 0; }
+    .bal-eq.show { opacity: 1; }
+
+    /* ── Root cards ── */
+    .roots-box { display: flex; gap: 16px; margin: 8px 0 24px; }
+    .root-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+    .root-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 24px; margin-bottom: 6px; }
+    .root-meaning { font-size: 12px; color: var(--muted); margin-bottom: 10px; font-style: italic; line-height: 1.5; }
+    .root-badge { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+    .rb-d { background: rgba(217,119,6,0.15); color: var(--dunya-light); }
+    .rb-a { background: rgba(124,58,237,0.15); color: var(--akhira-light); }
+    .highlight-d { color: var(--dunya-light); font-weight: 700; }
+    .highlight-a { color: var(--akhira-light); font-weight: 700; }
+
+    /* ── Duolingo answer cards ── */
+    .answer-card {
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.28);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+    }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct {
+      border-color: var(--ok);
+      border-bottom-color: var(--ok-border);
+      background: rgba(34,197,94,0.08);
+      pointer-events: none;
+    }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter {
+      width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border);
+      flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s;
+    }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Form builder (s2) ── */
+    .counter-display { text-align: center; margin: 16px 0 20px; }
+    .counter-num { font-family: 'Playfair Display', serif; font-size: clamp(52px, 13vw, 80px); font-weight: 700; line-height: 1; color: var(--muted); transition: color .5s, text-shadow .5s; }
+    .counter-num.done { color: var(--akhira-light); text-shadow: 0 0 60px rgba(124,58,237,0.5); }
+    .counter-lbl { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 6px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .form-card { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--akhira-light); border-radius: 10px; padding: 14px; cursor: pointer; transition: all .22s; user-select: none; }
+    .form-card:not(.used):hover { border-color: rgba(167,139,250,0.35); transform: translateY(-1px); }
+    .form-card.used { opacity: 0.4; cursor: default; pointer-events: none; background: rgba(124,58,237,0.05); }
+    .form-card .fc-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: 22px; color: var(--text); margin-bottom: 4px; }
+    .form-card .fc-en { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .form-card .fc-n { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--akhira-light); line-height: 1; }
+    .form-card.big-card { grid-column: 1 / -1; display: flex; align-items: center; gap: 20px; }
+    .form-card.big-card .fc-ar { font-size: 28px; flex-shrink: 0; }
+    .form-card.big-card .fc-body { flex: 1; }
+    .form-card.big-card .fc-n { font-size: 40px; }
+
+    .forms-prog { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin: 12px 0 20px; }
+    .forms-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--akhira-light)); width: 0%; border-radius: 2px; transition: width .5s ease; }
+
+    /* ── Paradox bar chart ── */
+    .paradox-wrap { margin: 16px 0 24px; }
+    .paradox-section { margin-bottom: 20px; }
+    .paradox-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .paradox-row { margin-bottom: 10px; }
+    .paradox-row .pr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; font-size: 13px; }
+    .paradox-row .pr-head .ar { font-family: 'Amiri', serif; font-size: 18px; }
+    .paradox-row .pr-val { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+    .pbar-bg { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .pbar-fill { height: 100%; border-radius: 3px; width: 0; transition: width 1s ease; }
+    .fill-d { background: var(--dunya-light); }
+    .fill-a { background: var(--akhira-light); }
+    .fill-eq { background: linear-gradient(90deg, var(--dunya-light), var(--akhira-light)); }
+    .paradox-section.eq .paradox-row .pr-val { color: #f59e0b; }
+
+    /* ── Verdict (s4) ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+
+    .stat-row-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 16px 0 20px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row.gold { background: rgba(245,158,11,0.07); }
+    .stat-row .sr-name { color: var(--muted); }
+    .stat-row .sr-val { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; }
+    .stat-row.gold .sr-name { color: var(--text); font-weight: 500; }
+    .stat-row.gold .sr-val { color: #f59e0b; font-size: 20px; }
+
+    .timeline { position: relative; padding-left: 26px; margin: 20px 0 28px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(to bottom, var(--accent-light), #f59e0b); }
+    .tl-item { position: relative; margin-bottom: 26px; }
+    .tl-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent-light); }
+    .tl-item:last-child::before { border-color: #f59e0b; background: #f59e0b; }
+    .tl-year { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 4px; }
+    .tl-text { font-size: 15px; line-height: 1.75; }
+    .tl-sub { font-size: 13px; color: var(--muted); display: block; margin-top: 3px; }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Fixed feedback panel (Duolingo) ── */
+    .fb-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      padding: 18px 20px 32px;
+      transform: translateY(110%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok); color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  All lessons
+<\/a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-calendar-cycles.html" class="nav-back">← Calendar Cycles</a>
+
+  <!-- Duolingo-style progress bar -->
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · World &amp; Hereafter</div>
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · World &amp; Hereafter</p>
+    <h1 class="hero-title">The Quran's two most fundamental opposites appear an identical number of times — exactly.</h1>
+
+    <div class="balance-eq">
+      <div class="bal-side bal-dunya">
+        <div class="bal-ar">الدنيا</div>
+        <div class="bal-num" id="dn0">0</div>
+        <div class="bal-lbl">the world</div>
+      </div>
+      <div class="bal-eq" id="eq0">=</div>
+      <div class="bal-side bal-akhira">
+        <div class="bal-ar">الآخرة</div>
+        <div class="bal-num" id="ak0">0</div>
+        <div class="bal-lbl">the hereafter</div>
+      </div>
+    </div>
+
+    <p class="body-text">Across 114 chapters and 6,236 verses, the word for "the world" (الدنيا) appears exactly 115 times. The word for "the hereafter" (الآخرة) — a completely different Arabic root, with a completely different frequency across the text — also appears exactly 115 times. The balance is perfect. Zero difference.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Show me the pairing →</button>
+  </div>
+
+  <!-- ── STAGE 1: MC Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3</p>
+    <p class="prompt">The Arabic word الدُّنْيَا (al-dunyā) means "this world" or "the present life." How many times does it appear in the Quran?</p>
+    <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">100</div><div class="ac-sub">A round number</div></div></div>
+    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">115</div><div class="ac-sub">Exactly this many times</div></div></div>
+    <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">133</div><div class="ac-sub">The root total for the hereafter</div></div></div>
+  </div>
+
+  <!-- ── STAGE 2: Form Builder ── -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3</p>
+    <h2 class="hero-title">الآخرة appears in six grammatical forms. Click each one to add it.</h2>
+    <p class="body-text">Arabic attaches prepositions directly to words. These are all the same theological term — "the hereafter" — with standard clitic prefixes.</p>
+
+    <div class="counter-display">
+      <div class="counter-num" id="akcount">0</div>
+      <div class="counter-lbl">occurrences of الآخرة</div>
+    </div>
+
+    <div class="forms-prog"><div class="forms-fill" id="fpfill"></div></div>
+
+    <div class="form-grid">
+      <div class="form-card big-card" data-fid="f0" onclick="addForm('f0',71,this)">
+        <div class="fc-ar">الآخرة</div>
+        <div class="fc-body">
+          <div class="fc-en">the hereafter (plain form)</div>
+          <div class="fc-n">71</div>
+        </div>
+      </div>
+
+      <div class="form-card" data-fid="f1" onclick="addForm('f1',21,this)">
+        <div class="fc-ar">بالآخرة</div>
+        <div class="fc-en">in the hereafter</div>
+        <div class="fc-n">21</div>
+      </div>
+
+      <div class="form-card" data-fid="f2" onclick="addForm('f2',19,this)">
+        <div class="fc-ar">والآخرة</div>
+        <div class="fc-en">and the hereafter</div>
+        <div class="fc-n">19</div>
+      </div>
+
+      <div class="form-card" data-fid="f3" onclick="addForm('f3',2,this)">
+        <div class="fc-ar">وللآخرة</div>
+        <div class="fc-en">and for the hereafter</div>
+        <div class="fc-n">2</div>
+      </div>
+
+      <div class="form-card" data-fid="f4" onclick="addForm('f4',1,this)">
+        <div class="fc-ar">وبالآخرة</div>
+        <div class="fc-en">and with the hereafter</div>
+        <div class="fc-n">1</div>
+      </div>
+
+      <div class="form-card" data-fid="f5" onclick="addForm('f5',1,this)">
+        <div class="fc-ar">للآخرة</div>
+        <div class="fc-en">for the hereafter</div>
+        <div class="fc-n">1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 3: MC Exercise 2 ── -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <p class="prompt">The root word أخر (meaning "other/later") appears 250 times in the Quran. But how many times do the specific forms of الآخرة (the Hereafter) appear?</p>
+    <div onclick="pickEx3(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">133</div><div class="ac-sub">The root total</div></div></div>
+    <div onclick="pickEx3(this,false)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">250</div><div class="ac-sub">All occurrences of the root</div></div></div>
+    <div onclick="pickEx3(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">115</div><div class="ac-sub">Exactly equal to the Dunya count</div></div></div>
+  </div>
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">Neither dominates. Neither is heavier. Exactly 115 each.</h2>
+
+    <div class="match-wrap" style="display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0;flex-wrap:wrap;">
+      <div style="text-align:center"><div class="match-num" id="mv0" style="font-family:'Playfair Display',serif;font-size:clamp(42px,10vw,64px);font-weight:700;color:var(--accent-light,#93c5fd);text-shadow:0 0 40px rgba(147,197,253,0.4)">0</div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">الدنيا · this world</div></div>
+      <div style="font-family:'Playfair Display',serif;font-size:clamp(28px,6vw,44px);color:var(--muted)">=</div>
+      <div style="text-align:center"><div class="match-num" id="mv1" style="font-family:'Playfair Display',serif;font-size:clamp(42px,10vw,64px);font-weight:700;color:var(--gold-light,#fcd34d);text-shadow:0 0 40px rgba(252,211,77,0.4)">0</div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">الآخرة · the hereafter</div></div>
+    </div>
+
+    <div class="stat-row-wrap">
+      <div class="stat-row">
+        <span class="sr-name">الدنيا — world root total forms</span>
+        <span class="sr-val" style="color:var(--dunya-light)">133</span>
+      </div>
+      <div class="stat-row">
+        <span class="sr-name">الآخرة — hereafter root total forms</span>
+        <span class="sr-val" style="color:var(--akhira-light)">250</span>
+      </div>
+      <div class="stat-row">
+        <span class="sr-name">الدنيا specific occurrences</span>
+        <span class="sr-val" style="color:var(--dunya-light)">115</span>
+      </div>
+      <div class="stat-row">
+        <span class="sr-name">الآخرة specific occurrences</span>
+        <span class="sr-val" style="color:var(--akhira-light)">115</span>
+      </div>
+      <div class="stat-row gold">
+        <span class="sr-name">Difference between the two</span>
+        <span class="sr-val">0</span>
+      </div>
+    </div>
+
+    <p class="body-text" style="font-size:14px;margin-bottom:22px">Conservative probability of this exact match by chance: <strong style="color:#fcd34d">less than 1 in 100</strong>. Accounting for the fact that these are THE defining theological terms of the Quran's central duality — not a randomly selected pair — the likelihood of accidental balance collapses further.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">610–632 CE — Arabia</div>
+        <div class="tl-text">
+          The Quran is composed over 23 years. No concordances exist. No word frequency tracking exists. Verses are revealed in response to events, across different cities and contexts.
+          <span class="tl-sub">Maintaining exact word-count parity across 23 years of spontaneous revelation requires knowing the running total of every word at every moment.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Modern verification</div>
+        <div class="tl-text">
+          First confirmed computationally using the Quranic Arabic Corpus and Tanzil Ḥafṣ/Uthmānī text. The same text preserved memorized by hundreds of millions — unchanged — produces this count. Anyone can run the verification script and receive the same result.
+          <span class="tl-sub">Search: corpus.quran.com/qurandictionary.jsp?q=dnw and ?q=Axr</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">The Quran pairs this world and the hereafter in its theology, in its verses, and now in its word counts. The near life: 115. The final life: 115. Perfect equilibrium — in a book composed piece by piece over two decades.</div>
+      <div class="gs">Root frequencies differ by nearly 2:1 (133 vs 250). Yet the specific theological terms reach the same number. The counting rule is identical for both sides: all clitic variants, no unrelated root meanings. The balance holds with zero manipulation.</div>
+    </div>
+
+    <div class="insight-box">
+      <strong>The number 115 appears in neither word.</strong> It is not stated anywhere in the text. It emerges only when you count — and only when you count both. The Quran does not claim this balance; it simply contains it.
+    </div>
+
+    <a href="quran-calendar-cycles.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Calendar Cycles</a>
+    <a href="quran-sun-temperature.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Sun Temperature →</a>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let akv = 0;
+const fused = new Set();
+let fcount = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function animNum(el, target, ms, cb) {
+  animFrom(el, 0, target, ms, cb);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · World & Hereafter', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('world-hereafter');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 115, 1800, null);
+        animFrom(document.getElementById('mv1'), 0, 115, 1800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('115 — and the Quran\'s word for the Hereafter (الآخرة) also appears exactly 115 times. Two opposites, perfectly balanced.', function(){ go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function addForm(id, n, card) {
+  if (fused.has(id)) return;
+  fused.add(id);
+  card.classList.add('used');
+  fcount++;
+  document.getElementById('fpfill').style.width = (fcount / 6 * 100) + '%';
+
+  var prev = akv;
+  akv += n;
+  animFrom(document.getElementById('akcount'), prev, akv, 600, function() {
+    if (akv === 115) {
+      document.getElementById('akcount').classList.add('done');
+      setTimeout(function() {
+        showOk('Six forms of الآخرة — all adding up to 115, matching the Dunya count exactly.', function(){ go(3); });
+      }, 400);
+    }
+  });
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('115 — the specific grammatical forms of الآخرة equal the specific count of الدنيا. Two opposites, one count.', function(){ go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    animNum(document.getElementById('dn0'), 115, 1700);
+    animNum(document.getElementById('ak0'), 115, 1700, function() {
+      document.getElementById('eq0').classList.add('show');
+    });
+  }, 400);
+});
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var worldPs = Array.from({length:18},function(){return{x:Math.random()*W*0.44,y:Math.random()*H,sp:0.3+Math.random()*0.5,ph:Math.random()*6.28};});
+  var herePs  = Array.from({length:18},function(){return{x:W*0.56+Math.random()*W*0.44,y:Math.random()*H,sp:0.3+Math.random()*0.5,ph:Math.random()*6.28};});
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    var gw=ctx.createLinearGradient(0,0,W*0.48,0);
+    gw.addColorStop(0,'#09090f'); gw.addColorStop(1,'#0d101a');
+    ctx.fillStyle=gw; ctx.fillRect(0,0,W*0.5,H);
+    var gh=ctx.createLinearGradient(W*0.52,0,W,0);
+    gh.addColorStop(0,'#160f00'); gh.addColorStop(1,'#1e1400');
+    ctx.fillStyle=gh; ctx.fillRect(W*0.5,0,W*0.5,H);
+    worldPs.forEach(function(p){
+      p.y-=p.sp; if(p.y<-5){p.y=H+5;p.x=Math.random()*W*0.43;}
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.3,0,Math.PI*2);
+      ctx.fillStyle='rgba(110,120,135,0.4)'; ctx.fill();
+    });
+    herePs.forEach(function(p){
+      p.y-=p.sp; if(p.y<-5){p.y=H+5;p.x=W*0.57+Math.random()*W*0.43;}
+      var gp=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,5);
+      gp.addColorStop(0,'rgba(253,224,71,0.75)'); gp.addColorStop(1,'rgba(253,224,71,0)');
+      ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fillStyle=gp; ctx.fill();
+    });
+    var gv=ctx.createLinearGradient(W*0.45,0,W*0.55,0);
+    gv.addColorStop(0,'transparent'); gv.addColorStop(0.5,'rgba(255,255,255,0.055)'); gv.addColorStop(1,'transparent');
+    ctx.fillStyle=gv; ctx.fillRect(W*0.45,0,W*0.1,H);
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

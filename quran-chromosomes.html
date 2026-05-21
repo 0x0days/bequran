@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>The Bee Surah · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #d97706;
+      --accent-light: #fbbf24;
+      --accent-dim:   rgba(217,119,6,0.12);
+      --accent-ring:  rgba(251,191,36,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    .surah-hero { text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; margin-bottom: 28px; position: relative; overflow: hidden; }
+    .surah-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.08) 0%, transparent 70%); }
+    .surah-num { font-family: 'Playfair Display', serif; font-size: clamp(64px, 14vw, 100px); font-weight: 700; color: var(--accent-light); line-height: 1; text-shadow: 0 0 60px rgba(251,191,36,0.3); position: relative; }
+    .surah-name-ar { font-family: 'Amiri', serif; font-size: 36px; direction: rtl; color: var(--text); margin: 10px 0 4px; position: relative; }
+    .surah-name-en { font-size: 14px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; position: relative; }
+
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 16px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; font-size: 15px; font-weight: 500; line-height: 1.4; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    .chr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .chr-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 12px; text-align: center; transition: border-color .5s, background .5s, box-shadow .5s; }
+    .chr-card.lit { border-color: var(--accent-ring); background: var(--accent-dim); box-shadow: 0 0 20px rgba(251,191,36,0.08); }
+    .chr-mult { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; }
+    .chr-num { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; color: var(--accent-light); line-height: 1; margin-bottom: 8px; }
+    .chr-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+    .chr-tag { display: inline-block; background: var(--accent-dim); border: 1px solid var(--accent-ring); border-radius: 8px; padding: 3px 10px; font-size: 10px; color: var(--accent-light); }
+
+    .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .calc-btn.used { opacity: 0.5; pointer-events: none; }
+
+    .mult-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; opacity: 0; transform: translateY(8px); transition: opacity .55s, transform .55s, border-color .55s; }
+    .mult-row.show { opacity: 1; transform: none; border-color: var(--accent-ring); }
+    .mult-base { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--muted); min-width: 52px; text-align: center; flex-shrink: 0; }
+    .mult-eq { font-size: 18px; color: var(--muted); flex-shrink: 0; }
+    .mult-result { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--accent-light); min-width: 62px; text-align: center; line-height: 1; flex-shrink: 0; }
+    .mult-desc { flex: 1; }
+    .mult-label { font-size: 14px; font-weight: 500; color: var(--text); }
+    .mult-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .insight-box { background: var(--surface); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; color: var(--muted); line-height: 1.75; border-left: 3px solid var(--accent); }
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    .next-teaser { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .next-teaser-label { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .next-teaser-title { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.5; margin-bottom: 14px; }
+
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-sea-land.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Sea &amp; Land · Pattern 1
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · The Bee Surah</div>
+
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--accent-light)">Pattern 2a · The Bee Surah</div>
+    <h1 class="hero-title">The Quran's 16th chapter is named "The Bee." The number 16 encodes exact bee chromosome biology.</h1>
+    <p class="body-text">Every surah has a number. The 16th surah is An-Nahl. That number — 16 — turns out to be the precise chromosome count of the male bee, and a root for every other biological number in the hive. No 7th-century human knew this.</p>
+    <div class="surah-hero">
+      <div class="surah-num">16</div>
+      <div class="surah-name-ar">النَّحْل</div>
+      <div class="surah-name-en">An-Nahl · The Bee</div>
+    </div>
+    <button class="btn" style="background:var(--accent);color:#fff" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="stage" id="s1">
+    <div class="step-lbl">Exercise 1 of 3</div>
+    <div class="prompt">The 16th chapter of the Quran has a unique name. Which of these is it?</div>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-family:'Amiri',serif;font-size:22px;direction:rtl;margin-bottom:4px">البقرة</div>
+        <div style="font-size:12px;color:var(--muted)">Al-Baqara · The Cow</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,true)">
+        <div style="font-family:'Amiri',serif;font-size:22px;direction:rtl;margin-bottom:4px">النَّحْل</div>
+        <div style="font-size:12px;color:var(--muted)">An-Nahl · The Bee</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-family:'Amiri',serif;font-size:22px;direction:rtl;margin-bottom:4px">النَّمْل</div>
+        <div style="font-size:12px;color:var(--muted)">An-Naml · The Ant</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-family:'Amiri',serif;font-size:22px;direction:rtl;margin-bottom:4px">الفيل</div>
+        <div style="font-size:12px;color:var(--muted)">Al-Fil · The Elephant</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="s2">
+    <div class="step-lbl">Exercise 2 of 3</div>
+    <div class="prompt">How many chromosomes does a male honeybee (drone) have?</div>
+    <p class="body-text" style="margin-bottom:20px">Male bees develop from unfertilised eggs, making them haploid — they carry only one set of chromosomes. This was confirmed by cytogeneticists in the 1950s.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx2(this,false)" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">8</div>
+      <div class="answer-card" onclick="pickEx2(this,true)"  style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">16</div>
+      <div class="answer-card" onclick="pickEx2(this,false)" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">32</div>
+      <div class="answer-card" onclick="pickEx2(this,false)" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">46</div>
+    </div>
+  </div>
+
+  <div class="stage" id="s3">
+    <div class="step-lbl">Exercise 3 of 3</div>
+    <div class="prompt">Watch how 16 multiplies through bee biology — and through the surah itself.</div>
+    <div class="chr-grid">
+      <div class="chr-card" id="cc0">
+        <div class="chr-mult">16 × 1</div>
+        <div class="chr-num" id="ccn0">—</div>
+        <div class="chr-desc">Drone (male)<br>chromosomes</div>
+        <div class="chr-tag">Haploid · n</div>
+      </div>
+      <div class="chr-card" id="cc1">
+        <div class="chr-mult">16 × 2</div>
+        <div class="chr-num" id="ccn1">—</div>
+        <div class="chr-desc">Worker &amp; Queen<br>chromosomes</div>
+        <div class="chr-tag">Diploid · 2n</div>
+      </div>
+      <div class="chr-card" id="cc2">
+        <div class="chr-mult">16 × 8</div>
+        <div class="chr-num" id="ccn2">—</div>
+        <div class="chr-desc">Verses in<br>Surah An-Nahl</div>
+        <div class="chr-tag">Verse count</div>
+      </div>
+    </div>
+    <button class="calc-btn" id="chrBtn" onclick="runChrGrid()">Reveal the pattern</button>
+  </div>
+
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">The surah number is not a coincidence. It is the biological unit for the entire hive.</h2>
+
+    <div class="mult-row" id="mr0">
+      <div class="mult-base">16 × 1</div>
+      <div class="mult-eq">=</div>
+      <div class="mult-result" id="mrn0">0</div>
+      <div class="mult-desc">
+        <div class="mult-label">Drone chromosomes</div>
+        <div class="mult-sub">Haploid · male bee · confirmed 1950s</div>
+      </div>
+    </div>
+    <div class="mult-row" id="mr1">
+      <div class="mult-base">16 × 2</div>
+      <div class="mult-eq">=</div>
+      <div class="mult-result" id="mrn1">0</div>
+      <div class="mult-desc">
+        <div class="mult-label">Worker &amp; Queen chromosomes</div>
+        <div class="mult-sub">Diploid · female bee · confirmed 1950s</div>
+      </div>
+    </div>
+    <div class="mult-row" id="mr2">
+      <div class="mult-base">16 × 8</div>
+      <div class="mult-eq">=</div>
+      <div class="mult-result" id="mrn2">0</div>
+      <div class="mult-desc">
+        <div class="mult-label">Verses in Surah An-Nahl</div>
+        <div class="mult-sub">The Bee · Quran chapter 16</div>
+      </div>
+    </div>
+
+    <div class="gold-box" style="margin-top:28px">
+      <div class="gt">16 = drone chromosomes. 32 = female bee chromosomes. 128 = verses in the surah. Every number is 16 × an integer — and 16 is the surah's own number.</div>
+      <div class="gs">Bee chromosome counts were established by cytogenetics in the 1950s. The surah was fixed in the 7th century. The surah number, verse count, and chromosome biology all resolve to the same unit. No rounding was used.</div>
+    </div>
+
+    <div class="next-teaser">
+      <div class="next-teaser-label">But there is a second miracle in this same surah</div>
+      <div class="next-teaser-title">The Quran addresses bees with three commands — all in the feminine. In 7th-century Arabia, hive workers were assumed to be male.</div>
+      <a href="quran-bee-female.html" class="btn" style="background:var(--accent);color:#fff">
+        Continue · The Female Worker →
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <a href="quran-sea-land.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sea &amp; Land</a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let chrDone = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+const metaMap = { 0:'Lesson · The Bee Surah', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('chromosomes');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(revealMultRows, 500);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Surah 16 is An-Nahl — The Bee. It is the only Quranic chapter named after an insect.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Drone bees are haploid with exactly 16 chromosomes — the same number as the surah that bears their name.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runChrGrid() {
+  if (chrDone) return;
+  chrDone = true;
+  document.getElementById('chrBtn').classList.add('used');
+  setTimeout(function() {
+    document.getElementById('cc0').classList.add('lit');
+    animFrom(document.getElementById('ccn0'), 0, 16, 700, null);
+  }, 200);
+  setTimeout(function() {
+    document.getElementById('cc1').classList.add('lit');
+    animFrom(document.getElementById('ccn1'), 0, 32, 900, null);
+  }, 1000);
+  setTimeout(function() {
+    document.getElementById('cc2').classList.add('lit');
+    animFrom(document.getElementById('ccn2'), 0, 128, 1100, null);
+  }, 1900);
+  setTimeout(function() {
+    showOk('16 drone chromosomes. 32 female chromosomes. 128 surah verses. Every number is an exact multiple of 16.', function() { go(4); });
+  }, 3200);
+}
+
+function revealMultRows() {
+  var rows    = ['mr0','mr1','mr2'];
+  var targets = [16, 32, 128];
+  var nums    = ['mrn0','mrn1','mrn2'];
+  rows.forEach(function(id, i) {
+    setTimeout(function() {
+      document.getElementById(id).classList.add('show');
+      animFrom(document.getElementById(nums[i]), 0, targets[i], 900, null);
+    }, i * 650);
+  });
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#060d18'); g.addColorStop(1,'#0c1828');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    var steps=60, pts1=[], pts2=[];
+    for(var i=0;i<=steps;i++){
+      var x=i/steps*W;
+      var angle=i/steps*Math.PI*4-t*1.5;
+      var amp=H*0.3;
+      pts1.push({x:x,y:H*0.5+Math.sin(angle)*amp});
+      pts2.push({x:x,y:H*0.5+Math.sin(angle+Math.PI)*amp});
+    }
+    for(var i=0;i<steps;i+=4){
+      var vis=Math.abs(pts1[i].y-pts2[i].y)/(H*0.6);
+      ctx.beginPath(); ctx.moveTo(pts1[i].x,pts1[i].y); ctx.lineTo(pts2[i].x,pts2[i].y);
+      ctx.strokeStyle='rgba(139,92,246,'+(0.12+vis*0.28)+')'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    [pts1,pts2].forEach(function(pts,si){
+      ctx.beginPath();
+      pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
+      ctx.strokeStyle=si===0?'rgba(52,211,153,0.8)':'rgba(139,92,246,0.8)';
+      ctx.lineWidth=2.5; ctx.stroke();
+    });
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>
