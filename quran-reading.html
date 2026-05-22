@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Reading · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #f0abfc;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(240,171,252,0.04) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    .nav-home-fixed { position:fixed; top:12px; left:16px; z-index:300; display:inline-flex; align-items:center; gap:6px; background:rgba(17,30,46,0.9); border:1px solid var(--border); border-radius:100px; padding:6px 14px; font-size:12px; color:var(--muted); text-decoration:none; backdrop-filter:blur(10px); }
+    .nav-home-fixed:hover { color:var(--text); }
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#c026d3); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    .hero-verse { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin-bottom:24px; border-left:3px solid var(--accent); }
+    .verse-ar { font-family:'Amiri',serif; font-size:19px; color:var(--accent); direction:rtl; text-align:right; line-height:2.2; margin-bottom:10px; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.75; font-style:italic; }
+    .verse-highlight { color:var(--accent); font-style:normal; font-weight:600; }
+    .claim-box { background:linear-gradient(135deg,rgba(240,171,252,0.07),rgba(192,38,211,0.03)); border:1px solid rgba(240,171,252,0.17); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:600; }
+    .claim-text { font-size:15px; line-height:1.7; }
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(240,171,252,0.3); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-ref { font-size:10px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; color:var(--accent); line-height:1.8; }
+    .ac-tr { font-size:12px; color:var(--muted); margin-top:2px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:13px; font-weight:600; color:var(--ok); }
+    .verdict-hero { text-align:center; padding:12px 0 28px; }
+    .verdict-number { font-family:'Playfair Display',serif; font-size:clamp(52px,10vw,80px); font-weight:700; color:var(--accent); line-height:1; }
+    .verdict-label { font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:.06em; text-transform:uppercase; }
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(240,171,252,0.06),rgba(192,38,211,0.02)); border:1px solid rgba(240,171,252,0.17); border-radius:14px; padding:20px 24px; margin-bottom:16px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#1a0420; box-shadow:0 4px 20px rgba(240,171,252,0.22); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(240,171,252,0.4); color:var(--text); }
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+
+<div class="container">
+  <a href="quran-pharaoh-mourning.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    ← Mourning of Pharaoh
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Reading</div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <div id="s0" class="stage active">
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <div class="hero-verse">
+      <div class="verse-ref">Quran 96:1–5 · Surah Al-Alaq — First Revealed Verses</div>
+      <div class="verse-ar">اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ · خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ · اقْرَأْ وَرَبُّكَ الْأَكْرَمُ · الَّذِي عَلَّمَ بِالْقَلَمِ · عَلَّمَ الْإِنْسَانَ مَا لَمْ يَعْلَمْ</div>
+      <div class="verse-en">"<span class="verse-highlight">Read</span>: In the Name of your Lord who created. Created man from a leech. <span class="verse-highlight">Read</span>: And your Lord is the Most Generous. He who taught by the pen. <span class="verse-highlight">Taught man what he never knew.</span>"</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">Prewired at Birth</div>
+      <div class="claim-text">
+        The very first word ever revealed in the Quran is <strong style="color:var(--accent)">اقْرَأْ</strong> — "Read." The passage describes creation from a leech (before birth), then immediately: taught to read by the pen. The sequence implies the capacity for reading was given before birth.
+        <br><br>
+        For 1,400 years this seemed like a spiritual command. Then neuroscientists scanned newborn brains and found something extraordinary: the <strong style="color:var(--accent)">Visual Word Form Area (VWFA)</strong> — the brain's reading center — is already connected to the language network <em>at birth</em>, before any exposure to words. The human brain is born prewired to read.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="go(1)">
+      Begin Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- ══ STAGE 1 ══ -->
+  <div id="s1" class="stage">
+    <p class="prompt">What was the very first word ever revealed in the Quran — the opening word of the first verse?</p>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-ar">بِسْمِ</div>
+        <div class="ac-tr">"In the name of" — opening of the Basmala</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">اقْرَأْ</div>
+        <div class="ac-ref">96:1 · Surah Al-Alaq · First Revelation</div>
+        <div class="ac-tr">"Read" — the first word revealed to Muhammad (ﷺ) in the Cave of Hira. Not "believe," not "worship" — but "Read."</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-ar">الْحَمْدُ</div>
+        <div class="ac-tr">"Praise" — opening of Surah Al-Fatiha</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 2 — brain canvas ══ -->
+  <div id="s2" class="stage">
+    <p class="prompt">Neuroscientists scanned newborn brains. What did they find about the brain's reading center — the Visual Word Form Area (VWFA)?</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">The VWFA is blank at birth and only develops connections to language after years of reading practice</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">The VWFA does not exist at birth — it forms entirely through education between ages 4 and 7</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">The VWFA is already connected to the brain's language network at birth — before any exposure to words. Newborns are born prewired to see and process written language.</div>
+        <div class="ac-ref">Ohio State University · Scientific Reports · 2020</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 3 ══ -->
+  <div id="s3" class="stage">
+    <p class="prompt">Quran 96 says: "Created man from a leech — taught by the pen." What does the sequence of these phrases imply, in light of the VWFA discovery?</p>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Nothing — "taught by the pen" is a spiritual metaphor and has no connection to neurological prewiring</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">The verse first describes creation at the embryonic stage (alaq = leech), then immediately states God taught reading by the pen — implying reading capacity was built into humans at the point of creation, before birth. This matches the VWFA finding exactly.</div>
+        <div class="ac-ar">خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ · الَّذِي عَلَّمَ بِالْقَلَمِ</div>
+        <div class="ac-ref">96:2–4 · Created from leech → taught by the pen</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">The verse describes two separate people — one created from a leech, another person who was taught to read</div></div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 4 — VERDICT ══ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <div class="verdict-hero">
+      <div class="verdict-number" id="mv0">0</div>
+      <div class="verdict-label">Years before neuroscience confirmed the prewired reading brain</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n" id="mv1">0</div>
+        <div class="lbl">Year Ohio State study published</div>
+      </div>
+      <div class="stat-card">
+        <div class="n">1</div>
+        <div class="lbl">Word — اقرأ — first word in the Quran</div>
+      </div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Neuroscience News · Ohio State University · 2020</div>
+      <div class="source-quote">"Humans are born with a part of the brain that is prewired to be receptive to seeing words and letters, setting the stage at birth for people to learn how to read… Even at birth, the VWFA is more connected functionally to the language network of the brain than it is to other areas. It is an incredibly exciting finding." — Zeynep Saygin, senior author</div>
+    </div>
+
+    <div class="verdict-text">
+      For 1,400 years, scholars read "اقْرَأْ — Read" as a divine command. Nobody thought it said anything about biology. The conventional belief was that reading is a skill acquired years after birth — a product of education, not nature.
+      <br><br>
+      In 2020, Ohio State University neuroscientists published MRI scans of newborn brains. They found the <strong>Visual Word Form Area</strong> — the brain region responsible for reading — is already functionally connected to the language network <em style="color:var(--accent)">at birth</em>. Before the infant has seen a single word. Before any language exposure. The reading circuit is installed before birth.
+      <br><br>
+      Quran 96 opens: "Created man from a leech" (embryonic stage) → "taught by the pen" (reading, before birth). The verse that commanded an illiterate man to "Read" described the neurological prewiring of the human brain 1,400 years before it was discovered.
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-brainstem.html" class="btn btn-primary">
+        Next: Brainstem
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ══ HERO CANVAS — brain silhouette with VWFA glowing, neural connections, pen writing اقرأ ══ */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = 640, H = 130; cv.width = W; cv.height = H;
+  var t = 0;
+
+  var rng = (function(){ var s=113; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
+
+  /* Neural nodes — scattered across brain region */
+  var nodes = [];
+  var brainCx = W * 0.42, brainCy = H * 0.52, brainRx = 115, brainRy = 50;
+  for (var i = 0; i < 32; i++) {
+    var angle = rng() * Math.PI * 2;
+    var rad = 0.25 + rng() * 0.75;
+    nodes.push({
+      x: brainCx + Math.cos(angle) * brainRx * rad,
+      y: brainCy + Math.sin(angle) * brainRy * rad,
+      r: 1.2 + rng() * 1.8,
+      phase: rng() * Math.PI * 2,
+      freq: 0.8 + rng() * 1.4,
+      vwfa: false
+    });
+  }
+  /* VWFA cluster — left-occipital region, visually distinct */
+  var vwfaNodes = [];
+  for (var j = 0; j < 8; j++) {
+    var vx = brainCx - brainRx * 0.55 + (rng()-0.5) * 28;
+    var vy = brainCy + brainRy * 0.15 + (rng()-0.5) * 18;
+    vwfaNodes.push({ x: vx, y: vy, r: 2 + rng() * 1.5, phase: rng() * Math.PI * 2 });
+  }
+
+  /* Connections between random node pairs */
+  var edges = [];
+  for (var k = 0; k < 22; k++) {
+    var a = Math.floor(rng() * nodes.length);
+    var b = Math.floor(rng() * nodes.length);
+    if (a !== b) edges.push({ a: a, b: b, phase: rng() * Math.PI * 2, speed: 0.4 + rng() * 0.8 });
+  }
+  /* VWFA connections to regular nodes (language network) */
+  var vwfaEdges = [];
+  for (var m = 0; m < 10; m++) {
+    vwfaEdges.push({
+      vi: Math.floor(rng() * vwfaNodes.length),
+      ni: Math.floor(rng() * nodes.length),
+      phase: rng() * Math.PI * 2
+    });
+  }
+
+  /* Pen tip position — writes اقرأ on the right */
+  var penX = W * 0.76, penY = H * 0.40;
+  var inkChars = ['ا', 'قْ', 'رَ', 'أْ'];
+  var inkPositions = [{ x: W*0.755, y: H*0.48 }, { x: W*0.785, y: H*0.52 }, { x: W*0.815, y: H*0.48 }, { x: W*0.845, y: H*0.46 }];
+
+  function drawBrainOutline(alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = 'rgba(240,171,252,0.55)'; ctx.lineWidth = 1.5;
+    /* Simple brain-like outline using bezier curves */
+    ctx.beginPath();
+    ctx.moveTo(brainCx - brainRx, brainCy + 10);
+    ctx.bezierCurveTo(brainCx - brainRx - 12, brainCy - 28, brainCx - brainRx * 0.5, brainCy - brainRy - 14, brainCx, brainCy - brainRy - 5);
+    ctx.bezierCurveTo(brainCx + brainRx * 0.5, brainCy - brainRy - 14, brainCx + brainRx + 8, brainCy - 22, brainCx + brainRx, brainCy + 8);
+    ctx.bezierCurveTo(brainCx + brainRx, brainCy + 28, brainCx + brainRx * 0.4, brainCy + brainRy + 2, brainCx, brainCy + brainRy);
+    ctx.bezierCurveTo(brainCx - brainRx * 0.4, brainCy + brainRy + 2, brainCx - brainRx, brainCy + 28, brainCx - brainRx, brainCy + 10);
+    ctx.stroke();
+    /* Brain fold lines */
+    ctx.strokeStyle = 'rgba(240,171,252,0.14)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(brainCx - 20, brainCy - brainRy + 8); ctx.quadraticCurveTo(brainCx, brainCy - 12, brainCx + 25, brainCy - brainRy + 12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(brainCx - 40, brainCy + 10); ctx.quadraticCurveTo(brainCx - 10, brainCy + 22, brainCx + 30, brainCy + 8); ctx.stroke();
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* Background */
+    var bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#06020e'); bg.addColorStop(0.5, '#08020f'); bg.addColorStop(1, '#050110');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    /* Brain glow */
+    var bglow = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainRx * 1.1);
+    bglow.addColorStop(0, 'rgba(240,171,252,0.07)'); bglow.addColorStop(0.6, 'rgba(240,171,252,0.03)'); bglow.addColorStop(1, 'rgba(240,171,252,0)');
+    ctx.fillStyle = bglow; ctx.fillRect(0, 0, W, H);
+
+    /* Brain outline */
+    drawBrainOutline(0.7);
+
+    /* Neural connections — pulsing signals */
+    edges.forEach(function(e) {
+      var na = nodes[e.a], nb = nodes[e.b];
+      var pulse = (Math.sin(t * e.speed * 0.05 + e.phase) + 1) / 2;
+      var a = 0.05 + pulse * 0.14;
+      ctx.strokeStyle = 'rgba(240,171,252,' + a + ')'; ctx.lineWidth = 0.6;
+      ctx.beginPath(); ctx.moveTo(na.x, na.y); ctx.lineTo(nb.x, nb.y); ctx.stroke();
+    });
+
+    /* VWFA edges — brighter, representing language network connection */
+    vwfaEdges.forEach(function(e) {
+      var vn = vwfaNodes[e.vi], nn = nodes[e.ni];
+      var pulse = (Math.sin(t * 0.06 + e.phase) + 1) / 2;
+      var a = 0.15 + pulse * 0.35;
+      ctx.save();
+      ctx.shadowColor = 'rgba(240,171,252,0.4)'; ctx.shadowBlur = 3;
+      ctx.strokeStyle = 'rgba(240,171,252,' + a + ')'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(vn.x, vn.y); ctx.lineTo(nn.x, nn.y); ctx.stroke();
+      ctx.restore();
+    });
+
+    /* Regular neural nodes */
+    nodes.forEach(function(n) {
+      var a = 0.28 + Math.sin(t * n.freq * 0.04 + n.phase) * 0.18;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(240,171,252,' + a + ')'; ctx.fill();
+    });
+
+    /* VWFA nodes — glowing bright */
+    var vwfaGlow = 0.7 + Math.sin(t * 0.07) * 0.2;
+    ctx.save();
+    ctx.shadowColor = 'rgba(240,171,252,0.9)'; ctx.shadowBlur = 10 + vwfaGlow * 6;
+    vwfaNodes.forEach(function(n) {
+      var a = 0.65 + Math.sin(t * 0.09 + n.phase) * 0.22;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(240,171,252,' + a + ')'; ctx.fill();
+      /* Halo */
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(240,171,252,' + (a * 0.18) + ')'; ctx.fill();
+    });
+    ctx.restore();
+
+    /* VWFA label */
+    ctx.font = '600 8px DM Sans,sans-serif';
+    ctx.fillStyle = 'rgba(240,171,252,' + (0.5 + Math.sin(t*0.06)*0.15) + ')';
+    ctx.textAlign = 'center';
+    ctx.fillText('VWFA', brainCx - brainRx * 0.55, brainCy + brainRy * 0.15 + 20);
+
+    /* Pen writing اقرأ on right side */
+    var penBob = Math.sin(t * 0.05) * 3;
+    /* Pen body */
+    ctx.save();
+    ctx.translate(penX + 20, penY - 28 + penBob);
+    ctx.rotate(-0.35);
+    ctx.fillStyle = 'rgba(240,171,252,0.62)'; ctx.beginPath(); ctx.roundRect(-2, -22, 4, 24, 1); ctx.fill();
+    ctx.fillStyle = 'rgba(240,171,252,0.82)'; ctx.beginPath(); ctx.moveTo(-2, 2); ctx.lineTo(0, 8); ctx.lineTo(2, 2); ctx.fill();
+    ctx.restore();
+
+    /* Arabic letters appearing */
+    ctx.font = 'bold 16px Amiri,serif';
+    ctx.textAlign = 'center';
+    inkChars.forEach(function(ch, ci) {
+      var appear = Math.min(1, Math.max(0, (t - ci * 28) / 18));
+      var a = 0.55 + Math.sin(t * 0.04 + ci) * 0.12;
+      ctx.fillStyle = 'rgba(240,171,252,' + (appear * a) + ')';
+      ctx.fillText(ch, inkPositions[ci].x, inkPositions[ci].y);
+    });
+
+    /* Ink glow under pen tip */
+    ctx.save();
+    ctx.shadowColor = 'rgba(240,171,252,0.8)'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(penX + 22, penY - 18 + penBob, 2, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(240,171,252,0.75)'; ctx.fill();
+    ctx.restore();
+
+    /* "Read" label */
+    ctx.font = '600 8px DM Sans,sans-serif';
+    ctx.fillStyle = 'rgba(240,171,252,0.38)';
+    ctx.textAlign = 'center';
+    ctx.fillText('First word revealed', W * 0.83, H - 8);
+
+    t += 0.4; requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ══ S2 CANVAS — Old belief vs VWFA discovery ══ */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width || 640, H = cv.height || 220;
+  var startTs = null, TOTAL = 1400;
+
+  var rng2 = (function(){ var s=37; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
+  /* Pre-generate static node positions for right panel brain */
+  var rNodes = [];
+  var rcx = 0.5, rcy = 0.48, rrx = 0.32, rry = 0.36;
+  for (var i = 0; i < 18; i++) {
+    var a2 = rng2() * Math.PI * 2, r2 = 0.3 + rng2() * 0.7;
+    rNodes.push({ x: rcx + Math.cos(a2)*rrx*r2, y: rcy + Math.sin(a2)*rry*r2, ph: rng2()*6.28 });
+  }
+  var vwfaRNodes = [];
+  for (var j = 0; j < 5; j++) vwfaRNodes.push({ x: rcx - rrx*0.5 + (rng2()-0.5)*0.1, y: rcy + rry*0.1 + (rng2()-0.5)*0.12, ph: rng2()*6.28 });
+  var animT2 = 0;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / TOTAL, 1);
+    animT2 += 0.5;
+    var lA = Math.min(p * 2.2, 1);
+    var rA = Math.max(0, Math.min((p - 0.4) * 2.0, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#03060e'; ctx.fillRect(0, 0, W, H);
+
+    var gap = 10, pW = (W - gap * 3) / 2;
+
+    /* ── LEFT — Old belief: reading acquired after years ── */
+    ctx.globalAlpha = lA;
+    var lx = gap, ly = 8, lh = H - 16;
+    ctx.fillStyle = '#080614';
+    ctx.beginPath(); ctx.roundRect(lx, ly, pW, lh, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(248,113,113,0.20)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(lx, ly, pW, lh, 10); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(248,113,113,0.75)'; ctx.font = '700 10px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('OLD BELIEF', lx + pW/2, ly + 20);
+    ctx.fillStyle = 'rgba(248,113,113,0.45)'; ctx.font = '500 9px DM Sans,sans-serif';
+    ctx.fillText('Reading acquired after years of study', lx + pW/2, ly + 34);
+
+    /* Empty/blank brain outline */
+    var lcx = lx + pW/2, lcy = ly + lh*0.55;
+    ctx.strokeStyle = 'rgba(248,113,113,0.30)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.ellipse(lcx, lcy, pW*0.30, lh*0.24, 0, 0, Math.PI*2);
+    ctx.stroke();
+    /* Dashed interior — empty */
+    ctx.setLineDash([3, 4]);
+    ctx.strokeStyle = 'rgba(248,113,113,0.12)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.ellipse(lcx, lcy, pW*0.20, lh*0.16, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(248,113,113,0.22)'; ctx.font = '700 11px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('?', lcx, lcy + 4);
+    /* X mark */
+    ctx.strokeStyle = 'rgba(248,113,113,0.7)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(lcx+30, lcy-32); ctx.lineTo(lcx+40, lcy-22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(lcx+40, lcy-32); ctx.lineTo(lcx+30, lcy-22); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(248,113,113,0.45)'; ctx.font = '500 9px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('VWFA blank at birth', lcx, ly + lh - 14);
+    ctx.globalAlpha = 1;
+
+    /* ── RIGHT — Discovery: VWFA prewired ── */
+    var rx = gap * 2 + pW;
+    ctx.globalAlpha = rA;
+    ctx.fillStyle = '#050010';
+    ctx.beginPath(); ctx.roundRect(rx, ly, pW, lh, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(240,171,252,0.24)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(rx, ly, pW, lh, 10); ctx.stroke();
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(240,171,252,0.5)'; ctx.shadowBlur = 8;
+    ctx.fillStyle = 'rgba(240,171,252,0.88)'; ctx.font = '700 10px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('DISCOVERY 2020', rx + pW/2, ly + 20);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(240,171,252,0.45)'; ctx.font = '500 9px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('VWFA connected to language at birth', rx + pW/2, ly + 34);
+
+    /* Brain with firing VWFA */
+    var rcx2 = rx + pW/2, rcy2 = ly + lh*0.54;
+    var brRx = pW*0.29, brRy = lh*0.23;
+    ctx.strokeStyle = 'rgba(240,171,252,0.45)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(rcx2 - brRx, rcy2 + 5);
+    ctx.bezierCurveTo(rcx2 - brRx - 8, rcy2 - brRy*0.8, rcx2 - brRx*0.3, rcy2 - brRy - 6, rcx2, rcy2 - brRy);
+    ctx.bezierCurveTo(rcx2 + brRx*0.3, rcy2 - brRy - 6, rcx2 + brRx + 6, rcy2 - brRy*0.7, rcx2 + brRx, rcy2 + 5);
+    ctx.bezierCurveTo(rcx2 + brRx, rcy2 + brRy + 2, rcx2 + brRx*0.3, rcy2 + brRy, rcx2, rcy2 + brRy);
+    ctx.bezierCurveTo(rcx2 - brRx*0.3, rcy2 + brRy, rcx2 - brRx, rcy2 + brRy + 2, rcx2 - brRx, rcy2 + 5);
+    ctx.stroke();
+
+    /* VWFA glow patch */
+    var vx2 = rcx2 - brRx*0.52, vy2 = rcy2 + brRy*0.12;
+    var vGlow = ctx.createRadialGradient(vx2, vy2, 0, vx2, vy2, 20);
+    var vp = 0.7 + Math.sin(animT2 * 0.12)*0.2;
+    vGlow.addColorStop(0, 'rgba(240,171,252,' + (vp * 0.55) + ')');
+    vGlow.addColorStop(0.6, 'rgba(240,171,252,' + (vp * 0.18) + ')');
+    vGlow.addColorStop(1, 'rgba(240,171,252,0)');
+    ctx.save(); ctx.shadowColor='rgba(240,171,252,0.8)'; ctx.shadowBlur=12;
+    ctx.fillStyle = vGlow; ctx.fillRect(vx2-22, vy2-22, 44, 44);
+    ctx.restore();
+
+    /* Neural connections firing */
+    rNodes.forEach(function(n, ni) {
+      var nx2 = rx + 8 + n.x*(pW-16), ny2 = ly+42 + (n.y-0.1)*(lh-60);
+      var np = 0.08 + Math.sin(animT2*0.06+n.ph)*0.10;
+      ctx.beginPath(); ctx.arc(nx2, ny2, 1.2, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(240,171,252,'+np+')'; ctx.fill();
+    });
+    vwfaRNodes.forEach(function(n) {
+      var nx2 = rx + 8 + n.x*(pW-16), ny2 = ly+42 + (n.y-0.1)*(lh-60);
+      var np = 0.60 + Math.sin(animT2*0.1+n.ph)*0.25;
+      ctx.save(); ctx.shadowColor='rgba(240,171,252,0.7)'; ctx.shadowBlur=5;
+      ctx.beginPath(); ctx.arc(nx2, ny2, 2.2, 0, Math.PI*2);
+      ctx.fillStyle='rgba(240,171,252,'+np+')'; ctx.fill();
+      ctx.restore();
+    });
+
+    ctx.fillStyle = 'rgba(240,171,252,0.50)'; ctx.font = '700 9px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('VWFA', vx2, vy2 + 20);
+    ctx.fillStyle = 'rgba(240,171,252,0.45)'; ctx.font = '500 9px DM Sans,sans-serif';
+    ctx.fillText('Prewired at birth', rx + pW/2, ly + lh - 14);
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ══ ENGINE ══ */
+var stage = 0;
+function ease(t) { return 1 - Math.pow(1-t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  (function run(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts-t0)/ms, 1);
+    el.textContent = Math.round(from + ease(p)*(to-from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  })(performance.now());
+}
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Reading', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('reading');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1400, 1800);
+        animFrom(document.getElementById('mv1'), 0, 2020, 1800);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id); localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('اقْرَأْ — "Read" — was the first word revealed to Muhammad (ﷺ) in the Cave of Hira. Not a command to pray or worship, but to read. This opening was not a coincidence — the Quran had something to say about the human capacity for reading.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Ohio State University (2020): "Even at birth, the VWFA is more connected functionally to the language network of the brain than it is to other areas." The reading circuit is installed in the brain before the infant has ever seen a word.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Quran 96:2–4 first mentions creation from alaq (embryonic stage, before birth), then immediately connects this to being taught to read by the pen. The reading capacity is placed at the creation stage — precisely matching the VWFA finding that the reading brain is prewired at birth.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

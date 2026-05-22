@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>The Microscopic Horizon · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #090d16;
+      --surface:      #101726;
+      --surface2:     #172237;
+      --border:       rgba(255,255,255,0.05);
+      --text:         #e3ded5;
+      --muted:        #718599;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #38bdf8;
+      --accent-light: #bae6fd;
+      --accent-dim:   rgba(56,189,248,0.07);
+      --accent-ring:  rgba(56,189,248,0.18);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; padding:44px 20px 160px;
+    }
+    .dot-field {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px);
+      background-size:24px 24px;
+    }
+    .container { max-width:720px; margin:0 auto; position:relative; z-index:1; }
+
+    /* PROGRESS BAR */
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent-light)); width:0%; transition:width .7s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:28px; }
+
+    /* STAGES */
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    /* VERSE CONTAINER */
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:22px 0; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:22px; line-height:2.1; direction:rtl; text-align:right; color:var(--text); margin-bottom:10px; }
+    .verse-ar .hl { color:var(--accent-light); }
+    .verse-en { font-size:14px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .verse-en .hl { color:var(--accent-light); font-style:normal; font-weight:600; }
+
+    /* CORE TYPOGRAPHY */
+    .lesson-eyebrow { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .lesson-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+    .lesson-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+    /* CLAIM CARD */
+    .claim-box { background:var(--accent-dim); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:22px 0; }
+    .claim-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .claim-text { font-size:15px; line-height:1.65; color:var(--text); }
+
+    /* INTERACTIVE ELEMENT BOXES */
+    .prompt { font-family:'Playfair Display',serif; font-size:18px; line-height:1.5; margin:24px 0 16px; }
+    .answers { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .answer-card {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+      cursor:pointer; transition:border-color .18s, background .18s;
+    }
+    .answer-card:hover { border-color:rgba(255,255,255,0.15); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); pointer-events:none; }
+    .answer-card.ac-wrong   { border-color:var(--err-border); background:var(--err-bg); animation:shake .35s ease; }
+    .answer-card.ac-disabled{ opacity:.45; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .ac-letter { width:26px; height:26px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:2px; }
+    .ac-big { font-size:16px; font-weight:600; line-height:1.3; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    /* ACTION UTILITIES */
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:transform .18s, box-shadow .18s; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-accent { background:var(--accent); color:#090d16; box-shadow:0 4px 20px rgba(56,189,248,0.15); }
+    .btn-accent:hover { box-shadow:0 8px 30px rgba(56,189,248,0.25); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* DASHBOARD DATA PANELS */
+    .ex-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--accent-light); line-height:1; }
+    .ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+    .ex-result.show { display:block; }
+    .ex-arena { display:flex; gap:14px; margin:20px 0; }
+    .ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 14px; text-align:center; transition:border-color .3s, background .3s; }
+    .ex-panel.lit { border-color:var(--accent-ring); background:var(--accent-dim); }
+
+    /* VERDICT OBJECT VIEW */
+    .verdict-title { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,28px); font-weight:700; line-height:1.3; margin-bottom:10px; }
+    .verdict-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:28px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:10px; padding:14px 18px; margin-bottom:22px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .stat-row { display:flex; gap:14px; margin:22px 0; flex-wrap:wrap; }
+    .stat-box { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:16px 14px; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--accent-light); }
+    .stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:4px; }
+    .verdict-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .verdict-table th { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+    .verdict-table td { font-size:13px; padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.03); }
+    .verdict-table tr:last-child td { border-bottom:none; }
+    .td-check { color:var(--ok); font-weight:700; }
+
+    /* GOLD ENCLOSURE */
+    .gold-box { background:rgba(245,158,11,0.04); border:1px solid rgba(245,158,11,0.15); border-radius:12px; padding:18px 20px; margin:24px 0; }
+    .gt { font-family:'Playfair Display',serif; font-size:16px; line-height:1.55; color:var(--gold-light); margin-bottom:8px; }
+    .gs { font-size:13px; color:var(--muted); line-height:1.7; }
+
+    /* SYSTEM FEEDBACK NOTIFICATIONS */
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:18px 20px 32px;transform:translateY(110%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .fb-panel.show{transform:translateY(0)}
+    .fb-panel.fb-ok{background:var(--ok-bg);border-top:3px solid var(--ok)}
+    .fb-panel.fb-err{background:var(--err-bg);border-top:3px solid var(--err-light)}
+    .fb-left{display:flex;align-items:center;gap:12px}
+    .fb-icon{font-size:24px;line-height:1}
+    .fb-title{font-size:17px;font-weight:700}
+    .fb-panel.fb-ok .fb-title{color:var(--ok)}
+    .fb-panel.fb-err .fb-title{color:var(--err-light)}
+    .fb-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:3px;line-height:1.55;max-width:340px}
+    .fb-btn{flex-shrink:0;padding:14px 30px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+    .fb-btn:active{transform:scale(0.96)}
+    .fb-panel.fb-ok .fb-btn{background:var(--ok);color:var(--ok-bg)}
+    .fb-panel.fb-err .fb-btn{background:var(--err-light);color:var(--err-bg)}
+  </style>
+</head>
+<body>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Main Dashboard · Lessons
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · The Microscopic Horizon</div>
+
+  <!-- ── STAGE 0: INTRODUCTION ── -->
+  <div id="s0" class="stage active">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="lesson-eyebrow">Zoology · Micro-Parasitology</p>
+    <h1 class="lesson-title">The Mosquito Horizon</h1>
+    <p class="lesson-sub">For centuries, critics claimed the Quran's scale comparison of an insect holding organisms "above it" was a simple metaphorical hyperbole. Modern entomology has revealed a literal reality: mosquitoes host their own highly specialized blood-sucking parasites.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">2:26 · Surah Al-Baqarah</div>
+      <div class="verse-ar">إِنَّ اللَّهَ لَا يَسْتَحْيِي أَنْ يَضْرِبَ مَثَلًا مَا <span class="hl">بَعُوضَةً فَمَا فَوْقَهَا</span> ۚ فَأَمَّا الَّذِينَ آمَنُوا فَيَعْلَمُونَ أَنَّهُ الْحَقُّ مِنْ رَبِّهِمْ</div>
+      <div class="verse-en">"Indeed, Allah is not timid to present an example — that of a mosquito <span class="hl">and what is above it.</span> And those who have believed know that it is the truth from their Lord..."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovery</div>
+      <div class="claim-text">The Arabic term used for mosquito (*Ba'udah*) is grammatically female. In nature, only female mosquitoes hunt for blood meals. Furthermore, scientists discovered microscopic flying midges (*Culicoides anophelis*) that ride exclusively on top of these female mosquitoes, directly piercing them to feed on their blood.</div>
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── STAGE 1: LINGUISTIC & ANATOMICAL VIEW ── -->
+  <div id="s1" class="stage">
+    <p class="prompt">What structural reality does the specific wording "Ba'udah" (female mosquito) and "what is above it" identify?</p>
+
+    <canvas id="s1Canvas" width="640" height="210" style="width:100%;height:210px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div id="s1Mc" style="display:none">
+      <div class="answers">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">An abstract expression of relative physical volume</div>
+            <div class="ac-sub">A poetic comparison implying items larger than a common gnat</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">A literal ectoparasite attached to a female host body</div>
+            <div class="ac-sub">Specific tracking of microscopic organisms riding and feeding on the fly</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">The structural mechanics of high-altitude navigation flights</div>
+            <div class="ac-sub">How crosswinds behave on the upper surface layer of insect wings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 2: PARASITIC DOCKING SIMULATION ── -->
+  <div id="s2" class="stage">
+    <p class="prompt">Observe micro-parasitic vectors docking onto the host organism's cuticle.</p>
+    <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">This microscopic simulation shows biting midges (*Culicoides anophelis*) targeting a female mosquito. They latch onto her dorsal abdomen and thorax to extract nutrients directly from her blood meal.</p>
+
+    <canvas id="s2Canvas" width="640" height="220" style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="ex-arena">
+      <div class="ex-panel" id="s2PanelA">
+        <div class="ex-unit">Parasitic Connection</div>
+        <div class="ex-num" id="extractionRate">0</div>
+        <div class="ex-unit">% nutrient transmission</div>
+      </div>
+      <div class="ex-panel" id="s2PanelB">
+        <div class="ex-unit">Target Vector Profiling</div>
+        <div class="ex-num">Female Host</div>
+        <div class="ex-unit">Culicoides selection path</div>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="s2Btn" onclick="startMidgeSim()">
+      Run parasitic docking sequence
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="ex-result" id="s2Result">
+      <div style="font-size:13px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">Ectoparasitic load successfully verified</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Entomological studies show these midges deliberately seek out blood-engorged female mosquitoes to steal concentrated lipids and proteins, validating the precise phrasing "and what is above it".</div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 3: CHRONOLOGICAL VERIFICATION ── -->
+  <div id="s3" class="stage">
+    <p class="prompt">When did Western science first publish documentation of midges acting as blood-sucking parasites on mosquitoes?</p>
+
+    <div class="answers">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">During Aristotelian classic biological categorizations</div>
+          <div class="ac-sub">Ancient Greek definitions of insect hierarchies and internal fluids</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">In 1922, by entomologist F.W. Edwards</div>
+          <div class="ac-sub">First official classification of Culicoides anophelis feeding behaviors</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">With the launch of early optical lenses in 1665</div>
+          <div class="ac-sub">Robert Hooke's Micrographia initial compound insect reviews</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 4: EVALUATION BREAKDOWN ── -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">Linguistic accuracy at a microscopic scale.</h2>
+    <p class="verdict-sub">The structural layout of Surah Al-Baqarah combines precise grammatical gender classification with micro-biological realities that were completely impossible to observe or verify in the seventh century.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="mv0">0</div>
+        <div class="stat-lbl">entomological discovery year</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="mv1">0</div>
+        <div class="stat-lbl">years preserved prior to identification</div>
+      </div>
+    </div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr><th>Quranic Variable Expression</th><th>Modern Entomological Realities</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Ba'udah (Feminine Noun)</td><td>Only female mosquitoes possess piercing mouthparts and seek blood meals.</td><td class="td-check">✓</td></tr>
+        <tr><td>"What is above it" (Fama Fawgaha)</td><td>Ectoparasitic midges land on top of the host's thorax/abdomen to feed.</td><td class="td-check">✓</td></tr>
+        <tr><td>Parasite-on-parasite matrix</td><td>Complex parasitic hierarchies exist down to sub-millimeter scales.</td><td class="td-check">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">Microscopic reality recorded 14 centuries ago.</div>
+      <div class="gs">The specific convergence of using a feminine noun paired with a precise spatial modifier (*above it*) mirrors the real-world behavioral profile of *Culicoides anophelis*. This level of micro-biological insight stands as a striking indicator of the text's profound precision.</div>
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Return to Lessons
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FEEDBACK ENGINE -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ── INSECT VECTOR RENDER GRAPHICS ───────────────────── */
+function drawMosquitoVector(ctx, x, y, scale, wingAngle, isEngorged, pulseVal) {
+  ctx.save();
+  ctx.translate(x, y);
+  
+  // Proboscis
+  ctx.beginPath();
+  ctx.moveTo(scale * 1.0, -scale * 0.1);
+  ctx.lineTo(scale * 2.3, scale * 0.4);
+  ctx.strokeStyle = 'rgba(56,189,248,0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Long hind legs
+  ctx.strokeStyle = 'rgba(56,189,248,0.45)';
+  ctx.lineWidth = 1;
+  // Leg 1
+  ctx.beginPath(); ctx.moveTo(-scale * 0.2, 0); ctx.lineTo(-scale * 0.6, -scale * 1.2); ctx.lineTo(-scale * 1.5, -scale * 0.4); ctx.stroke();
+  // Leg 2
+  ctx.beginPath(); ctx.moveTo(scale * 0.2, 0); ctx.lineTo(scale * 0.5, scale * 1.3); ctx.lineTo(scale * 1.4, scale * 1.9); ctx.stroke();
+
+  // Abdomen
+  ctx.beginPath();
+  var abdW = scale * 1.3;
+  var abdH = isEngorged ? (scale * 0.6 + Math.sin(pulseVal) * 0.05 * scale) : scale * 0.35;
+  ctx.ellipse(-scale * 0.8, scale * 0.2, abdW, abdH, Math.PI / 10, 0, Math.PI * 2);
+  ctx.fillStyle = isEngorged ? '#b8122a' : 'rgba(18,50,90,0.95)';
+  ctx.fill();
+  ctx.strokeStyle = isEngorged ? 'rgba(239,68,68,0.85)' : 'rgba(56,189,248,0.6)';
+  ctx.stroke();
+
+  // Thorax
+  ctx.beginPath();
+  ctx.arc(scale * 0.2, -scale * 0.05, scale * 0.45, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(12,42,78,0.95)';
+  ctx.strokeStyle = 'rgba(56,189,248,0.75)';
+  ctx.fill();
+  ctx.stroke();
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(scale * 0.7, -scale * 0.05, scale * 0.25, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(8,28,55,0.95)';
+  ctx.strokeStyle = 'rgba(56,189,248,0.7)';
+  ctx.fill();
+  ctx.stroke();
+
+  // Translucent Wings (Vibrating via wingAngle)
+  ctx.save();
+  ctx.translate(0, -scale * 0.2);
+  ctx.rotate(-Math.PI / 4 + wingAngle);
+  ctx.beginPath();
+  ctx.ellipse(0, -scale * 0.8, scale * 0.25, scale * 0.9, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(186,230,253,0.55)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(56,189,248,0.92)';
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawMidgeVector(ctx, x, y, scale, wingOsc, isDocked) {
+  ctx.save();
+  ctx.translate(x, y);
+  if(isDocked) {
+    ctx.rotate(-Math.PI / 6);
+  }
+
+  // Body
+  ctx.beginPath();
+  ctx.ellipse(0, 0, scale, scale * 0.5, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fill();
+  ctx.strokeStyle = '#0284c7';
+  ctx.stroke();
+
+  // Head & Feeding Proboscis
+  ctx.beginPath();
+  ctx.arc(scale * 0.8, -scale * 0.1, scale * 0.3, 0, Math.PI * 2);
+  ctx.fillStyle = '#0284c7';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.moveTo(scale * 0.9, 0);
+  ctx.lineTo(scale * 1.4, scale * 0.5);
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Vibrating parasite wings
+  ctx.beginPath();
+  var wY = -scale * 0.4 - Math.sin(wingOsc) * scale * 0.5;
+  ctx.ellipse(-scale * 0.2, wY, scale * 0.2, scale * 0.6, Math.PI/4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* ── STAGE ENGINE CORE CONFIGS ───────────────────── */
+var stage = 0;
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · The Microscopic Horizon',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initS1Canvas, 60);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('mosquito-parasites');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1922, 1400);
+        animFrom(document.getElementById('mv1'), 0, 1400, 1700);
+      }, 300);
+    }, 200);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Correct. The text uses a spatial modifier specifying attachment directly on top of the host. Entomology confirms micro-midges reside on the dorsal surfaces of mosquitoes to exploit their blood meals.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Perfect execution. F.W. Edwards cataloged Culicoides anophelis in 1922, pulling back the curtain on complex micro-parasitic systems completely unknown to antiquity.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS RUNTIME LOOP ────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = 640, H = 130;
+  cv.width = W; cv.height = H;
+  var t = 0;
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Deep blue sky with subtle warm base
+    var bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#010610');
+    bg.addColorStop(0.65, '#03091a');
+    bg.addColorStop(1, '#05101e');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Warm skin surface tint at bottom
+    var skin = ctx.createLinearGradient(0, H * 0.7, 0, H);
+    skin.addColorStop(0, 'rgba(0,0,0,0)');
+    skin.addColorStop(1, 'rgba(160,100,60,0.22)');
+    ctx.fillStyle = skin;
+    ctx.fillRect(0, H * 0.7, W, H * 0.3);
+
+    var mX = (t * 0.9) % (W + 80) - 40;
+    var mY = H * 0.42 + Math.sin(t * 0.05) * 14;
+    var wOsc = Math.sin(t * 0.7) * 0.3;
+
+    // Radial glow tracking mosquito
+    var glow = ctx.createRadialGradient(mX, mY, 0, mX, mY, 36);
+    glow.addColorStop(0, 'rgba(56,189,248,0.13)');
+    glow.addColorStop(1, 'rgba(56,189,248,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = 16;
+    drawMosquitoVector(ctx, mX, mY, 15, wOsc, true, t * 0.05);
+    ctx.restore();
+
+    drawMidgeVector(ctx, mX - 8, mY - 16, 4, t * 1.2, true);
+
+    ctx.font = 'bold 15px Amiri, serif';
+    ctx.fillStyle = 'rgba(56,189,248,0.75)';
+    ctx.textAlign = 'right';
+    ctx.fillText('بَعُوضَةً فَمَا فَوْقَهَا', W - 18, H - 13);
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ── S1 CANVAS RENDER — COMPARATIVE REALITIES ────── */
+function initS1Canvas() {
+  var cv = document.getElementById('s1Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var startTs = null;
+  var DUR = 600, INTERMISSION = 500, TOTAL = 1500;
+
+  function drawFrame(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+
+    var lAlpha = Math.min(elapsed / DUR, 1);
+    var rAlpha = Math.max(0, Math.min((elapsed - INTERMISSION) / DUR, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040710';
+    ctx.fillRect(0, 0, W, H);
+
+    var gap = 12, pW = (W - gap * 3) / 2;
+    var midY = H * 0.55;
+
+    // Panel 1: Skeptical Size Model
+    var lx = gap;
+    ctx.globalAlpha = lAlpha;
+    ctx.fillStyle = '#0e1524';
+    ctx.beginPath(); ctx.roundRect(lx, 10, pW, H - 20, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(248,113,113,0.12)'; ctx.stroke();
+
+    if (lAlpha > 0.05) {
+      var lCx = lx + pW / 2;
+      ctx.fillStyle = '#f87171';
+      ctx.font = '700 9px DM Sans, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('CLASSICAL SKEPTICAL MODEL', lCx, 28);
+      ctx.fillStyle = 'rgba(113,133,153,0.4)';
+      ctx.font = '500 12px DM Sans, sans-serif';
+      ctx.fillText('"Merely a rhetorical hyperbole"', lCx, midY);
+    }
+
+    // Panel 2: Microscopic Structural Reality
+    var rx = gap * 2 + pW;
+    ctx.globalAlpha = rAlpha;
+    ctx.fillStyle = '#0e1524';
+    ctx.beginPath(); ctx.roundRect(rx, 10, pW, H - 20, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(56,189,248,0.18)' ; ctx.stroke();
+
+    if (rAlpha > 0.05) {
+      var rCx = rx + pW / 2;
+      ctx.fillStyle = 'var(--text)';
+      ctx.font = '700 9px DM Sans, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('ECTOPARASITIC TRACKING', rCx, 28);
+
+      // Draw explicit detailed mapping of vector host interactions
+      drawMosquitoVector(ctx, rCx, midY + 10, 16, 0, true, ts * 0.02);
+      drawMidgeVector(ctx, rCx - 8, midY - 6, 4.5, ts * 0.5, true);
+
+      ctx.fillStyle = 'rgba(56,189,248,0.8)';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.fillText('LITERAL PARASITE DETECTED', rCx, H - 22);
+    }
+    ctx.globalAlpha = 1;
+
+    if (elapsed < TOTAL) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      document.getElementById('s1Mc').style.display = 'block';
+    }
+  }
+  requestAnimationFrame(drawFrame);
+}
+
+/* ── S2 CANVAS RENDER — PARASITE INTERACTIVE DOCK ── */
+var s2Active = false;
+var parasiteGroup = [];
+
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+
+  ctx.fillStyle = '#040710'; ctx.fillRect(0, 0, W, H);
+  
+  // Perched Target Profile Setup
+  drawMosquitoVector(ctx, W/2, H/2 + 10, 32, 0.1, true, 0);
+
+  ctx.font = '600 9px DM Sans, sans-serif'; ctx.fillStyle = 'var(--muted)'; ctx.textAlign = 'center';
+  ctx.fillText('TARGET HOST: FEMALE ANOPHELES PROFILE', W/2, H - 16);
+
+  parasiteGroup = [
+    { sX: 40,   sY: 30,  tX: W/2 - 20, tY: H/2 - 14, curX: 40,   curY: 30,  docked: false },
+    { sX: W-40, sY: 40,  tX: W/2 + 5,  tY: H/2 - 16, curX: W-40, curY: 40,  docked: false },
+    { sX: W/3,  sY: -20, tX: W/2 - 40, tY: H/2 - 2,  curX: W/3,  curY: -20, docked: false }
+  ];
+}
+
+function startMidgeSim() {
+  if (s2Active) return;
+  s2Active = true;
+  document.getElementById('s2Btn').disabled = true;
+
+  var cv = document.getElementById('s2Canvas');
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var metricEl = document.getElementById('extractionRate');
+
+  var runTime = 2600;
+  var startTs = null;
+
+  function run(ts) {
+    if (!startTs) startTs = ts;
+    var delta = ts - startTs;
+    var fraction = Math.min(delta / runTime, 1);
+    var smoothFrac = ease(fraction);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040710';
+    ctx.fillRect(0, 0, W, H);
+
+    // Static Base Anchor
+    drawMosquitoVector(ctx, W/2, H/2 + 10, 32, 0.05 * Math.sin(ts*0.02), true, ts*0.04);
+
+    // Tracking incoming midges
+    parasiteGroup.forEach(function(p) {
+      p.curX = p.sX + (p.tX - p.sX) * smoothFrac;
+      p.curY = p.sY + (p.tY - p.sY) * smoothFrac;
+
+      if(fraction >= 0.96) p.docked = true;
+      drawMidgeVector(ctx, p.curX, p.curY, 7, ts * 1.5, p.docked);
+    });
+
+    metricEl.textContent = Math.round(smoothFrac * 100);
+
+    if (fraction < 1) {
+      requestAnimationFrame(run);
+    } else {
+      document.getElementById('s2PanelA').classList.add('lit');
+      document.getElementById('s2PanelB').classList.add('lit');
+      document.getElementById('s2Result').classList.add('show');
+      setTimeout(function() {
+        showOk('Microscopic interface lock absolute. Nutrient extraction channels verified on top of host tissue alignment structures.', function() { go(3); });
+      }, 1000);
+    }
+  }
+  requestAnimationFrame(run);
+}
+
+// Global runtime execution hooks
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

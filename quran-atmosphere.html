@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Atmospheric Pressure · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #bae6fd;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(186,230,253,0.03) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    .nav-home-fixed { position:fixed; top:12px; left:16px; z-index:300; display:inline-flex; align-items:center; gap:6px; background:rgba(17,30,46,0.9); border:1px solid var(--border); border-radius:100px; padding:6px 14px; font-size:12px; color:var(--muted); text-decoration:none; backdrop-filter:blur(10px); }
+    .nav-home-fixed:hover { color:var(--text); }
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#38bdf8); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+
+    .hero-eyebrow { font-size:11px; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:10px; }
+    .hero-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:26px; max-width:560px; }
+
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin:24px 0; border-left:3px solid var(--accent); }
+    .verse-ref { font-size:11px; color:var(--accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:18px; color:var(--accent); direction:rtl; text-align:right; line-height:2.2; margin-bottom:12px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.75; font-style:italic; }
+    .verse-highlight { color:var(--accent); font-style:normal; font-weight:600; }
+
+    .claim-box { background:linear-gradient(135deg,rgba(186,230,253,0.07),rgba(56,189,248,0.02)); border:1px solid rgba(186,230,253,0.18); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:700; }
+    .claim-text { font-size:14px; line-height:1.8; }
+    .claim-text strong { color:var(--accent); }
+
+    .zone-card { display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin:12px 0; }
+    .zone-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .zone-text { font-size:13px; line-height:1.6; color:var(--muted); }
+    .zone-text strong { color:var(--text); }
+
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(186,230,253,0.3); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-correct .ac-letter { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .ac-wrong .ac-letter { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+    .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; color:var(--accent); line-height:1.8; }
+    .ac-ref { font-size:10px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(186,230,253,0.06),rgba(56,189,248,0.02)); border:1px solid rgba(186,230,253,0.17); border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#020f1a; box-shadow:0 4px 20px rgba(186,230,253,0.2); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(186,230,253,0.4); color:var(--text); }
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-skin-memory.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Skin Memory
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Atmospheric Pressure</div>
+
+  <!-- ── S0 INTRO ──────────────────────────────── -->
+  <div id="s0" class="stage active">
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="hero-eyebrow">Physics · 6:125</p>
+    <h1 class="hero-title">Chest Tightens as You Rise</h1>
+    <p class="hero-sub">In 624 CE, nobody had climbed above 8,000 metres. Nobody knew that altitude crushes the chest. The Quran used this as a universally-understood comparison — centuries before atmospheric science existed.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">Quran 6:125</div>
+      <div class="verse-ar">وَمَنْ يُرِدْ أَنْ يُضِلَّهُ يَجْعَلْ صَدْرَهُ ضَيِّقًا حَرَجًا كَأَنَّمَا يَصَّعَّدُ فِي السَّمَاءِ</div>
+      <div class="verse-en">"And those whom He wants to leave astray, He makes <span class="verse-highlight">their chests tight and constricted</span>, <span class="verse-highlight">as if they are ascending to the sky</span>."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">Why this is remarkable</div>
+      <div class="claim-text">The Quran uses altitude as an analogy for chest tightness — implying that <strong>ascending causes constriction of breathing</strong>. This is the exact physiological reality: as altitude increases, atmospheric pressure drops, oxygen thins, and the chest physically tightens. The Death Zone begins at <strong>8,000 metres</strong> — where pressure falls below 356 millibars and humans cannot survive without supplemental oxygen.</div>
+    </div>
+
+    <div class="zone-card"><div class="zone-dot" style="background:#22c55e"></div><div class="zone-text"><strong>Sea level: 1,013 mbar</strong> — normal breathing, chest free</div></div>
+    <div class="zone-card"><div class="zone-dot" style="background:#f59e0b"></div><div class="zone-text"><strong>4,000 m: ~617 mbar</strong> — shortness of breath begins</div></div>
+    <div class="zone-card"><div class="zone-dot" style="background:#f87171"></div><div class="zone-text"><strong>8,000 m (Death Zone): &lt;356 mbar</strong> — human life unsustainable without oxygen</div></div>
+
+    <button onclick="go(1)" class="btn btn-primary" style="margin-top:24px;">
+      Start Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 EXERCISE 1 ──────────────────────────── -->
+  <div id="s1" class="stage">
+    <p class="hero-eyebrow">Exercise 1 of 3</p>
+    <p class="prompt">The Quran says God makes the disbeliever's chest "tight and constricted, as if ascending to the sky." What is the modern scientific explanation for this analogy?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Higher altitude brings more solar radiation, warming the chest</div>
+      </div>
+    </div>
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">As altitude increases, atmospheric pressure and oxygen concentration decrease — making breathing progressively harder and the chest feel constricted</div>
+      </div>
+    </div>
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Cold temperatures at altitude cause the chest muscles to contract</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 EXERCISE 2 (canvas) ─────────────────── -->
+  <div id="s2" class="stage">
+    <p class="hero-eyebrow">Exercise 2 of 3</p>
+
+    <canvas id="s2Canvas" width="640" height="240"
+      style="width:100%;height:240px;border-radius:14px;margin-bottom:22px;display:block;"></canvas>
+
+    <p class="prompt">According to Wikipedia, above what altitude does the "Death Zone" begin — where oxygen is insufficient to sustain human life?</p>
+
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">4,000 metres (13,000 ft) · 617 mbar</div></div>
+    </div>
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">6,000 metres (20,000 ft) · 472 mbar</div></div>
+    </div>
+    <div onclick="pickEx2(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">8,000 metres (26,000 ft) · less than 356 mbar</div>
+        <div class="ac-sub">Wikipedia: "The death zone — altitudes above 8,000 m where oxygen is insufficient to sustain human life"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S3 EXERCISE 3 ──────────────────────────── -->
+  <div id="s3" class="stage">
+    <p class="hero-eyebrow">Exercise 3 of 3</p>
+    <p class="prompt">The Arabic word يَصَّعَّدُ (yassaʿʿadu) in 6:125 uses an intensified progressive form — meaning to keep ascending higher and higher. Why is this verb form scientifically precise?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">It suggests the person teleports to the top of the sky instantly</div>
+      </div>
+    </div>
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Altitude sickness is gradual and progressive — the chest tightens more with every additional metre of ascent, matching the progressive intensification of the verb</div>
+      </div>
+    </div>
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">It means spiritual ascent only, with no physical meaning</div>
+        <div class="ac-sub">The Quran uses it explicitly as a physical comparison for a real sensation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ─────────────────────────────── -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-size:clamp(22px,4vw,30px);margin-bottom:18px;">The Sky That Crushes</h2>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n" id="ctr1">0</div>
+        <div class="lbl">Years Before Science</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="ctr2">0</div>
+        <div class="lbl">Metres — Death Zone</div>
+      </div>
+    </div>
+
+    <div class="verdict-text">
+      <strong>No one in 624 CE had ascended to the Death Zone.</strong> No instruments existed to measure atmospheric pressure. No one had scientifically established that altitude causes chest constriction. Yet the Quran used ascending to the sky as a self-evident metaphor for <em>exactly</em> that sensation — describing it as progressive (يَصَّعَّدُ) and physically precise.<br><br>
+      The word for "constricted" (ضَيِّقًا حَرَجًا) combines two degrees of tightening — narrow then severely compressed. This is a medically accurate description of the stages of altitude hypoxia: first shortness of breath, then complete respiratory failure.
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Wikipedia · Effects of High Altitude on Humans · 2019</div>
+      <div class="source-quote">"The death zone, in mountaineering, refers to altitudes above a certain point where the amount of oxygen is insufficient to sustain human life for an extended time span. This point is generally tagged as 8,000 m (26,000 ft, less than 356 millibars of atmospheric pressure)."</div>
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var stage = 0;
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Atmospheric Pressure', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('atmosphere');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('ctr1'), 0, 1400, 1800);
+        animFrom(document.getElementById('ctr2'), 0, 8000, 2000);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Every metre of altitude reduces atmospheric pressure and oxygen density. Above the Death Zone (8,000m), no human can breathe without supplemental oxygen. The Quran described this 1,400 years before it was measured.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Above 8,000m (26,000 ft), atmospheric pressure falls below 356 mbar. Mountaineers must carry oxygen tanks. Mount Everest\'s summit (8,849m) sits inside this Death Zone.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The progressive verb يَصَّعَّدُ matches the physics exactly: every 1,000m of ascent drops pressure ~120 mbar. Chest tightness is not sudden — it accumulates with each step upward.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS ─────────────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var t = 0;
+
+  // deterministic RNG for O2 particles
+  function rng(seed) {
+    var s = seed;
+    return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+  }
+  var r = rng(7331);
+  var particles = [];
+  for (var i = 0; i < 120; i++) {
+    var py = r() * H;
+    var px = r() * 310;
+    // density drops with altitude: bottom (y=H) dense, top (y=0) sparse
+    var density = (py / H) * 0.85 + 0.15;
+    if (r() < density) {
+      // color: green at bottom → amber → red at top
+      var frac = py / H; // 0=top(red), 1=bottom(green)
+      var col;
+      if (frac > 0.65) col = '#22c55e';
+      else if (frac > 0.38) col = '#f59e0b';
+      else col = '#f87171';
+      particles.push({ x: px, y: py, phase: r() * Math.PI * 2, col: col, r: 1.2 + r() * 1.8 });
+    }
+  }
+
+  function drawMountain() {
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, 86);
+    ctx.lineTo(28, 70);
+    ctx.lineTo(58, 78);
+    ctx.lineTo(100, 42);
+    ctx.lineTo(132, 56);
+    ctx.lineTo(168, 10); // main peak
+    ctx.lineTo(196, 44);
+    ctx.lineTo(232, 28);
+    ctx.lineTo(262, 60);
+    ctx.lineTo(298, 80);
+    ctx.lineTo(312, H);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(20,40,65,0.9)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(186,230,253,0.3)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // snow cap at peak
+    ctx.beginPath();
+    ctx.moveTo(160, 20); ctx.lineTo(168, 10); ctx.lineTo(176, 20);
+    ctx.lineTo(186, 30); ctx.lineTo(150, 30); ctx.closePath();
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fill();
+  }
+
+  function drawAltitudeBands() {
+    // Death zone band (top area)
+    var grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0,   'rgba(248,113,113,0.12)');
+    grad.addColorStop(0.32,'rgba(249,115,22,0.08)');
+    grad.addColorStop(0.60,'rgba(234,179,8,0.05)');
+    grad.addColorStop(1,   'rgba(34,197,94,0.04)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 312, H);
+
+    // Death zone label
+    ctx.globalAlpha = 0.65;
+    ctx.font = 'bold 8px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171';
+    ctx.textAlign = 'left';
+    ctx.fillText('DEATH ZONE ≥8,000 m', 6, 12);
+    ctx.globalAlpha = 0.35;
+    ctx.font = '7px DM Sans,sans-serif';
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('Altitude sickness zone', 6, 50);
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('SEA LEVEL · 1,013 mbar', 6, H - 6);
+  }
+
+  function drawPressureGauge() {
+    // Right panel: vertical pressure bar (320-420px)
+    var gx = 328, gy1 = 12, gy2 = H - 12;
+    var gw = 18;
+
+    // gradient bar background
+    var grad2 = ctx.createLinearGradient(0, gy1, 0, gy2);
+    grad2.addColorStop(0,   'rgba(248,113,113,0.5)');
+    grad2.addColorStop(0.35,'rgba(249,115,22,0.4)');
+    grad2.addColorStop(0.65,'rgba(234,179,8,0.35)');
+    grad2.addColorStop(1,   'rgba(34,197,94,0.5)');
+    ctx.fillStyle = grad2;
+    ctx.beginPath();
+    ctx.roundRect(gx, gy1, gw, gy2 - gy1, 4);
+    ctx.fill();
+
+    // Pressure labels
+    ctx.globalAlpha = 0.6;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171'; ctx.textAlign = 'left';
+    ctx.fillText('<356', gx + gw + 5, gy1 + 5);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('617', gx + gw + 5, (gy1 + gy2) * 0.5 + 3);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('1013 mbar', gx + gw + 5, gy2);
+
+    // Gauge label
+    ctx.globalAlpha = 0.4;
+    ctx.font = '7px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.textAlign = 'center';
+    ctx.fillText('PRESSURE', gx + gw/2, gy2 + 10);
+  }
+
+  function drawArabicVerse() {
+    ctx.globalAlpha = 0.88;
+    ctx.font = 'bold 12px Amiri,serif';
+    ctx.fillStyle = '#bae6fd';
+    ctx.textAlign = 'right';
+    ctx.fillText('كَأَنَّمَا يَصَّعَّدُ فِي السَّمَاءِ', W - 14, 42);
+    ctx.globalAlpha = 0.42;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('as if ascending to the sky · 6:125', W - 14, 58);
+    ctx.globalAlpha = 0.28;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = '#bae6fd';
+    ctx.fillText('Death Zone confirmed: ≥8,000m', W - 14, 74);
+  }
+
+  function frame() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    drawAltitudeBands();
+
+    // O2 particles with slow upward drift
+    particles.forEach(function(p) {
+      var drift = (t * 0.3 + p.phase) % (H + 4);
+      var py2 = p.y - drift; // drift upward
+      if (py2 < -4) return; // offscreen
+      var frac = py2 / H;
+      var alpha = 0.25 + 0.6 * frac + 0.15 * Math.sin(t * 0.25 + p.phase);
+      if (alpha < 0) alpha = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, py2, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.col;
+      ctx.globalAlpha = alpha;
+      ctx.fill();
+    });
+
+    drawMountain();
+    drawPressureGauge();
+    drawArabicVerse();
+
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── S2 CANVAS: Sea level vs altitude breathing ── */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var t = 0;
+  var mid = W / 2;
+
+  function drawPerson(cx, cy, col, breathScale) {
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.75;
+    // head
+    ctx.beginPath(); ctx.arc(cx, cy - 36, 10, 0, Math.PI * 2); ctx.stroke();
+    // torso
+    ctx.beginPath(); ctx.moveTo(cx, cy - 26); ctx.lineTo(cx, cy + 10); ctx.stroke();
+    // arms
+    ctx.beginPath(); ctx.moveTo(cx, cy - 20); ctx.lineTo(cx - 18, cy - 5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy - 20); ctx.lineTo(cx + 18, cy - 5); ctx.stroke();
+    // legs
+    ctx.beginPath(); ctx.moveTo(cx, cy + 10); ctx.lineTo(cx - 12, cy + 32); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy + 10); ctx.lineTo(cx + 12, cy + 32); ctx.stroke();
+    ctx.restore();
+
+    // Chest circle (breathing animation)
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.9;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 8;
+    var cr = 13 * breathScale;
+    ctx.beginPath();
+    ctx.arc(cx, cy - 13, cr, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawO2Particles(x1, x2, y1, y2, density, col) {
+    ctx.save();
+    ctx.fillStyle = col;
+    var r2 = rng2(x1 * 7 + y1 * 3);
+    for (var i = 0; i < 30; i++) {
+      var px = x1 + r2() * (x2 - x1);
+      var py = y1 + r2() * (y2 - y1);
+      if (r2() > density) continue;
+      var a = 0.2 + 0.5 * Math.sin(t * 0.18 + i * 0.7);
+      ctx.globalAlpha = a * density;
+      ctx.beginPath();
+      ctx.arc(px, py, 2, 0, Math.PI * 2);
+      ctx.fill();
+      // O2 label for some
+      if (i % 7 === 0) {
+        ctx.globalAlpha = 0.25 * density;
+        ctx.font = '7px DM Sans,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('O₂', px, py - 5);
+      }
+    }
+    ctx.restore();
+  }
+
+  function rng2(seed) {
+    var s = seed | 0;
+    var out = [];
+    for (var i = 0; i < 35; i++) {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      out.push((s >>> 0) / 0xffffffff);
+    }
+    var idx = 0;
+    return function() { return out[idx++ % out.length]; };
+  }
+
+  function drawPressureBar(cx, y, pressure, maxP, col) {
+    var bw = 80, bh = 10;
+    var fill = (pressure / maxP) * bw;
+    ctx.save();
+    // Track
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(cx - bw/2, y, bw, bh, 3); ctx.stroke();
+    // Fill
+    ctx.fillStyle = col;
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath(); ctx.roundRect(cx - bw/2, y, fill, bh, 3); ctx.fill();
+    // Label
+    ctx.globalAlpha = 0.55;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = col;
+    ctx.textAlign = 'center';
+    ctx.fillText(pressure + ' mbar', cx, y + bh + 12);
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    // divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.moveTo(mid, 8); ctx.lineTo(mid, H - 8); ctx.stroke();
+    ctx.setLineDash([]);
+
+    var breathL = 1 + 0.12 * Math.sin(t * 0.18);
+    var breathR = 0.58 + 0.06 * Math.sin(t * 0.28);
+
+    // LEFT: Sea level — easy breathing
+    var lx = mid * 0.4, ly = H * 0.52;
+    // sky background (dense)
+    ctx.fillStyle = 'rgba(34,197,94,0.04)';
+    ctx.fillRect(0, 0, mid, H);
+    drawO2Particles(14, mid - 14, 30, H - 30, 0.82, '#22c55e');
+    drawPerson(lx, ly, '#22c55e', breathL);
+    drawPressureBar(lx, H - 30, 1013, 1013, '#22c55e');
+
+    ctx.globalAlpha = 0.8;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = '#22c55e'; ctx.textAlign = 'center';
+    ctx.fillText('SEA LEVEL', lx, 16);
+    ctx.globalAlpha = 0.45;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('Full oxygen · chest free', lx, 30);
+
+    // RIGHT: Death zone — constricted
+    var rx = mid + mid * 0.4, ry = H * 0.52;
+    ctx.fillStyle = 'rgba(248,113,113,0.04)';
+    ctx.fillRect(mid, 0, mid, H);
+    drawO2Particles(mid + 14, W - 14, 30, H - 30, 0.18, '#f87171');
+    drawPerson(rx, ry, '#f87171', breathR);
+    drawPressureBar(rx, H - 30, 356, 1013, '#f87171');
+
+    // Tightness arcs around chest
+    var cr2 = 13 * breathR;
+    var tightA = 0.35 + 0.15 * Math.sin(t * 0.28);
+    for (var i = 0; i < 3; i++) {
+      ctx.save();
+      ctx.strokeStyle = '#f87171';
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = tightA - i * 0.1;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.arc(rx, ry - 13, cr2 + 6 + i * 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 0.8;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171'; ctx.textAlign = 'center';
+    ctx.fillText('DEATH ZONE · 8,000 m', rx, 16);
+    ctx.globalAlpha = 0.45;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('Oxygen starved · chest constricts', rx, 30);
+
+    // Arabic label at bottom-right
+    ctx.globalAlpha = 0.45;
+    ctx.font = '10px Amiri,serif';
+    ctx.fillStyle = '#bae6fd';
+    ctx.textAlign = 'center';
+    ctx.fillText('ضَيِّقًا حَرَجًا كَأَنَّمَا يَصَّعَّدُ فِي السَّمَاءِ', rx, H - 44);
+
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+initHeroCanvas();
+</script>
+</body>
+</html>

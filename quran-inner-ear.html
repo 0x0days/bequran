@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inner Ear · Quranic Numerics</title>
+<script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+<link rel="stylesheet" href="theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+    --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+    --gold: #f59e0b; --gold-light: #fcd34d;
+    --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+    --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+    --accent: #fde68a;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+  .container { max-width: 680px; margin: 0 auto; }
+  .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:28px 28px; }
+  .container { position:relative; z-index:1; }
+
+  /* nav */
+  .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:22px; transition:color .15s; }
+  .nav-back:hover { color:var(--text); }
+  .nav-back svg { opacity:.6; }
+
+  /* progress */
+  .lesson-bar-wrap { height:6px; background:var(--surface2); border-radius:3px; margin-bottom:10px; overflow:hidden; }
+  #lbar { height:100%; background:var(--accent); border-radius:3px; transition:width .5s cubic-bezier(.4,0,.2,1); width:0%; }
+  #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.04em; }
+
+  /* stage */
+  .stage { display:none; }
+  .stage.active { display:block; }
+
+  /* hero */
+  .hero-eyebrow { font-size:11px; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+  .hero-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+  .hero-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:26px; max-width:560px; }
+
+  /* verse block */
+  .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:24px 0; }
+  .verse-ar { font-family:'Amiri',serif; font-size:22px; direction:rtl; text-align:right; color:var(--text); line-height:1.8; margin-bottom:10px; }
+  .verse-ref { font-size:11px; color:var(--accent); font-weight:600; letter-spacing:.06em; margin-bottom:6px; }
+  .verse-en { font-size:14px; color:var(--muted); line-height:1.7; font-style:italic; }
+
+  /* claim box */
+  .claim-box { background:linear-gradient(135deg,rgba(253,230,138,0.07),rgba(251,191,36,0.02)); border:1px solid rgba(253,230,138,0.2); border-radius:14px; padding:20px 22px; margin:22px 0; }
+  .claim-box p { font-size:14px; line-height:1.8; color:var(--text); }
+  .claim-box strong { color:var(--accent); }
+
+  /* exercises */
+  .prompt { font-family:'Playfair Display',serif; font-size:17px; line-height:1.55; margin-bottom:20px; color:var(--text); }
+  .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s, background .15s; }
+  .answer-card:hover { border-color:rgba(253,230,138,0.4); }
+  .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+  .answer-card.ac-wrong { border-color:var(--err-light); background:var(--err-bg); animation:shake .4s ease; }
+  .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .ac-letter { width:28px; height:28px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:1px; }
+  .ac-correct .ac-letter { background:rgba(34,197,94,0.2); color:var(--ok); }
+  .ac-wrong .ac-letter { background:rgba(248,113,113,0.2); color:var(--err-light); }
+  .ac-body { flex:1; }
+  .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+  .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; text-align:right; line-height:1.7; }
+  .ac-ref { font-size:11px; color:var(--accent); margin-top:4px; }
+  .ac-tr { font-size:12px; color:var(--muted); font-style:italic; margin-top:2px; }
+
+  /* evidence image */
+  .evidence-wrap { margin:22px 0; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  .evidence-wrap img { width:100%; display:block; }
+  .evidence-cap { font-size:11px; color:var(--muted); padding:9px 14px; background:var(--surface); text-align:center; }
+
+  /* stat cards */
+  .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+  .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+  .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+  .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+  .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+  .verdict-text strong { color:var(--text); }
+  .source-box { background:linear-gradient(135deg,rgba(253,230,138,0.06),rgba(251,191,36,0.02)); border:1px solid rgba(253,230,138,0.17); border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+  .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+  .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+
+  /* xp badge */
+  .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:12px; padding:14px 18px; margin-bottom:24px; }
+  .xp-badge.show { display:flex; animation:fadeUp .4s ease; }
+  .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* nav */
+  .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+  .btn:hover { transform:translateY(-1px); }
+  .btn-primary { background:var(--accent); color:#100900; box-shadow:0 4px 20px rgba(253,230,138,0.25); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+  .btn-outline:hover { border-color:rgba(253,230,138,0.4); color:var(--text); }
+  .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+
+  /* fb-panel */
+  .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+  .fb-panel.show { transform:translateY(0); }
+  .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+  .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+  .fb-left { display:flex; align-items:center; gap:14px; }
+  .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+  .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+  .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+  .fb-title { font-size:15px; font-weight:700; }
+  .fb-ok .fb-title { color:var(--ok); }
+  .fb-err .fb-title { color:var(--err-light); }
+  .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+  .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+  .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+  .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+</style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-brainstem.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Brainstem
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Inner Ear</div>
+
+  <!-- ── S0 INTRO ──────────────────────────────── -->
+  <div id="s0" class="stage active">
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="hero-eyebrow">Biology · 18:11</p>
+    <h1 class="hero-title">The Ear That Knocks You Out</h1>
+    <p class="hero-sub">1,400 years ago, ears were understood to do one thing: hear sounds. Nobody knew that the inner ear also controls your entire sense of balance and consciousness. Yet the Quran described it precisely.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">Quran 18:11</div>
+      <div class="verse-ar">فَضَرَبْنَا عَلَىٰ آذَانِهِمْ فِي الْكَهْفِ سِنِينَ عَدَدًا</div>
+      <div class="verse-en">"Then We struck upon their ears in the cave for a number of years."</div>
+    </div>
+
+    <div class="claim-box">
+      <p>The People of the Cave appear awake to observers — eyes open, bodies intact — yet cannot be roused. The Quran says God <strong>"struck their ears."</strong> A boxing punch to the ear causes the same: <strong>complete unconsciousness</strong> that no sound can break. Normal sleep is broken by any noise. A knocked-out person is not.</p>
+    </div>
+
+    <button onclick="go(1)" class="btn btn-primary" style="margin-top:8px;">
+      Start Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 EXERCISE 1 ──────────────────────────── -->
+  <div id="s1" class="stage">
+    <p class="hero-eyebrow">Exercise 1 of 3</p>
+    <p class="prompt">The People of the Cave could not be woken even though they appeared alive. What does "We struck their ears" describe?</p>
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Their eardrums ruptured, so they heard nothing and stayed asleep</div></div>
+    </div>
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">Their ears were covered by divine silence to block external sounds</div></div>
+    </div>
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">The inner ear was struck, causing deep unconsciousness — like a knockout — impossible to wake from sound alone</div></div>
+    </div>
+  </div>
+
+  <!-- ── S2 EXERCISE 2 (canvas) ─────────────────── -->
+  <div id="s2" class="stage">
+    <p class="hero-eyebrow">Exercise 2 of 3</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:14px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="evidence-wrap">
+      <img src="pics/inner-ear.jpeg" alt="Anatomy of the Internal Ear showing cochlea and semicircular canals">
+      <div class="evidence-cap">Inner ear anatomy: cochlea (hearing) + 3 semicircular canals (balance) — Cranial Nerve VIII</div>
+    </div>
+
+    <p class="prompt" style="margin-top:18px;">According to modern science, what does the inner ear control <em>besides</em> hearing?</p>
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Taste perception and smell sensitivity</div></div>
+    </div>
+    <div onclick="pickEx2(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">Balance — static balance (sensing gravity) and dynamic balance (sensing acceleration and rotation)</div></div>
+    </div>
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Vision focusing and depth perception</div></div>
+    </div>
+  </div>
+
+  <!-- ── S3 EXERCISE 3 ──────────────────────────── -->
+  <div id="s3" class="stage">
+    <p class="hero-eyebrow">Exercise 3 of 3</p>
+    <p class="prompt">How many semicircular canals does the inner ear contain — each sensing rotation in a different plane of space?</p>
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">1 — one canal for all rotational motion</div></div>
+    </div>
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">2 — one for horizontal, one for vertical</div></div>
+    </div>
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">3 — anterior, posterior, and lateral canals — covering all three axes of 3D space</div></div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ─────────────────────────────── -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-size:clamp(22px,4vw,30px);margin-bottom:18px;">The Ear Controls Everything</h2>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n" id="ctr1">0</div>
+        <div class="lbl">Years Before Science</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="ctr2">0</div>
+        <div class="lbl">Semicircular Canals</div>
+      </div>
+    </div>
+
+    <div class="verdict-text">
+      <strong>1,400 years before neuroscience mapped the vestibular system,</strong> the Quran described "striking the ears" as the mechanism of sustained unconsciousness. People at the time understood ears only as hearing organs. The idea that a blow to the ear — not a blow to the head, not a sedative — could render someone unconscious for years was unknown.<br><br>
+      The inner ear contains three semicircular canals that detect rotational acceleration in all three planes of space. Disrupting them causes vertigo, loss of balance, and loss of consciousness — exactly what "we struck their ears" physiologically describes.
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Wikipedia · Ear · 2019</div>
+      <div class="source-quote">"Providing balance, when moving or stationary, is also a central function of the ear. The ear facilitates two types of balance: static balance, which allows a person to feel the effects of gravity, and dynamic balance, which allows a person to sense acceleration."</div>
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-skin-memory.html" class="btn btn-primary">
+        Next: Skin Memory
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<!-- fb-panel -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var stage = 0;
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Inner Ear', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('inner-ear');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('ctr1'), 0, 1400, 1800);
+        animFrom(document.getElementById('ctr2'), 0, 3, 900);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Like a knockout punch in boxing — the inner ear disruption overrides consciousness entirely. Normal sleep can be broken by sound; this cannot.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The vestibular system in the inner ear provides two types of balance: static (gravity) and dynamic (acceleration). This was unknown 1,400 years ago.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Three semicircular canals — one for each axis of rotation in 3D space — are housed in the inner ear alongside the cochlea. A strike to the ear disrupts all three.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS ──────────────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var ACCENT = '#fde68a';
+  var t = 0;
+
+  // cochlea center
+  var ex = 195, ey = 75;
+  // canal cluster center
+  var cx2 = 185, cy2 = 32;
+
+  function drawCochlea() {
+    ctx.save();
+    ctx.shadowColor = 'rgba(253,230,138,0.45)';
+    ctx.shadowBlur = 7;
+    ctx.strokeStyle = ACCENT;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    var turns = 2.5, steps = 240;
+    var r0 = 4, r1 = 30;
+    for (var i = 0; i <= steps; i++) {
+      var ang = (i / steps) * turns * Math.PI * 2 - Math.PI * 0.5;
+      var r = r0 + (r1 - r0) * (i / steps);
+      var x = ex + r * Math.cos(ang);
+      var y = ey + r * Math.sin(ang);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCanals(alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = 1.8;
+    // lateral canal (horizontal ellipse)
+    ctx.beginPath();
+    ctx.ellipse(cx2, cy2, 28, 9, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(253,230,138,0.75)';
+    ctx.stroke();
+    // anterior canal (vertical ellipse tilted right)
+    ctx.save();
+    ctx.translate(cx2 + 12, cy2 + 2);
+    ctx.rotate(0.38);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 11, 26, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(253,230,138,0.60)';
+    ctx.stroke();
+    ctx.restore();
+    // posterior canal (vertical ellipse tilted left)
+    ctx.save();
+    ctx.translate(cx2 - 12, cy2 + 2);
+    ctx.rotate(-0.32);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 11, 24, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(253,230,138,0.52)';
+    ctx.stroke();
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function drawStrikePulse() {
+    var p1 = (t * 0.35) % 1;
+    var p2 = (t * 0.35 + 0.45) % 1;
+    var maxR = 80;
+    [p1, p2].forEach(function(p) {
+      var r = p * maxR;
+      var a = (1 - p) * 0.55;
+      ctx.beginPath();
+      ctx.arc(ex, ey - 10, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(253,230,138,' + a + ')';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+  }
+
+  function drawBalanceLevel() {
+    var bx = 195, by = 118, bw = 58;
+    var tilt = Math.sin(t * 0.28) * 0.22;
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.rotate(tilt);
+    // level bar
+    ctx.strokeStyle = 'rgba(253,230,138,0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-bw/2, 0); ctx.lineTo(bw/2, 0); ctx.stroke();
+    // end ticks
+    ctx.beginPath(); ctx.moveTo(-bw/2, -4); ctx.lineTo(-bw/2, 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bw/2, -4); ctx.lineTo(bw/2, 4); ctx.stroke();
+    // bubble indicator
+    var bubbleX = tilt * bw * 0.5;
+    ctx.beginPath();
+    ctx.arc(bubbleX, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = ACCENT;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    ctx.restore();
+    // BALANCE label
+    ctx.globalAlpha = 0.4;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center';
+    ctx.fillText('BALANCE', bx, by + 14);
+  }
+
+  function drawText() {
+    // Verse Arabic right side
+    ctx.globalAlpha = 0.88;
+    ctx.font = 'bold 14px Amiri,serif';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'right';
+    ctx.fillText('فَضَرَبْنَا عَلَىٰ آذَانِهِمْ', W - 18, 48);
+    ctx.globalAlpha = 0.45;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('Quran 18:11', W - 18, 64);
+    // right side labels
+    ctx.globalAlpha = 0.38;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = ACCENT;
+    ctx.fillText('Cochlea · Hearing', W - 18, 88);
+    ctx.fillText('Semicircular Canals · Balance', W - 18, 102);
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    // connecting line from canals down to cochlea
+    ctx.strokeStyle = 'rgba(253,230,138,0.22)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx2, cy2 + 10);
+    ctx.bezierCurveTo(cx2 + 5, cy2 + 30, ex - 10, ey - 25, ex, ey - 30);
+    ctx.stroke();
+
+    drawStrikePulse();
+    drawCochlea();
+    drawCanals(0.9);
+    drawBalanceLevel();
+    drawText();
+
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── S2 CANVAS: Old belief vs Modern science ── */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var t = 0;
+  var ACCENT = '#fde68a';
+  var mid = W / 2;
+
+  function drawEarOutline(cx, cy, scale, col) {
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.8;
+    ctx.globalAlpha = 0.7;
+    // simplified ear pinna
+    ctx.beginPath();
+    ctx.moveTo(cx - scale * 10, cy + scale * 30);
+    ctx.bezierCurveTo(cx - scale * 28, cy + scale * 10, cx - scale * 32, cy - scale * 20, cx - scale * 15, cy - scale * 38);
+    ctx.bezierCurveTo(cx, cy - scale * 50, cx + scale * 18, cy - scale * 42, cx + scale * 14, cy - scale * 20);
+    ctx.bezierCurveTo(cx + scale * 10, cy, cx - scale * 2, cy + scale * 10, cx, cy + scale * 30);
+    ctx.bezierCurveTo(cx - scale * 2, cy + scale * 38, cx - scale * 8, cy + scale * 42, cx - scale * 10, cy + scale * 30);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSoundWaves(cx, cy, scale, col) {
+    // 3 arc waves going inward
+    for (var i = 1; i <= 3; i++) {
+      var r = scale * (10 + i * 12);
+      ctx.save();
+      ctx.strokeStyle = col;
+      ctx.globalAlpha = (0.7 - i * 0.15) * (0.6 + 0.35 * Math.sin(t * 0.1 + i * 1.2));
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx + scale * 14, cy, r, Math.PI * 0.55, Math.PI * 1.45);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawBalanceArrows(cx, cy, scale, col) {
+    // circular rotation arrows around the cochlea area
+    var arcR = scale * 20;
+    var sweep = Math.PI * 1.4;
+    var startA = -Math.PI * 0.7 + Math.sin(t * 0.08) * 0.15;
+
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.75 + 0.2 * Math.sin(t * 0.08);
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy + scale * 12, arcR, startA, startA + sweep);
+    ctx.stroke();
+    // arrowhead
+    var endA = startA + sweep;
+    var ax = cx + arcR * Math.cos(endA);
+    var ay = cy + scale * 12 + arcR * Math.sin(endA);
+    var headA = endA + Math.PI * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(ax + 7 * Math.cos(headA - 0.4), ay + 7 * Math.sin(headA - 0.4));
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(ax + 7 * Math.cos(headA + 0.4), ay + 7 * Math.sin(headA + 0.4));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMiniCochlea(cx, cy, scale, col) {
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.65;
+    ctx.beginPath();
+    var r0 = 2, r1 = scale * 11, turns = 2;
+    for (var i = 0; i <= 160; i++) {
+      var ang = (i / 160) * turns * Math.PI * 2 - Math.PI * 0.5;
+      var r = r0 + (r1 - r0) * (i / 160);
+      var x = cx + r * Math.cos(ang);
+      var y = cy + r * Math.sin(ang);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawX(cx, cy, col) {
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.9;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx - 10, cy - 10); ctx.lineTo(cx + 10, cy + 10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + 10, cy - 10); ctx.lineTo(cx - 10, cy + 10); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCheck(cx, cy, col) {
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.9;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy);
+    ctx.lineTo(cx - 3, cy + 9);
+    ctx.lineTo(cx + 10, cy - 8);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    // divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(mid, 10); ctx.lineTo(mid, H - 10); ctx.stroke();
+
+    // LEFT panel: Old belief — hearing only (red)
+    var lx = mid * 0.45, ly = H * 0.5;
+    drawEarOutline(lx, ly, 1.1, 'rgba(248,113,113,0.7)');
+    drawSoundWaves(lx - 30, ly, 1.1, '#f87171');
+    drawMiniCochlea(lx + 18, ly + 15, 1.0, '#f87171');
+    drawX(lx + 20, ly - 35, '#f87171');
+
+    ctx.globalAlpha = 0.75;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171';
+    ctx.textAlign = 'center';
+    ctx.fillText('OLD BELIEF', mid * 0.45, 18);
+    ctx.globalAlpha = 0.5;
+    ctx.font = '10px DM Sans,sans-serif';
+    ctx.fillText('Hearing Only', mid * 0.45, 32);
+
+    // RIGHT panel: Modern science — hearing + balance (gold)
+    var rx = mid + mid * 0.45, ry = H * 0.5;
+    drawEarOutline(rx, ry, 1.1, 'rgba(253,230,138,0.7)');
+    drawSoundWaves(rx - 30, ry, 1.1, ACCENT);
+    drawMiniCochlea(rx + 18, ry + 15, 1.0, ACCENT);
+    drawBalanceArrows(rx + 22, ry - 15, 1.1, ACCENT);
+    drawCheck(rx + 20, ry - 35, '#22c55e');
+
+    ctx.globalAlpha = 0.8;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = ACCENT;
+    ctx.textAlign = 'center';
+    ctx.fillText('MODERN SCIENCE', rx, 18);
+    ctx.globalAlpha = 0.55;
+    ctx.font = '10px DM Sans,sans-serif';
+    ctx.fillText('Hearing + Balance', rx, 32);
+
+    // bottom labels
+    ctx.globalAlpha = 0.35;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.textAlign = 'center';
+    ctx.fillText('1400 years ago · common belief', mid * 0.5, H - 8);
+    ctx.fillStyle = ACCENT;
+    ctx.fillText('Wikipedia 2019 · confirmed', mid + mid * 0.5, H - 8);
+
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+initHeroCanvas();
+</script>
+</body>
+</html>

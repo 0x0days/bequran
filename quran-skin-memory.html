@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Skin Memory · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #d946ef;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(217,70,239,0.04) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    .nav-home-fixed { position:fixed; top:12px; left:16px; z-index:300; display:inline-flex; align-items:center; gap:6px; background:rgba(17,30,46,0.9); border:1px solid var(--border); border-radius:100px; padding:6px 14px; font-size:12px; color:var(--muted); text-decoration:none; backdrop-filter:blur(10px); }
+    .nav-home-fixed:hover { color:var(--text); }
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#9333ea); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+
+    .hero-eyebrow { font-size:11px; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; font-weight:600; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:10px; }
+    .hero-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:26px; max-width:560px; }
+
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin:24px 0; border-left:3px solid var(--accent); }
+    .verse-ref { font-size:11px; color:var(--accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:18px; color:var(--accent); direction:rtl; text-align:right; line-height:2.1; margin-bottom:10px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.75; font-style:italic; }
+    .verse-highlight { color:var(--accent); font-style:normal; font-weight:600; }
+
+    .claim-box { background:linear-gradient(135deg,rgba(217,70,239,0.08),rgba(147,51,234,0.03)); border:1px solid rgba(217,70,239,0.2); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:700; }
+    .claim-text { font-size:14px; line-height:1.8; }
+    .claim-text strong { color:var(--accent); }
+
+    .controversy-box { background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.18); border-radius:14px; padding:16px 20px; margin:18px 0; }
+    .controversy-label { font-size:10px; color:var(--err-light); letter-spacing:.12em; text-transform:uppercase; font-weight:700; margin-bottom:6px; }
+    .controversy-text { font-size:13px; color:var(--muted); line-height:1.7; font-style:italic; }
+
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(217,70,239,0.3); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-correct .ac-letter { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .ac-wrong .ac-letter { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+
+    .evidence-wrap { margin:22px 0; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+    .evidence-wrap img { width:100%; display:block; }
+    .evidence-cap { font-size:11px; color:var(--muted); padding:9px 14px; background:var(--surface); text-align:center; line-height:1.5; }
+
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(217,70,239,0.06),rgba(147,51,234,0.02)); border:1px solid rgba(217,70,239,0.17); border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#1a0020; box-shadow:0 4px 20px rgba(217,70,239,0.3); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(217,70,239,0.4); color:var(--text); }
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-inner-ear.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Inner Ear
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Skin Memory</div>
+
+  <!-- ── S0 INTRO ──────────────────────────────── -->
+  <div id="s0" class="stage active">
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="hero-eyebrow">Biology · 41:20-21</p>
+    <h1 class="hero-title">Your Skin Remembers Everything</h1>
+    <p class="hero-sub">For centuries, critics said this verse was scientifically impossible. Memory only lives in neurons — skin can't store anything. In 2024, New York University proved them wrong.</p>
+
+    <div class="controversy-box">
+      <div class="controversy-label">The Skeptic's Objection</div>
+      <div class="controversy-text">"How can skin testify? Only the brain stores memories. Skin has no neurons, no synapses, no memory circuits. This verse is scientifically absurd."</div>
+    </div>
+
+    <div class="verse-block">
+      <div class="verse-ref">Quran 41:20–21</div>
+      <div class="verse-ar">حَتَّىٰ إِذَا مَا جَاءُوهَا شَهِدَ عَلَيْهِمْ سَمْعُهُمْ وَأَبْصَارُهُمْ وَجُلُودُهُمْ بِمَا كَانُوا يَعْمَلُونَ</div>
+      <div class="verse-ar" style="font-size:16px; margin-top:8px;">وَقَالُوا لِجُلُودِهِمْ لِمَ شَهِدْتُمْ عَلَيْنَا ۖ قَالُوا أَنْطَقَنَا اللَّهُ الَّذِي أَنْطَقَ كُلَّ شَيْءٍ</div>
+      <div class="verse-en" style="margin-top:12px;">"Their hearing, their sight, and <span class="verse-highlight">their skins will testify against them</span> regarding what they used to do. And they will say to their skins: 'Why did you testify against us?' They will say: 'Allah, Who made all things speak, made us speak.'"</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Logic</div>
+      <div class="claim-text">For skin to <strong>testify</strong>, it must be able to <strong>remember</strong>. Testimony without memory is impossible. The Quran does not say the brain testifies — it says the skin does. That is a precise, falsifiable claim. <strong>New York University, 2024: non-neural cells — including skin — can store and retrieve memories.</strong></div>
+    </div>
+
+    <button onclick="go(1)" class="btn btn-primary" style="margin-top:8px;">
+      Start Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 EXERCISE 1 ──────────────────────────── -->
+  <div id="s1" class="stage">
+    <p class="hero-eyebrow">Exercise 1 of 3</p>
+    <p class="prompt">The Quran says people will ask their skins: "Why did you testify against us?" For skin to give testimony, it logically requires what?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">A vocal box and physical ability to produce speech</div>
+        <div class="ac-sub">Testimony is about speaking, not remembering</div>
+      </div>
+    </div>
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">The ability to store and retrieve memories of past actions</div>
+        <div class="ac-sub">You cannot testify about what you don't remember</div>
+      </div>
+    </div>
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">The ability to feel pain and temperature at the time of events</div>
+        <div class="ac-sub">Sensing is enough for testimony</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 EXERCISE 2 (canvas) ─────────────────── -->
+  <div id="s2" class="stage">
+    <p class="hero-eyebrow">Exercise 2 of 3</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:14px;margin-bottom:20px;display:block;"></canvas>
+
+    <p class="prompt">NYU's 2024 study found that non-neural cells can store and retrieve memories. Which two organs were specifically reported as having this ability?</p>
+
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Heart and lungs</div></div>
+    </div>
+    <div onclick="pickEx2(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Skin and liver</div>
+        <div class="ac-sub">"Can skin and liver remember?" — Times of India, 2024</div>
+      </div>
+    </div>
+    <div onclick="pickEx2(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Kidneys and stomach</div></div>
+    </div>
+  </div>
+
+  <!-- ── S3 EXERCISE 3 ──────────────────────────── -->
+  <div id="s3" class="stage">
+    <p class="hero-eyebrow">Exercise 3 of 3</p>
+
+    <p class="prompt">Before 2024, what was the universal scientific consensus about where memories are stored?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Memory is stored in the heart and blood</div></div>
+    </div>
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Memory is a specialized function of neural circuits in the brain — no other cells were believed capable of storing memories</div>
+      </div>
+    </div>
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Memory is distributed equally throughout every cell in the body</div></div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ─────────────────────────────── -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-size:clamp(22px,4vw,30px);margin-bottom:18px;">The Skeptics Were Wrong</h2>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n" id="ctr1">0</div>
+        <div class="lbl">Years Before Science</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="ctr2">0</div>
+        <div class="lbl">Year Confirmed (NYU)</div>
+      </div>
+    </div>
+
+    <div class="verdict-text">
+      <strong>The Quran stated in 624 CE that human skin stores memories of actions.</strong> Critics used this as evidence against the Quran for centuries — "skin can't remember, only neurons can." The entire field of neuroscience agreed with the critics.<br><br>
+      In 2024, New York University researchers discovered that non-neural cells — including skin and liver — can store and retrieve memories. The Quran named skin specifically. The critics were not just wrong — they were 1,400 years behind.
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Times of India · 2024</div>
+      <div class="source-quote">"For a long time, memory was thought to be a specialized function of the brain, with our neural circuits and brain cells handling all our memories. But recent research from New York University has turned this assumption on its head. According to this study, even cells outside the brain can store and retrieve memories, opening up a new view of how our entire body participates in memory process."</div>
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-atmosphere.html" class="btn btn-primary">
+        Next: Atmospheric Pressure
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var stage = 0;
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Skin Memory', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('skin-memory');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('ctr1'), 0, 1400, 1800);
+        animFrom(document.getElementById('ctr2'), 0, 2024, 2000);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Testimony requires memory. A witness who cannot recall cannot testify. The Quran\'s claim that skin testifies is a direct claim that skin stores memories.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The Times of India (2024) specifically asked: "Can skin and liver remember?" — both named after a New York University study on non-neural memory.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The entire field agreed: memory = neurons = brain. No exceptions. The Quran named skin as a memory carrier 1,400 years before this was overturned in 2024.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS: Neuron → signal → skin cell ── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var A = '#d946ef';
+  var t = 0;
+  var BX = 86, BY = 65, BR = 18;
+  var AXON_START = BX + BR, AXON_END = 436;
+
+  function drawNeuron() {
+    // Dendrites
+    ctx.strokeStyle = 'rgba(217,70,239,0.48)';
+    ctx.lineWidth = 1.3;
+    ctx.lineCap = 'round';
+    var segs = [
+      [BX-14,BY-14, BX-34,BY-28, BX-52,BY-16],
+      [BX-34,BY-28, BX-44,BY-46],
+      [BX-18,BY-2,  BX-48,BY-8,  BX-70,BY-22],
+      [BX-48,BY-8,  BX-56,BY+12],
+      [BX-14,BY+14, BX-34,BY+28, BX-52,BY+16],
+      [BX-34,BY+28, BX-44,BY+44],
+      [BX-4, BY+17, BX-18,BY+46]
+    ];
+    segs.forEach(function(s) {
+      ctx.beginPath();
+      ctx.moveTo(s[0], s[1]);
+      for (var i = 2; i < s.length; i += 2) ctx.lineTo(s[i], s[i+1]);
+      ctx.stroke();
+    });
+
+    // Cell body glow + fill
+    ctx.save();
+    ctx.shadowColor = A;
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.arc(BX, BY, BR, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(217,70,239,0.12)';
+    ctx.fill();
+    ctx.strokeStyle = A;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    // Nucleus
+    ctx.beginPath();
+    ctx.arc(BX, BY, 7, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(217,70,239,0.28)';
+    ctx.fill();
+    ctx.restore();
+
+    // Axon
+    ctx.strokeStyle = 'rgba(217,70,239,0.52)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(AXON_START, BY);
+    ctx.lineTo(AXON_END, BY);
+    ctx.stroke();
+
+    // Myelin sheath segments
+    ctx.strokeStyle = 'rgba(217,70,239,0.16)';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'square';
+    for (var mx = AXON_START + 14; mx < AXON_END - 18; mx += 36) {
+      ctx.beginPath();
+      ctx.moveTo(mx, BY);
+      ctx.lineTo(mx + 21, BY);
+      ctx.stroke();
+    }
+    ctx.lineCap = 'round';
+
+    // Axon terminal
+    ctx.strokeStyle = 'rgba(217,70,239,0.42)';
+    ctx.lineWidth = 1.2;
+    [[AXON_END,BY, AXON_END+15,BY-17, AXON_END+23,BY-25],
+     [AXON_END,BY, AXON_END+17,BY],
+     [AXON_END,BY, AXON_END+15,BY+17, AXON_END+23,BY+25]].forEach(function(b) {
+      ctx.beginPath();
+      ctx.moveTo(b[0],b[1]);
+      for (var i = 2; i < b.length; i += 2) ctx.lineTo(b[i],b[i+1]);
+      ctx.stroke();
+    });
+    // synaptic boutons
+    [[AXON_END+23,BY-25],[AXON_END+17,BY],[AXON_END+23,BY+25]].forEach(function(pt) {
+      ctx.beginPath();
+      ctx.arc(pt[0],pt[1],3.5,0,Math.PI*2);
+      ctx.fillStyle = A;
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function drawSkinCell() {
+    var sx = 502, sy = BY;
+    var glow = 0.5 + 0.45 * Math.sin(t * 0.12);
+    ctx.save();
+    ctx.shadowColor = A;
+    ctx.shadowBlur = 9 * glow;
+    ctx.strokeStyle = 'rgba(217,70,239,' + (0.45 + glow * 0.35) + ')';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(sx-22,sy-13);
+    ctx.bezierCurveTo(sx-10,sy-22,sx+14,sy-20,sx+22,sy-10);
+    ctx.bezierCurveTo(sx+28,sy+1,sx+20,sy+17,sx+8,sy+19);
+    ctx.bezierCurveTo(sx-4,sy+22,sx-22,sy+14,sx-24,sy+2);
+    ctx.bezierCurveTo(sx-26,sy-5,sx-28,sy-8,sx-22,sy-13);
+    ctx.stroke();
+    ctx.restore();
+    // memory nodes
+    [[sx-7,sy-6],[sx+7,sy-5],[sx-2,sy+6],[sx+9,sy+7],[sx+1,sy-1]].forEach(function(n,i) {
+      var ng = (Math.sin(t*0.15 + i*1.4)+1)/2;
+      ctx.beginPath();
+      ctx.arc(n[0],n[1],2.5,0,Math.PI*2);
+      ctx.fillStyle = 'rgba(217,70,239,'+(0.28+ng*0.65)+')';
+      ctx.fill();
+    });
+    ctx.globalAlpha = 0.55;
+    ctx.font = 'bold 8px DM Sans,sans-serif';
+    ctx.fillStyle = A;
+    ctx.textAlign = 'center';
+    ctx.fillText('SKIN CELL', sx, sy+32);
+    ctx.globalAlpha = 0.38;
+    ctx.font = '7px DM Sans,sans-serif';
+    ctx.fillText('stores memory', sx, sy+42);
+  }
+
+  function drawPulse() {
+    var p = (t * 0.38) % 1;
+    var px = AXON_START + p * (AXON_END - AXON_START);
+    ctx.save();
+    ctx.shadowColor = A;
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(px, BY, 4.5, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.restore();
+    for (var i = 1; i <= 4; i++) {
+      var tp = p - i * 0.019;
+      if (tp < 0) continue;
+      var tx = AXON_START + tp * (AXON_END - AXON_START);
+      ctx.beginPath();
+      ctx.arc(tx, BY, 3.5 - i*0.5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(217,70,239,'+(0.55 - i*0.12)+')';
+      ctx.fill();
+    }
+  }
+
+  function drawText() {
+    ctx.globalAlpha = 0.88;
+    ctx.font = 'bold 13px Amiri,serif';
+    ctx.fillStyle = A;
+    ctx.textAlign = 'right';
+    ctx.fillText('وَجُلُودُهُمْ بِمَا كَانُوا يَعْمَلُونَ', W - 12, 43);
+    ctx.globalAlpha = 0.4;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('Their skins will testify · 41:20', W - 12, 59);
+    ctx.globalAlpha = 0.28;
+    ctx.font = '8px DM Sans,sans-serif';
+    ctx.fillStyle = A;
+    ctx.fillText('NYU 2024: Non-neural memory confirmed', W - 12, 74);
+  }
+
+  function frame() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+    drawNeuron();
+    drawPulse();
+    drawSkinCell();
+    drawText();
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── S2 CANVAS: Brain-Only vs Body-Wide Memory ── */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var A = '#d946ef';
+  var t = 0;
+  var mid = W / 2;
+
+  function drawBrainOutline(cx, cy, scale, col, shadowBlurAmt) {
+    ctx.save();
+    ctx.shadowColor = col;
+    ctx.shadowBlur = shadowBlurAmt;
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(cx-scale*44,cy+scale*18);
+    ctx.bezierCurveTo(cx-scale*56,cy-scale*8,cx-scale*46,cy-scale*50,cx-scale*8,cy-scale*54);
+    ctx.bezierCurveTo(cx+scale*28,cy-scale*58,cx+scale*56,cy-scale*28,cx+scale*52,cy+scale*4);
+    ctx.bezierCurveTo(cx+scale*48,cy+scale*24,cx+scale*28,cy+scale*28,cx,cy+scale*26);
+    ctx.bezierCurveTo(cx-scale*20,cy+scale*26,cx-scale*38,cy+scale*24,cx-scale*44,cy+scale*18);
+    ctx.stroke();
+    // fold lines
+    ctx.lineWidth = 0.8;
+    ctx.globalAlpha = 0.38;
+    ctx.beginPath();
+    ctx.moveTo(cx-scale*18,cy-scale*43);
+    ctx.bezierCurveTo(cx-scale*4,cy-scale*24,cx+scale*10,cy-scale*34,cx+scale*18,cy-scale*14);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx+scale*14,cy-scale*48);
+    ctx.bezierCurveTo(cx+scale*24,cy-scale*28,cx+scale*36,cy-scale*18,cx+scale*42,cy-scale*4);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSkinStrip(x1,x2,y,col,active) {
+    // epidermis wavy line
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.globalAlpha = active ? 0.7 : 0.35;
+    ctx.beginPath();
+    ctx.moveTo(x1,y);
+    for (var x=x1; x<=x2; x+=6) ctx.lineTo(x, y+Math.sin((x-x1)*0.14)*4);
+    ctx.stroke();
+    // cells below
+    ctx.lineWidth = 0.9;
+    for (var cx3=x1+12; cx3<x2-10; cx3+=26) {
+      ctx.globalAlpha = active ? 0.3 : 0.16;
+      ctx.beginPath(); ctx.rect(cx3,y+5,22,14); ctx.stroke();
+      if (active) {
+        var ng = (Math.sin(t*0.15+cx3*0.04)+1)/2;
+        ctx.beginPath(); ctx.arc(cx3+11,y+12,3.5,0,Math.PI*2);
+        ctx.fillStyle = col; ctx.globalAlpha = 0.28+ng*0.58; ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawLiverShape(cx,cy,scale,col,active) {
+    var g = active ? (Math.sin(t*0.13)+1)/2 : 0;
+    ctx.save();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = active ? 5*g : 0;
+    ctx.globalAlpha = active ? (0.45+g*0.35) : 0.22;
+    ctx.beginPath();
+    ctx.moveTo(cx-scale*18,cy-scale*8);
+    ctx.bezierCurveTo(cx-scale*8,cy-scale*18,cx+scale*16,cy-scale*14,cx+scale*20,cy);
+    ctx.bezierCurveTo(cx+scale*22,cy+scale*10,cx+scale*10,cy+scale*18,cx-scale*5,cy+scale*16);
+    ctx.bezierCurveTo(cx-scale*18,cy+scale*12,cx-scale*24,cy+scale*4,cx-scale*18,cy-scale*8);
+    ctx.stroke();
+    if (active) {
+      ctx.beginPath(); ctx.arc(cx,cy+2,4,0,Math.PI*2);
+      ctx.fillStyle = col; ctx.globalAlpha = 0.3+g*0.55; ctx.fill();
+    }
+    ctx.globalAlpha = active ? 0.45 : 0.2;
+    ctx.font = '7px DM Sans,sans-serif'; ctx.fillStyle = col;
+    ctx.textAlign = 'center'; ctx.fillText('LIVER',cx,cy+scale*24);
+    ctx.restore();
+  }
+
+  function drawX(cx,cy,col) {
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.globalAlpha=0.85;
+    ctx.beginPath(); ctx.moveTo(cx-9,cy-9); ctx.lineTo(cx+9,cy+9); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+9,cy-9); ctx.lineTo(cx-9,cy+9); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCheck(cx,cy,col) {
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.globalAlpha=0.88;
+    ctx.beginPath(); ctx.moveTo(cx-9,cy); ctx.lineTo(cx-2,cy+8); ctx.lineTo(cx+9,cy-7); ctx.stroke();
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    // divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,5]);
+    ctx.beginPath(); ctx.moveTo(mid,8); ctx.lineTo(mid,H-8); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // ── LEFT: Brain Only ──
+    var LBX = mid*0.42, LBY = 88;
+    drawBrainOutline(LBX, LBY, 0.78, 'rgba(248,113,113,0.55)', 4);
+    ctx.globalAlpha = 0.68;
+    ctx.font = 'bold 10px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171'; ctx.textAlign = 'center';
+    ctx.fillText('MEMORY', LBX, LBY - 4);
+    drawSkinStrip(18, mid-18, 146, 'rgba(248,113,113,0.45)', false);
+    drawX(LBX, 155, '#f87171');
+
+    ctx.globalAlpha = 0.75;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171'; ctx.textAlign = 'center';
+    ctx.fillText('BRAIN ONLY', LBX, 16);
+    ctx.globalAlpha = 0.42;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('Scientific consensus before 2024', LBX, 30);
+    ctx.globalAlpha = 0.4;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#f87171';
+    ctx.fillText('Skin: no memory capacity ✗', LBX, H-10);
+
+    // ── RIGHT: Body-Wide ──
+    var RBX = mid + mid*0.38, RBY = 82;
+    var bGlow = 8 + 4*Math.sin(t*0.10);
+    drawBrainOutline(RBX, RBY, 0.75, 'rgba(217,70,239,0.6)', bGlow);
+    ctx.globalAlpha = 0.72;
+    ctx.font = 'bold 10px DM Sans,sans-serif';
+    ctx.fillStyle = A; ctx.textAlign = 'center';
+    ctx.fillText('MEMORY', RBX, RBY - 4);
+    drawSkinStrip(mid+18, W-18, 140, 'rgba(217,70,239,0.55)', true);
+    drawCheck(RBX, 151, '#22c55e');
+    drawLiverShape(mid+mid*0.68, 108, 1.0, A, true);
+
+    ctx.globalAlpha = 0.82;
+    ctx.font = 'bold 11px DM Sans,sans-serif';
+    ctx.fillStyle = A; ctx.textAlign = 'center';
+    ctx.fillText('BODY-WIDE MEMORY', RBX, 16);
+    ctx.globalAlpha = 0.48;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#7a8fa3';
+    ctx.fillText('New York University · 2024', RBX, 30);
+    ctx.globalAlpha = 0.55;
+    ctx.font = '9px DM Sans,sans-serif';
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('Skin + liver: memory confirmed ✓', RBX, H-10);
+
+    ctx.globalAlpha = 1;
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+initHeroCanvas();
+</script>
+</body>
+</html>

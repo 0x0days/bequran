@@ -54,6 +54,27 @@
     .pill-xp   { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.22); color:var(--gold); }
     .pill-fire { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#fca5a5; }
 
+    /* ── HEADER LIGHT MODE — Islamic teal palette ── */
+    html[data-theme="light"] .site-header {
+      background: linear-gradient(135deg, #4f2d0b 0%, #4f2d0b 55%, #4f2d0b 100%);
+      border-bottom: 1px solid rgba(196,128,16,0.40);
+      box-shadow: 0 1px 18px rgba(10,55,70,0.30);
+    }
+    html[data-theme="light"] .brand-name { color: #fcd34d; }
+    html[data-theme="light"] .brand-sub  { color: rgba(253,211,77,0.62); }
+    html[data-theme="light"] .brand-mark svg path { stroke: rgba(253,211,77,0.85); }
+    html[data-theme="light"] .brand-mark svg circle { fill: rgba(253,211,77,0.65); }
+    html[data-theme="light"] .pill-xp {
+      background: rgba(253,211,77,0.14);
+      border-color: rgba(253,211,77,0.32);
+      color: #fcd34d;
+    }
+    html[data-theme="light"] .pill-fire {
+      background: rgba(252,165,165,0.14);
+      border-color: rgba(252,165,165,0.28);
+      color: #fca5a5;
+    }
+
     /* ── HERO ────────────────────────────────────── */
     .hero {
       position:relative; overflow:hidden;
@@ -190,7 +211,7 @@
       border:1px solid var(--border);
       border-bottom:4px solid rgba(0,0,0,0.32);
       border-radius:16px;
-      padding:20px 19px 16px;
+      padding:0;                          /* padding moved to .card-body */
       text-decoration:none; color:inherit;
       display:flex; flex-direction:column;
       position:relative; overflow:hidden;
@@ -201,6 +222,7 @@
     .lcard::after {
       content:''; position:absolute; top:0; left:0; right:0; height:2px;
       background:var(--accent,var(--gold)); opacity:0; transition:opacity .22s;
+      z-index:4;
     }
     .lcard:hover {
       transform:translateY(-4px);
@@ -208,6 +230,37 @@
       border-color:var(--accent-border,rgba(245,158,11,0.28));
     }
     .lcard:hover::after { opacity:1; }
+
+    /* ── Canvas zone (top ~42% of card) ── */
+    .card-cv-zone {
+      position:relative;
+      height:118px;
+      overflow:hidden;
+      border-radius:15px 15px 0 0;
+      flex-shrink:0;
+    }
+    .card-cv {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      display:block;
+    }
+    /* Gradient fade: canvas → solid surface at bottom of zone */
+    .card-cv-fade {
+      position:absolute; inset:0;
+      background:linear-gradient(
+        to bottom,
+        rgba(11,22,34,0.08) 0%,
+        rgba(11,22,34,0.55) 68%,
+        var(--surface)     100%
+      );
+      pointer-events:none;
+    }
+    /* Card body — solid surface, all text content */
+    .card-body {
+      padding:14px 19px 16px;
+      display:flex; flex-direction:column;
+      flex:1;
+    }
 
     .card-row1 {
       display:flex; align-items:center; justify-content:space-between;
@@ -272,8 +325,8 @@
 
     /* ── RESPONSIVE ──────────────────────────────── */
     @media (max-width:600px) {
-      .hero { height:clamp(240px,55vw,300px); }
       .hero-hl { font-size:clamp(22px,7vw,30px); }
+      .card-cv-zone { height:100px; }
       .cards-grid { grid-template-columns:1fr; }
       .stat-block { max-width:none; }
       .stat-n { font-size:20px; }
@@ -327,7 +380,7 @@
   <canvas id="bgCanvas"></canvas>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">34 Discoveries · Verified by Modern Science</p>
+    <p class="hero-eyebrow">49 Discoveries · Verified by Modern Science</p>
     <h1 class="hero-hl">Patterns hidden<br>for 1,400 years.</h1>
     <p class="hero-sub">Mathematical and scientific discoveries encoded in the Quran — each confirmed by physics, biology, or astronomy developed centuries later. Each lesson takes 5 minutes.</p>
     <a href="#lessons" class="hero-cta">
@@ -340,7 +393,7 @@
 <!-- ── STATS BAR ─────────────────────────────────── -->
 <div class="stats-bar">
   <div class="stat-block">
-    <div class="stat-n">34</div>
+    <div class="stat-n">49</div>
     <div class="stat-lbl">Total Lessons</div>
   </div>
   <div class="stat-block">
@@ -375,7 +428,7 @@
   </div>
 
   <div class="filter-row" id="filterRow">
-    <button class="ftab active" data-cat="all">All &thinsp;34</button>
+    <button class="ftab active" data-cat="all">All &thinsp;49</button>
     <button class="ftab" data-cat="biology">Biology</button>
     <button class="ftab" data-cat="balance">Balance</button>
     <button class="ftab" data-cat="astronomy">Astronomy</button>
@@ -384,6 +437,8 @@
     <button class="ftab" data-cat="geology">Geology</button>
     <button class="ftab" data-cat="chemistry">Chemistry</button>
     <button class="ftab" data-cat="cosmology">Cosmology</button>
+    <button class="ftab" data-cat="zoology">Zoology</button>
+<button class="ftab" data-cat="history">History</button>
   </div>
 
   <div class="cards-grid" id="cardsGrid"></div>
@@ -532,6 +587,82 @@ var lessons = [
   { id:'moving-mountains', n:34, title:'Moving Mountains',         ar:'الْجِبَالُ تَتَحَرَّكُ',
     hook:'تَمُرُّ', teaser:'The Quran says mountains "move like clouds" — a claim dismissed as error for centuries. Plate tectonics, confirmed in the 1960s, proves every mountain on Earth drifts up to 100 mm per year on a moving plate.',
     cat:'geology', catLabel:'Geology', accent:'#a8a29e', url:'quran-moving-mountains.html' },
+
+  { id:'ants', n:35, title:'Ants', ar:'النمل',
+  hook:'The Ant', teaser:'The Quran described a worker ant as female 1,400 years before zoology confirmed it. Worker ants outside the nest are female and wingless.',
+  cat:'zoology', catLabel:'Zoology', accent:'#d97706',
+  url:'quran-ants.html' },
+
+  { id:'camel-drinking', n:36, title:'Fastest Drinkers', ar:'شُرْبَ الْهِيمِ',
+  hook:'Drink 200 L',
+  teaser:'Camels drink 200 liters in 3 minutes — the fastest of any mammal. The Quran named them 1,400 years early. Quran 56:55 compares drinking in Hell to thirsty camels. Science only recently discovered that camels are the fastest drinkers on Earth.',
+  cat:'zoology', catLabel:'Zoology', accent:'#c2855a',
+  url:'quran-camel-drink.html' },
+  { id:'mosquito', n:37, title:'The Mosquito', ar:'بَعُوضَةً فَمَا فَوْقَهَا',
+  hook:'2:26',
+  teaser:'The Quran uses a mosquito as a parable — and modern science confirms mosquitoes are among the most complex animals on Earth, with more genes than a human.',
+  cat:'biology', catLabel:'Biology', accent:'#38bdf8',
+  url:'quran-mosquito.html' },
+  { id:'spider-web', n:38, title:'The Spider\'s Web', ar:'بَيْتُ الْعَنْكَبُوتِ',
+  hook:'29:41',
+  teaser:'The Quran calls the spider\'s web the weakest of houses — and materials science confirms it is the weakest structure per anchor point of any known biological architecture.',
+  cat:'biology', catLabel:'Biology', accent:'#5ea88f',
+  url:'quran-spider-web.html' },
+  { id:'crow-funerals', n:39, title:'Crow Funerals', ar:'يُوَارِي سَوْءَةَ أَخِيهِ',
+  hook:'5:31',
+  teaser:'The Quran shows a crow teaching burial — 1,400 years before scientists discovered that crows actually hold funeral rituals and teach each other to bury the dead.',
+  cat:'zoology', catLabel:'Zoology', accent:'#94a3b8',
+  url:'quran-crow-funerals.html' },
+  { id:'pharaoh-mummy', n:40, title:"Pharaoh's Mummy", ar:'نُنَجِّيكَ بِبَدَنِكَ',
+  hook:'10:92',
+  teaser:"The Quran said Allah preserved Pharaoh's body as a sign. His metal armor should have sunk it forever — yet it was found mummified inland. French scientist Dr. Bucaille accepted Islam on this discovery.",
+  cat:'history', catLabel:'History', accent:'#fde68a',
+  url:'quran-pharaoh-mummy.html' },
+  { id:'pharaoh-crucifixion', n:41, title:"Pharaoh's Stakes", ar:'وَفِرْعَوْنَ ذِي الْأَوْتَادِ',
+  hook:'89:10',
+  teaser:"Skeptics said the Quran erred — crucifixion didn't exist in Pharaoh's Egypt. Papyrus Boulaq 18 and Egyptian hieroglyphs prove stake-impalement existed millennia before Rome.",
+  cat:'history', catLabel:'History', accent:'#e879f9',
+  url:'quran-pharaoh-crucifixion.html' },
+  { id:'haman', n:42, title:'Haman in Egypt', ar:'يَا هَامَانُ ابْنِ لِي صَرْحًا',
+  hook:'28:38',
+  teaser:"The Bible says Haman was in Persia, centuries after Moses. The Quran says he was in Egypt. Egyptologists found his name in hieroglyphs — with the title 'Overseer of the stone-quarry workers.'",
+  cat:'history', catLabel:'History', accent:'#4ade80',
+  url:'quran-haman.html' },
+  { id:'paper-money', n:43, title:'Paper Money', ar:'بِوَرِقِكُمْ هَٰذِهِ',
+  hook:'18:19',
+  teaser:"7th-century Arabia used only metal coins. Yet Quran 18:19 uses the word بِوَرِقِكُمْ — 'your paper money.' The first paper currency in history appeared in China 400 years later.",
+  cat:'history', catLabel:'History', accent:'#7dd3fc',
+  url:'quran-paper-money.html' },
+  { id:'pharaoh-mourning', n:44, title:'Mourning of Pharaoh', ar:'فَمَا بَكَتْ عَلَيْهِمُ السَّمَاءُ',
+  hook:'44:29',
+  teaser:"Quran 44:29 says the sky did not weep for Pharaoh. Egyptologists later found pyramid texts saying exactly that — the sky weeps for dead pharaohs. Sealed in undecipherable hieroglyphs for 1,200 years.",
+  cat:'history', catLabel:'History', accent:'#a5f3fc',
+  url:'quran-pharaoh-mourning.html' },
+  { id:'reading', n:45, title:'Reading', ar:'اقْرَأْ بِاسْمِ رَبِّكَ',
+  hook:'96:1',
+  teaser:"The first word ever revealed in the Quran is 'Read.' Neuroscientists discovered in 2020 that human brains are born prewired with a reading center — the VWFA — already connected to language at birth.",
+  cat:'biology', catLabel:'Biology', accent:'#f0abfc',
+  url:'quran-reading.html' },
+  { id:'brainstem', n:46, title:'Brainstem', ar:'يَتَوَفَّى الْأَنْفُسَ حِينَ مَوْتِهَا',
+  hook:'39:42',
+  teaser:"Quran 39:42 links sleep and death as one event. Science confirmed: the brainstem governs sleep — and brainstem death is legally certified as death itself.",
+  cat:'biology', catLabel:'Biology', accent:'#22d3ee',
+  url:'quran-brainstem.html' },
+  { id:'inner-ear', n:47, title:'Inner Ear', ar:'فَضَرَبْنَا عَلَىٰ آذَانِهِمْ',
+  hook:'18:11',
+  teaser:"1,400 years before science, ears were thought to only hear. The Quran described striking the ear to cause unconsciousness — exactly how the inner ear's vestibular system works.",
+  cat:'biology', catLabel:'Biology', accent:'#fde68a',
+  url:'quran-inner-ear.html' },
+  { id:'skin-memory', n:48, title:'Skin Memory', ar:'وَجُلُودُهُمْ بِمَا كَانُوا يَعْمَلُونَ',
+  hook:'41:20',
+  teaser:"Skeptics said it was impossible: skin can't store memories. In 2024, NYU proved them wrong — non-neural cells including skin can store and retrieve memories.",
+  cat:'biology', catLabel:'Biology', accent:'#d946ef',
+  url:'quran-skin-memory.html' },
+  { id:'atmosphere', n:49, title:'Atmospheric Pressure', ar:'يَصَّعَّدُ فِي السَّمَاءِ',
+  hook:'6:125',
+  teaser:"The Quran describes chests 'tight and constricted as if ascending to the sky.' Science confirms: above 8,000m the Death Zone begins — where oxygen is too thin for human life.",
+  cat:'physics', catLabel:'Physics', accent:'#bae6fd',
+  url:'quran-atmosphere.html' },
 ];
 
 /* ── CATEGORY COLORS ─────────────────────────────── */
@@ -566,27 +697,36 @@ lessons.forEach(function(l, i) {
     '--shadow:' + l.accent + '18',
   ].join(';');
 
+  card.dataset.lessonId = l.id;
   card.innerHTML =
-    '<div class="card-row1">' +
-      '<span class="cat-pill" style="background:' + cs.bg + ';color:' + cs.color + '">' + l.catLabel + '</span>' +
-      '<div class="card-meta">' +
-        (i === 0 ? '<span class="start-badge">Start here</span>' : '') +
-        '<span class="lesson-num">Lesson ' + l.n + '</span>' +
-        '<div class="check-ring' + (isDone ? ' done' : '') + '">' +
-          (isDone ? '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+    /* ── animated canvas zone ── */
+    '<div class="card-cv-zone">' +
+      '<canvas class="card-cv"></canvas>' +
+      '<div class="card-cv-fade"></div>' +
+    '</div>' +
+    /* ── text content ── */
+    '<div class="card-body">' +
+      '<div class="card-row1">' +
+        '<span class="cat-pill" style="background:' + cs.bg + ';color:' + cs.color + '">' + l.catLabel + '</span>' +
+        '<div class="card-meta">' +
+          (i === 0 ? '<span class="start-badge">Start here</span>' : '') +
+          '<span class="lesson-num">Lesson ' + l.n + '</span>' +
+          '<div class="check-ring' + (isDone ? ' done' : '') + '">' +
+            (isDone ? '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+          '</div>' +
         '</div>' +
       '</div>' +
-    '</div>' +
-    '<div class="hook" style="color:' + l.accent + '">' + l.hook + '</div>' +
-    '<p class="teaser">' + l.teaser + '</p>' +
-    '<div class="card-title">' + l.title + '</div>' +
-    '<div class="card-ar">' + l.ar + '</div>' +
-    '<div class="card-footer">' +
-      '<span class="card-time">~5 min · +30 XP</span>' +
-      '<span class="card-go" style="color:' + l.accent + '">' +
-        (isDone ? 'Review' : 'Begin') +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
-      '</span>' +
+      '<div class="hook" style="color:' + l.accent + '">' + l.hook + '</div>' +
+      '<p class="teaser">' + l.teaser + '</p>' +
+      '<div class="card-title">' + l.title + '</div>' +
+      '<div class="card-ar">' + l.ar + '</div>' +
+      '<div class="card-footer">' +
+        '<span class="card-time">~5 min · +30 XP</span>' +
+        '<span class="card-go" style="color:' + l.accent + '">' +
+          (isDone ? 'Review' : 'Begin') +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+        '</span>' +
+      '</div>' +
     '</div>';
 
   grid.appendChild(card);
@@ -605,6 +745,34 @@ lessons.forEach(function(l, i) {
     });
   }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
   cards.forEach(function(c) { observer.observe(c); });
+})();
+
+/* ── CARD CANVAS ANIMATIONS ─────────────────────── */
+(function() {
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      var card = e.target;
+      var cv   = card.querySelector('.card-cv');
+      if (!cv) return;
+      var id   = card.dataset.lessonId;
+      if (e.isIntersecting) {
+        if (cv._anim) return;                    /* already running */
+        /* size the canvas to its CSS layout size */
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cv.width  = cv.offsetWidth  * dpr;
+        cv.height = cv.offsetHeight * dpr;
+        if (CardCanvases[id]) {
+          cv._anim = CardCanvases[id](cv);
+        }
+      } else {
+        if (cv._anim) { cv._anim.stop(); cv._anim = null; }
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '80px 0px 80px 0px' });
+
+  document.querySelectorAll('.lcard').forEach(function(card) {
+    io.observe(card);
+  });
 })();
 
 /* ── FILTER ──────────────────────────────────────── */
@@ -667,7 +835,7 @@ document.getElementById('xpN').textContent = xp.toLocaleString();
 setTimeout(function() {
   countUp(document.getElementById('completedN'), done.size, 900);
   countUp(document.getElementById('xpTotal'), xp, 1200);
-  document.getElementById('progressFill').style.width = (done.size / 34 * 100).toFixed(1) + '%';
+  document.getElementById('progressFill').style.width = (done.size / 49 * 100).toFixed(1) + '%';
 }, 300);
 
 /* ── HERO CANVAS — Islamic Geometric Art ─ */
@@ -1081,6 +1249,7 @@ setTimeout(function() {
   frame();
 })();
 </script>
+<script src="card-canvas.js"></script>
 <script src="theme.js"></script>
 </body>
 </html>
