@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Internal Mountains · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #2dd4bf;
+      --accent-light: #99f6e4;
+      --accent-dim:   rgba(45,212,191,0.12);
+      --accent-ring:  rgba(45,212,191,0.28);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(22px, 4.5vw, 34px); line-height: 1.25; margin-bottom: 20px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    /* Intro verse */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin-bottom: 24px; }
+    .iv-ref { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 16px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(22px, 4vw, 32px); line-height: 2.2; color: var(--text); margin-bottom: 16px; }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; line-height: 1.8; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--text); font-style: normal; font-weight: 600; }
+
+    /* Claim row */
+    .claim-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 28px; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(32px, 6vw, 48px); font-weight: 700; color: var(--accent-light); line-height: 1; text-shadow: 0 0 40px rgba(45,212,191,0.35); }
+    .cr-lbl { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--muted); align-self: center; padding-top: 8px; }
+
+    /* Answer cards */
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 16px 18px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; display: flex; align-items: flex-start; gap: 14px; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; letter-spacing: .04em; }
+    .ac-body { flex: 1; }
+    .ac-big { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.55; }
+    .ac-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: 22px; line-height: 1.8; margin-bottom: 2px; }
+    .ac-ref { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 2px; }
+    .ac-tr { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.5; }
+
+    /* S2 scanner */
+    .scan-controls { display: flex; gap: 16px; align-items: center; margin: 14px 0; flex-wrap: wrap; }
+    .scan-depth-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--accent-light); line-height: 1; }
+    .scan-unit { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+    .scan-stats { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 16px 20px; margin: 14px 0; display: none; animation: rise .35s ease; }
+    .scan-stats.show { display: block; }
+    .ss-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ss-item { text-align: center; flex: 1; min-width: 80px; }
+    .ss-num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--accent-light); line-height: 1; }
+    .ss-lbl { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+    .ss-note { font-size: 13px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--border); padding-top: 12px; }
+
+    /* S4 verdict */
+    .verdict-title { font-family: 'Playfair Display', serif; font-size: clamp(20px, 4.5vw, 30px); line-height: 1.3; margin-bottom: 28px; }
+    .match-wrap { display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 32px; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(52px, 10vw, 72px); font-weight: 700; line-height: 1; }
+    .match-num.accent { color: var(--accent-light); text-shadow: 0 0 50px rgba(45,212,191,0.4); }
+    .match-num.gold { color: var(--gold-light); text-shadow: 0 0 50px rgba(252,211,77,0.35); font-size: clamp(38px, 7vw, 54px); }
+    .match-lbl { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--muted); padding-top: 10px; }
+
+    /* Sci table */
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 28px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; }
+    .sci-table .hl-row td { background: var(--accent-dim); }
+    .td-num { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--accent-light); }
+    .td-check { color: var(--ok); font-weight: 600; }
+    .td-dash { color: var(--surface2); font-size: 18px; }
+
+    /* Insight box */
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+    .insight-box strong { color: var(--text); }
+    .insight-box em { font-style: normal; color: var(--accent-light); }
+
+    /* Gold box */
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 28px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    /* XP badge */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    /* Feedback panel */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); z-index: 100; }
+    .fb-panel.show { transform: none; }
+    .fb-panel.fb-ok { border-top-color: var(--ok-border); background: var(--ok-bg); }
+    .fb-panel.fb-err { border-top-color: var(--err-border); background: var(--err-bg); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .fb-panel.fb-err .fb-icon { background: var(--err-light); color: var(--err-bg); }
+    .fb-title { font-size: 15px; font-weight: 700; color: var(--ok); margin-bottom: 2px; }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.55; max-width: 380px; }
+    .fb-btn { padding: 12px 24px; border-radius: 10px; background: var(--ok); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; cursor: pointer; transition: opacity .2s; white-space: nowrap; }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+    .fb-btn:hover { opacity: .88; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+
+<div class="container">
+  <a href="quran-big-bang.html" class="nav-back">← Big Bang</a>
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · Internal Mountains</div>
+
+  <!-- ===== S0 INTRO ===== -->
+  <div class="stage active" id="s0">
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · Geology</p>
+    <h1 class="hero-title">400 miles beneath your feet, there are mountains taller than Everest. The Quran said they were <em>inside</em> the Earth — using a word that means exactly that.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 21:31 · Surah Al-Anbiya</div>
+      <div class="iv-ar">وَجَعَلْنَا <span class="hl">فِي</span> الْأَرْضِ رَوَاسِيَ أَن تَمِيدَ بِهِمْ</div>
+      <div class="iv-tr">And We placed <span class="hl">inside</span> the Earth firm mountains, lest it sway with them.</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">400+</div>
+        <div class="cr-lbl">miles deep</div>
+      </div>
+      <div class="cr-eq">·</div>
+      <div class="cr-block">
+        <div class="cr-num">~40</div>
+        <div class="cr-lbl">mi peak height</div>
+      </div>
+      <div class="cr-eq">·</div>
+      <div class="cr-block">
+        <div class="cr-num">1994</div>
+        <div class="cr-lbl">discovered</div>
+      </div>
+    </div>
+
+    <p class="body-text">
+      For most of history, people assumed Quranic mountains meant surface mountains — the kind you can see. But the Arabic word chosen is <strong style="color:var(--text)">فِي</strong> (fee), meaning <strong style="color:var(--text)">inside</strong>. In 1994, seismic wave scanning revealed a massive mountain range buried 410 miles inside Earth's mantle — up to 7 times taller than Everest.
+    </p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#040810">
+      Begin lesson →
+    </button>
+  </div>
+
+  <!-- ===== S1 WORD PRECISION ===== -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3 · Word precision</p>
+    <p class="prompt">Arabic has two prepositions for location. Which one does the Quran choose for Earth's mountains?</p>
+
+    <canvas id="cmpCanvas" width="640" height="200" style="width:100%;height:200px;border-radius:14px;margin-bottom:16px;display:block;background:#040810"></canvas>
+
+    <div id="cmpMc" style="display:none">
+      <p class="prompt" style="font-size:clamp(16px,3.5vw,20px);margin-bottom:18px;">The Arabic word <span style="font-family:'Amiri',serif;font-size:26px;color:var(--accent-light);vertical-align:middle;">فِي</span> (fee) in verse 21:31 means…</p>
+      <div class="answers-grid">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">On top of the surface</div>
+            <div class="ac-sub">The word عَلَى (aala) would be used for this meaning</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">Inside / within the Earth</div>
+            <div class="ac-sub">فِي is the standard Arabic preposition for "inside" or "within"</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">Beneath the ocean floor</div>
+            <div class="ac-sub">A more specific phrase would be required for this location</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== S2 SCAN THE EARTH ===== -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3 · Scan the Earth</p>
+    <p class="prompt">Scientists use seismic waves to see inside Earth — the same way doctors use ultrasound. Press <strong>Scan Earth</strong> to find the hidden mountains.</p>
+
+    <canvas id="scanCanvas" width="640" height="220" style="width:100%;height:220px;border-radius:14px;margin-bottom:14px;display:block;background:#040810"></canvas>
+
+    <div class="scan-controls">
+      <div>
+        <div class="scan-depth-num" id="scanDepth">0</div>
+        <div class="scan-unit" id="scanUnit">miles depth</div>
+      </div>
+      <button class="btn" id="scanBtn" onclick="scanEarth()" style="background:var(--accent);color:#040810">Scan Earth</button>
+    </div>
+
+    <div class="scan-stats" id="scanStats">
+      <div class="ss-row">
+        <div class="ss-item">
+          <div class="ss-num">410 mi</div>
+          <div class="ss-lbl">depth of mountain range</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-num">~40 mi</div>
+          <div class="ss-lbl">peak height</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-num">5.5 mi</div>
+          <div class="ss-lbl">Everest height</div>
+        </div>
+      </div>
+      <p class="ss-note">These internal mountains are up to <strong style="color:var(--text)">7× taller than Everest</strong> — yet nobody knew they existed until seismic scanning technology was developed. The Quran named them 1,400 years earlier.</p>
+    </div>
+
+    <div id="scanContinue" style="display:none;margin-top:4px;animation:rise .4s ease">
+      <button class="btn" onclick="go(3)" style="background:var(--accent);color:#040810">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ===== S3 MC EXERCISE ===== -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <p class="prompt">The Quran says these internal mountains prevent Earth from "swaying." What do modern geologists say they actually do?</p>
+
+    <div class="answers-grid">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Generate earthquakes on the surface</div>
+          <div class="ac-sub">Earthquakes are caused by tectonic plate movement, not the deep mantle range</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Anchor and slow the ductile layer above — stabilizing the mantle</div>
+          <div class="ac-sub">The 410-mile boundary anchors mantle flow and prevents large-scale convective instability</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Generate Earth's magnetic field</div>
+          <div class="ac-sub">The magnetic field is produced by the liquid outer core, ~1,800 miles deep</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== S4 VERDICT ===== -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">The Quran used the word <em style="color:var(--accent-light)">inside</em> — 1,400 years before scientists found what was inside.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num accent" id="mv0">0</div>
+        <div class="match-lbl">years before discovery</div>
+      </div>
+      <div class="match-sep">·</div>
+      <div class="match-block">
+        <div class="match-num gold" id="mv1">0</div>
+        <div class="match-lbl">miles depth — confirmed</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr>
+          <th>Finding</th>
+          <th>Quran (7th c.)</th>
+          <th>Science (1994)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hl-row">
+          <td>Mountains inside Earth</td>
+          <td><span class="td-check">✓ فِي الْأَرْضِ</span></td>
+          <td><span class="td-check">✓ Confirmed</span></td>
+        </tr>
+        <tr>
+          <td>Depth (~400 mi)</td>
+          <td><span class="td-dash">—</span></td>
+          <td><span class="td-num">410 mi</span></td>
+        </tr>
+        <tr class="hl-row">
+          <td>Stabilizing function</td>
+          <td><span class="td-check">✓ "lest it sways"</span></td>
+          <td><span class="td-check">✓ Anchors mantle</span></td>
+        </tr>
+        <tr>
+          <td>Taller than Everest</td>
+          <td><span class="td-dash">—</span></td>
+          <td><span class="td-num">Up to 7×</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Word choice matters.</strong> The Quran did not say mountains <em style="color:var(--muted);font-style:italic;">on</em> the Earth (عَلَى) — it said mountains <em>فِي</em> (inside). That single preposition distinguishes a folk observation from a precise geological claim made 14 centuries before it could be verified.
+    </div>
+
+    <div class="insight-box">
+      <strong>Function confirmed.</strong> The Quran's phrase <em>"lest it sways"</em> directly maps to the modern discovery that the 410-mile boundary zone anchors the viscous upper mantle, preventing large-scale convective instability — a stabilizing role invisible from the surface.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"And We placed inside the Earth firm mountains, lest it sway with them." — Quran 21:31</div>
+      <div class="gs">One word. One preposition. One claim that every geologist in the 7th century would have called impossible — and that seismology in 1994 confirmed in full.</div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <a href="quran-big-bang.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Big Bang</a>
+      <a href="quran-brain-functions.html" class="btn" style="background:var(--accent);color:#fff">Next · Brain Functions →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback panel — outside .container -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script src="theme.js"></script>
+<script>
+/* ===== CORE ENGINE ===== */
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+const metaMap = {
+  0: 'Lesson · Internal Mountains',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initCmpCanvas, 60);
+  if (n === 2) setTimeout(initScanCanvas, 60);
+  if (n === 4) {
+    saveProgress('internal-mountains');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1400, 1800, null);
+        animFrom(document.getElementById('mv1'), 0, 410, 2200, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* ===== MC HANDLERS ===== */
+function pickEx1(el, correct) {
+  if (document.querySelector('#cmpMc .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#cmpMc .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('فِي (fee) = inside. The Quran chose this word precisely — and 1,400 years later, geologists found mountains inside the earth at exactly 400+ miles depth.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('They anchor the ductile layer above — the Quran\'s "lest it sways" maps precisely to this stabilizing function discovered by modern geoscience.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ===== CMP CANVAS (S1) ===== */
+function initCmpCanvas() {
+  var cv = document.getElementById('cmpCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var startTs = null, DURATION = 1600;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / DURATION, 1);
+    var leftAlpha  = Math.min(p / 0.5, 1);
+    var rightAlpha = Math.max(0, Math.min((p - 0.4) / 0.5, 1));
+    drawCmpFrame(ctx, W, H, leftAlpha, rightAlpha);
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('cmpMc').style.display = 'block';
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function drawCmpFrame(ctx, W, H, leftAlpha, rightAlpha) {
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+  var midX = W / 2;
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fillRect(midX - 1, 10, 2, H - 20);
+
+  function drawPanel(startX, endX, alpha, isInside) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var pw = endX - startX;
+    var cx = startX + pw / 2;
+
+    // Arabic word
+    ctx.font = 'bold 38px Amiri, serif';
+    ctx.fillStyle = isInside ? '#99f6e4' : '#fcd34d';
+    ctx.textAlign = 'center';
+    ctx.direction = 'rtl';
+    ctx.fillText(isInside ? 'فِي' : 'عَلَى', cx, 42);
+    ctx.direction = 'ltr';
+
+    // Transliteration
+    ctx.font = '10px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.fillText(isInside ? 'fee = inside' : 'aala = on top', cx, 58);
+
+    // Cross-section
+    var ex = startX + pw * 0.15;
+    var ew = pw * 0.70;
+    var ey = 68;
+    var eh = H - 80;
+
+    // Layer bands
+    ctx.fillStyle = 'rgba(100,82,52,0.75)';  ctx.fillRect(ex, ey, ew, eh * 0.14);
+    ctx.fillStyle = 'rgba(148,58,28,0.60)';  ctx.fillRect(ex, ey + eh * 0.14, ew, eh * 0.30);
+    var transY = ey + eh * 0.44;
+    var transH = eh * 0.20;
+    ctx.fillStyle = isInside ? 'rgba(45,212,191,0.18)' : 'rgba(180,48,18,0.50)';
+    ctx.fillRect(ex, transY, ew, transH);
+    ctx.fillStyle = 'rgba(80,20,10,0.60)';
+    ctx.fillRect(ex, transY + transH, ew, eh - eh * 0.44 - transH);
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1;
+    ctx.strokeRect(ex, ey, ew, eh);
+
+    // Surface mountains (على panel)
+    if (!isInside) {
+      ctx.fillStyle = '#fcd34d';
+      [[0.18,22],[0.35,16],[0.52,28],[0.68,14],[0.82,20]].forEach(function(m) {
+        var mx = ex + ew * m[0], mh = m[1];
+        ctx.beginPath();
+        ctx.moveTo(mx, ey);
+        ctx.lineTo(mx - mh * 0.5, ey - mh);
+        ctx.lineTo(mx + mh * 0.5, ey - mh);
+        ctx.closePath();
+        ctx.fill();
+      });
+    }
+
+    // Internal mountains (في panel)
+    if (isInside) {
+      ctx.shadowColor = 'rgba(45,212,191,0.6)'; ctx.shadowBlur = 8;
+      ctx.fillStyle = '#2dd4bf';
+      [[0.18,18],[0.34,24],[0.50,16],[0.66,20],[0.82,14]].forEach(function(m) {
+        var mx = ex + ew * m[0], mh = m[1];
+        ctx.beginPath();
+        ctx.moveTo(mx, transY);
+        ctx.lineTo(mx - mh * 0.45, transY - mh);
+        ctx.lineTo(mx + mh * 0.45, transY - mh);
+        ctx.closePath();
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+      ctx.font = '10px DM Sans, sans-serif'; ctx.fillStyle = 'rgba(45,212,191,0.65)';
+      ctx.textAlign = 'left'; ctx.fillText('410 mi deep', ex + 4, transY + transH / 2 + 4);
+    }
+
+    // Bottom label
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.fillStyle = isInside ? '#99f6e4' : 'rgba(252,211,77,0.75)';
+    ctx.textAlign = 'center';
+    ctx.fillText(isInside ? 'What the Quran says' : 'What people assumed', cx, H - 6);
+    ctx.restore();
+  }
+
+  drawPanel(0, midX - 2, leftAlpha, false);
+  drawPanel(midX + 2, W, rightAlpha, true);
+}
+
+/* ===== SCAN CANVAS (S2) ===== */
+var scanStarted = false;
+var SCAN_TOTAL_MILES = 500;
+var MOUNTAIN_DEPTH   = 410;
+
+function drawScanFrame(ctx, W, H, waveFraction, mountainAlpha) {
+  ctx.fillStyle = '#040810'; ctx.fillRect(0, 0, W, H);
+
+  // Layer bands
+  var layers = [
+    ['Crust (0–25 mi)',  'rgba(90,110,60,0.65)',   0.000, 0.050],
+    ['Upper Mantle',     'rgba(155,68,28,0.60)',    0.050, 0.400],
+    ['Transition Zone',  'rgba(175,50,15,0.55)',    0.400, 0.820],
+    ['Lower Mantle',     'rgba(68,14,7,0.60)',      0.820, 1.000]
+  ];
+  layers.forEach(function(l) {
+    var ly = Math.round(l[2] * H), lh = Math.round((l[3] - l[2]) * H);
+    ctx.fillStyle = l[1]; ctx.fillRect(0, ly, W, lh);
+    ctx.font = '10px DM Sans, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'left'; ctx.fillText(l[0], 8, ly + 14);
+  });
+
+  // Depth ticks right side
+  ctx.font = '9px DM Sans, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  [0, 100, 200, 300, 410, 500].forEach(function(d) {
+    var ty = Math.round(d / SCAN_TOTAL_MILES * H);
+    ctx.textAlign = 'right'; ctx.fillText(d + ' mi', W - 5, ty + 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fillRect(W - 38, ty, 32, 1);
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  });
+
+  // 410-mile dashed marker
+  var mY = Math.round(MOUNTAIN_DEPTH / SCAN_TOTAL_MILES * H);
+  ctx.strokeStyle = 'rgba(45,212,191,0.28)'; ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(0, mY); ctx.lineTo(W, mY); ctx.stroke(); ctx.setLineDash([]);
+
+  // Mountains
+  if (mountainAlpha > 0) {
+    ctx.save(); ctx.globalAlpha = mountainAlpha;
+    ctx.fillStyle = '#2dd4bf'; ctx.shadowColor = 'rgba(45,212,191,0.7)'; ctx.shadowBlur = 12;
+    [[0.10,20],[0.22,15],[0.36,26],[0.50,17],[0.63,22],[0.76,13],[0.89,19]].forEach(function(pk) {
+      var px = Math.round(pk[0] * W), ph = pk[1];
+      ctx.beginPath();
+      ctx.moveTo(px, mY);
+      ctx.lineTo(px - ph * 0.55, mY - ph);
+      ctx.lineTo(px + ph * 0.55, mY - ph);
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    ctx.font = 'bold 11px DM Sans, sans-serif'; ctx.fillStyle = 'rgba(45,212,191,0.9)';
+    ctx.textAlign = 'center'; ctx.fillText('Mountain Range — discovered here', W / 2, mY - 30);
+    ctx.restore();
+  }
+
+  // Seismic wave
+  if (waveFraction >= 0) {
+    var wY = Math.round(waveFraction * H);
+    var grd = ctx.createLinearGradient(0, wY - 3, 0, wY + 3);
+    grd.addColorStop(0, 'transparent');
+    grd.addColorStop(0.5, 'rgba(255,255,255,0.8)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd; ctx.fillRect(0, wY - 3, W, 6);
+    document.getElementById('scanDepth').textContent = Math.round(waveFraction * SCAN_TOTAL_MILES).toLocaleString();
+  }
+}
+
+function initScanCanvas() {
+  var cv = document.getElementById('scanCanvas');
+  if (!cv) return;
+  drawScanFrame(cv.getContext('2d'), cv.width, cv.height, -1, 0);
+}
+
+function scanEarth() {
+  if (scanStarted) return;
+  scanStarted = true;
+  var btn = document.getElementById('scanBtn');
+  btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+  var cv = document.getElementById('scanCanvas');
+  var ctx = cv.getContext('2d'); var W = cv.width, H = cv.height;
+  var startTs = null, DURATION = 3500;
+  var MFRAC = MOUNTAIN_DEPTH / SCAN_TOTAL_MILES;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / DURATION, 1);
+    var mAlpha = p >= MFRAC ? Math.min((p - MFRAC) / 0.15, 1) : 0;
+    drawScanFrame(ctx, W, H, p, mAlpha);
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('scanDepth').textContent = SCAN_TOTAL_MILES.toLocaleString();
+      document.getElementById('scanUnit').textContent  = 'miles — scan complete';
+      document.getElementById('scanStats').classList.add('show');
+      setTimeout(function() { document.getElementById('scanContinue').style.display = 'block'; }, 800);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ===== HERO CANVAS (S0) ===== */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height; // 640 × 130
+
+  // Seismic pulse state — 4 pulses staggered
+  var pulses = [0, 0.28, 0.56, 0.82].map(function(offset) {
+    return { frac: offset };
+  });
+
+  // Mountain peaks at y = 0.68 * H inside the earth
+  var peaks = [
+    [0.08, 10], [0.18, 8], [0.28, 13], [0.40, 9],
+    [0.50, 11], [0.62, 8], [0.72, 12], [0.84, 9], [0.92, 7]
+  ];
+
+  function drawHero() {
+    ctx.fillStyle = '#040810'; ctx.fillRect(0, 0, W, H);
+
+    // Earth layer bands (horizontal)
+    var layers = [
+      ['rgba(72,88,48,0.80)',  0.00, 0.12],  // crust
+      ['rgba(130,55,22,0.65)', 0.12, 0.46],  // upper mantle
+      ['rgba(150,40,12,0.55)', 0.46, 0.82],  // transition zone (mountain level)
+      ['rgba(58,10,5,0.65)',   0.82, 1.00]   // lower mantle
+    ];
+    layers.forEach(function(l) {
+      ctx.fillStyle = l[0];
+      ctx.fillRect(0, Math.round(l[1] * H), W, Math.round((l[2] - l[1]) * H));
+    });
+
+    // Surface arc at very top
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(55,70,35,0.90)';
+    ctx.fillRect(0, 0, W, Math.round(0.12 * H));
+    // Slightly curved top edge
+    ctx.beginPath();
+    ctx.moveTo(0, Math.round(0.12 * H));
+    ctx.quadraticCurveTo(W / 2, Math.round(0.08 * H) + 4, W, Math.round(0.12 * H));
+    ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+    ctx.fillStyle = 'rgba(60,78,40,0.75)';
+    ctx.fill();
+
+    // "SURFACE" label
+    ctx.font = '600 9px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'left';
+    ctx.fillText('SURFACE', 8, 10);
+
+    // Mountain peaks at 0.68 * H
+    var mY = Math.round(0.68 * H);
+    ctx.shadowColor = 'rgba(45,212,191,0.7)'; ctx.shadowBlur = 10;
+    ctx.fillStyle = '#2dd4bf';
+    peaks.forEach(function(pk) {
+      var px = Math.round(pk[0] * W), ph = pk[1];
+      ctx.beginPath();
+      ctx.moveTo(px, mY);
+      ctx.lineTo(px - ph * 0.55, mY - ph);
+      ctx.lineTo(px + ph * 0.55, mY - ph);
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+
+    // "410 mi" label near mountains
+    ctx.font = '600 9px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(45,212,191,0.60)';
+    ctx.textAlign = 'left';
+    ctx.fillText('410 mi', 8, mY - 2);
+
+    // Seismic pulses — horizontal white glow lines sweeping top → bottom
+    pulses.forEach(function(pulse) {
+      if (pulse.frac < 0 || pulse.frac > 1) return;
+      var py = Math.round(pulse.frac * H);
+      var grd = ctx.createLinearGradient(0, py - 2, 0, py + 2);
+      grd.addColorStop(0, 'transparent');
+      grd.addColorStop(0.5, 'rgba(255,255,255,0.55)');
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, py - 2, W, 4);
+    });
+
+    // Thin accent line at mountain level
+    ctx.strokeStyle = 'rgba(45,212,191,0.20)'; ctx.lineWidth = 1;
+    ctx.setLineDash([5, 8]);
+    ctx.beginPath(); ctx.moveTo(0, mY); ctx.lineTo(W, mY); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function animate() {
+    // Advance pulses
+    pulses.forEach(function(pulse) {
+      pulse.frac += 0.004;
+      if (pulse.frac > 1.1) pulse.frac = -0.05;
+    });
+    drawHero();
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+// Start hero canvas on load
+initHeroCanvas();
+</script>
+</body>
+</html>

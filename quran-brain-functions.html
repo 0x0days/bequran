@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Brain Functions · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #f472b6;
+      --accent-light: #f9a8d4;
+      --accent-dim:   rgba(244,114,182,0.12);
+      --accent-ring:  rgba(244,114,182,0.28);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(22px, 4.5vw, 34px); line-height: 1.25; margin-bottom: 20px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+    .btn.used { opacity: .4; pointer-events: none; }
+
+    /* Intro verse */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin-bottom: 24px; }
+    .iv-ref { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 16px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(22px, 4vw, 32px); line-height: 2.2; color: var(--text); margin-bottom: 16px; }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; line-height: 1.8; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--text); font-style: normal; font-weight: 600; }
+
+    /* Claim row */
+    .claim-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 28px; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(32px, 6vw, 48px); font-weight: 700; color: var(--accent-light); line-height: 1; text-shadow: 0 0 40px rgba(244,114,182,0.35); }
+    .cr-lbl { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; max-width: 160px; margin-left: auto; margin-right: auto; }
+
+    /* Answer cards */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 16px 18px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; display: flex; align-items: flex-start; gap: 14px; margin-bottom: 11px; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; letter-spacing: .04em; }
+    .ac-body { flex: 1; }
+    .ac-big { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.55; }
+
+    /* S1 comparison canvas */
+    .cmp-wrap { margin: 0 0 20px; }
+    .cmp-labels { display: flex; gap: 4px; margin-top: 8px; }
+    .cmp-lbl { flex: 1; text-align: center; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 6px 0; background: var(--surface); border-radius: 6px; }
+    .cmp-lbl.pink { color: var(--accent-light); }
+
+    /* S2 scan */
+    .scan-arena { border-radius: 14px; overflow: hidden; margin-bottom: 16px; display: block; }
+    .scan-stats { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px 20px; margin: 0 0 20px; display: none; animation: rise .35s ease; }
+    .scan-stats.show { display: block; }
+    .ss-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ss-item { text-align: center; flex: 1; min-width: 90px; }
+    .ss-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--accent-light); line-height: 1; }
+    .ss-lbl { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+    .ss-note { font-size: 13px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--border); padding-top: 12px; }
+
+    /* S4 verdict */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 8px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-num.mc1 { color: var(--accent-light); text-shadow: 0 0 40px var(--accent-ring); }
+    .match-num.mc2 { color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.4); }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-eq { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* Feedback panel */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-internal-mountains.html" class="nav-back">← Internal Mountains</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · Brain Functions</div>
+
+
+  <!-- ═══ STAGE 0 — INTRO ═══════════════════════════════════════ -->
+  <div class="stage active" id="s0">
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · Brain Functions</p>
+
+    <h1 class="hero-title">The Quran named the exact region of the brain where lying is planned — 1,400 years before neuroscience existed.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">96:15–16 — Surah Al-ʿAlaq · The Clot</div>
+      <div class="iv-ar">كَلَّا لَئِن لَّمْ يَنتَهِ لَنَسْفَعًا بِٱلنَّاصِيَةِ ۝ <span class="hl">نَاصِيَةٍ كَاذِبَةٍ خَاطِئَةٍ</span></div>
+      <div class="iv-tr">"No! If he does not desist, We will surely drag him by <span class="hl">the forelock — a lying, sinful forelock.</span>"</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">ناصية</div>
+        <div class="cr-lbl">Quran's word for forelock / forehead region</div>
+      </div>
+      <div class="cr-block" style="align-self:center;padding-top:8px">
+        <div style="font-size:28px;color:var(--muted);font-family:'Playfair Display',serif">=</div>
+      </div>
+      <div class="cr-block">
+        <div class="cr-num" style="font-size:clamp(18px,3.5vw,28px);padding-top:8px">Prefrontal<br>Cortex</div>
+        <div class="cr-lbl">where deception is planned, per neuroscience</div>
+      </div>
+    </div>
+
+    <p class="body-text">For centuries, scholars assumed the forehead was the seat of vision — it seemed logical, since eyes sit just below it. But the Quran called that same region <em>lying</em> and <em>sinful</em>. Modern neuroscience confirms: the prefrontal cortex — located directly behind the forehead — is where the brain plans deception.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Begin the lesson →</button>
+  </div>
+
+
+  <!-- ═══ STAGE 1 — EXERCISE 1 ══════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3</p>
+    <p class="prompt">For most of history, what did scholars assume the forehead region controlled?</p>
+
+    <canvas id="cmpCanvas" width="640" height="200"
+      style="width:100%;height:200px;border-radius:14px;margin-bottom:10px;display:block;"></canvas>
+    <div class="cmp-labels">
+      <div class="cmp-lbl">Historical assumption</div>
+      <div class="cmp-lbl pink">Quran's description</div>
+    </div>
+
+    <div style="margin-top:20px" id="s1Mc">
+      <div onclick="pickEx1(this, false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Speech &amp; language</div>
+          <div class="ac-sub">The front of the brain forms sounds and words</div>
+        </div>
+      </div>
+      <div onclick="pickEx1(this, true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Vision</div>
+          <div class="ac-sub">Eyes are just below the forehead, so it seemed obvious</div>
+        </div>
+      </div>
+      <div onclick="pickEx1(this, false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Memory &amp; emotion</div>
+          <div class="ac-sub">Strong feelings seemed to originate from the face</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ STAGE 2 — EXERCISE 2 (Brain Scan) ════════════════════ -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3</p>
+    <p class="prompt">Watch the scan reveal which region activates most when deception is planned.</p>
+
+    <canvas id="scanCanvas" width="640" height="220"
+      class="scan-arena"
+      style="width:100%;height:220px;"></canvas>
+
+    <div class="scan-stats" id="scanStats">
+      <div class="ss-row">
+        <div class="ss-item">
+          <div class="ss-num" id="ssWm">0</div>
+          <div class="ss-lbl">% more white matter</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-num">2007</div>
+          <div class="ss-lbl">year of study</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-num">Prefrontal</div>
+          <div class="ss-lbl">region studied</div>
+        </div>
+      </div>
+      <div class="ss-note">A 2007 British Journal of Psychiatry study found pathological liars have <strong>23–36% more white matter</strong> in their orbitofrontal and prefrontal cortex — the region directly behind the forehead. More connections = greater capacity to construct and sustain lies.</div>
+    </div>
+
+    <button class="btn" id="scanBtn" onclick="runBrainScan()" style="background:var(--accent);color:#fff">Run deception scan →</button>
+  </div>
+
+
+  <!-- ═══ STAGE 3 — EXERCISE 3 ══════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <p class="prompt">What did the 2007 British Journal of Psychiatry study find about pathological liars?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Larger visual cortex</div>
+        <div class="ac-sub">Enhanced visual processing in the back of the brain</div>
+      </div>
+    </div>
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Reduced amygdala activity</div>
+        <div class="ac-sub">Less emotional response to moral decisions</div>
+      </div>
+    </div>
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">23–36% more white matter in the prefrontal cortex</div>
+        <div class="ac-sub">The forehead region — exactly where the Quran pointed</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ STAGE 4 — VERDICT ════════════════════════════════════ -->
+  <div class="stage" id="s4">
+
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The Quran called the forehead "lying" — neuroscience confirms it is where lies are planned.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num mc1" id="mv0">0</div>
+        <div class="match-lbl">years before the discovery</div>
+      </div>
+      <div class="match-eq">&amp;</div>
+      <div class="match-block">
+        <div class="match-num mc2" id="mv1">0</div>
+        <div class="match-lbl">% more white matter in liars' prefrontal cortex</div>
+      </div>
+    </div>
+
+    <table class="sci-table" style="margin-top:28px">
+      <thead>
+        <tr><th>Fact</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Quranic verse describing the forehead as "lying, sinful"</td>
+          <td class="td-v">96:16</td>
+        </tr>
+        <tr>
+          <td>Year neuroscience confirmed prefrontal cortex = deception planning</td>
+          <td class="td-v">20th century</td>
+        </tr>
+        <tr class="hl">
+          <td>Extra white matter in pathological liars' prefrontal cortex (2007 study)</td>
+          <td class="td-v"><strong>23–36%</strong></td>
+        </tr>
+        <tr>
+          <td>Location of prefrontal cortex</td>
+          <td class="td-v">Directly behind the forehead</td>
+        </tr>
+        <tr>
+          <td>Arabic word used in the Quran</td>
+          <td class="td-v">نَاصِيَة (nāṣiyah)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why this matters:</strong> The word <em>nāṣiyah</em> (ناصية) specifically refers to the forelock — the forehead region. Ancient anatomy had no way to know the prefrontal cortex controlled planning, judgment, and deception. The Quran didn't just mention the forehead; it called it <em>lying and sinful</em> — a description that only makes biological sense with modern neuroscience.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"A lying, sinful forelock" — written 14 centuries before brain imaging showed the prefrontal cortex is where lies are constructed.</div>
+      <div class="gs">The 2007 study in the British Journal of Psychiatry measured pathological liars and found 23–36% more white matter (neural connections) concentrated in the orbitofrontal and prefrontal cortex — the tissue directly behind the forehead.</div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <a href="quran-internal-mountains.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Internal Mountains</a>
+      <a href="quran-iron.html" class="btn" style="background:var(--accent);color:#fff">Next · Iron →</a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ── CORE ENGINE ──────────────────────────────────────────────── */
+var stage = 0;
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  function run(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  }
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · Brain Functions',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initCmpCanvas, 60);
+  if (n === 2) setTimeout(initScanCanvas, 60);
+  if (n === 4) {
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        saveProgress('brain-functions');
+        animFrom(document.getElementById('mv0'), 0, 1400, 1800, null);
+        animFrom(document.getElementById('mv1'), 0, 23, 1600, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* ── STAGE 1: MC ─────────────────────────────────────────────── */
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Vision seemed linked to the forehead because the eyes sit just below it — but the eyes are wired to the back of the brain (occipital lobe), not the front.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── STAGE 1: COMPARISON CANVAS ─────────────────────────────── */
+function initCmpCanvas() {
+  var c = document.getElementById('cmpCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var midX = W / 2;
+  var leftAlpha = 0, rightAlpha = 0;
+  var startTime = null;
+
+  /* Draw a simplified brain silhouette path (side profile, facing right) */
+  function traceBrain(ctx, ox, oy, sx, sy) {
+    /* ox,oy = offset; sx,sy = scale factors */
+    ctx.beginPath();
+    /* Start at base-front, curve up over frontal lobe, over parietal/occipital, down to back */
+    ctx.moveTo(ox + 20*sx, oy + 60*sy);
+    ctx.bezierCurveTo(
+      ox + 10*sx, oy + 20*sy,
+      ox + 30*sx, oy + 2*sy,
+      ox + 60*sx, oy + 0*sy
+    );
+    ctx.bezierCurveTo(
+      ox + 95*sx, oy - 2*sy,
+      ox + 130*sx, oy + 5*sy,
+      ox + 148*sx, oy + 20*sy
+    );
+    ctx.bezierCurveTo(
+      ox + 160*sx, oy + 35*sy,
+      ox + 155*sx, oy + 55*sy,
+      ox + 148*sx, oy + 65*sy
+    );
+    ctx.bezierCurveTo(
+      ox + 140*sx, oy + 75*sy,
+      ox + 110*sx, oy + 80*sy,
+      ox + 80*sx, oy + 80*sy
+    );
+    ctx.bezierCurveTo(
+      ox + 50*sx, oy + 80*sy,
+      ox + 25*sx, oy + 78*sy,
+      ox + 20*sx, oy + 60*sy
+    );
+    ctx.closePath();
+  }
+
+  /* Frontal lobe path (front ~30% of brain) */
+  function traceFrontal(ctx, ox, oy, sx, sy) {
+    ctx.beginPath();
+    ctx.moveTo(ox + 20*sx, oy + 60*sy);
+    ctx.bezierCurveTo(
+      ox + 10*sx, oy + 20*sy,
+      ox + 30*sx, oy + 2*sy,
+      ox + 60*sx, oy + 0*sy
+    );
+    ctx.lineTo(ox + 60*sx, oy + 80*sy);
+    ctx.bezierCurveTo(
+      ox + 50*sx, oy + 80*sy,
+      ox + 25*sx, oy + 78*sy,
+      ox + 20*sx, oy + 60*sy
+    );
+    ctx.closePath();
+  }
+
+  /* Occipital / back visual lobe (rear ~25%) */
+  function traceOccipital(ctx, ox, oy, sx, sy) {
+    ctx.beginPath();
+    ctx.moveTo(ox + 115*sx, oy + 10*sy);
+    ctx.bezierCurveTo(
+      ox + 130*sx, oy + 5*sy,
+      ox + 148*sx, oy + 20*sy,
+      ox + 148*sx, oy + 65*sy
+    );
+    ctx.bezierCurveTo(
+      ox + 140*sx, oy + 75*sy,
+      ox + 115*sx, oy + 80*sy,
+      ox + 110*sx, oy + 80*sy
+    );
+    ctx.lineTo(ox + 108*sx, oy + 15*sy);
+    ctx.closePath();
+  }
+
+  function drawPanel(pCtx, ox, oy, sx, sy, alpha, isQuran) {
+    pCtx.save();
+    pCtx.globalAlpha = alpha;
+
+    /* Brain fill */
+    traceBrain(pCtx, ox, oy, sx, sy);
+    pCtx.fillStyle = '#1a2e45';
+    pCtx.fill();
+    pCtx.strokeStyle = 'rgba(255,255,255,0.12)';
+    pCtx.lineWidth = 1.5;
+    pCtx.stroke();
+
+    if (!isQuran) {
+      /* Historical: highlight occipital (back) in blue-ish for "VISION" */
+      traceOccipital(pCtx, ox, oy, sx, sy);
+      pCtx.fillStyle = 'rgba(56,189,248,0.30)';
+      pCtx.fill();
+      pCtx.strokeStyle = 'rgba(56,189,248,0.60)';
+      pCtx.lineWidth = 1.5;
+      pCtx.stroke();
+
+      /* Label */
+      pCtx.fillStyle = '#38bdf8';
+      pCtx.font = 'bold 11px DM Sans, sans-serif';
+      pCtx.textAlign = 'center';
+      pCtx.fillText('VISION', ox + 130*sx, oy + 45*sy);
+
+      /* Arrow from label toward back region */
+      pCtx.strokeStyle = 'rgba(56,189,248,0.70)';
+      pCtx.lineWidth = 1.5;
+      pCtx.beginPath();
+      pCtx.moveTo(ox + 130*sx, oy + 50*sy);
+      pCtx.lineTo(ox + 130*sx, oy + 62*sy);
+      pCtx.stroke();
+
+      /* Title */
+      pCtx.font = '500 10px DM Sans, sans-serif';
+      pCtx.fillStyle = 'rgba(120,143,163,0.9)';
+      pCtx.textAlign = 'center';
+      pCtx.fillText('ASSUMED', ox + 80*sx, oy + 100*sy);
+    } else {
+      /* Quran: highlight frontal lobe in pink for "LYING / SINFUL" */
+      traceFrontal(pCtx, ox, oy, sx, sy);
+      pCtx.fillStyle = 'rgba(244,114,182,0.32)';
+      pCtx.fill();
+      pCtx.strokeStyle = 'rgba(249,168,212,0.80)';
+      pCtx.lineWidth = 1.5;
+      pCtx.stroke();
+
+      /* Label */
+      pCtx.fillStyle = '#f9a8d4';
+      pCtx.font = 'bold 11px DM Sans, sans-serif';
+      pCtx.textAlign = 'center';
+      pCtx.fillText('LYING', ox + 32*sx, oy + 45*sy);
+
+      /* Arrow */
+      pCtx.strokeStyle = 'rgba(249,168,212,0.70)';
+      pCtx.lineWidth = 1.5;
+      pCtx.beginPath();
+      pCtx.moveTo(ox + 32*sx, oy + 50*sy);
+      pCtx.lineTo(ox + 32*sx, oy + 62*sy);
+      pCtx.stroke();
+
+      /* Title */
+      pCtx.font = '500 10px DM Sans, sans-serif';
+      pCtx.fillStyle = 'rgba(249,168,212,0.8)';
+      pCtx.textAlign = 'center';
+      pCtx.fillText('QURAN 96:16', ox + 80*sx, oy + 100*sy);
+    }
+
+    pCtx.restore();
+  }
+
+  /* Divider line */
+  function drawDivider() {
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(midX, 10);
+    ctx.lineTo(midX, H - 10);
+    ctx.stroke();
+  }
+
+  function frame(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed = ts - startTime;
+    leftAlpha  = Math.min(1, elapsed / 800);
+    rightAlpha = Math.min(1, Math.max(0, (elapsed - 500) / 800));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Left panel: historical assumption */
+    drawPanel(ctx, 40, 50, 0.95, 0.95, leftAlpha, false);
+
+    drawDivider();
+
+    /* Right panel: Quran description — offset to right half */
+    drawPanel(ctx, midX + 40, 50, 0.95, 0.95, rightAlpha, true);
+
+    if (leftAlpha < 1 || rightAlpha < 1) {
+      requestAnimationFrame(frame);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── STAGE 2: BRAIN SCAN ─────────────────────────────────────── */
+var scanDone = false;
+
+function initScanCanvas() {
+  var c = document.getElementById('scanCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+
+  /* Draw idle brain (no scan yet) */
+  drawScanFrame(ctx, W, H, -1, 0);
+}
+
+function drawScanFrame(ctx, W, H, scanY, frontalGlow) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+
+  var cx = W / 2, cy = H * 0.44;
+  var rx = 190, ry = 72;
+
+  /* Outer brain shape */
+  function traceBrainMain() {
+    ctx.beginPath();
+    ctx.moveTo(cx - rx * 0.12, cy + ry * 0.82);
+    ctx.bezierCurveTo(cx - rx * 0.55, cy + ry * 0.5, cx - rx * 0.85, cy + ry * 0.1, cx - rx * 0.80, cy - ry * 0.55);
+    ctx.bezierCurveTo(cx - rx * 0.70, cy - ry * 1.0, cx - rx * 0.28, cy - ry * 1.15, cx, cy - ry * 1.1);
+    ctx.bezierCurveTo(cx + rx * 0.28, cy - ry * 1.15, cx + rx * 0.72, cy - ry * 1.0, cx + rx * 0.82, cy - ry * 0.55);
+    ctx.bezierCurveTo(cx + rx * 0.88, cy + ry * 0.05, cx + rx * 0.65, cy + ry * 0.55, cx + rx * 0.55, cy + ry * 0.85);
+    ctx.bezierCurveTo(cx + rx * 0.30, cy + ry * 1.0, cx - rx * 0.10, cy + ry * 1.0, cx - rx * 0.12, cy + ry * 0.82);
+    ctx.closePath();
+  }
+
+  /* Frontal region (left side of brain = front, anatomically) */
+  function traceFrontalRegion() {
+    ctx.beginPath();
+    ctx.moveTo(cx - rx * 0.12, cy + ry * 0.82);
+    ctx.bezierCurveTo(cx - rx * 0.55, cy + ry * 0.5, cx - rx * 0.85, cy + ry * 0.1, cx - rx * 0.80, cy - ry * 0.55);
+    ctx.bezierCurveTo(cx - rx * 0.70, cy - ry * 1.0, cx - rx * 0.28, cy - ry * 1.15, cx, cy - ry * 1.1);
+    ctx.lineTo(cx, cy + ry * 1.0);
+    ctx.bezierCurveTo(cx - rx * 0.10, cy + ry * 1.0, cx - rx * 0.12, cy + ry * 0.82, cx - rx * 0.12, cy + ry * 0.82);
+    ctx.closePath();
+  }
+
+  /* Brain fill */
+  traceBrainMain();
+  ctx.fillStyle = '#16263b';
+  ctx.fill();
+
+  /* Scan glow regions (dim background regions first) */
+  var regions = [
+    { name:'Motor',    rx2:rx*0.18, ry2:ry*0.55, ox: rx*0.22, oy:-ry*0.18, glow:0.15 },
+    { name:'Parietal', rx2:rx*0.22, ry2:ry*0.50, ox:-rx*0.15, oy:-ry*0.50, glow:0.15 },
+    { name:'Occipital',rx2:rx*0.26, ry2:ry*0.45, ox:-rx*0.62, oy:-ry*0.15, glow:0.15 },
+    { name:'Temporal', rx2:rx*0.24, ry2:ry*0.30, ox: rx*0.30, oy: ry*0.40, glow:0.12 }
+  ];
+
+  regions.forEach(function(r) {
+    if (scanY > 0) {
+      var rg = ctx.createRadialGradient(cx + r.ox, cy + r.oy, 0, cx + r.ox, cy + r.oy, Math.max(r.rx2, r.ry2));
+      rg.addColorStop(0, 'rgba(56,189,248,' + r.glow + ')');
+      rg.addColorStop(1, 'rgba(56,189,248,0)');
+      ctx.fillStyle = rg;
+      ctx.beginPath();
+      ctx.ellipse(cx + r.ox, cy + r.oy, r.rx2, r.ry2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  /* Frontal glow — pink, maximum intensity */
+  if (frontalGlow > 0) {
+    ctx.save();
+    traceFrontalRegion();
+    ctx.clip();
+    var fg = ctx.createRadialGradient(cx - rx*0.38, cy - ry*0.1, 0, cx - rx*0.38, cy - ry*0.1, rx * 0.72);
+    fg.addColorStop(0, 'rgba(244,114,182,' + (0.55 * frontalGlow) + ')');
+    fg.addColorStop(0.5, 'rgba(244,114,182,' + (0.25 * frontalGlow) + ')');
+    fg.addColorStop(1, 'rgba(244,114,182,0)');
+    ctx.fillStyle = fg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  /* Brain outline */
+  traceBrainMain();
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  /* Scan line */
+  if (scanY > 0 && scanY < H) {
+    ctx.strokeStyle = 'rgba(244,114,182,0.55)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#f472b6';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(0, scanY);
+    ctx.lineTo(W, scanY);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  /* Labels when scan complete */
+  if (frontalGlow > 0.8) {
+    ctx.font = 'bold 12px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+
+    /* Frontal label */
+    var fa = Math.min(1, (frontalGlow - 0.8) / 0.2);
+    ctx.globalAlpha = fa;
+    ctx.fillStyle = '#f9a8d4';
+    ctx.fillText('LYING PLANNED HERE', cx - rx * 0.38, cy - ry * 0.6);
+    ctx.strokeStyle = 'rgba(249,168,212,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - rx * 0.38, cy - ry * 0.5);
+    ctx.lineTo(cx - rx * 0.38, cy - ry * 0.22);
+    ctx.stroke();
+
+    /* Other region labels */
+    ctx.font = '10px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(122,143,163,0.7)';
+    ctx.fillText('Motor', cx + rx*0.22, cy - ry*0.4);
+    ctx.fillText('Occipital', cx - rx*0.65, cy - ry*0.35);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function runBrainScan() {
+  if (scanDone) return;
+  var btn = document.getElementById('scanBtn');
+  btn.classList.add('used');
+
+  var c = document.getElementById('scanCanvas');
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var SCAN_MS = 2200;
+  var GLOW_MS = 800;
+  var t0 = null;
+
+  function tick(ts) {
+    if (!t0) t0 = ts;
+    var elapsed = ts - t0;
+
+    var scanFrac = Math.min(1, elapsed / SCAN_MS);
+    var scanY = scanFrac * H;
+    var frontalFrac = Math.min(1, Math.max(0, (elapsed - SCAN_MS) / GLOW_MS));
+
+    drawScanFrame(ctx, W, H, scanY, frontalFrac);
+
+    if (elapsed < SCAN_MS + GLOW_MS) {
+      requestAnimationFrame(tick);
+    } else {
+      /* Show stats */
+      var stats = document.getElementById('scanStats');
+      stats.classList.add('show');
+      /* Animate white matter counter */
+      animFrom(document.getElementById('ssWm'), 0, 23, 1200, null);
+      /* Mark done and show feedback after brief pause */
+      scanDone = true;
+      setTimeout(function() {
+        showOk('The prefrontal cortex — behind the forehead — showed the highest activity. Pathological liars have 23–36% more neural connections there.', function() { go(3); });
+      }, 1400);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ── STAGE 3: MC ─────────────────────────────────────────────── */
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The 2007 British Journal of Psychiatry study found pathological liars have significantly more white matter (neural wiring) in the prefrontal cortex — the exact region the Quran described as "lying."', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS ─────────────────────────────────────────────── */
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var t = 0;
+
+  /* Deterministic RNG for stable particle positions */
+  function makeRng(seed) {
+    var s = seed;
+    return function() {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      return (s >>> 0) / 0xffffffff;
+    };
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    var cx = W / 2, cy = H * 0.50;
+    var rx = 200, ry = 44;
+
+    /* Brain outline */
+    ctx.beginPath();
+    ctx.moveTo(cx - rx*0.12, cy + ry*0.82);
+    ctx.bezierCurveTo(cx - rx*0.55, cy + ry*0.5, cx - rx*0.85, cy + ry*0.1, cx - rx*0.80, cy - ry*0.55);
+    ctx.bezierCurveTo(cx - rx*0.70, cy - ry*1.0, cx - rx*0.28, cy - ry*1.15, cx, cy - ry*1.1);
+    ctx.bezierCurveTo(cx + rx*0.28, cy - ry*1.15, cx + rx*0.72, cy - ry*1.0, cx + rx*0.82, cy - ry*0.55);
+    ctx.bezierCurveTo(cx + rx*0.88, cy + ry*0.05, cx + rx*0.65, cy + ry*0.55, cx + rx*0.55, cy + ry*0.85);
+    ctx.bezierCurveTo(cx + rx*0.30, cy + ry*1.0, cx - rx*0.10, cy + ry*1.0, cx - rx*0.12, cy + ry*0.82);
+    ctx.closePath();
+
+    ctx.fillStyle = 'rgba(22,38,59,0.9)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* Frontal glow (pulsing) */
+    var pulse = 0.4 + 0.3 * Math.sin(t * 1.4);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx - rx*0.12, cy + ry*0.82);
+    ctx.bezierCurveTo(cx - rx*0.55, cy + ry*0.5, cx - rx*0.85, cy + ry*0.1, cx - rx*0.80, cy - ry*0.55);
+    ctx.bezierCurveTo(cx - rx*0.70, cy - ry*1.0, cx - rx*0.28, cy - ry*1.15, cx, cy - ry*1.1);
+    ctx.lineTo(cx, cy + ry*1.0);
+    ctx.bezierCurveTo(cx - rx*0.10, cy + ry*1.0, cx - rx*0.12, cy + ry*0.82, cx - rx*0.12, cy + ry*0.82);
+    ctx.closePath();
+    ctx.clip();
+
+    var fg = ctx.createRadialGradient(cx - rx*0.40, cy, 0, cx - rx*0.40, cy, rx*0.75);
+    fg.addColorStop(0, 'rgba(244,114,182,' + (0.45 * pulse) + ')');
+    fg.addColorStop(0.6, 'rgba(244,114,182,' + (0.15 * pulse) + ')');
+    fg.addColorStop(1, 'rgba(244,114,182,0)');
+    ctx.fillStyle = fg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    /* Neural dots — stable positions, pulsing opacity */
+    var rng = makeRng(42);
+    for (var i = 0; i < 18; i++) {
+      var nx = (cx - rx*0.85) + rng() * rx * 0.85;
+      var ny = cy - ry*0.9 + rng() * ry * 1.8;
+      var nr = 1.5 + rng() * 1.5;
+      var na = 0.2 + 0.5 * Math.sin(t * (0.8 + rng() * 0.8) + i * 1.1);
+      ctx.beginPath();
+      ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(249,168,212,' + Math.max(0, na) + ')';
+      ctx.fill();
+    }
+
+    /* Frontal neural dots (brighter, more of them) */
+    var rng2 = makeRng(77);
+    for (var j = 0; j < 10; j++) {
+      var fnx = (cx - rx*0.80) + rng2() * rx * 0.50;
+      var fny = cy - ry*0.85 + rng2() * ry * 1.7;
+      var fnr = 1.5 + rng2() * 2;
+      var fna = (0.45 + 0.45 * Math.sin(t * 1.2 + j * 0.7)) * pulse;
+      ctx.beginPath();
+      ctx.arc(fnx, fny, fnr, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(244,114,182,' + Math.max(0, fna) + ')';
+      ctx.fill();
+    }
+
+    /* Subtle folds (curved lines inside brain) */
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    [0.1, 0.3, 0.55, 0.75].forEach(function(fx) {
+      ctx.beginPath();
+      ctx.moveTo(cx - rx*0.78 + rx*fx, cy - ry*0.7);
+      ctx.bezierCurveTo(
+        cx - rx*0.78 + rx*fx + 8, cy,
+        cx - rx*0.78 + rx*fx - 5, cy + ry*0.5,
+        cx - rx*0.78 + rx*fx + 3, cy + ry*0.75
+      );
+      ctx.stroke();
+    });
+
+    t += 0.018;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

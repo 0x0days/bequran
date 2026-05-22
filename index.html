@@ -57,7 +57,9 @@
     /* ── HERO ────────────────────────────────────── */
     .hero {
       position:relative; overflow:hidden;
-      height:clamp(280px,42vh,380px);
+      /* min-height lets hero grow on small phones instead of clipping content */
+      min-height:clamp(260px,42vh,380px);
+      padding:clamp(28px,5vh,60px) 0 clamp(32px,5vh,60px);
       display:flex; align-items:center; justify-content:center;
     }
     #bgCanvas { position:absolute; inset:0; width:100%; height:100%; }
@@ -68,22 +70,22 @@
     .hero-content {
       position:relative; z-index:2;
       text-align:center; padding:0 24px;
-      max-width:620px;
+      max-width:620px; width:100%;
     }
     .hero-eyebrow {
       font-size:10px; letter-spacing:.2em; text-transform:uppercase;
-      color:var(--gold); margin-bottom:14px; font-weight:500;
+      color:var(--gold); margin-bottom:12px; font-weight:500;
     }
     .hero-hl {
       font-family:'Playfair Display',serif;
-      font-size:clamp(26px,5.5vw,44px);
-      line-height:1.16; margin-bottom:14px;
+      font-size:clamp(24px,5.5vw,44px);
+      line-height:1.16; margin-bottom:12px;
       color:#f0ede8;
       text-shadow:0 2px 24px rgba(0,0,0,0.55);
     }
     .hero-sub {
-      font-size:14px; line-height:1.8; color:var(--muted);
-      margin-bottom:26px; max-width:480px; margin-left:auto; margin-right:auto;
+      font-size:14px; line-height:1.7; color:var(--muted);
+      margin-bottom:22px; max-width:480px; margin-left:auto; margin-right:auto;
     }
     .hero-cta {
       display:inline-flex; align-items:center; gap:8px;
@@ -94,6 +96,15 @@
       transition:transform .18s ease, box-shadow .18s ease;
     }
     .hero-cta:hover { transform:translateY(-2px); box-shadow:0 8px 36px rgba(245,158,11,0.42); }
+    /* ── HERO responsive — shorten content on small phones ── */
+    @media (max-width:430px) {
+      .hero-sub { font-size:13px; line-height:1.6; margin-bottom:18px; }
+    }
+    @media (max-height:620px) {
+      /* Very short screens: hide sub-copy, keep eyebrow + title + CTA */
+      .hero-sub { display:none; }
+      .hero { padding:20px 0; }
+    }
 
     /* ── STATS BAR ───────────────────────────────── */
     .stats-bar {
@@ -316,7 +327,7 @@
   <canvas id="bgCanvas"></canvas>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">19 Discoveries · Verified by Modern Science</p>
+    <p class="hero-eyebrow">34 Discoveries · Verified by Modern Science</p>
     <h1 class="hero-hl">Patterns hidden<br>for 1,400 years.</h1>
     <p class="hero-sub">Mathematical and scientific discoveries encoded in the Quran — each confirmed by physics, biology, or astronomy developed centuries later. Each lesson takes 5 minutes.</p>
     <a href="#lessons" class="hero-cta">
@@ -329,7 +340,7 @@
 <!-- ── STATS BAR ─────────────────────────────────── -->
 <div class="stats-bar">
   <div class="stat-block">
-    <div class="stat-n">19</div>
+    <div class="stat-n">34</div>
     <div class="stat-lbl">Total Lessons</div>
   </div>
   <div class="stat-block">
@@ -364,12 +375,15 @@
   </div>
 
   <div class="filter-row" id="filterRow">
-    <button class="ftab active" data-cat="all">All &thinsp;19</button>
+    <button class="ftab active" data-cat="all">All &thinsp;34</button>
     <button class="ftab" data-cat="biology">Biology</button>
     <button class="ftab" data-cat="balance">Balance</button>
     <button class="ftab" data-cat="astronomy">Astronomy</button>
     <button class="ftab" data-cat="physics">Physics</button>
     <button class="ftab" data-cat="numerics">Numerics</button>
+    <button class="ftab" data-cat="geology">Geology</button>
+    <button class="ftab" data-cat="chemistry">Chemistry</button>
+    <button class="ftab" data-cat="cosmology">Cosmology</button>
   </div>
 
   <div class="cards-grid" id="cardsGrid"></div>
@@ -494,6 +508,30 @@ var lessons = [
   { id:'big-bang', n:28, title:'Big Bang',                     ar:'الانفجار العظيم',
     hook:'3 facts', teaser:'One verse in the Quran (21:30) describes the singularity (ratq), the expansion (fatq — torn in opposite directions), and water-based life — three 20th-century discoveries in a single 7th-century sentence.',
     cat:'cosmology', catLabel:'Cosmology',  accent:'#f9a8d4', url:'quran-big-bang.html' },
+
+  { id:'internal-mountains', n:29, title:'Internal Mountains',  ar:'الجِبَالُ الدَّاخِلِيَّة',
+    hook:'400 mi', teaser:'400 miles below the surface, Earth has mountains taller than Everest. The Quran placed them فِي (inside) the Earth — not عَلَى (on top of it) — 1,400 years before geologists discovered them with seismic scanning.',
+    cat:'geology', catLabel:'Geology', accent:'#2dd4bf', url:'quran-internal-mountains.html' },
+
+  { id:'brain-functions', n:30, title:'Brain Functions',        ar:'وَظَائِفُ الدِّمَاغ',
+    hook:'ناصية', teaser:'The Quran called the forehead region "lying and sinful" in 96:16. Neuroscience confirms the prefrontal cortex — directly behind the forehead — is where the brain plans deception. A 2007 study found pathological liars have 23–36% more white matter there.',
+    cat:'biology', catLabel:'Biology', accent:'#f472b6', url:'quran-brain-functions.html' },
+
+  { id:'iron', n:31, title:'Iron',                             ar:'الْحَدِيد',
+    hook:'26 = 57 = 5100', teaser:'The Arabic word for iron has a gematrical value of 26 — iron\'s atomic number. The chapter is numbered 57 — matching isotope ⁵⁷Fe and the chapter name\'s own gematria. And the verse count to the Iron verse equals the depth of Earth\'s solid iron core: 5,100 km.',
+    cat:'chemistry', catLabel:'Chemistry', accent:'#fb7185', url:'quran-iron.html' },
+
+  { id:'dead-sea', n:32, title:'Dead Sea',                     ar:'أَدْنَى الْأَرْضِ',
+    hook:'−430 m', teaser:'The Quran says Romans were defeated in "أَدْنَى الأرض" — the word means both "nearest" and "lowest." Modern geography confirms: the Dead Sea is Earth\'s lowest land point at 430 metres below sea level. No 7th-century tool could measure this.',
+    cat:'geology', catLabel:'Geology', accent:'#fdba74', url:'quran-dead-sea.html' },
+
+  { id:'mountains', n:33, title:'Mountains as Pegs',           ar:'الْجِبَالَ أَوْتَادًا',
+    hook:'250 km', teaser:'The Quran calls mountains أَوْتَادًا — pegs. Pegs are mostly underground. Modern geology confirms: Mount Everest stands 8.8 km tall but its root extends 250 km into the mantle — 28× deeper than the mountain is high, exactly like a peg.',
+    cat:'geology', catLabel:'Geology', accent:'#67e8f9', url:'quran-mountains.html' },
+
+  { id:'moving-mountains', n:34, title:'Moving Mountains',         ar:'الْجِبَالُ تَتَحَرَّكُ',
+    hook:'تَمُرُّ', teaser:'The Quran says mountains "move like clouds" — a claim dismissed as error for centuries. Plate tectonics, confirmed in the 1960s, proves every mountain on Earth drifts up to 100 mm per year on a moving plate.',
+    cat:'geology', catLabel:'Geology', accent:'#a8a29e', url:'quran-moving-mountains.html' },
 ];
 
 /* ── CATEGORY COLORS ─────────────────────────────── */
@@ -504,6 +542,8 @@ var catStyles = {
   physics:   { bg:'rgba(251,191,36,0.13)',  color:'#fbbf24' },
   numerics:  { bg:'rgba(56,189,248,0.13)',  color:'#38bdf8' },
   cosmology: { bg:'rgba(124,58,237,0.13)',  color:'#8b5cf6' },
+  geology:   { bg:'rgba(45,212,191,0.13)',  color:'#2dd4bf' },
+  chemistry: { bg:'rgba(251,113,133,0.13)', color:'#fb7185' },
 };
 
 /* ── LOCALSTORAGE STATE ───────────────────────────── */
@@ -627,171 +667,415 @@ document.getElementById('xpN').textContent = xp.toLocaleString();
 setTimeout(function() {
   countUp(document.getElementById('completedN'), done.size, 900);
   countUp(document.getElementById('xpTotal'), xp, 1200);
-  document.getElementById('progressFill').style.width = (done.size / 19 * 100).toFixed(1) + '%';
+  document.getElementById('progressFill').style.width = (done.size / 34 * 100).toFixed(1) + '%';
 }, 300);
 
-/* ── HERO CANVAS — Islamic Geometric Constellation ─ */
+/* ── HERO CANVAS — Islamic Geometric Art ─ */
 (function() {
   var c = document.getElementById('bgCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  var t = 0;
-  var W, H, cx, cy, starR;
-  var outerPts = [], innerPts = [], bgPts = [];
+  var t = 0, W, H, cx, cy, R;
 
-  function setSize() {
+  function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = c.offsetWidth; H = c.offsetHeight;
     c.width  = W * dpr;
     c.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cx = W * 0.5; cy = H * 0.5;
-    starR = Math.min(W, H) * 0.28;
-    buildPts();
+    /* R large enough that ring 4 reaches both horizontal edges */
+    R  = Math.max(W * 0.66, H * 1.05);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* 6 concentric rings — alternating rotation, slowing outward */
+  var RINGS = [
+    { r: 0.088, n: 12, dir:  1, spd: 2.20 },
+    { r: 0.200, n: 12, dir: -1, spd: 1.50 },
+    { r: 0.325, n: 24, dir:  1, spd: 0.88 },
+    { r: 0.452, n: 12, dir: -1, spd: 0.55 },
+    { r: 0.594, n: 24, dir:  1, spd: 0.30 },
+    { r: 0.760, n: 12, dir: -1, spd: 0.15 },
+  ];
+
+  /* particles traveling along ring paths */
+  var parts = [];
+  for (var pi = 0; pi < 120; pi++) {
+    parts.push({
+      ri:  pi % 6,
+      pos: pi / 120,
+      spd: 0.00042 + (pi % 9) * 0.000078,
+      sz:  0.70 + (pi % 5) * 0.32,
+      hue: pi % 4
+    });
   }
 
-  function buildPts() {
-    outerPts = []; innerPts = []; bgPts = [];
-    // 12 outer + 12 inner = 24-point Islamic star
-    for (var i = 0; i < 12; i++) {
-      var a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-      outerPts.push({ a: a, r: starR,        ph: i * 0.52, x: 0, y: 0 });
-      innerPts.push({ a: a + Math.PI / 12, r: starR * 0.38, ph: i * 0.52 + 0.26, x: 0, y: 0 });
-    }
-    // Background constellation nodes (golden ratio scatter)
-    var count = Math.min(48, Math.floor(W * H / 9500));
-    for (var j = 0; j < count; j++) {
-      bgPts.push({
-        x: ((j * 137.508) % (W - 40)) + 20,
-        y: ((j * 89.3)    % (H - 30)) + 15,
-        ph: j * 0.41, sz: 0.5 + (j % 3) * 0.25
-      });
-    }
-  }
-
-  setSize();
-  window.addEventListener('resize', function() { setSize(); });
+  function gpx(r, a) { return cx + Math.cos(a) * r; }
+  function gpy(r, a) { return cy + Math.sin(a) * r; }
+  function rRot(ri, base) { return base * RINGS[ri].spd * RINGS[ri].dir; }
 
   function frame() {
     ctx.clearRect(0, 0, W, H);
+    var base = t * 0.00017;
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
-    // Background gradient
-    var bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#03070d');
-    bg.addColorStop(0.5, '#05090f');
-    bg.addColorStop(1, '#03070d');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
+    /* ── background gradient ── */
+    var bg;
+    if (isLight) {
+      bg = ctx.createRadialGradient(cx, cy * 0.75, 0, cx, cy * 0.75, R * 0.90);
+      bg.addColorStop(0.00, '#c48010');
+      bg.addColorStop(0.22, '#904208');
+      bg.addColorStop(0.46, '#622405');
+      bg.addColorStop(0.70, '#361202');
+      bg.addColorStop(1.00, '#160501');
+    } else {
+      bg = ctx.createRadialGradient(cx, cy * 0.88, 0, cx, cy * 0.88, R * 0.92);
+      bg.addColorStop(0.00, '#0d4a9a');
+      bg.addColorStop(0.14, '#0a3580');
+      bg.addColorStop(0.30, '#072460');
+      bg.addColorStop(0.52, '#041540');
+      bg.addColorStop(0.75, '#020c26');
+      bg.addColorStop(1.00, '#010610');
+    }
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-    var rot = t * 0.00038;
+    /* ── background star tile — fills sides and corners ── */
+    drawBgTile(base, isLight);
 
-    // Update star positions
-    outerPts.forEach(function(p) {
-      p.x = cx + Math.cos(p.a + rot) * p.r;
-      p.y = cy + Math.sin(p.a + rot) * p.r;
-    });
-    innerPts.forEach(function(p) {
-      p.x = cx + Math.cos(p.a + rot) * p.r;
-      p.y = cy + Math.sin(p.a + rot) * p.r;
-    });
-
-    // Interleave outer/inner for star outline
-    var allStar = [];
-    for (var i = 0; i < 12; i++) {
-      allStar.push(outerPts[i]);
-      allStar.push(innerPts[i]);
+    /* ── outermost skip-chord webs ── */
+    if (isLight) {
+      skipLines(5, 4,  base, 'rgba(100,48,6,0.28)',  0.38);
+      skipLines(4, 8,  base, 'rgba(130,64,4,0.26)',  0.42);
+      skipLines(3, 4,  base, 'rgba(120,56,4,0.24)',  0.40);
+    } else {
+      skipLines(5, 4,  base, 'rgba(99,102,241,0.20)',  0.38);
+      skipLines(4, 8,  base, 'rgba(37,99,235,0.20)',   0.42);
+      skipLines(3, 4,  base, 'rgba(37,99,235,0.18)',   0.40);
     }
 
-    // Star outline path
-    var starA = 0.13 + Math.sin(t * 0.55) * 0.04;
-    ctx.beginPath();
-    allStar.forEach(function(p, i) {
-      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
-    });
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(245,158,11,' + starA + ')';
-    ctx.lineWidth = 0.9;
-    ctx.stroke();
-
-    // Star internal chords (outer-to-outer, skip 3 — creates internal star)
-    for (var i = 0; i < outerPts.length; i++) {
-      var j = (i + 4) % outerPts.length;
-      var ca = (0.06 + Math.sin(t * 0.35 + i * 0.5) * 0.025);
+    /* ── concentric polygon bands ── */
+    var bands;
+    if (isLight) {
+      bands = [
+        { rf:0.14, n:12, ri:0, col:'rgba(160,88,10,0.18)'  },
+        { rf:0.26, n:12, ri:1, col:'rgba(10,100,90,0.16)'  },
+        { rf:0.41, n:24, ri:2, col:'rgba(10,80,100,0.14)'  },
+        { rf:0.56, n:12, ri:3, col:'rgba(120,50,5,0.12)'   },
+        { rf:0.72, n:24, ri:4, col:'rgba(10,70,80,0.10)'   },
+        { rf:0.88, n:12, ri:5, col:'rgba(100,40,5,0.08)'   },
+      ];
+    } else {
+      bands = [
+        { rf:0.14, n:12, ri:0, col:'rgba(167,243,208,0.16)' },
+        { rf:0.26, n:12, ri:1, col:'rgba(103,232,249,0.14)' },
+        { rf:0.41, n:24, ri:2, col:'rgba(56,189,248,0.12)'  },
+        { rf:0.56, n:12, ri:3, col:'rgba(37,99,235,0.10)'   },
+        { rf:0.72, n:24, ri:4, col:'rgba(99,102,241,0.09)'  },
+        { rf:0.88, n:12, ri:5, col:'rgba(139,92,246,0.07)'  },
+      ];
+    }
+    for (var bi = 0; bi < bands.length; bi++) {
+      var bd = bands[bi];
+      var brot = rRot(bd.ri, base) * 0.44;
       ctx.beginPath();
-      ctx.moveTo(outerPts[i].x, outerPts[i].y);
-      ctx.lineTo(outerPts[j].x, outerPts[j].y);
-      ctx.strokeStyle = 'rgba(245,158,11,' + ca + ')';
-      ctx.lineWidth = 0.55;
-      ctx.stroke();
+      for (var bk = 0; bk <= bd.n; bk++) {
+        var ba = brot + (bk / bd.n) * Math.PI * 2;
+        bk === 0
+          ? ctx.moveTo(gpx(bd.rf * R, ba), gpy(bd.rf * R, ba))
+          : ctx.lineTo(gpx(bd.rf * R, ba), gpy(bd.rf * R, ba));
+      }
+      ctx.strokeStyle = bd.col; ctx.lineWidth = 0.42; ctx.stroke();
     }
 
-    // Outer nodes with glow
-    outerPts.forEach(function(p, i) {
-      var pulse = 0.45 + Math.sin(t * 1.1 + p.ph) * 0.35;
-      var r = 1.6 + pulse * 1.1;
-      var a = 0.4 + pulse * 0.3;
-      // Glow halo
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, r * 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(245,158,11,' + (a * 0.07) + ')';
-      ctx.fill();
-      // Core
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(245,158,11,' + a + ')';
-      ctx.fill();
-    });
-    // Inner nodes (subtle)
-    innerPts.forEach(function(p) {
-      var pulse = 0.3 + Math.sin(t * 0.9 + p.ph) * 0.2;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 0.7 + pulse * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(245,158,11,' + (0.18 + pulse * 0.12) + ')';
-      ctx.fill();
-    });
-    // Center glow
-    var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, starR * 0.22);
-    cg.addColorStop(0, 'rgba(245,158,11,0.06)');
-    cg.addColorStop(1, 'transparent');
-    ctx.fillStyle = cg;
-    ctx.fillRect(cx - starR, cy - starR, starR * 2, starR * 2);
+    /* ── girih cross-ring lines ── */
+    if (isLight) {
+      crossLines(4, 5, base, 'rgba(110,50,5,0.24)',   0.48);
+      crossLines(3, 4, base, 'rgba(140,68,4,0.30)',   0.50);
+      crossLines(2, 3, base, 'rgba(10,90,85,0.34)',   0.54);
+      crossLines(1, 2, base, 'rgba(10,110,100,0.42)', 0.58);
+    } else {
+      crossLines(4, 5, base, 'rgba(139,92,246,0.22)',  0.48);
+      crossLines(3, 4, base, 'rgba(37,99,235,0.26)',   0.50);
+      crossLines(2, 3, base, 'rgba(6,182,212,0.30)',   0.54);
+      crossLines(1, 2, base, 'rgba(34,211,238,0.36)',  0.58);
+    }
 
-    // Background constellation lines
-    for (var i = 0; i < bgPts.length; i++) {
-      for (var j = i + 1; j < bgPts.length; j++) {
-        var dx = bgPts[i].x - bgPts[j].x;
-        var dy = bgPts[i].y - bgPts[j].y;
-        var d  = Math.sqrt(dx * dx + dy * dy);
-        if (d < 78) {
-          var la = (0.025 + Math.sin(t * 0.28 + i * 0.19) * 0.01) * (1 - d / 78);
-          ctx.beginPath();
-          ctx.moveTo(bgPts[i].x, bgPts[i].y);
-          ctx.lineTo(bgPts[j].x, bgPts[j].y);
-          ctx.strokeStyle = 'rgba(147,197,253,' + la + ')';
-          ctx.lineWidth = 0.35;
-          ctx.stroke();
-        }
+    /* ── arch-rings ── */
+    if (isLight) {
+      drawArchesC(4, base, '#7c2d12', '#c2410c');
+      drawArchesC(3, base, '#0c4a5a', '#0e7490');
+    } else {
+      drawArchesC(4, base, '#4338ca', '#818cf8');
+      drawArchesC(3, base, '#1e40af', '#06b6d4');
+    }
+
+    /* ── kite rings ── */
+    if (isLight) {
+      drawKitesC(3, 4, base, '#9a3412', '#ea580c');
+      drawKitesC(1, 2, base, '#0f5460', '#0891b2');
+    } else {
+      drawKitesC(3, 4, base, '#1d4ed8', '#60a5fa');
+      drawKitesC(1, 2, base, '#0891b2', '#22d3ee');
+    }
+
+    /* ── inner star chords ── */
+    if (isLight) {
+      skipLines(0, 4, base, 'rgba(180,100,10,0.62)', 0.72);
+      skipLines(1, 4, base, 'rgba(10,120,100,0.48)', 0.55);
+    } else {
+      skipLines(0, 4, base, 'rgba(167,243,208,0.55)', 0.72);
+      skipLines(1, 4, base, 'rgba(103,232,249,0.40)', 0.55);
+    }
+
+    /* ── central Shamsa ── */
+    drawShamsa(base, isLight);
+
+    /* ── glowing nodes ── */
+    var nodeColors = isLight ? [
+      'rgba(200,100,10,',
+      'rgba(10,120,90,',
+      'rgba(10,130,130,',
+      'rgba(180,70,0,',
+      'rgba(140,30,30,',
+      'rgba(200,150,10,',
+    ] : [
+      'rgba(252,211,77,',
+      'rgba(167,243,208,',
+      'rgba(103,232,249,',
+      'rgba(96,165,250,',
+      'rgba(167,139,250,',
+      'rgba(196,181,253,',
+    ];
+    for (var ri = 0; ri < RINGS.length; ri++) {
+      var rg = RINGS[ri], rr2 = rg.r * R, rot3 = rRot(ri, base);
+      for (var ni = 0; ni < rg.n; ni++) {
+        var na  = rot3 + (ni / rg.n) * Math.PI * 2;
+        var nx  = gpx(rr2, na), ny = gpy(rr2, na);
+        /* skip nodes clearly outside canvas bounds */
+        if (nx < -20 || nx > W + 20 || ny < -20 || ny > H + 20) continue;
+        var pulse = 0.28 + Math.sin(t * 0.52 + ni * 0.86 + ri * 1.7) * 0.22;
+        var nr    = (ri === 0 ? 2.4 : 1.5) * (0.84 + pulse * 0.44);
+        ctx.beginPath(); ctx.arc(nx, ny, nr * 5.2, 0, Math.PI * 2);
+        ctx.fillStyle = nodeColors[ri] + (pulse * 0.07) + ')'; ctx.fill();
+        ctx.beginPath(); ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+        ctx.fillStyle = nodeColors[ri] + (0.48 + pulse * 0.42) + ')'; ctx.fill();
       }
     }
-    // Bg nodes
-    bgPts.forEach(function(p) {
-      var pulse = 0.3 + Math.sin(t * 0.8 + p.ph) * 0.25;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.sz * (0.8 + pulse * 0.4), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(147,197,253,' + (0.1 + pulse * 0.08) + ')';
-      ctx.fill();
-    });
 
-    // Radial vignette for text readability
-    var vig = ctx.createRadialGradient(cx, cy * 0.9, H * 0.08, cx, cy * 0.9, H * 0.9);
-    vig.addColorStop(0, 'rgba(11,22,34,0.08)');
-    vig.addColorStop(0.55, 'rgba(8,17,28,0.42)');
-    vig.addColorStop(1, 'rgba(5,10,18,0.88)');
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, W, H);
+    /* ── particles ── */
+    var pcols = isLight ? [
+      'rgba(210,130,10,0.88)',
+      'rgba(10,130,110,0.82)',
+      'rgba(190,70,0,0.78)',
+      'rgba(150,30,30,0.72)',
+    ] : [
+      'rgba(103,232,249,0.80)',
+      'rgba(56,189,248,0.72)',
+      'rgba(252,211,77,0.70)',
+      'rgba(167,139,250,0.68)',
+    ];
+    for (var pi2 = 0; pi2 < parts.length; pi2++) {
+      var p = parts[pi2];
+      p.pos = (p.pos + p.spd) % 1;
+      var prr = RINGS[p.ri].r * R;
+      var pa2 = rRot(p.ri, base) + p.pos * Math.PI * 2;
+      var ppx2 = gpx(prr, pa2), ppy2 = gpy(prr, pa2);
+      if (ppx2 < -4 || ppx2 > W + 4 || ppy2 < -4 || ppy2 > H + 4) continue;
+      ctx.beginPath(); ctx.arc(ppx2, ppy2, p.sz, 0, Math.PI * 2);
+      ctx.fillStyle = pcols[p.hue]; ctx.fill();
+    }
 
-    t += 1;
+    /* ── center bloom ── */
+    var br = RINGS[0].r * R * 0.62;
+    var bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, br);
+    if (isLight) {
+      bloom.addColorStop(0,    'rgba(220,140,10,0.70)');
+      bloom.addColorStop(0.38, 'rgba(180,80,0,0.22)');
+      bloom.addColorStop(1,    'transparent');
+    } else {
+      bloom.addColorStop(0,    'rgba(252,211,77,0.65)');
+      bloom.addColorStop(0.38, 'rgba(245,158,11,0.18)');
+      bloom.addColorStop(1,    'transparent');
+    }
+    ctx.fillStyle = bloom; ctx.beginPath(); ctx.arc(cx, cy, br, 0, Math.PI * 2); ctx.fill();
+
+    /* ── vignette (dark mode only) ── */
+    if (!isLight) {
+      var vig = ctx.createRadialGradient(cx, cy * 0.82, H * 0.03, cx, cy * 0.82, H * 0.94);
+      vig.addColorStop(0,    'rgba(4,12,32,0.00)');
+      vig.addColorStop(0.45, 'rgba(4,12,32,0.30)');
+      vig.addColorStop(1,    'rgba(1,5,16,0.92)');
+      ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
+    }
+
+    t++;
     requestAnimationFrame(frame);
+  }
+
+  /* ─── helpers ─────────────────────────────────── */
+
+  function skipLines(ri, skip, base, color, lw) {
+    var rg = RINGS[ri], rr = rg.r * R, rot = rRot(ri, base);
+    for (var i = 0; i < rg.n; i++) {
+      var j = (i + skip) % rg.n;
+      ctx.beginPath();
+      ctx.moveTo(gpx(rr, rot + (i/rg.n)*Math.PI*2), gpy(rr, rot + (i/rg.n)*Math.PI*2));
+      ctx.lineTo(gpx(rr, rot + (j/rg.n)*Math.PI*2), gpy(rr, rot + (j/rg.n)*Math.PI*2));
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke();
+    }
+  }
+
+  function crossLines(ri1, ri2, base, color, lw) {
+    var rg1 = RINGS[ri1], rg2 = RINGS[ri2];
+    var r1  = rg1.r * R,  r2  = rg2.r * R;
+    var n   = Math.min(rg1.n, rg2.n);
+    var rot1 = rRot(ri1, base), rot2 = rRot(ri2, base);
+    for (var i = 0; i < n; i++) {
+      var a1 = rot1 + (i       / n) * Math.PI * 2;
+      var a2 = rot2 + ((i+0.5) / n) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(gpx(r1,a1), gpy(r1,a1));
+      ctx.lineTo(gpx(r2,a2), gpy(r2,a2));
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke();
+    }
+  }
+
+  /* hex color → rgba with alpha */
+  function hx(hex, a) {
+    var r2 = parseInt(hex.slice(1,3),16), g2 = parseInt(hex.slice(3,5),16), b2 = parseInt(hex.slice(5,7),16);
+    return 'rgba(' + r2 + ',' + g2 + ',' + b2 + ',' + a + ')';
+  }
+
+  function drawArchesC(ri, base, innerHex, outerHex) {
+    var rg = RINGS[ri], rr = rg.r * R, rot = rRot(ri, base);
+    for (var i = 0; i < rg.n; i++) {
+      var aC   = rot + (i / rg.n) * Math.PI * 2;
+      var half = (Math.PI * 2 / rg.n) * 0.38;
+      var aL   = aC - half, aR = aC + half;
+      var tipR = rr * 1.06, sideR = rr * 0.74;
+      var tx = gpx(tipR, aC), ty = gpy(tipR, aC);
+      /* skip if tip is far off canvas */
+      if (tx < -R*0.3 || tx > W+R*0.3 || ty < -R*0.3 || ty > H+R*0.3) continue;
+      ctx.beginPath();
+      ctx.moveTo(gpx(sideR,aL), gpy(sideR,aL));
+      ctx.quadraticCurveTo(gpx(rr*1.11,aL+(aC-aL)*0.5), gpy(rr*1.11,aL+(aC-aL)*0.5), tx, ty);
+      ctx.quadraticCurveTo(gpx(rr*1.11,aR+(aC-aR)*0.5), gpy(rr*1.11,aR+(aC-aR)*0.5), gpx(sideR,aR), gpy(sideR,aR));
+      ctx.lineTo(gpx(sideR*0.95,aC), gpy(sideR*0.95,aC));
+      ctx.closePath();
+      var pulse = 0.18 + Math.sin(t * 0.27 + i * 0.77) * 0.06;
+      var fg = ctx.createLinearGradient(cx, cy, tx, ty);
+      fg.addColorStop(0, hx(innerHex, pulse * 0.9));
+      fg.addColorStop(1, hx(outerHex, pulse * 1.5));
+      ctx.fillStyle = fg; ctx.fill();
+      ctx.strokeStyle = hx(outerHex, 0.55); ctx.lineWidth = 0.58; ctx.stroke();
+    }
+  }
+
+  function drawKitesC(ri1, ri2, base, innerHex, outerHex) {
+    var rg1 = RINGS[ri1], rg2 = RINGS[ri2];
+    var r1  = rg1.r * R,  r2  = rg2.r * R;
+    var n   = rg1.n;
+    var rot1 = rRot(ri1, base), rot2 = rRot(ri2, base);
+    for (var i = 0; i < n; i++) {
+      var aO = rot2 + (i       / n) * Math.PI * 2;
+      var aL = rot1 + ((i-0.28)/ n) * Math.PI * 2;
+      var aR = rot1 + ((i+0.28)/ n) * Math.PI * 2;
+      var aM = rot1 + ((i+0.5) / n) * Math.PI * 2;
+      var ox = gpx(r2,aO), oy = gpy(r2,aO);
+      if (ox < -R*0.2 || ox > W+R*0.2 || oy < -R*0.2 || oy > H+R*0.2) continue;
+      ctx.beginPath();
+      ctx.moveTo(gpx(r1,aL),       gpy(r1,aL));
+      ctx.lineTo(ox, oy);
+      ctx.lineTo(gpx(r1,aR),       gpy(r1,aR));
+      ctx.lineTo(gpx(r1*0.72,aM),  gpy(r1*0.72,aM));
+      ctx.closePath();
+      var pulse = 0.20 + Math.sin(t * 0.37 + i * 0.93) * 0.07;
+      var kg = ctx.createLinearGradient(gpx(r1*0.72,aM),gpy(r1*0.72,aM), ox, oy);
+      kg.addColorStop(0, hx(innerHex, pulse * 0.9));
+      kg.addColorStop(1, hx(outerHex, pulse * 1.4));
+      ctx.fillStyle = kg; ctx.fill();
+      ctx.strokeStyle = hx(outerHex, 0.60); ctx.lineWidth = 0.60; ctx.stroke();
+    }
+  }
+
+  function drawShamsa(base, isLight) {
+    var rr = RINGS[0].r * R, ir = rr * 0.38, rot = rRot(0, base);
+    ctx.beginPath();
+    for (var i = 0; i < 24; i++) {
+      var a = rot + (i / 24) * Math.PI * 2;
+      var sr = i % 2 === 0 ? rr : ir;
+      i === 0 ? ctx.moveTo(gpx(sr,a),gpy(sr,a)) : ctx.lineTo(gpx(sr,a),gpy(sr,a));
+    }
+    ctx.closePath();
+    var pulse = 0.22 + Math.sin(t * 0.44) * 0.08;
+    var sf = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+    if (isLight) {
+      sf.addColorStop(0,    'rgba(220,140,20,'  + (pulse * 1.0) + ')');
+      sf.addColorStop(0.35, 'rgba(10,120,90,'   + (pulse * 0.9) + ')');
+      sf.addColorStop(0.70, 'rgba(10,100,100,'  + pulse + ')');
+      sf.addColorStop(1,    'rgba(140,50,5,'    + (pulse * 0.7) + ')');
+    } else {
+      sf.addColorStop(0,    'rgba(252,211,77,'  + (pulse * 1.0) + ')');
+      sf.addColorStop(0.35, 'rgba(167,243,208,' + (pulse * 0.9) + ')');
+      sf.addColorStop(0.70, 'rgba(6,182,212,'   + pulse + ')');
+      sf.addColorStop(1,    'rgba(37,99,235,'   + (pulse * 0.7) + ')');
+    }
+    ctx.fillStyle = sf; ctx.fill();
+    ctx.strokeStyle = isLight ? 'rgba(10,120,90,0.95)' : 'rgba(167,243,208,0.95)';
+    ctx.lineWidth = 0.88; ctx.stroke();
+    ctx.beginPath();
+    for (var i2 = 0; i2 <= 6; i2++) {
+      var a2 = rot * 0.62 + (i2 / 6) * Math.PI * 2;
+      i2 === 0 ? ctx.moveTo(gpx(ir*0.62,a2),gpy(ir*0.62,a2)) : ctx.lineTo(gpx(ir*0.62,a2),gpy(ir*0.62,a2));
+    }
+    ctx.strokeStyle = isLight ? 'rgba(220,140,10,0.80)' : 'rgba(252,211,77,0.80)';
+    ctx.lineWidth = 0.72; ctx.stroke();
+    for (var i3 = 0; i3 < 12; i3++) {
+      var j2 = (i3 + 4) % 12;
+      var pa = 0.36 + Math.sin(t * 0.54 + i3) * 0.13;
+      ctx.beginPath();
+      ctx.moveTo(gpx(rr,rot+(i3/12)*Math.PI*2), gpy(rr,rot+(i3/12)*Math.PI*2));
+      ctx.lineTo(gpx(rr,rot+(j2/12)*Math.PI*2), gpy(rr,rot+(j2/12)*Math.PI*2));
+      ctx.strokeStyle = isLight ? 'rgba(10,120,90,' + pa + ')' : 'rgba(167,243,208,' + pa + ')';
+      ctx.lineWidth = 0.52; ctx.stroke();
+    }
+  }
+
+  function drawBgTile(base, isLight) {
+    var step = 72;
+    var sz   = step * 0.22;
+    var ir   = sz * 0.44;
+    var tRot = base * 0.06;
+    for (var gy = -step; gy < H + step; gy += step) {
+      var xOff = (Math.floor(gy / step) % 2 === 0) ? 0 : step * 0.5;
+      for (var gx = -step + xOff; gx < W + step; gx += step) {
+        var dx = gx - cx, dy = gy - cy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var fade = Math.max(0, Math.min(1, (dist - R * 0.44) / (step * 2.5)));
+        if (fade <= 0.01) continue;
+        var alpha = fade * (isLight ? 0.30 : 0.12);
+        ctx.beginPath();
+        for (var si = 0; si < 16; si++) {
+          var sa = tRot + (si / 16) * Math.PI * 2;
+          var sr = si % 2 === 0 ? sz : ir;
+          var px = gx + Math.cos(sa) * sr, py = gy + Math.sin(sa) * sr;
+          si === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        if (isLight) {
+          ctx.fillStyle   = 'rgba(90,40,5,'    + (alpha * 0.55) + ')';
+          ctx.strokeStyle = 'rgba(160,90,10,'  + alpha + ')';
+        } else {
+          ctx.fillStyle   = 'rgba(30,80,180,'  + (alpha * 0.55) + ')';
+          ctx.strokeStyle = 'rgba(60,140,220,' + alpha + ')';
+        }
+        ctx.lineWidth = 0.55;
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
   }
 
   frame();

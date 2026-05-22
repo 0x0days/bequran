@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Moving Mountains · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #a8a29e;
+      --accent-light: #d6d0ca;
+      --accent-dim:   rgba(168,162,158,0.10);
+      --accent-ring:  rgba(168,162,158,0.22);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; padding:44px 20px 160px;
+    }
+    .dot-field {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:radial-gradient(rgba(255,255,255,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    .container { max-width:720px; margin:0 auto; position:relative; z-index:1; }
+
+    /* PROGRESS */
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent-light)); width:0%; transition:width .7s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:28px; }
+
+    /* STAGES */
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    /* VERSE */
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:22px 0; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:22px; line-height:2.1; direction:rtl; text-align:right; color:var(--text); margin-bottom:10px; }
+    .verse-ar .hl { color:var(--accent-light); }
+    .verse-en { font-size:14px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .verse-en .hl { color:var(--accent-light); font-style:normal; font-weight:600; }
+
+    /* LESSON INTRO */
+    .lesson-eyebrow { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .lesson-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+    .lesson-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+    /* CLAIM BOX */
+    .claim-box { background:var(--accent-dim); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:22px 0; }
+    .claim-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .claim-text { font-size:15px; line-height:1.65; color:var(--text); }
+
+    /* PROMPT */
+    .prompt { font-family:'Playfair Display',serif; font-size:18px; line-height:1.5; margin:24px 0 16px; }
+
+    /* ANSWERS */
+    .answers { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .answer-card {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+      cursor:pointer; transition:border-color .18s, background .18s;
+    }
+    .answer-card:hover { border-color:rgba(255,255,255,0.2); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); pointer-events:none; }
+    .answer-card.ac-wrong   { border-color:var(--err-border); background:var(--err-bg); animation:shake .35s ease; }
+    .answer-card.ac-disabled{ opacity:.45; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .ac-letter { width:26px; height:26px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:2px; }
+    .ac-big { font-size:16px; font-weight:600; line-height:1.3; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:transform .18s, box-shadow .18s; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-accent { background:var(--accent); color:#0b1622; box-shadow:0 4px 20px rgba(168,162,158,0.22); }
+    .btn-accent:hover { box-shadow:0 8px 30px rgba(168,162,158,0.32); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* INTERACTIVE */
+    .ex-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--accent-light); line-height:1; }
+    .ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+    .ex-result.show { display:block; }
+    .ex-arena { display:flex; gap:14px; margin:20px 0; }
+    .ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 14px; text-align:center; transition:border-color .3s, background .3s; }
+    .ex-panel.lit { border-color:var(--accent-ring); background:var(--accent-dim); }
+
+    /* VERDICT */
+    .verdict-title { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,28px); font-weight:700; line-height:1.3; margin-bottom:10px; }
+    .verdict-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:28px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:14px 18px; margin-bottom:22px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .stat-row { display:flex; gap:14px; margin:22px 0; flex-wrap:wrap; }
+    .stat-box { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:16px 14px; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--accent-light); }
+    .stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:4px; }
+    .verdict-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .verdict-table th { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+    .verdict-table td { font-size:13px; padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .verdict-table tr:last-child td { border-bottom:none; }
+    .td-check { color:var(--ok); font-weight:700; }
+
+    /* GOLD BOX */
+    .gold-box { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.18); border-radius:12px; padding:18px 20px; margin:24px 0; }
+    .gt { font-family:'Playfair Display',serif; font-size:16px; line-height:1.55; color:var(--gold-light); margin-bottom:8px; }
+    .gs { font-size:13px; color:var(--muted); line-height:1.7; }
+
+    /* NAV */
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:28px; transition:color .18s; }
+    .nav-back:hover { color:var(--text); }
+    .nav-next-wrap { margin-top:36px; padding-top:24px; border-top:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; }
+
+    /* FEEDBACK PANEL */
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:300; padding:18px 20px 32px; transform:translateY(110%); transition:transform .35s cubic-bezier(.4,0,.2,1); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok  { background:var(--ok-bg);  border-top:3px solid var(--ok); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top:3px solid var(--err-light); }
+    .fb-left { display:flex; align-items:center; gap:12px; }
+    .fb-icon { font-size:24px; line-height:1; }
+    .fb-title { font-size:17px; font-weight:700; }
+    .fb-panel.fb-ok  .fb-title { color:var(--ok); }
+    .fb-panel.fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:rgba(255,255,255,0.6); margin-top:3px; line-height:1.55; max-width:340px; }
+    .fb-btn { flex-shrink:0; padding:14px 30px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:transform .1s; }
+    .fb-btn:active { transform:scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background:var(--ok);        color:var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background:var(--err-light); color:var(--err-bg); }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-mountains.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Previous · Mountains as Pegs
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Moving Mountains</div>
+
+  <!-- ── S0 INTRO ── -->
+  <div id="s0" class="stage active">
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="lesson-eyebrow">Geology · Plate Tectonics</p>
+    <h1 class="lesson-title">Moving Mountains</h1>
+    <p class="lesson-sub">For centuries, the idea that mountains could move was dismissed as a scientific blunder. The Quran stated it plainly — 1,400 years before geologists proved it.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">27:88 · Surah An-Naml</div>
+      <div class="verse-ar">وَتَرَى الْجِبَالَ تَحْسَبُهَا جَامِدَةً <span class="hl">وَهِيَ تَمُرُّ مَرَّ السَّحَابِ</span> ۚ صُنْعَ اللَّهِ الَّذِي أَتْقَنَ كُلَّ شَيْءٍ</div>
+      <div class="verse-en">"You see the mountains and think them firmly fixed — <span class="hl">but they are moving like clouds.</span> Such is the artistry of God, who perfects all things."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovery</div>
+      <div class="claim-text">Mountains <em>appear</em> fixed — the verse uses the word جَامِدَة, meaning "frozen in place," to describe that appearance. Then it immediately corrects it: <strong style="color:var(--accent-light)">they are moving.</strong> Plate tectonics, discovered in the 1960s, confirmed every mountain on Earth rides a drifting plate — up to 100 mm per year.</div>
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 — Comparison canvas + MC ── -->
+  <div id="s1" class="stage">
+
+    <p class="prompt">What does Quran 27:88 specifically say about mountains?</p>
+
+    <canvas id="s1Canvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div id="s1Mc" style="display:none">
+      <div class="answers">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">They contain deep roots that hold the Earth firm</div>
+            <div class="ac-sub">Their peg-like structure stabilises the crust</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">They appear fixed but are actually moving like clouds</div>
+            <div class="ac-sub">The verse uses جَامِدَة ("frozen") only to deny it</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">They are the oldest permanent structures on Earth</div>
+            <div class="ac-sub">Never changed since creation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 — Tectonic plate animation ── -->
+  <div id="s2" class="stage">
+
+    <p class="prompt">Watch the plates drift — and see how fast.</p>
+    <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">The animation compresses geological time so the movement is visible. In reality this happens at the speed you grow a fingernail.</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="ex-arena">
+      <div class="ex-panel" id="s2PanelA">
+        <div class="ex-unit">Max plate drift</div>
+        <div class="ex-num" id="driftCount">0</div>
+        <div class="ex-unit">mm per year</div>
+      </div>
+      <div class="ex-panel" id="s2PanelB">
+        <div class="ex-unit">Major tectonic plates</div>
+        <div class="ex-num">7–8</div>
+        <div class="ex-unit">covering Earth's crust</div>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="s2Btn" onclick="startTectonics()">
+      Simulate plate motion
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="ex-result" id="s2Result">
+      <div style="font-size:13px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">Up to 100 mm every year</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">About the length of your hand — continuously, without stopping. Over millions of years this moves entire continents. The Quran's phrase: <em style="color:var(--text)">"moving like clouds."</em></div>
+    </div>
+  </div>
+
+  <!-- ── S3 — MC ── -->
+  <div id="s3" class="stage">
+
+    <p class="prompt">Which field of science, confirmed in the 1960s, proved that mountains and continents are constantly in motion?</p>
+
+    <div class="answers">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Meteorology</div>
+          <div class="ac-sub">The scientific study of weather and atmosphere</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Plate Tectonics</div>
+          <div class="ac-sub">Earth's lithosphere is divided into moving plates</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Vulcanology</div>
+          <div class="ac-sub">The scientific study of volcanoes and lava</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ── -->
+  <div id="s4" class="stage">
+
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">The mountains are moving — just as written.</h2>
+    <p class="verdict-sub">The verse uses the word جَامِدَة — "frozen, fixed" — specifically to describe how mountains <em>appear</em>, then immediately contradicts it: "they are passing like clouds." A 7th-century author guessing about mountain behaviour would never phrase it this way. He would write that they are fixed — full stop. The denial of the appearance is the unexpected, scientific part.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="mv0">0</div>
+        <div class="stat-lbl">mm per year (max drift)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="mv1">0</div>
+        <div class="stat-lbl">years before geologists confirmed it</div>
+      </div>
+    </div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr><th>Statement in Quran 27:88</th><th>Modern science confirms</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mountains appear fixed</td><td>Correct — movement is imperceptible to naked eye</td><td class="td-check">✓</td></tr>
+        <tr><td>But they are actually moving</td><td>Tectonic plates drift 0–100 mm/yr</td><td class="td-check">✓</td></tr>
+        <tr><td>Movement is like clouds passing</td><td>Whole landmasses drift together, smoothly</td><td class="td-check">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">"Moving like clouds" — a phrase no 7th-century observer could verify.</div>
+      <div class="gs">Clouds move because they ride an invisible current of air. Mountains move because they ride an invisible current of mantle material. The analogy is structurally accurate. No ancient geology text uses this comparison — because until the 1960s, no one knew mountains moved at all.</div>
+    </div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-mountains.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Mountains as Pegs
+      </a>
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ── CORE ENGINE ────────────────────────────────── */
+var stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · Moving Mountains',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initS1Canvas, 80);
+  if (n === 2) setTimeout(initS2Canvas, 80);
+  if (n === 4) {
+    saveProgress('moving-mountains');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 100, 1800);
+        animFrom(document.getElementById('mv1'), 0, 1400, 2100);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The verse uses جَامِدَة ("frozen") only to deny it — then confirms movement. This is the scientific structure of the claim.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Plate tectonics — confirmed in the 1960s — shows Earth\'s lithosphere is broken into 7–8 major plates that constantly drift, carrying mountains with them.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HELPERS ────────────────────────────────────── */
+function makeRng(seed) {
+  var s = seed;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+/* ── HERO CANVAS ────────────────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = 640, H = 130;
+  cv.width = W; cv.height = H;
+
+  var peaks = [
+    {cx:0.08, ht:0.46, hw:0.07},
+    {cx:0.22, ht:0.60, hw:0.10},
+    {cx:0.40, ht:0.72, hw:0.13},
+    {cx:0.57, ht:0.54, hw:0.09},
+    {cx:0.70, ht:0.63, hw:0.11},
+    {cx:0.85, ht:0.44, hw:0.08},
+    {cx:0.97, ht:0.36, hw:0.06}
+  ];
+  var surfY = H * 0.63;
+
+  // Cloud particles (faster than mountains)
+  var rng = makeRng(33);
+  var clouds = [];
+  for (var i = 0; i < 22; i++) {
+    clouds.push({
+      x: rng() * W,
+      y: H * 0.08 + rng() * H * 0.28,
+      sz: 1.6 + rng() * 2.8,
+      spd: 0.18 + rng() * 0.30,
+      ph: rng() * Math.PI * 2,
+      a: 0.12 + rng() * 0.16
+    });
+  }
+
+  var mDrift = 0;
+  var t = 0;
+
+  function drawPeak(ox, pk) {
+    var bx = pk.cx * W + ox;
+    var ty = surfY - pk.ht * (surfY - 14);
+    var lw = pk.hw * W;
+    ctx.beginPath();
+    ctx.moveTo(bx - lw, surfY);
+    ctx.lineTo(bx, ty);
+    ctx.lineTo(bx + lw, surfY);
+    ctx.closePath();
+    var mg = ctx.createLinearGradient(bx, ty, bx, surfY);
+    mg.addColorStop(0, 'rgba(168,162,158,0.20)');
+    mg.addColorStop(1, 'rgba(90,85,80,0.07)');
+    ctx.fillStyle = mg;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(168,162,158,0.24)';
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
+    // Snow cap
+    var snowH = (surfY - ty) * 0.18;
+    ctx.beginPath();
+    ctx.moveTo(bx - lw * 0.20, ty + snowH);
+    ctx.lineTo(bx, ty);
+    ctx.lineTo(bx + lw * 0.20, ty + snowH);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(214,208,202,0.32)';
+    ctx.fill();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    var bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#020608');
+    bg.addColorStop(1, '#060c10');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Tectonic plate boundary lines (subtle vertical dashes, drifting)
+    ctx.setLineDash([2, 6]);
+    for (var pi = 0; pi < 4; pi++) {
+      var px = (mDrift * 1.8 + pi * (W / 4)) % W;
+      ctx.beginPath();
+      ctx.moveTo(px, surfY * 0.25);
+      ctx.lineTo(px - 10, H);
+      ctx.strokeStyle = 'rgba(168,162,158,0.06)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Ground surface line
+    ctx.beginPath();
+    ctx.moveTo(0, surfY);
+    ctx.lineTo(W, surfY);
+    ctx.strokeStyle = 'rgba(168,162,158,0.13)';
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // Mountains — wrapped drift
+    mDrift = (mDrift + 0.16) % W;
+    ctx.save();
+    ctx.rect(0, 0, W, H);
+    ctx.clip();
+    for (var m = -1; m <= 1; m++) {
+      var ox = m * W + mDrift;
+      for (var pi2 = 0; pi2 < peaks.length; pi2++) {
+        drawPeak(ox, peaks[pi2]);
+      }
+    }
+    ctx.restore();
+
+    // Drift arrows (subtle, fade in and out)
+    [0.22, 0.52, 0.78].forEach(function(frac) {
+      var ax = (frac * W + mDrift * 0.5) % W;
+      var ay = surfY * 0.78;
+      var alpha = 0.06 + Math.sin(t * 0.4 + frac * 8) * 0.04;
+      ctx.beginPath();
+      ctx.moveTo(ax - 7, ay);
+      ctx.lineTo(ax + 7, ay);
+      ctx.lineTo(ax + 3, ay - 3);
+      ctx.moveTo(ax + 7, ay);
+      ctx.lineTo(ax + 3, ay + 3);
+      ctx.strokeStyle = 'rgba(168,162,158,' + alpha + ')';
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+    });
+
+    // Cloud particles
+    for (var ci = 0; ci < clouds.length; ci++) {
+      var c = clouds[ci];
+      c.x = (c.x + c.spd) % (W + 10);
+      var ca = c.a + Math.sin(t * 0.5 + c.ph) * 0.06;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.sz, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(214,208,202,' + ca + ')';
+      ctx.fill();
+    }
+
+    // Arabic label
+    ctx.font = 'bold 14px Amiri, serif';
+    ctx.fillStyle = 'rgba(214,208,202,0.28)';
+    ctx.textAlign = 'right';
+    ctx.fillText('وَهِيَ تَمُرُّ مَرَّ السَّحَابِ', W - 14, H - 11);
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ── S1 CANVAS — Two-panel comparison ──────────── */
+function initS1Canvas() {
+  var cv = document.getElementById('s1Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var startTs = null;
+  var LEFT_DUR = 680, RIGHT_START = 520, RIGHT_DUR = 680;
+  var TOTAL = RIGHT_START + RIGHT_DUR + 250;
+
+  function drawMtn(bx, sy, ht, hw, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(bx - hw, sy);
+    ctx.lineTo(bx, sy - ht);
+    ctx.lineTo(bx + hw, sy);
+    ctx.closePath();
+    var mg = ctx.createLinearGradient(bx, sy - ht, bx, sy);
+    mg.addColorStop(0, 'rgba(168,162,158,0.38)');
+    mg.addColorStop(1, 'rgba(100,95,90,0.10)');
+    ctx.fillStyle = mg;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(168,162,158,0.48)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // snow
+    var sn = (sy - (sy - ht)) * 0.18;
+    ctx.beginPath();
+    ctx.moveTo(bx - hw * 0.22, sy - ht + sn);
+    ctx.lineTo(bx, sy - ht);
+    ctx.lineTo(bx + hw * 0.22, sy - ht + sn);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(214,208,202,0.45)';
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawFrame(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+    var lA = Math.min(elapsed / LEFT_DUR, 1);
+    var rA = Math.max(0, Math.min((elapsed - RIGHT_START) / RIGHT_DUR, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#060c14';
+    ctx.fillRect(0, 0, W, H);
+
+    var gap = 12, pW = (W - gap * 3) / 2;
+    var surfY = H * 0.73;
+
+    // ── LEFT PANEL: "THE ASSUMPTION"
+    var lx = gap;
+    ctx.globalAlpha = lA;
+    ctx.fillStyle = '#0d1a28';
+    roundRect(ctx, lx, 8, pW, H - 16, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(248,113,113,0.22)'; ctx.lineWidth = 1;
+    roundRect(ctx, lx, 8, pW, H - 16, 10); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (lA > 0.05) {
+      var lCx = lx + pW * 0.5;
+      // Ground
+      ctx.globalAlpha = lA * 0.7;
+      ctx.beginPath(); ctx.moveTo(lx + 14, surfY); ctx.lineTo(lx + pW - 14, surfY);
+      ctx.strokeStyle = 'rgba(168,162,158,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
+      // Static mountain
+      drawMtn(lCx, surfY, 68, 44, lA);
+      // Lock anchors at base
+      [lCx - 28, lCx, lCx + 28].forEach(function(ax) {
+        ctx.globalAlpha = lA * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(ax - 5, surfY + 6); ctx.lineTo(ax, surfY); ctx.lineTo(ax + 5, surfY + 6);
+        ctx.strokeStyle = 'rgba(248,113,113,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+      });
+      // Labels
+      ctx.globalAlpha = lA * 0.85;
+      ctx.fillStyle = '#f87171';
+      ctx.font = '700 9px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('THE ASSUMPTION', lCx, 24);
+      ctx.fillStyle = 'rgba(248,113,113,0.65)';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.fillText('FIXED · IMMOVABLE', lCx, H - 18);
+      ctx.globalAlpha = 1;
+    }
+
+    // ── RIGHT PANEL: "QURAN 27:88"
+    var rx = gap * 2 + pW;
+    ctx.globalAlpha = rA;
+    ctx.fillStyle = '#0d1a28';
+    roundRect(ctx, rx, 8, pW, H - 16, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(168,162,158,0.26)'; ctx.lineWidth = 1;
+    roundRect(ctx, rx, 8, pW, H - 16, 10); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (rA > 0.05) {
+      var rCx = rx + pW * 0.5;
+      // Subtle oscillating drift
+      var dOff = Math.sin(ts * 0.0008) * 5;
+      // Ground
+      ctx.globalAlpha = rA * 0.7;
+      ctx.beginPath(); ctx.moveTo(rx + 14, surfY); ctx.lineTo(rx + pW - 14, surfY);
+      ctx.strokeStyle = 'rgba(168,162,158,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
+      // Mountain with drift offset
+      drawMtn(rCx + dOff, surfY, 68, 44, rA);
+      // Cloud dots above
+      for (var ci = 0; ci < 6; ci++) {
+        var cx2 = rx + pW * (0.12 + ci * 0.16) + dOff * 0.7;
+        var cy2 = H * 0.22 + (ci % 3) * 6;
+        ctx.globalAlpha = rA * 0.35;
+        ctx.beginPath();
+        ctx.arc(cx2, cy2, 2.2 + (ci % 3) * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(214,208,202,1)';
+        ctx.fill();
+      }
+      // Drift arrow
+      ctx.globalAlpha = rA * 0.75;
+      ctx.beginPath();
+      ctx.moveTo(rCx - 16 + dOff, surfY - 16);
+      ctx.lineTo(rCx + 16 + dOff, surfY - 16);
+      ctx.lineTo(rCx + 10 + dOff, surfY - 21);
+      ctx.moveTo(rCx + 16 + dOff, surfY - 16);
+      ctx.lineTo(rCx + 10 + dOff, surfY - 11);
+      ctx.strokeStyle = 'rgba(168,162,158,0.80)'; ctx.lineWidth = 1.5; ctx.stroke();
+      // Labels
+      ctx.globalAlpha = rA * 0.88;
+      ctx.fillStyle = 'rgba(214,208,202,0.85)';
+      ctx.font = '700 9px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('QURAN 27:88', rCx, 24);
+      ctx.fillStyle = 'rgba(168,162,158,0.75)';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.fillText('MOVES LIKE CLOUDS  ✓', rCx, H - 18);
+      ctx.globalAlpha = 1;
+    }
+
+    if (elapsed < TOTAL) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      document.getElementById('s1Mc').style.display = 'block';
+    }
+  }
+  requestAnimationFrame(drawFrame);
+}
+
+/* ── S2 CANVAS — Tectonic cross-section ─────────── */
+var s2Running = false;
+
+function drawS2Frame(ctx, W, H, dFrac, lblA) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+
+  var surfY = H * 0.28;
+  var midX = W * 0.5;
+  var lShift = ease(dFrac) * W * 0.048;
+
+  // Sky band
+  var sky = ctx.createLinearGradient(0, 0, 0, surfY);
+  sky.addColorStop(0, '#030608'); sky.addColorStop(1, '#07111c');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, surfY);
+
+  // Left plate
+  var lGrad = ctx.createLinearGradient(0, surfY, 0, H);
+  lGrad.addColorStop(0, '#18222f'); lGrad.addColorStop(1, '#0c141e');
+  ctx.fillStyle = lGrad;
+  ctx.fillRect(0, surfY, midX - lShift, H - surfY);
+
+  // Right plate
+  var rGrad = ctx.createLinearGradient(0, surfY, 0, H);
+  rGrad.addColorStop(0, '#1a2433'); rGrad.addColorStop(1, '#0e1620');
+  ctx.fillStyle = rGrad;
+  ctx.fillRect(midX + lShift, surfY, W - midX - lShift, H - surfY);
+
+  // Strata lines
+  [0.25, 0.50, 0.75].forEach(function(f) {
+    var sy = surfY + (H - surfY) * f;
+    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(midX - lShift, sy);
+    ctx.strokeStyle = 'rgba(168,162,158,0.055)'; ctx.lineWidth = 0.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(midX + lShift, sy); ctx.lineTo(W, sy);
+    ctx.stroke();
+  });
+
+  // Mantle heat glow
+  var mGrad = ctx.createLinearGradient(0, H * 0.65, 0, H);
+  mGrad.addColorStop(0, 'rgba(160,70,20,0)');
+  mGrad.addColorStop(1, 'rgba(160,70,20,0.10)');
+  ctx.fillStyle = mGrad; ctx.fillRect(0, H * 0.65, W, H * 0.35);
+
+  // Boundary glow
+  var boundA = 0.12 + ease(dFrac) * 0.28;
+  var bGrad = ctx.createLinearGradient(midX - 14, 0, midX + 14, 0);
+  bGrad.addColorStop(0, 'rgba(168,162,158,0)');
+  bGrad.addColorStop(0.5, 'rgba(168,162,158,' + boundA + ')');
+  bGrad.addColorStop(1, 'rgba(168,162,158,0)');
+  ctx.fillStyle = bGrad;
+  ctx.fillRect(midX - lShift - 8, surfY, lShift * 2 + 16, H - surfY);
+
+  // Surface line
+  ctx.beginPath(); ctx.moveTo(0, surfY); ctx.lineTo(W, surfY);
+  ctx.strokeStyle = 'rgba(168,162,158,0.28)'; ctx.lineWidth = 1; ctx.stroke();
+
+  // Mountains — left plate (move leftward), right plate (move rightward)
+  function drawMtn2(bx, ht, hw) {
+    ctx.beginPath();
+    ctx.moveTo(bx - hw, surfY); ctx.lineTo(bx, surfY - ht); ctx.lineTo(bx + hw, surfY);
+    ctx.closePath();
+    var mg = ctx.createLinearGradient(bx, surfY - ht, bx, surfY);
+    mg.addColorStop(0, 'rgba(200,195,188,0.38)'); mg.addColorStop(1, 'rgba(168,162,158,0.10)');
+    ctx.fillStyle = mg; ctx.fill();
+    ctx.strokeStyle = 'rgba(200,195,188,0.42)'; ctx.lineWidth = 0.8; ctx.stroke();
+  }
+
+  drawMtn2(W * 0.20 - lShift * 0.8, 44, 30);
+  drawMtn2(W * 0.37 - lShift * 0.5, 56, 38);
+  drawMtn2(W * 0.63 + lShift * 0.5, 50, 35);
+  drawMtn2(W * 0.80 + lShift * 0.8, 38, 26);
+
+  // Drift arrows (appear as animation progresses)
+  if (dFrac > 0.08) {
+    var arA = Math.min(ease(dFrac) * 1.1, 0.85);
+    ctx.globalAlpha = arA;
+    ctx.strokeStyle = 'rgba(168,162,158,0.65)'; ctx.lineWidth = 1.6;
+
+    // Left arrow → pointing left
+    var laX = midX * 0.44 - lShift * 0.3, laY = surfY + (H - surfY) * 0.48;
+    ctx.beginPath();
+    ctx.moveTo(laX + 22, laY); ctx.lineTo(laX - 22, laY);
+    ctx.lineTo(laX - 15, laY - 6); ctx.moveTo(laX - 22, laY); ctx.lineTo(laX - 15, laY + 6);
+    ctx.stroke();
+
+    // Right arrow → pointing right
+    var raX = midX + (W - midX) * 0.44 + lShift * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(raX - 22, laY); ctx.lineTo(raX + 22, laY);
+    ctx.lineTo(raX + 15, laY - 6); ctx.moveTo(raX + 22, laY); ctx.lineTo(raX + 15, laY + 6);
+    ctx.stroke();
+
+    // Plate labels
+    ctx.fillStyle = 'rgba(168,162,158,0.55)';
+    ctx.font = '600 9px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PLATE A', laX, laY + 20);
+    ctx.fillText('PLATE B', raX, laY + 20);
+    ctx.globalAlpha = 1;
+  }
+
+  // Text labels at end
+  if (lblA > 0) {
+    ctx.globalAlpha = lblA;
+    ctx.fillStyle = 'rgba(168,162,158,0.55)';
+    ctx.font = '600 9px DM Sans, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('SURFACE', 10, surfY - 6);
+    ctx.fillStyle = 'rgba(160,70,20,0.5)';
+    ctx.fillText('MANTLE', 10, H - 10);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  drawS2Frame(ctx, cv.width, cv.height, 0, 0);
+}
+
+function startTectonics() {
+  if (s2Running) return;
+  s2Running = true;
+  document.getElementById('s2Btn').disabled = true;
+
+  var cv = document.getElementById('s2Canvas');
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var DRIFT_MS = 2800, LABEL_MS = 600;
+  var startTs = null;
+  var countEl = document.getElementById('driftCount');
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+    var dFrac = Math.min(elapsed / DRIFT_MS, 1);
+    var lblA  = elapsed > DRIFT_MS ? Math.min((elapsed - DRIFT_MS) / LABEL_MS, 1) : 0;
+
+    drawS2Frame(ctx, W, H, dFrac, lblA);
+    countEl.textContent = Math.round(ease(dFrac) * 100);
+
+    if (elapsed < DRIFT_MS + LABEL_MS) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('s2PanelA').classList.add('lit');
+      document.getElementById('s2PanelB').classList.add('lit');
+      document.getElementById('s2Result').classList.add('show');
+      setTimeout(function() {
+        showOk('Up to 100 mm per year — the exact motion the Quran called "moving like clouds."', function() { go(3); });
+      }, 900);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

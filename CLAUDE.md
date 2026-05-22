@@ -165,6 +165,76 @@ BODY:
 
 ---
 
+## Exercise animation standards — REQUIRED for new pages
+
+**Do NOT use text-only MC questions for complex physics/science concepts.** At least one exercise stage (S1 or S2) must include a canvas animation or interactive mechanic that visually demonstrates the key concept before asking the MC question.
+
+### Rule
+- S1 can be: animated canvas + MC (canvas auto-starts on `go(1)`, MC appears after animation ends)
+- S2 is always: button-triggered interactive canvas → reveal → Continue button
+- S3 can be: pure MC (topic should be clear after S1+S2 established the concept)
+- MC questions must reference what was just demonstrated, not standalone trivia
+
+### Canvas init pattern (for exercise stages)
+```javascript
+// In go(n):
+if (n === 1) setTimeout(initExCanvas, 60);
+if (n === 2) setTimeout(initScanCanvas, 60);
+
+// Each init function draws an initial static frame and starts the RAF loop:
+function initExCanvas() {
+  var cv = document.getElementById('exCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var startTs = null, DURATION = 1600;
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / DURATION, 1);
+    drawExFrame(ctx, cv.width, cv.height, p);
+    if (p < 1) { requestAnimationFrame(tick); }
+    else { document.getElementById('exMc').style.display = 'block'; }
+  }
+  requestAnimationFrame(tick);
+}
+```
+
+### Proven exercise animation patterns (reuse or invent new ones):
+
+| Concept | Pattern | Example page |
+|---------|---------|-------------|
+| Time dilation | Two side-by-side clock canvases at different speeds; counters race | wormholes S1 |
+| Space shortcut | Bezier line folds into arc; distance counter drops to 0 | wormholes S2 |
+| Length contraction | Rectangle (camel) approaches narrow gap, bounces, compresses & passes | wormholes S3 |
+| Layer revelation | Seismic wave sweeps down a cross-section; target feature glows as wave hits it | internal-mountains S2 |
+| Before/After comparison | Split-panel canvas: left = old assumption, right = Quranic claim; panels fade in sequentially | internal-mountains S1 |
+| Pulsar knock rings | Expanding concentric circles from a point source on a canvas | pulsars-blackholes S2 |
+| Ratio bar chart | Colored proportion bars embedded in answer-card to show scale | age-of-universe S1 |
+
+### Canvas RNG pattern (deterministic star fields):
+```javascript
+function makeRng(seed) {
+  var s = seed;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+// Called INSIDE the draw function so every frame draws same stars at same positions.
+// E.g.: var rng = makeRng(77); for (var i=0; i<35; i++) { ... rng() ... }
+```
+
+### Exercise CSS tokens to reuse:
+```css
+/* Counter display */
+.ex-num { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent-light); line-height:1; }
+.ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:3px; }
+/* Result reveal panel */
+.ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+.ex-result.show { display:block; }
+/* Side-by-side panels */
+.ex-arena { display:flex; gap:16px; margin:20px 0; }
+.ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; }
+```
+
+---
+
 ## JS patterns — copy verbatim, never reinvent
 
 ### Core engine (never modify)
