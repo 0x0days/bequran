@@ -127,6 +127,70 @@
     .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-top: 4px; }
     .calc-btn.used { opacity: 0.5; pointer-events: none; }
 
+    /* ── INLINE VALIDATOR ─────────────────────────── */
+    .ve-panel{display:none;margin-top:14px;}
+    .ve-panel.open{display:block;animation:rise .3s ease;}
+    .ve-loading{display:flex;align-items:center;gap:10px;padding:20px;justify-content:center;background:var(--surface);border-radius:10px;font-size:13px;color:var(--muted);}
+    .ve-spinner{width:18px;height:18px;border-radius:50%;border:2px solid var(--surface2);border-top-color:var(--accent);animation:spin .8s linear infinite;flex-shrink:0;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .ve-embed{border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:500px;background:var(--bg);}
+    .ve-guide{flex-shrink:0;background:var(--surface2);border-bottom:1px solid var(--border);padding:10px 14px;}
+    .ve-guide-r1{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .ve-badge{font-family:'Amiri',serif;font-size:18px;font-weight:700;padding:2px 9px;border-radius:5px;direction:rtl;flex-shrink:0;line-height:1.5;}
+    .ve-badge.sea{background:rgba(14,165,233,0.14);border:1px solid rgba(14,165,233,0.32);color:#7dd3fc;}
+    .ve-badge.land{background:rgba(245,158,11,0.13);border:1px solid rgba(245,158,11,0.30);color:#fcd34d;}
+    .ve-badge.yabas{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.26);color:#86efac;}
+    .ve-ginfo{font-size:13px;color:var(--text);flex:1;line-height:1.35;}
+    .ve-gsub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .ve-pills{display:flex;gap:5px;flex-shrink:0;}
+    .ve-pill{font-size:10px;font-weight:700;padding:3px 7px;border-radius:100px;letter-spacing:.03em;}
+    .ve-pill.sea{background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.28);color:var(--accent-light);}
+    .ve-pill.land{background:rgba(245,158,11,0.11);border:1px solid rgba(245,158,11,0.26);color:#fcd34d;}
+    .ve-guide-r2{display:grid;grid-template-columns:1fr 1.4fr 1fr 1fr;gap:7px;}
+    .ve-btn{height:40px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+    .ve-btn.prev,.ve-btn.next,.ve-btn.skip{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+    .ve-btn.confirm{background:var(--ok);color:var(--ok-bg);font-weight:700;}
+    .ve-btn.confirm:disabled{opacity:.4;cursor:default;filter:none;}
+    .ve-btn:active{transform:scale(.96);}
+    .ve-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+    .ve-page{max-width:580px;margin:0 auto;padding:10px 15px 12px;}
+    .ve-nav{flex-shrink:0;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--surface);border-top:1px solid var(--border);}
+    .ve-nav-btn{height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .ve-pinfo{font-size:11px;color:var(--muted);}
+    /* verses */
+    .ve-shdr{text-align:center;padding:10px 0 7px;}
+    .ve-sorn{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+    .ve-sorl{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.18),transparent);}
+    .ve-sord{color:rgba(245,158,11,0.32);font-size:8px;}
+    .ve-sar{font-family:'Amiri',serif;direction:rtl;font-size:16px;color:rgba(245,158,11,0.70);}
+    .ve-sen{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+    .ve-v{display:flex;align-items:baseline;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+    .ve-v:last-child{border-bottom:none;}
+    .ve-vt{flex:1;font-family:'Amiri',serif;direction:rtl;text-align:right;font-size:clamp(15px,3.6vw,18px);line-height:2.1;color:var(--text);word-break:break-word;}
+    .ve-vn{font-family:'Amiri',serif;font-size:11px;color:var(--muted);flex-shrink:0;direction:rtl;opacity:.6;}
+    .ve-v.ve-tgt{background:rgba(14,165,233,0.06);border-radius:5px;padding:5px 7px;border-left:2px solid rgba(14,165,233,0.5);animation:vpbs 2s ease infinite;}
+    .ve-v.ve-tgt.lt{background:rgba(245,158,11,0.05);border-left-color:rgba(245,158,11,0.5);animation:vpbl 2s ease infinite;}
+    .ve-v.ve-tgt.yt{background:rgba(74,222,128,0.05);border-left-color:rgba(74,222,128,0.5);animation:vpby 2s ease infinite;}
+    @keyframes vpbs{0%,100%{border-left-color:rgba(14,165,233,0.28)}50%{border-left-color:rgba(14,165,233,0.90)}}
+    @keyframes vpbl{0%,100%{border-left-color:rgba(245,158,11,0.28)}50%{border-left-color:rgba(245,158,11,0.90)}}
+    @keyframes vpby{0%,100%{border-left-color:rgba(74,222,128,0.28)}50%{border-left-color:rgba(74,222,128,0.90)}}
+    .hl-sea{background:rgba(14,165,233,0.18);color:#7dd3fc;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(14,165,233,0.50);cursor:pointer;transition:background .12s;}
+    .hl-sea:hover{background:rgba(14,165,233,0.30);}
+    .hl-land{background:rgba(245,158,11,0.15);color:#fcd34d;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(245,158,11,0.45);cursor:pointer;transition:background .12s;}
+    .hl-land:hover{background:rgba(245,158,11,0.28);}
+    .hl-yabas{background:rgba(74,222,128,0.13);color:#86efac;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(74,222,128,0.40);cursor:pointer;}
+    .hl-confirmed{opacity:.42;}
+    .hl-sea.hl-confirmed::after,.hl-land.hl-confirmed::after,.hl-yabas.hl-confirmed::after{content:' ✓';font-size:9px;color:var(--ok);font-family:'DM Sans',sans-serif;}
+    /* done */
+    .ve-done{display:none;flex-direction:column;align-items:center;padding:22px 14px;gap:11px;text-align:center;}
+    .ve-done.vis{display:flex;}
+    .ve-done-box{background:var(--surface);border:1px solid rgba(14,165,233,0.26);border-radius:10px;padding:16px;width:100%;max-width:300px;}
+    /* light mode */
+    html[data-theme="light"] .ve-vt{color:#1c2b3a;}
+    html[data-theme="light"] .hl-sea{background:rgba(14,165,233,0.13);color:#0369a1;border-bottom-color:#0ea5e9;}
+    html[data-theme="light"] .hl-land{background:rgba(245,158,11,0.12);color:#92400e;border-bottom-color:#f59e0b;}
+    html[data-theme="light"] .ve-sar{color:#92400e;}
+
     .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
     .xp-badge.show { opacity: 1; transform: none; }
     .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
@@ -379,13 +443,63 @@
       </div>
     </div>
 
-    <div style="background:var(--surface);border:1px solid var(--accent-ring);border-radius:14px;padding:22px;margin:24px 0;text-align:center;">
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-light);margin-bottom:10px;font-weight:600;">Want to verify it yourself?</div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:16px;">Open the complete Quran and count every occurrence of البحر (sea) and البر (land) with your own eyes. Each word is highlighted. You guide the navigation.</p>
-      <a href="quran-sea-land-validator.html" class="btn" style="background:var(--accent);color:#fff;font-size:14px;padding:11px 24px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Count It Yourself in the Full Quran
-      </a>
+    <div class="enhanced-section" style="margin-top:0;border-top:1px solid var(--border);padding-top:22px;">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Validate it yourself</h4>
+          <p>Open the full Quran — count البحر and البر with your own eyes</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="vswitch" onchange="toggleValidator(this.checked)">
+          <div class="track"></div>
+          <div class="thumb"></div>
+        </label>
+      </div>
+      <div class="ve-panel" id="vePanel">
+        <!-- Loading -->
+        <div class="ve-loading" id="veLoading">
+          <div class="ve-spinner"></div>Loading Quran text…
+        </div>
+        <!-- Embedded validator card -->
+        <div class="ve-embed" id="veEmbed" style="display:none">
+          <div class="ve-guide">
+            <div class="ve-guide-r1">
+              <span class="ve-badge sea" id="veBadge">البحر</span>
+              <div style="flex:1">
+                <div class="ve-ginfo" id="veInfo">Sea word 1 of 32</div>
+                <div class="ve-gsub" id="veSub">Tap the blue word to confirm</div>
+              </div>
+              <div class="ve-pills">
+                <span class="ve-pill sea" id="veSeaP">0/32</span>
+                <span class="ve-pill land" id="veLandP">0/12</span>
+              </div>
+            </div>
+            <div class="ve-guide-r2">
+              <button class="ve-btn prev" onclick="vePrev()" id="veBP" disabled>← Prev</button>
+              <button class="ve-btn confirm" onclick="veConfirm()" id="veBC">✓ Confirm</button>
+              <button class="ve-btn skip" onclick="veSkip()">Skip</button>
+              <button class="ve-btn next" onclick="veNext()">Next →</button>
+            </div>
+          </div>
+          <div class="ve-content" id="veContent">
+            <div class="ve-page" id="vePage"></div>
+            <div class="ve-done" id="veDone">
+              <div style="font-size:28px;color:#fcd34d">✦</div>
+              <div style="font-family:'Playfair Display',serif;color:#fcd34d;font-size:20px">Verified!</div>
+              <div class="ve-done-box">
+                <div id="veDoneEq" style="font-size:22px;font-weight:700;color:var(--accent-light);margin-bottom:6px">32÷44=72.7%</div>
+                <div id="veDoneSub" style="font-size:12px;color:var(--muted);line-height:1.7"></div>
+              </div>
+              <div style="font-size:13px;color:var(--ok);font-weight:600">You counted it yourself.</div>
+            </div>
+          </div>
+          <div class="ve-nav">
+            <button class="ve-nav-btn" onclick="vePrevPage()">← Prev</button>
+            <span class="ve-pinfo" id="vePInfo">—</span>
+            <button class="ve-nav-btn" onclick="veNextPage()">Next →</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <a href="quran-chromosomes.html" class="btn" style="background:var(--accent);color:#fff">Next · Chromosomes &amp; The Bee →</a>
@@ -552,6 +666,198 @@ function animGlobes() {
 
 function toggleEnhanced(on) {
   document.getElementById('epanel').classList.toggle('open', on);
+  /* update validator if it is open */
+  ve_useEnhanced = on;
+  if (ve_loaded && document.getElementById('vePanel').classList.contains('open')) {
+    veBuildComb(); ve_gIdx=0; ve_conf={};
+    veUpdProg(); veGoTo(0);
+    document.getElementById('veDone').classList.remove('vis');
+    document.getElementById('vePage').style.display='';
+  }
+}
+
+function toggleValidator(on) {
+  var panel = document.getElementById('vePanel');
+  panel.classList.toggle('open', on);
+  if (on && !ve_loaded) veLoad();
+}
+
+/* ── INLINE VALIDATOR ─────────────────────────────────────── */
+var ve_VPP=15, ve_allV=[], ve_curP=0, ve_totP=0, ve_gIdx=0, ve_conf={};
+var ve_comb=[], ve_loaded=false, ve_useEnhanced=false;
+var VE_SEA=[[2,50],[2,164],[5,96],[6,59],[6,63],[6,97],[7,138],[7,163],[10,22],[10,90],[14,32],[16,14],[17,66],[17,67],[17,70],[18,61],[18,63],[18,79],[18,109],[20,77],[22,65],[26,63],[27,63],[30,41],[31,27],[31,31],[35,12],[42,32],[44,24],[45,12],[52,6],[55,24]];
+var VE_LAND=[[5,96],[6,59],[6,63],[6,97],[10,22],[17,67],[17,68],[17,70],[27,63],[29,65],[30,41],[31,32]];
+var VE_YABAS=[[20,77]];
+var VE_SN={1:"Al-Fatihah",2:"Al-Baqarah",3:"Ali 'Imran",4:"An-Nisa",5:"Al-Ma'idah",6:"Al-An'am",7:"Al-A'raf",8:"Al-Anfal",9:"At-Tawbah",10:"Yunus",11:"Hud",12:"Yusuf",13:"Ar-Ra'd",14:"Ibrahim",15:"Al-Hijr",16:"An-Nahl",17:"Al-Isra",18:"Al-Kahf",19:"Maryam",20:"Ta-Ha",21:"Al-Anbiya",22:"Al-Hajj",23:"Al-Mu'minun",24:"An-Nur",25:"Al-Furqan",26:"Ash-Shu'ara",27:"An-Naml",28:"Al-Qasas",29:"Al-'Ankabut",30:"Ar-Rum",31:"Luqman",32:"As-Sajdah",35:"Fatir",42:"Ash-Shura",44:"Ad-Dukhan",45:"Al-Jathiyah",52:"At-Tur",55:"Ar-Rahman"};
+
+function veBuildComb(){
+  ve_comb=VE_SEA.map(function(x){return{s:x[0],a:x[1],t:'sea'};})
+    .concat(VE_LAND.map(function(x){return{s:x[0],a:x[1],t:'land'};}));
+  if(ve_useEnhanced) ve_comb=ve_comb.concat(VE_YABAS.map(function(x){return{s:x[0],a:x[1],t:'yabas'};}));
+  ve_comb.sort(function(a,b){return a.s!==b.s?a.s-b.s:a.a-b.a;});
+}
+function veNorm(t){return t.replace(/[ً-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]/g,'').replace(/[ٱأإآ]/g,'ا');}
+function veAr(n){return String(n).replace(/[0-9]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[+d];});}
+function veEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function veIsSea(s,a){return VE_SEA.some(function(x){return x[0]===s&&x[1]===a;});}
+function veIsLand(s,a){return VE_LAND.some(function(x){return x[0]===s&&x[1]===a;});}
+function veIsYabas(s,a){return ve_useEnhanced&&VE_YABAS.some(function(x){return x[0]===s&&x[1]===a;});}
+function veVIdx(s,a){for(var i=0;i<ve_allV.length;i++)if(ve_allV[i].s===s&&ve_allV[i].a===a)return i;return 0;}
+function veCCnt(t){var n=0;for(var k in ve_conf)if(ve_conf[k]&&k.split(':')[2]===t)n++;return n;}
+
+function veHlV(text,s,a){
+  var hs=veIsSea(s,a),hl=veIsLand(s,a),hy=veIsYabas(s,a);
+  if(!hs&&!hl&&!hy)return veEsc(text);
+  var sk=s+':'+a+':sea',lk=s+':'+a+':land',yk=s+':'+a+':yabas';
+  return text.split(' ').map(function(w){
+    var wn=veNorm(w);
+    if(hs&&wn.indexOf('البحر')!==-1&&wn.indexOf('البحرين')===-1&&wn.length<=14)
+      return '<span class="hl-sea'+(ve_conf[sk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="sea" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    if(hl&&['البر','بالبر','والبر','فالبر'].indexOf(wn)!==-1)
+      return '<span class="hl-land'+(ve_conf[lk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="land" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    if(hy&&wn.indexOf('يبس')!==-1)
+      return '<span class="hl-yabas'+(ve_conf[yk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="yabas" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    return veEsc(w);
+  }).join(' ');
+}
+
+function veRenderP(pn,dir){
+  var pg=document.getElementById('vePage');
+  var start=pn*ve_VPP,end=Math.min(start+ve_VPP,ve_allV.length);
+  var tgt=ve_comb[ve_gIdx]||null;
+  var prevS=-1,html='';
+  for(var i=start;i<end;i++){
+    var v=ve_allV[i];
+    if(v.s!==prevS){
+      var name=VE_SN[v.s]||('Surah '+v.s);
+      html+='<div class="ve-shdr"><div class="ve-sorn"><div class="ve-sorl"></div><div class="ve-sord">✦</div><div class="ve-sorl"></div></div><div class="ve-sar">'+veEsc(name)+'</div><div class="ve-sen">Surah '+v.s+'</div></div>';
+      prevS=v.s;
+    }
+    var isT=tgt&&tgt.s===v.s&&tgt.a===v.a;
+    var tc=isT?('ve-tgt'+(tgt.t==='land'?' lt':tgt.t==='yabas'?' yt':'')):'';
+    html+='<div class="ve-v '+tc+'" id="vev-'+v.s+'-'+v.a+'"><div class="ve-vt">'+veHlV(v.text,v.s,v.a)+'</div><div class="ve-vn">﴿'+veAr(v.a)+'﴾</div></div>';
+  }
+  if(dir){
+    pg.style.transition='transform .18s ease,opacity .18s ease';
+    pg.style.transform=dir==='f'?'translateX(-14px)':'translateX(14px)';
+    pg.style.opacity='0';
+    var _pn=pn;
+    setTimeout(function(){
+      pg.innerHTML=html;ve_curP=_pn;
+      pg.style.transition='none';pg.style.transform='none';pg.style.opacity='1';
+      document.getElementById('vePInfo').textContent='Page '+(ve_curP+1)+' / '+ve_totP;
+      veScrollTgt();
+    },185);
+  } else {
+    pg.style.transition='';pg.style.transform='';pg.style.opacity='1';
+    pg.innerHTML=html;ve_curP=pn;
+    document.getElementById('vePInfo').textContent='Page '+(ve_curP+1)+' / '+ve_totP;
+    veScrollTgt();
+  }
+}
+function veScrollTgt(){
+  var t=ve_comb[ve_gIdx];if(!t)return;
+  var el=document.getElementById('vev-'+t.s+'-'+t.a);
+  if(el)setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'});},80);
+}
+function veUpdGuide(){
+  if(ve_gIdx>=ve_comb.length){veCheckDone();return;}
+  var o=ve_comb[ve_gIdx];
+  var badge=document.getElementById('veBadge');
+  badge.textContent=o.t==='sea'?'البحر':o.t==='land'?'البر':'يَبَسًا';
+  badge.className='ve-badge '+o.t;
+  var n=ve_comb.slice(0,ve_gIdx+1).filter(function(x){return x.t===o.t;}).length;
+  var tot=o.t==='sea'?VE_SEA.length:(o.t==='land'?VE_LAND.length:VE_YABAS.length);
+  var name=VE_SN[o.s]||('Surah '+o.s);
+  document.getElementById('veInfo').textContent=(o.t==='sea'?'Sea':o.t==='land'?'Land':'Dry land')+' word '+n+' of '+tot+' · '+name+' · '+o.s+':'+o.a;
+  document.getElementById('veSub').textContent='Find the '+(o.t==='sea'?'blue':o.t==='land'?'gold':'green')+' word and tap Confirm';
+  document.getElementById('veBP').disabled=ve_gIdx===0;
+  document.getElementById('veBC').disabled=!!(ve_conf[o.s+':'+o.a+':'+o.t]);
+}
+function veUpdProg(){
+  var sc=veCCnt('sea'),lc=veCCnt('land');
+  var sl=VE_SEA.length,ll=VE_LAND.length;
+  document.getElementById('veSeaP').textContent=sc+'/'+sl;
+  document.getElementById('veLandP').textContent=lc+'/'+ll;
+}
+function veGoTo(idx){
+  if(idx<0||idx>=ve_comb.length)return;
+  ve_gIdx=idx;
+  var o=ve_comb[idx];
+  var vi=veVIdx(o.s,o.a);
+  var tp=Math.floor(vi/ve_VPP);
+  var dir=tp>ve_curP?'f':(tp<ve_curP?'b':null);
+  if(tp!==ve_curP)veRenderP(tp,dir); else veRenderP(ve_curP,null);
+  veUpdGuide();
+}
+function veNext(){if(ve_gIdx<ve_comb.length-1)veGoTo(ve_gIdx+1);}
+function vePrev(){if(ve_gIdx>0)veGoTo(ve_gIdx-1);}
+function veSkip(){veNext();}
+function veConfirm(){
+  if(ve_gIdx>=ve_comb.length)return;
+  var o=ve_comb[ve_gIdx],k=o.s+':'+o.a+':'+o.t;
+  if(ve_conf[k])return;
+  ve_conf[k]=true;veUpdProg();veRenderP(ve_curP,null);
+  if(ve_gIdx<ve_comb.length-1)setTimeout(function(){veGoTo(ve_gIdx+1);},110);
+  else veCheckDone();
+}
+function veClickW(el){
+  var s=+el.dataset.s,a=+el.dataset.a,t=el.dataset.t;
+  var o=ve_comb[ve_gIdx];
+  if(o&&o.s===s&&o.a===a&&o.t===t)veConfirm();
+}
+function vePrevPage(){if(ve_curP>0)veRenderP(ve_curP-1,'b');}
+function veNextPage(){if(ve_curP<ve_totP-1)veRenderP(ve_curP+1,'f');}
+function veCheckDone(){
+  var sc=veCCnt('sea'),lc=veCCnt('land'),yc=veCCnt('yabas');
+  var need=VE_SEA.length+VE_LAND.length+(ve_useEnhanced?VE_YABAS.length:0);
+  if(sc+lc+yc<need)return;
+  var tot=sc+lc+yc,rat=(sc/tot*100).toFixed(1);
+  document.getElementById('veDoneEq').textContent=sc+' ÷ '+tot+' = '+rat+'%';
+  var sub='البحر (sea): '+sc+' · البر (land): '+lc;
+  if(ve_useEnhanced)sub+='\nيَبَسًا (dry land): '+yc;
+  sub+='\nEarth ocean coverage: 71%';
+  document.getElementById('veDoneSub').textContent=sub;
+  document.getElementById('vePage').style.display='none';
+  document.getElementById('veDone').classList.add('vis');
+}
+function veLoad(){
+  var loading=document.getElementById('veLoading');
+  var embed=document.getElementById('veEmbed');
+  loading.style.display='flex'; embed.style.display='none';
+  ve_useEnhanced=document.getElementById('eswitch').checked;
+  /* use cached data if already fetched */
+  if(window._veQData){
+    ve_allV=window._veQData;
+    veInit(); return;
+  }
+  fetch('book/quran-uthmani.txt')
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(function(txt){
+      var vv=[];
+      txt.split('\n').forEach(function(ln){
+        ln=ln.trim();if(!ln)return;
+        var p=ln.split('|');if(p.length<3)return;
+        vv.push({s:+p[0],a:+p[1],text:p.slice(2).join('|')});
+      });
+      window._veQData=vv; ve_allV=vv; veInit();
+    })
+    .catch(function(e){
+      loading.innerHTML='<span style="color:#f87171">Could not load: '+e.message+'</span>';
+    });
+}
+function veInit(){
+  ve_loaded=true; ve_gIdx=0; ve_conf={};
+  ve_totP=Math.ceil(ve_allV.length/ve_VPP);
+  veBuildComb();
+  document.getElementById('veLoading').style.display='none';
+  document.getElementById('veEmbed').style.display='flex';
+  document.getElementById('veDone').classList.remove('vis');
+  document.getElementById('vePage').style.display='';
+  var f=ve_comb[0];
+  ve_curP=Math.floor(veVIdx(f.s,f.a)/ve_VPP);
+  veRenderP(ve_curP,null);
+  veUpdGuide(); veUpdProg();
 }
 
 function initHeroCanvas() {
