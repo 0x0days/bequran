@@ -328,6 +328,8 @@
       <div class="gs">The verse could have said "drinking of the thirsty" and still been technically correct. Instead it specified camels — the one animal whose drinking speed is extraordinary. That specificity has only one explanation: the author already knew the fact. No one in the 7th century had the equipment or methods to measure comparative drinking rates across species.</div>
     </div>
 
+    <div id="qv-camel"></div>
+
     <div class="nav-next-wrap">
       <a href="index.html" class="btn btn-outline">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -1035,5 +1037,17 @@ function startDrinking() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 56:54-55 — الهِيمِ (thirsty camels). Camels drink 200L in 3 minutes — fastest of any mammal. */
+QuranValidator.attach('qv-camel',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 56:54–55 — "drinking the drink of الهِيمِ (thirsty camels)." Fastest drinkers on Earth — confirmed by science.',
+  groups:[
+    {id:'camel', label:'Thirsty camels (al-haym)', arabic:'الْهِيمِ', color:'#fdba74', occurrences:[[56,54],[56,55]]}
+  ]
+});
+</script>
 </body>
 </html>

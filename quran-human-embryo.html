@@ -429,6 +429,8 @@
       <div class="gs">No microscope. No laboratory. No scientific tradition of embryology anywhere in 7th-century Arabia. The Quran's two-word description outperforms the entire ancient world's understanding of embryonic development by over a millennium.</div>
     </div>
 
+    <div id="qv-embryo"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-pulsar-navigation.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Pulsar Navigation</a>
       <a href="quran-red-giant.html" class="btn" style="background:var(--accent);color:#fff">Next &middot; Sun Swallows Earth &rarr;</a>
@@ -881,5 +883,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Both embryo words appear in 23:14. Navigate there and read them yourself. */
+QuranValidator.attach('qv-embryo',{
+  mode:'locate',
+  title:'Read the verse yourself',
+  subtitle:'Find 23:14 — the verse describing the embryo as a leech (عَلَقَة) then a chewed lump (مُضْغَة)',
+  groups:[
+    {id:'alaqa', label:'Leech stage',       arabic:'عَلَقَة', color:'#fdba74', occurrences:[[23,14]]},
+    {id:'mudgha',label:'Chewed-lump stage', arabic:'مُضْغَة', color:'#7dd3fc', occurrences:[[23,14]]}
+  ]
+});
+</script>
 </body>
 </html>

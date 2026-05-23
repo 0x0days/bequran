@@ -348,6 +348,8 @@
       <div class="gs">A tent peg is mostly underground. A mountain's root can be 28 times deeper than its visible height. No ancient geographer, cartographer, or natural philosopher described mountains this way — because they had no way to know.</div>
     </div>
 
+    <div id="qv-mountains-pegs"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <a href="quran-dead-sea.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Dead Sea</a>
       <a href="quran-moving-mountains.html" class="btn" style="background:var(--accent);color:#040810">Next · Moving Mountains →</a>
@@ -980,5 +982,17 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 78:6-7 — أَوْتَادًا (pegs/stakes). Mountains as geological anchors confirmed by plate tectonics. */
+QuranValidator.attach('qv-mountains-pegs',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 78:6–7 — "the mountains as pegs (أَوْتَادًا)." Geology confirmed mountains have deep roots like pegs.',
+  groups:[
+    {id:'pegs', label:'Mountains as pegs', arabic:'أَوْتَادًا', color:'#34d399', occurrences:[[78,6],[78,7]]}
+  ]
+});
+</script>
 </body>
 </html>

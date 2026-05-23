@@ -281,6 +281,8 @@
       The Quran used the word <em style="color:var(--accent)">الأوتاد</em> (autad = stakes) for Pharaoh — not cross, not wood, specifically <strong>stakes</strong>. This archaeological precision, written by an illiterate man in 7th-century Arabia, could not have been guessed.
     </div>
 
+    <div id="qv-crucifixion"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-haman.html" class="btn btn-primary">
         Next: Haman in Egypt
@@ -529,5 +531,18 @@ function pickEx3(el,correct){
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 89:10–12 — "Pharaoh of the Stakes (الأوتاد)." Papyrus Boulaq 18 confirmed
+   Egyptian stake-impalement ~1800 BC — predating Rome by 1,500 years. */
+QuranValidator.attach('qv-crucifixion',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 89:10–12 — "Pharaoh of the Stakes (الأوتاد)." Egyptologists confirmed stake-impalement in ancient Egypt.',
+  groups:[
+    {id:'stakes', label:'Pharaoh of the Stakes', arabic:'الْأَوْتَادِ', color:'#fb923c', occurrences:[[89,10],[89,11],[89,12]]}
+  ]
+});
+</script>
 </body>
 </html>

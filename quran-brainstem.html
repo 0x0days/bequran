@@ -260,6 +260,8 @@
       A 7th-century man in Arabia, with no knowledge of neuroscience, wrote a verse that <em style="color:var(--accent)">precisely describes the brainstem</em>: one organ that controls the cycle of sleep, and whose cessation is death itself.
     </div>
 
+    <div id="qv-brainstem"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-inner-ear.html" class="btn btn-primary">
         Next: Inner Ear
@@ -684,5 +686,19 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* 39:42 — Allah takes souls at death AND during sleep. Same organ (brainstem) governs both.
+   Also 6:60 — "He takes you by night (sleep)" — same sleep/death equivalence.
+   All three are the same claim: the brainstem is the seat of both sleep and death. */
+QuranValidator.attach('qv-brainstem',{
+  mode:'locate',
+  title:'Read the verses yourself',
+  subtitle:'39:42 links sleep and death as one event. 6:60 repeats it. The brainstem governs both — confirmed by modern neuroscience.',
+  groups:[
+    {id:'death-sleep', label:'Sleep and death — one event', arabic:'يَتَوَفَّى', color:'#22d3ee', occurrences:[[39,42],[6,60]]}
+  ]
+});
+</script>
 </body>
 </html>

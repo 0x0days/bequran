@@ -411,6 +411,8 @@
       <strong>The verse does not only describe lightning striking — it continues with a description of God's mercy.</strong> The boy survived. The full verse 13:13 ends: "Yet they dispute about God — and He is tremendous in might."
     </div>
 
+    <div id="qv-lightning"></div>
+
     <a href="quran-angels-devils.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Angels &amp; Devils</a>
     <a href="quran-calendar-cycles.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Calendar Cycles →</a>
   </div>
@@ -615,5 +617,21 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate mode — navigate to 13:13 and read the thunder/lightning verse yourself */
+QuranValidator.attach('qv-lightning',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Navigate to verse 13:13 — the verse about thunderbolts striking whom Allah wills',
+  groups:[
+    {
+      id:'thunder', label:'Thunderbolts', arabic:'الصَّوَاعِقَ',
+      color:'#38bdf8',
+      occurrences:[[13,13]]
+    }
+  ]
+});
+</script>
 </body>
 </html>

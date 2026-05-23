@@ -479,6 +479,8 @@
       <div class="gs">Carbon's atomic number was established by Moseley in 1913. C-12 was defined in the 20th century. The Quran's creation vocabulary was fixed in the 7th century. The numbers are exact. The gap is 1,300 years.</div>
     </div>
 
+    <div id="qv-carbon"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-moon-landing.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Moon Landing</a>
       <a href="quran-wind-atmosphere.html" class="btn" style="background:var(--accent-light);color:#fff">Next &middot; Wind &amp; Atmosphere &rarr;</a>
@@ -638,5 +640,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* طين (clay) appears exactly 12 times = Carbon-12 mass number */
+var CLAY_LIST=[[3,49],[5,110],[6,2],[7,12],[17,61],[23,12],[28,38],[32,7],[37,11],[38,71],[38,76],[51,33]];
+QuranValidator.attach('qv-carbon',{
+  mode:'count',
+  title:'Validate it yourself',
+  subtitle:'Count every طين (clay) in the Quran — the answer is 12, matching Carbon-12',
+  groups:[
+    {id:'clay', label:'Clay', arabic:'طين', color:'#86efac', occurrences:CLAY_LIST}
+  ]
+});
+</script>
 </body>
 </html>

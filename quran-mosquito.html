@@ -310,6 +310,8 @@
       <div class="gs">The specific convergence of using a feminine noun paired with a precise spatial modifier (*above it*) mirrors the real-world behavioral profile of *Culicoides anophelis*. This level of micro-biological insight stands as a striking indicator of the text's profound precision.</div>
     </div>
 
+    <div id="qv-mosquito"></div>
+
     <div class="nav-next-wrap">
       <a href="index.html" class="btn btn-outline">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -736,5 +738,18 @@ function startMidgeSim() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 2:26 — بَعُوضَةً (feminine mosquito) فَمَا فَوْقَهَا (and what is above it).
+   Female mosquitoes carry parasites that live on top of them — confirmed by modern biology. */
+QuranValidator.attach('qv-mosquito',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 2:26 — بَعُوضَةً (female mosquito) "and what is above it." Scientists found midges that live on top of female mosquitoes.',
+  groups:[
+    {id:'mosquito', label:'Female mosquito — and what rides it', arabic:'بَعُوضَةً', color:'#86efac', occurrences:[[2,26]]}
+  ]
+});
+</script>
 </body>
 </html>

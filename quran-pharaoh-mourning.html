@@ -260,6 +260,8 @@
       The Quran not only knew about this Egyptian belief — it specifically addressed and negated it. 1,200 years before any human could verify the belief existed.
     </div>
 
+    <div id="qv-mourning"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-reading.html" class="btn btn-primary">
         Next: Reading
@@ -623,5 +625,19 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 44:29 — "Neither heaven nor earth wept over them."
+   This negates a specific Egyptian belief sealed in unreadable hieroglyphs
+   until 1822 — 1,200 years after the Quran. */
+QuranValidator.attach('qv-mourning',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 44:29 — "Neither heaven nor earth wept over them." This negates Egyptian pyramid texts that were unreadable until 1822.',
+  groups:[
+    {id:'sky', label:'Sky did not weep — negating Egyptian belief', arabic:'السَّمَاءُ', color:'#bae6fd', occurrences:[[44,29]]}
+  ]
+});
+</script>
 </body>
 </html>

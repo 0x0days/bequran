@@ -317,6 +317,8 @@
       <div class="gs">The choice of a crow as a teacher of mortality matches their true cognitive profile. Corvids are among the only non-human species capable of organized death vigils and collective threat learning, making this precise choice impossible to attribute to mere 7th-century coincidence.</div>
     </div>
 
+    <div id="qv-crow"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-pharaoh-mummy.html" class="btn btn-primary">
         Next: Pharaoh's Mummy
@@ -734,5 +736,18 @@ function startVigilSim() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 5:31 — a crow digging the earth to show how to bury a body.
+   Confirmed 2015: crows hold structured death vigils to learn from their dead. */
+QuranValidator.attach('qv-crow',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 5:31 — a crow shows Cain how to bury. Science confirmed crows hold structured "funerals" (Animal Behaviour, 2015).',
+  groups:[
+    {id:'crow', label:'The crow teaches burial', arabic:'غُرَابًا', color:'#94a3b8', occurrences:[[5,31]]}
+  ]
+});
+</script>
 </body>
 </html>

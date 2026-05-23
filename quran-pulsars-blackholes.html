@@ -384,6 +384,8 @@
       <div class="gs">Pulsars were first detected in 1967 by Jocelyn Bell Burnell. Black holes were theorized in 1915 and confirmed in the 20th century. No human in 7th-century Arabia had any basis for describing a star that knocks rhythmically and also makes a hole in space — yet the Quran described both in the same breath.</div>
     </div>
 
+    <div id="qv-pulsars"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-wormholes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Wormholes</a>
       <a href="quran-age-of-universe.html" class="btn" style="background:var(--accent);color:#040810">Next &middot; Age of Universe &rarr;</a>
@@ -699,5 +701,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 86:1–3 — الطَّارِقُ (the Knocker) and النَّجْمُ الثَّاقِبُ (the piercing star).
+   Pulsars were discovered in 1967. These words are from 610 CE. */
+QuranValidator.attach('qv-pulsars',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 86:1–3 — "The Knocker… the piercing star." Pulsars were discovered 1,357 years later.',
+  groups:[
+    {id:'tariq', label:'The Knocker (pulsar)',       arabic:'الطَّارِقُ',  color:'#a78bfa', occurrences:[[86,1],[86,2],[86,3]]},
+    {id:'thaqib',label:'The Piercing Star (black hole)', arabic:'الثَّاقِبُ', color:'#38bdf8', occurrences:[[86,3]]}
+  ]
+});
+</script>
 </body>
 </html>

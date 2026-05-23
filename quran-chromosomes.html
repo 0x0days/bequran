@@ -266,6 +266,8 @@
       </a>
     </div>
 
+    <div id="qv-chromosomes-bee"></div>
+
     <a href="quran-sea-land.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sea &amp; Land</a>
   </div>
 
@@ -679,5 +681,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* النحل (the bee) appears exactly once in the Quran — at 16:68.
+   The chapter IS numbered 16 = drone chromosomes.
+   Navigate there and read it yourself. */
+QuranValidator.attach('qv-chromosomes-bee',{
+  mode:'locate',
+  title:'Find it yourself in the Quran',
+  subtitle:'The word النحل (the bee) appears once — in Surah 16, verse 68. Surah 16 = drone bee chromosomes.',
+  groups:[
+    {id:'bee', label:'The Bee', arabic:'النحل', color:'#fbbf24', occurrences:[[16,68],[16,69]]}
+  ]
+});
+</script>
 </body>
 </html>

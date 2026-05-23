@@ -348,6 +348,8 @@
       <div class="gs">The battle near the Dead Sea occurred in a region that was simultaneously the nearest Roman-adjacent territory and Earth's lowest land point at 430 metres below sea level. Confirming this required instrumentation that did not exist until the 20th century.</div>
     </div>
 
+    <div id="qv-dead-sea"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <a href="quran-iron.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Iron</a>
       <a href="quran-mountains.html" class="btn" style="background:var(--accent);color:#0b1622">Next · Mountains as Pegs →</a>
@@ -965,5 +967,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 30:2-3 — أَدْنَى means both "nearest" AND "lowest."
+   The Dead Sea shore is Earth's lowest point at −430 m. Confirmed by satellite in the 20th century. */
+QuranValidator.attach('qv-dead-sea',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 30:2–3 — أَدْنَى means "nearest" and "lowest." The battle site is Earth\'s lowest land at −430m.',
+  groups:[
+    {id:'adna', label:'Lowest / nearest land', arabic:'أَدْنَى', color:'#0ea5e9', occurrences:[[30,2],[30,3]]}
+  ]
+});
+</script>
 </body>
 </html>

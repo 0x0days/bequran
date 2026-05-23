@@ -328,6 +328,8 @@
       <div class="gs">A single letter — تْ — carries the entire scientific claim. Without it, the verse would say "the spider built" with no gender specified, and the precision would be lost. With it, the verse states that the female builds the web — a fact no one in the 7th century had any method to verify. No ancient text mentions this distinction. Only the Quran does.</div>
     </div>
 
+    <div id="qv-spider"></div>
+
     <div class="nav-next-wrap">
       <a href="index.html" class="btn btn-outline">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -982,5 +984,17 @@ function startFragility() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 29:41 — اتَّخَذَتْ (she built — feminine verb). Only female spiders spin webs. */
+QuranValidator.attach('qv-spider',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 29:41 — اتَّخَذَتْ "SHE built a house." The feminine تْ ending means the web-builder is female — confirmed by zoology.',
+  groups:[
+    {id:'spider', label:'She builds (female verb)', arabic:'الْعَنْكَبُوتِ', color:'#a8a29e', occurrences:[[29,41]]}
+  ]
+});
+</script>
 </body>
 </html>

@@ -335,6 +335,8 @@
       <strong>The question that remains:</strong> How does a 7th-century merchant in Arabia, with no telescopes, no mathematics of planetary motion, and no access to astronomy, describe orbital mechanics with grammatical precision — using the exact correct Arabic plural to include Earth among the moving bodies?
     </div>
 
+    <div id="qv-celestial"></div>
+
     <div style="margin-top:28px;">
       <a href="index.html" class="btn btn-ghost">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -738,5 +740,18 @@ function initGalaxyCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 21:33 — كُلٌّ فِى فَلَكٍۢ يَسْبَحُونَ (all swimming in orbits).
+   كُلٌّ is plural 3+ — includes Earth. 39:5 says كُلٌّ يَجْرِي (all move, plural). */
+QuranValidator.attach('qv-celestial',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 21:33 — كُلٌّ فِى فَلَكٍۢ يَسْبَحُونَ "all swimming in an orbit." كُلٌّ (plural 3+) includes Earth.',
+  groups:[
+    {id:'orbit', label:'All in an orbit', arabic:'فَلَكٍۢ', color:'#7dd3fc', occurrences:[[21,33],[39,5]]}
+  ]
+});
+</script>
 </body>
 </html>

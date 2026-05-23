@@ -408,6 +408,8 @@
       <strong>Hidden for 1,400 years:</strong> The ring structure was discovered by 20th-century scholars using modern literary analysis tools. The Quran had been memorized and recited perfectly for 14 centuries before anyone realized the mathematical mirror was there.
     </div>
 
+    <div id="qv-ring"></div>
+
     <div style="margin-top:28px;">
       <a href="index.html" class="btn btn-ghost">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -627,5 +629,18 @@ function bezierPoint(p0, p1, p2, p3, t) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 2:143 — وَسَطًا (middle/just). This is the CENTER verse of Al-Baqarah (286/2 = 143).
+   The center verse literally contains the word "middle." */
+QuranValidator.attach('qv-ring',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 2:143 — it contains وَسَطًا (middle). It IS the middle verse of Al-Baqarah (286 ÷ 2 = verse 143).',
+  groups:[
+    {id:'middle', label:'Middle — center of Al-Baqarah', arabic:'وَسَطًا', color:'#4ade80', occurrences:[[2,143]]}
+  ]
+});
+</script>
 </body>
 </html>

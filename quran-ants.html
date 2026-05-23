@@ -290,6 +290,8 @@
     <div class="gt">A wingless worker ant described correctly 1,400 years ago.</div>
     <div class="gs">Scientists only recently confirmed that worker ants outside the nest are female and wingless. The Quran described exactly that scenario with a single grammatical detail. This is impossible to dismiss as coincidence.</div>
   </div>
+
+  <div id="qv-ants"></div>
 </div>
 
 </div>
@@ -655,6 +657,18 @@ function startTectonics(){
 }
 
 initHeroCanvas();
+</script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 27:18 — قَالَتْ نَمْلَةٌ (a female ant said). The feminine verb form confirms worker ants are female. */
+QuranValidator.attach('qv-ants',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 27:18 — قَالَتْ نَمْلَةٌ "a female ant said." The feminine grammar confirms the worker ant is female.',
+  groups:[
+    {id:'ant', label:'A female ant said', arabic:'نَمْلَةٌ', color:'#fbbf24', occurrences:[[27,18]]}
+  ]
+});
 </script>
 </body>
 </html>

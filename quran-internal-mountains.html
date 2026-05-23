@@ -378,6 +378,8 @@
       <div class="gs">One word. One preposition. One claim that every geologist in the 7th century would have called impossible — and that seismology in 1994 confirmed in full.</div>
     </div>
 
+    <div id="qv-mountains"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <a href="quran-big-bang.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Big Bang</a>
       <a href="quran-brain-functions.html" class="btn" style="background:var(--accent);color:#fff">Next · Brain Functions →</a>
@@ -398,6 +400,19 @@
 </div>
 
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 21:31 — the one verse with فِي (inside) the Earth, not عَلَى (on).
+   That single preposition is the entire claim — confirmed by seismology in the 20th century. */
+QuranValidator.attach('qv-mountains',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 21:31 — "We placed INSIDE (فِي) the Earth firm mountains." Not "on" — inside.',
+  groups:[
+    {id:'inside', label:'Inside the Earth', arabic:'رَوَاسِيَ', color:'#f472b6', occurrences:[[21,31]]}
+  ]
+});
+</script>
 <script>
 /* ===== CORE ENGINE ===== */
 let stage = 0;

@@ -465,6 +465,8 @@
       <div class="gs">Hell has 7 gates (Quran 15:44). The word جهنم appears 77 times — both digits are 7. Paradise has 8 gates (Hadith Bukhari 3257). The word الجنة appears 78 times — the final digit is 8. Paradise is mentioned one more time than Hell, consistent with every Quranic and Hadith statement that divine mercy precedes divine wrath. The probability of both word counts landing on these exact values by chance: approximately 1 in 22,500.</div>
     </div>
 
+    <div id="qv-hell-paradise"></div>
+
     <a href="quran-life-death.html" class="btn" style="background:var(--gold);color:#1a0e00;margin-bottom:12px">
       Next pattern · Life &amp; Death
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0e00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -919,5 +921,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+var HELL_LIST=[[2,206],[3,12],[3,162],[3,197],[4,55],[4,93],[4,97],[4,115],[4,121],[4,140],[4,169],[7,18],[7,41],[7,179],[8,16],[8,36],[8,37],[9,35],[9,49],[9,63],[9,68],[9,73],[9,81],[9,95],[9,109],[11,119],[13,18],[14,16],[14,29],[15,43],[16,29],[17,8],[17,18],[17,39],[17,63],[17,97],[18,100],[18,102],[18,106],[19,68],[19,86],[20,74],[21,29],[21,98],[23,103],[25,34],[25,65],[29,54],[29,68],[32,13],[35,36],[36,63],[38,56],[38,85],[39,32],[39,60],[39,71],[39,72],[40,49],[40,60],[40,76],[43,74],[45,10],[48,6],[50,24],[50,30],[52,13],[55,43],[58,8],[66,9],[67,6],[72,15],[72,23],[78,21],[85,10],[89,23],[98,6]];
+var PARA_LIST=[[2,35],[2,82],[2,111],[2,214],[2,221],[3,142],[3,185],[4,124],[5,65],[5,72],[7,19],[7,22],[7,27],[7,40],[7,42],[7,43],[7,44],[7,46],[7,49],[7,50],[9,72],[9,111],[10,9],[10,26],[11,23],[11,108],[13,23],[13,35],[16,31],[16,32],[18,31],[18,107],[19,60],[19,61],[19,63],[20,76],[20,117],[20,121],[22,56],[25,15],[25,24],[26,85],[26,90],[29,58],[31,8],[32,19],[35,33],[36,26],[36,55],[37,43],[38,50],[39,73],[39,74],[40,8],[40,40],[41,30],[42,7],[43,70],[43,72],[46,14],[46,16],[47,6],[47,15],[50,31],[53,15],[56,12],[56,89],[59,20],[59,20],[61,12],[66,11],[68,17],[68,34],[70,38],[79,41],[81,13],[89,30],[98,8]];
+QuranValidator.attach('qv-hell-paradise',{
+  mode:'count',
+  title:'Validate it yourself',
+  subtitle:'77 times جهنم (Hell) · 78 times الجنة (Paradise)',
+  groups:[
+    {id:'hell',   label:'Hell',    arabic:'جهنم',  color:'#f97316', occurrences:HELL_LIST},
+    {id:'para',   label:'Paradise',arabic:'الجنة', color:'#34d399', occurrences:PARA_LIST}
+  ]
+});
+</script>
 </body>
 </html>

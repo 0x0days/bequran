@@ -280,6 +280,8 @@
       Two sources. Two countries. Two eras. The Bible says Haman was in Persia. The Quran says Egypt. Archaeology confirmed Egypt. An illiterate man in 7th-century Arabia could not have known this from the Bible — and could not have guessed it.
     </div>
 
+    <div id="qv-haman"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-paper-money.html" class="btn btn-primary">
         Next: Paper Money
@@ -594,5 +596,18 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 28:38 — Pharaoh orders Haman to build a tower. Hieroglyphics confirmed Haman
+   as "Overseer of stone-quarry workers" in New Kingdom Egypt — exactly this role. */
+QuranValidator.attach('qv-haman',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 28:38 — Pharaoh says "O Haman, build me a tower." Hieroglyphics confirmed this name in Egyptian construction records.',
+  groups:[
+    {id:'haman', label:'Haman — Egyptian construction overseer', arabic:'هَامَانُ', color:'#4ade80', occurrences:[[28,38]]}
+  ]
+});
+</script>
 </body>
 </html>

@@ -273,6 +273,8 @@
       <div class="source-quote">"For a long time, memory was thought to be a specialized function of the brain, with our neural circuits and brain cells handling all our memories. But recent research from New York University has turned this assumption on its head. According to this study, even cells outside the brain can store and retrieve memories, opening up a new view of how our entire body participates in memory process."</div>
     </div>
 
+    <div id="qv-skin"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-atmosphere.html" class="btn btn-primary">
         Next: Atmospheric Pressure
@@ -295,6 +297,19 @@
 </div>
 
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 41:20 — skin testifies against its owner. NYU 2024 confirmed skin can store memories.
+   For 1,400 years critics called this the Quran's biggest scientific error. */
+QuranValidator.attach('qv-skin',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 41:20 — skin testifies against its owner. NYU 2024: non-neural cells including skin can store and retrieve memories.',
+  groups:[
+    {id:'skin', label:'Skin testifies — stores memory', arabic:'جُلُودُهُمْ', color:'#d946ef', occurrences:[[41,20],[41,21]]}
+  ]
+});
+</script>
 <script>
 var stage = 0;
 var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };

@@ -261,6 +261,8 @@
       Quran 96 opens: "Created man from a leech" (embryonic stage) → "taught by the pen" (reading, before birth). The verse that commanded an illiterate man to "Read" described the neurological prewiring of the human brain 1,400 years before it was discovered.
     </div>
 
+    <div id="qv-reading"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-brainstem.html" class="btn btn-primary">
         Next: Brainstem
@@ -678,5 +680,20 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* 96:1–5 — first five verses revealed. اقْرَأْ = "Read" — to an illiterate man.
+   The passage describes creation from embryo then teaching by pen — sequence implies
+   the reading capacity is given before birth. OSU 2020: VWFA prewired at birth. */
+QuranValidator.attach('qv-reading',{
+  mode:'locate',
+  title:'Read the first revealed verses yourself',
+  subtitle:'Find 96:1–5 — the first word revealed was اقْرَأْ "Read." The brain\'s reading circuit is prewired at birth — confirmed OSU 2020.',
+  groups:[
+    {id:'iqra',  label:'Read (first word revealed)', arabic:'اقْرَأْ',    color:'#e879f9', occurrences:[[96,1],[96,2]]},
+    {id:'qalam', label:'Taught by the pen',          arabic:'بِالْقَلَمِ', color:'#a78bfa', occurrences:[[96,4],[96,5]]}
+  ]
+});
+</script>
 </body>
 </html>

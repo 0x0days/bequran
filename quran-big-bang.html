@@ -386,6 +386,8 @@
       <strong>The word fatq is not accidental:</strong> Arabic has simpler words for "separation" or "opening." The Quran chose fatq — the word specifically for tearing fabric by pulling its threads in opposite directions. This is not metaphor. This is the precise description of how Dark Energy works: it pulls the threads of spacetime apart. The word was chosen 1,400 years before physicists understood what it described.
     </div>
 
+    <div id="qv-big-bang"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
       <a href="quran-age-of-universe.html" class="btn btn-ghost">← Age of Universe</a>
       <a href="quran-internal-mountains.html" class="btn btn-accent">Next · Internal Mountains →</a>
@@ -682,5 +684,19 @@ function initFabricCanvas(){
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 21:30 — three discoveries in one verse: singularity (رَتْقًا), Dark Energy (فَتَقْنَاهُمَا), water-based life (الْمَاءِ). */
+QuranValidator.attach('qv-big-bang',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 21:30 — singularity + Dark Energy + water-based life in one 7th-century sentence',
+  groups:[
+    {id:'ratq',  label:'Singularity (ratq)',    arabic:'رَتْقًا',        color:'#60a5fa', occurrences:[[21,30]]},
+    {id:'fatq',  label:'Dark Energy (fatq)',    arabic:'فَفَتَقْنَاهُمَا', color:'#f87171', occurrences:[[21,30]]},
+    {id:'water', label:'Water-based life',      arabic:'الْمَاءِ',       color:'#4ade80', occurrences:[[21,30]]}
+  ]
+});
+</script>
 </body>
 </html>

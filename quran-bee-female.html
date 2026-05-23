@@ -385,6 +385,8 @@
       <div class="gs">Not once, not ambiguously. Three consecutive commands, all using the feminine imperative suffix -ī, all addressed to the bee that actually builds, forages, and produces honey. The text carries a biological accuracy that could not have been assumed from the culture it was revealed into.</div>
     </div>
 
+    <div id="qv-bee"></div>
+
     <a href="quran-chromosomes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Bee Chromosomes</a>
     <a href="quran-fish.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · The Fish Verse →</a>
   </div>
@@ -890,5 +892,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 16:68–69 and read the three feminine imperatives yourself.
+   النحل (the bee) is highlighted in amber; the feminine -ī endings
+   اتخذى / كلى / فاسلكى make the female bee undeniable in the text. */
+QuranValidator.attach('qv-bee',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 16:68–69 and see all three commands given to the bee in the feminine form',
+  groups:[
+    {id:'bee', label:'The Bee', arabic:'النحل', color:'#fbbf24', occurrences:[[16,68],[16,69]]}
+  ]
+});
+</script>
 </body>
 </html>

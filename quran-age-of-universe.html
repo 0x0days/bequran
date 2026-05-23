@@ -394,6 +394,8 @@
       <div class="gs">Cosmologists confirmed the 13.8-billion-year age of the universe in the 20th century. No human in 7th-century Arabia could have measured, calculated, or guessed that the correct ratio of Earth's age to the universe's age is precisely one third.</div>
     </div>
 
+    <div id="qv-age"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-pulsars-blackholes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Pulsars &amp; Black Holes</a>
       <a href="quran-big-bang.html" class="btn" style="background:var(--accent);color:#040810">Next &middot; Big Bang &rarr;</a>
@@ -651,5 +653,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 7:54 (six days) and 41:9 (two days for Earth).
+   2 out of 6 = Earth's 4.6 billion years out of universe's 13.8 billion = 1/3. */
+QuranValidator.attach('qv-age',{
+  mode:'locate',
+  title:'Read the two verses yourself',
+  subtitle:'7:54 says creation took 6 days · 41:9 says Earth took 2 of those days · ratio 2/6 = Earth\'s age / universe age',
+  groups:[
+    {id:'sixdays', label:'Six days (full creation)', arabic:'سِتَّةِ أَيَّامٍ', color:'#c084fc', occurrences:[[7,54]]},
+    {id:'twodays', label:'Two days (Earth only)',   arabic:'يَوْمَيْنِ',       color:'#4ade80', occurrences:[[41,9]]}
+  ]
+});
+</script>
 </body>
 </html>

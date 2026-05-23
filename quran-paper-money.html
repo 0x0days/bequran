@@ -277,6 +277,8 @@
       The first paper money in recorded history is the Chinese <strong>Jiaozi</strong>, appearing in the Song Dynasty around the 11th century — roughly 400 years after the Quran. An illiterate man in 7th-century Arabia could not have invented this word choice.
     </div>
 
+    <div id="qv-paper"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-pharaoh-mourning.html" class="btn btn-primary">
         Next: Mourning of Pharaoh
@@ -558,5 +560,18 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 18:19 — بِوَرِقِكُمْ "with this paper of yours." Root وَرَق = paper/leaf/sheet.
+   First paper money (Jiaozi, China) appeared ~400 years after the Quran. */
+QuranValidator.attach('qv-paper',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 18:19 — بِوَرِقِكُمْ "with this paper of yours." Root وَرَق = paper. First paper money appeared ~400 years after this verse.',
+  groups:[
+    {id:'wariq', label:'Paper (wariq) — not silver, not coin', arabic:'بِوَرِقِكُمْ', color:'#67e8f9', occurrences:[[18,19]]}
+  ]
+});
+</script>
 </body>
 </html>

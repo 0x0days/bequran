@@ -268,6 +268,8 @@
       <div class="source-quote">"The death zone, in mountaineering, refers to altitudes above a certain point where the amount of oxygen is insufficient to sustain human life for an extended time span. This point is generally tagged as 8,000 m (26,000 ft, less than 356 millibars of atmospheric pressure)."</div>
     </div>
 
+    <div id="qv-atmosphere"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-ring-composition.html" class="btn" style="background:var(--accent);color:#0b1622">
         Next: Ring Composition →
@@ -289,6 +291,17 @@
 </div>
 
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+QuranValidator.attach('qv-atmosphere',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 6:125 — يَصَّعَّدُ "ascending" causes chest constriction. Death Zone confirmed: above 8,000 m, oxygen is insufficient for life.',
+  groups:[
+    {id:'ascend', label:'Ascending — chest tightens', arabic:'يَصَّعَّدُ', color:'#bae6fd', occurrences:[[6,125]]}
+  ]
+});
+</script>
 <script>
 var stage = 0;
 var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };

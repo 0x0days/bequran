@@ -392,6 +392,8 @@
       <div class="gs">Red giant stellar evolution was not understood until the 20th century. No human in 7th-century Arabia had any basis for predicting that the sun would eventually grow large enough to consume the planets around it. The statement in Quran 75:9 describes the precise end-state: sun and moon in one body.</div>
     </div>
 
+    <div id="qv-red-giant"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-human-embryo.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Human Embryo</a>
       <a href="quran-wormholes.html" class="btn" style="background:var(--accent);color:#fff">Next &middot; Wormholes &rarr;</a>
@@ -722,5 +724,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 75:9 — "And the sun and moon are joined together."
+   The sun expanding as a red giant will engulf and merge with the Moon's orbit. */
+QuranValidator.attach('qv-red-giant',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 75:9 — "And the sun and the moon are joined together" — written 1,400 years before red giant science',
+  groups:[
+    {id:'sun',  label:'Sun',  arabic:'الشَّمْسُ', color:'#fb923c', occurrences:[[75,9]]},
+    {id:'moon', label:'Moon', arabic:'الْقَمَرُ', color:'#94a3b8', occurrences:[[75,9]]}
+  ]
+});
+</script>
 </body>
 </html>

@@ -338,6 +338,8 @@
       <strong>The only explanation that holds:</strong> The author of the Quran knew that Abraham&apos;s people were Sumerians who worshipped Venus as a star. The author also knew Venus was a planet, not a star. Both facts were impossible for any human to know in 610 CE. Both were verified by modern science and archaeology — one in the 1610s, one in the 1920s. As the Quran itself states: <em>"Indeed, He is the Knower of the unseen and the witnessed."</em> (6:73)
     </div>
 
+    <div id="qv-venus"></div>
+
     <div style="margin-top:28px;">
       <a href="index.html" class="btn btn-ghost">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -602,5 +604,18 @@ function initStarCanvas(){
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 6:76 — كَوْكَبًا (planet). Everyone around Abraham called Venus a star.
+   The Quran used the precise Arabic word for planet — confirmed by Galileo in 1610. */
+QuranValidator.attach('qv-venus',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 6:76 — كَوْكَبًا means "planet" not "star." Every ancient civilisation called Venus a star. The Quran alone got it right.',
+  groups:[
+    {id:'planet', label:'Planet (kawkab)', arabic:'كَوْكَبًا', color:'#fef08a', occurrences:[[6,76]]}
+  ]
+});
+</script>
 </body>
 </html>

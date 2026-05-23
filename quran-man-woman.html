@@ -366,6 +366,8 @@
       </div>
     </div>
 
+    <div id="qv-man-woman"></div>
+
     <a href="quran-man-woman-chromosomes.html" class="btn" style="background:var(--man);color:#fff;margin-bottom:12px">
       The chromosome connection
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -565,5 +567,20 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Singular forms only — 24:24 (duals excluded per README methodology) */
+var MAN_LIST=[[2,282],[4,12],[6,9],[7,63],[7,69],[7,155],[10,2],[11,78],[17,47],[18,37],[23,25],[23,38],[25,8],[28,20],[33,4],[34,7],[34,43],[36,20],[39,29],[39,29],[39,29],[40,28],[40,28],[43,31]];
+var WOMAN_LIST=[[3,35],[3,40],[4,12],[4,128],[7,83],[11,71],[11,81],[12,21],[12,30],[12,51],[15,60],[19,5],[19,8],[27,23],[27,57],[28,9],[29,32],[29,33],[33,50],[51,29],[66,10],[66,10],[66,11],[111,4]];
+QuranValidator.attach('qv-man-woman',{
+  mode:'count',
+  title:'Validate it yourself',
+  subtitle:'24 singular رجل (man) · 24 singular امرأة (woman) — count them yourself',
+  groups:[
+    {id:'man',  label:'Man',   arabic:'رجل',   color:'#60a5fa', occurrences:MAN_LIST},
+    {id:'woman',label:'Woman', arabic:'امرأة', color:'#f9a8d4', occurrences:WOMAN_LIST}
+  ]
+});
+</script>
 </body>
 </html>

@@ -405,6 +405,8 @@
       <div class="gs">Iron has the strongest bound nucleus among all elements — it is the endpoint of stellar nuclear fusion. Stars that try to fuse iron beyond it collapse. "Great might" is not poetic; it is the most precise nuclear description possible.</div>
     </div>
 
+    <div id="qv-iron"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <a href="quran-brain-functions.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Brain Functions</a>
       <a href="quran-dead-sea.html" class="btn" style="background:var(--accent);color:#0b1622">Next · Dead Sea →</a>
@@ -973,5 +975,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 57:25 — "We sent down iron." Chapter 57 = isotope ⁵⁷Fe.
+   Gematria of حديد = 26 = atomic number of Fe. Both in the same chapter. */
+QuranValidator.attach('qv-iron',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 57:25 — "We sent down iron." Chapter 57 = ⁵⁷Fe isotope. Gematria of حديد = 26 = atomic number.',
+  groups:[
+    {id:'iron', label:'Iron — sent down', arabic:'ٱلْحَدِيدَ', color:'#94a3b8', occurrences:[[57,25]]}
+  ]
+});
+</script>
 </body>
 </html>

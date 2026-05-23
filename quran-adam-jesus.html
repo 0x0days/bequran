@@ -428,6 +428,8 @@
       <div class="gs">Verse 3:59 states the comparison. The name counts confirm it — 25:25, exact, no adjustments. Adam's 3 letters point to Surah 3 (family and lineage). Jesus's 4 letters point to Surah 4 (The Women — for the prophet born of one). Both appear 25 times, and Surah 25 contains the verse about earthly origin (25:7) and celestial descent (25:25) — one for each. The pairing the text announces is encoded in every layer of its structure.</div>
     </div>
 
+    <div id="qv-adam-jesus"></div>
+
     <a href="quran-hell-paradise.html" class="btn" style="background:var(--match);color:#fff;margin-bottom:12px">
       Next pattern · Hell &amp; Paradise
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -832,5 +834,40 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+var ADAM_LIST = [
+  [2,31],[2,33],[2,34],[2,35],[2,37],[3,33],[3,59],[5,27],[7,11],[7,19],
+  [7,26],[7,27],[7,31],[7,35],[7,172],[17,61],[17,70],[18,50],[19,58],
+  [20,115],[20,116],[20,117],[20,120],[20,121],[36,60]
+];
+var JESUS_LIST = [
+  [2,87],[2,136],[2,253],[3,45],[3,52],[3,55],[3,59],[3,84],[4,157],[4,163],
+  [4,171],[5,46],[5,78],[5,110],[5,112],[5,114],[5,116],[6,85],[19,34],
+  [33,7],[42,13],[43,63],[57,27],[61,6],[61,14]
+];
+QuranValidator.attach('qv-adam-jesus', {
+  mode: 'count',
+  title: 'Validate it yourself',
+  subtitle: 'Count every آدم (Adam) and عيسى (Jesus) in the Quran',
+  groups: [
+    {
+      id: 'adam',
+      label: 'Adam',
+      arabic: 'آدم',
+      color: '#34d399',
+      occurrences: ADAM_LIST
+    },
+    {
+      id: 'jesus',
+      label: 'Jesus',
+      arabic: 'عيسى',
+      color: '#818cf8',
+      occurrences: JESUS_LIST
+    }
+  ],
+  claimedRatio: '25 : 25 — exact match'
+});
+</script>
 </body>
 </html>

@@ -310,6 +310,8 @@
       <strong>Dark Energy makes it more remarkable:</strong> The Quran does not say "We expanded it" (past tense). It says "We are expanding it" — present, ongoing, active. In 1998, astronomers discovered the expansion is not just ongoing but <em>accelerating</em>, driven by a force — Dark Energy — that makes up 68% of the universe and whose nature remains completely unknown. The most precise word the Quran could have used was exactly the word it used.
     </div>
 
+    <div id="qv-expanding"></div>
+
     <div style="margin-top:28px;">
       <a href="index.html" class="btn btn-ghost">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -559,5 +561,19 @@ function initDarkCanvas(){
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 51:47 — لَمُوسِعُونَ (We are expanding — present continuous).
+   Hubble confirmed expansion 1929. Dark Energy discovered 1998. Einstein called his
+   static-universe assumption his "greatest blunder." */
+QuranValidator.attach('qv-expanding',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 51:47 — لَمُوسِعُونَ "We are expanding it" — present tense, ongoing. Confirmed by Hubble 1929, accelerating expansion 1998.',
+  groups:[
+    {id:'expand', label:'We are expanding it', arabic:'لَمُوسِعُونَ', color:'#6366f1', occurrences:[[51,47]]}
+  ]
+});
+</script>
 </body>
 </html>

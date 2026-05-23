@@ -347,6 +347,8 @@
       In 1975, Dr. Bucaille examined the mummy of Ramesses II and found <strong>salt crystals embedded in the tissue</strong> — proof of drowning. The body had been found in the Valley of the Kings, hundreds of miles from the sea. An illiterate man in 7th-century Arabia could not have known about a preserved Pharaoh's mummy. <strong>No mistakes in the Quran.</strong>
     </div>
 
+    <div id="qv-pharaoh-mummy"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-pharaoh-crucifixion.html" class="btn btn-primary">
         Next: Pharaoh's Stakes
@@ -610,5 +612,18 @@ function pickEx3(el, correct) {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 10:92 — "We will preserve your body as a sign." Ramesses II mummy found 1881.
+   Dr. Bucaille confirmed salt crystals in 1975 — proof of drowning at sea. */
+QuranValidator.attach('qv-pharaoh-mummy',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 10:92 — "We will preserve your body as a sign." Pharaoh\'s mummy was found in 1881, 1,271 years after this verse.',
+  groups:[
+    {id:'body', label:'Preserved body — a sign', arabic:'بِبَدَنِكَ', color:'#fcd34d', occurrences:[[10,92]]}
+  ]
+});
+</script>
 </body>
 </html>

@@ -357,6 +357,8 @@
       <div class="gs">The 2007 study in the British Journal of Psychiatry measured pathological liars and found 23–36% more white matter (neural connections) concentrated in the orbitofrontal and prefrontal cortex — the tissue directly behind the forehead.</div>
     </div>
 
+    <div id="qv-brain"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <a href="quran-internal-mountains.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Internal Mountains</a>
       <a href="quran-iron.html" class="btn" style="background:var(--accent);color:#fff">Next · Iron →</a>
@@ -941,5 +943,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 96:15-16 — the forelock described as "lying, sinful."
+   Neuroscience confirmed the prefrontal cortex controls deception — 1,400 years later. */
+QuranValidator.attach('qv-brain',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 96:15–16 — the forelock called "lying, sinful." Neuroscience confirmed the prefrontal cortex controls deception in 2007.',
+  groups:[
+    {id:'nasiya', label:'Lying, sinful forelock', arabic:'نَاصِيَةٍ كَاذِبَةٍ', color:'#c084fc', occurrences:[[96,15],[96,16]]}
+  ]
+});
+</script>
 </body>
 </html>
