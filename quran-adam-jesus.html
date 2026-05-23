@@ -208,9 +208,9 @@
   </button>
 </div>
 <a href="index.html" class="nav-home-fixed">
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
   All lessons
-<\/a>
+</a>
 <div class="dot-field"></div>
 <div class="container">
 
@@ -643,34 +643,228 @@ function initHeroCanvas() {
   if (!c) return;
   var ctx = c.getContext('2d');
   var W = c.width, H = c.height, t = 0;
-  var earthPs = Array.from({length:22},function(){return{x:Math.random()*W*0.5,y:H-Math.random()*H*0.4,vy:-0.3-Math.random()*0.45,vx:Math.random()*0.8-0.4,life:Math.random()};});
-  var bgStars = Array.from({length:20},function(_,i){return{x:(i*173)%W,y:(i*97)%(H*0.7)};});
-  function frame(){
-    ctx.clearRect(0,0,W,H);
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#060810'); g.addColorStop(0.5,'#0a0f1c'); g.addColorStop(1,'#0e1520');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    bgStars.forEach(function(s,i){
-      var a=0.18+Math.sin(t+i*0.6)*0.15;
-      ctx.beginPath(); ctx.arc(s.x,s.y,0.7,0,Math.PI*2);
-      ctx.fillStyle='rgba(200,210,255,'+a+')'; ctx.fill();
+
+  var dust = [];
+  for (var i = 0; i < 60; i++) {
+    dust.push({
+      progress: Math.random(),
+      side: Math.random() < 0.5 ? -1 : 1,
+      spread: (Math.random() - 0.5) * 20,
+      speed: 0.002 + Math.random() * 0.003,
+      size: Math.random() * 2 + 0.5
     });
-    var lx=W*0.74;
-    var lg=ctx.createLinearGradient(lx,0,W*0.42,H*0.65);
-    lg.addColorStop(0,'rgba(253,224,71,0.17)'); lg.addColorStop(1,'rgba(253,224,71,0)');
-    ctx.beginPath(); ctx.moveTo(lx-18,0); ctx.lineTo(W*0.38,H); ctx.lineTo(W*0.5,H); ctx.lineTo(lx+18,0);
-    ctx.fillStyle=lg; ctx.fill();
-    earthPs.forEach(function(p){
-      p.y+=p.vy; p.x+=p.vx; p.life+=0.012;
-      if(p.y<H*0.15||p.life>1){p.y=H-3;p.x=Math.random()*W*0.48;p.life=0;p.vy=-0.3-Math.random()*0.45;}
-      var a=Math.max(0,0.65*(1-p.life));
-      ctx.beginPath(); ctx.arc(p.x,p.y,1.5+p.life*2,0,Math.PI*2);
-      ctx.fillStyle='rgba(175,115,55,'+a+')'; ctx.fill();
-    });
-    t+=0.02; requestAnimationFrame(frame);
   }
+
+  function drawSky() {
+    var bg = ctx.createRadialGradient(W/2, H * 0.2, 10, W/2, H/2, W*0.8);
+    bg.addColorStop(0, '#0c0818');
+    bg.addColorStop(0.5, '#060410');
+    bg.addColorStop(1, '#020205');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle stars
+    ctx.fillStyle = '#ffffff';
+    var stars = [[80, 15], [220, 40], [420, 20], [560, 50], [140, 65], [500, 70], [350, 10]];
+    stars.forEach(function(s) {
+      ctx.globalAlpha = 0.3 + Math.sin(t * 2 + s[0]) * 0.3;
+      ctx.fillRect(s[0], s[1], 1.5, 1.5);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSourceBeam() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    // Source glow at the top
+    var g = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 80);
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    g.addColorStop(0.3, 'rgba(200, 180, 255, 0.2)');
+    g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(W/2 - 80, 0, 160, 100);
+
+    // Left sweeping beam to Adam
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 5, 0);
+    ctx.quadraticCurveTo(W/2 - 40, H * 0.4, W * 0.32, H * 0.85);
+    ctx.lineTo(W * 0.32 + 30, H * 0.85);
+    ctx.quadraticCurveTo(W/2 + 20, H * 0.4, W/2 + 5, 0);
+    ctx.closePath();
+    var b1 = ctx.createLinearGradient(W/2, 0, W * 0.32, H * 0.85);
+    b1.addColorStop(0, 'rgba(255, 200, 150, 0.12)');
+    b1.addColorStop(1, 'rgba(255, 100, 50, 0)');
+    ctx.fillStyle = b1;
+    ctx.fill();
+
+    // Right sweeping beam to Jesus
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 5, 0);
+    ctx.quadraticCurveTo(W/2 + 40, H * 0.4, W * 0.68, H * 0.85);
+    ctx.lineTo(W * 0.68 - 30, H * 0.85);
+    ctx.quadraticCurveTo(W/2 - 20, H * 0.4, W/2 + 5, 0);
+    ctx.closePath();
+    var b2 = ctx.createLinearGradient(W/2, 0, W * 0.68, H * 0.85);
+    b2.addColorStop(0, 'rgba(150, 200, 255, 0.12)');
+    b2.addColorStop(1, 'rgba(50, 100, 255, 0)');
+    ctx.fillStyle = b2;
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawDust() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    dust.forEach(function(d) {
+      d.progress += d.speed;
+      if (d.progress > 1) { d.progress = 0; d.spread = (Math.random() - 0.5) * 20; }
+
+      var targetX = d.side === -1 ? W * 0.32 : W * 0.68;
+      var targetY = H * 0.85;
+      var u = d.progress;
+      
+      // Bezier math for X and Y along the sweeping beam
+      var cpx = d.side === -1 ? W/2 - 40 : W/2 + 40;
+      var cpy = H * 0.4;
+      var x = (1-u)*(1-u)*W/2 + 2*(1-u)*u*cpx + u*u*targetX + d.spread * (1 - u);
+      var y = (1-u)*(1-u)*0 + 2*(1-u)*u*cpy + u*u*targetY;
+
+      var alpha = Math.sin(u * Math.PI) * 0.8;
+      var r = d.side === -1 ? 255 : 150;
+      var g2 = d.side === -1 ? 180 : 220;
+      var b = d.side === -1 ? 100 : 255;
+
+      ctx.beginPath();
+      ctx.arc(x, y, d.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',' + alpha + ')';
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  // Draws a sharp, towering geometric light presence
+  function drawPresence(cx, cy, colorInner, colorMid, colorOuter, phaseOffset) {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    var breathe = Math.sin(t * 1.2 + phaseOffset) * 0.1 + 1; // 0.9 to 1.1 scale
+
+    // Outer ethereal aura glow
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var outerGlow = ctx.createRadialGradient(0, -40 * breathe, 10, 0, -40 * breathe, 90);
+    outerGlow.addColorStop(0, colorOuter + '0.2)');
+    outerGlow.addColorStop(1, colorOuter + '0)');
+    ctx.fillStyle = outerGlow;
+    ctx.fillRect(-90, -130, 180, 180);
+    ctx.restore();
+
+    // Sharp Diamond/Rhombus shape (Vertical, like a standing aura)
+    var h = 110 * breathe;
+    var w = 35 * breathe;
+
+    ctx.beginPath();
+    ctx.moveTo(0, -h);         // Top point
+    ctx.lineTo(w, -h * 0.3);  // Right shoulder
+    ctx.lineTo(w * 0.6, 20);  // Right hip
+    ctx.lineTo(0, 40);        // Bottom point
+    ctx.lineTo(-w * 0.6, 20); // Left hip
+    ctx.lineTo(-w, -h * 0.3); // Left shoulder
+    ctx.closePath();
+
+    // Fill with mid-tone
+    var grad = ctx.createLinearGradient(0, -h, 0, 40);
+    grad.addColorStop(0, colorMid + '0.8)');
+    grad.addColorStop(0.5, colorInner + '0.4)');
+    grad.addColorStop(1, colorOuter + '0.1)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Crisp sharp edge outline
+    ctx.strokeStyle = colorInner + '0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Inner cross-hatch geometry for "edgy detailed" look
+    ctx.strokeStyle = colorInner + '0.4)';
+    ctx.lineWidth = 1;
+    
+    // Horizontal sharp lines
+    for (var i = 1; i < 4; i++) {
+      var ly = -h + (h + 40) * (i / 4);
+      var lw = w * (1 - Math.abs((ly + 40) / (h + 40))); // Taper towards top and bottom
+      ctx.beginPath();
+      ctx.moveTo(-lw, ly);
+      ctx.lineTo(lw, ly);
+      ctx.stroke();
+    }
+
+    // Inner vertical spine
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.8);
+    ctx.lineTo(0, 30);
+    ctx.strokeStyle = colorInner + '0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Blinding inner core (White hot center)
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var core = ctx.createRadialGradient(0, -50 * breathe, 0, 0, -50 * breathe, 25);
+    core.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+    core.addColorStop(0.5, colorInner + '0.4)');
+    core.addColorStop(1, colorInner + '0)');
+    ctx.fillStyle = core;
+    ctx.fillRect(-25, -75 * breathe, 50, 50);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function frame() {
+    t += 0.012;
+    ctx.clearRect(0, 0, W, H);
+
+    drawSky();
+    drawSourceBeam();
+    drawDust();
+
+    // Left Light: Adam (Warm Gold/Amber - Created from Earth/Clay)
+    drawPresence(W * 0.32, H * 0.85, 'rgba(255, 200, 100,', 'rgba(255, 140, 50,', 'rgba(180, 60, 20,', 0);
+    
+    // Right Light: Jesus (Cool Cyan/Blue - Created from a Word/Ruh)
+    drawPresence(W * 0.68, H * 0.85, 'rgba(150, 220, 255,', 'rgba(80, 160, 255,', 'rgba(30, 60, 180,', 3.14);
+
+    // Vignettes
+    var vt = ctx.createLinearGradient(0, 0, 0, 35);
+    vt.addColorStop(0, 'rgba(2,2,5,0.9)');
+    vt.addColorStop(1, 'rgba(2,2,5,0)');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, 35);
+
+    var vb = ctx.createLinearGradient(0, H - 35, 0, H);
+    vb.addColorStop(0, 'rgba(2,2,5,0)');
+    vb.addColorStop(1, 'rgba(2,2,5,0.9)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H - 35, W, 35);
+
+    var vl = ctx.createLinearGradient(0, 0, 35, 0);
+    vl.addColorStop(0, 'rgba(2,2,5,0.8)');
+    vl.addColorStop(1, 'rgba(2,2,5,0)');
+    ctx.fillStyle = vl; ctx.fillRect(0, 0, 35, H);
+
+    var vr = ctx.createLinearGradient(W - 35, 0, W, 0);
+    vr.addColorStop(0, 'rgba(2,2,5,0)');
+    vr.addColorStop(1, 'rgba(2,2,5,0.8)');
+    ctx.fillStyle = vr; ctx.fillRect(W - 35, 0, 35, H);
+
+    requestAnimationFrame(frame);
+  }
+
   frame();
 }
+
+// Call it when the page loads
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>

@@ -231,9 +231,9 @@
   </button>
 </div>
 <a href="index.html" class="nav-home-fixed">
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
   All lessons
-<\/a>
+</a>
 <div class="dot-field"></div>
 <div class="container">
 
@@ -575,33 +575,216 @@ function initHeroCanvas() {
   if (!c) return;
   var ctx = c.getContext('2d');
   var W = c.width, H = c.height, t = 0;
-  var drops = Array.from({length:26},function(){
-    return{x:Math.random()*W,y:Math.random()*H,vy:0.35+Math.random()*0.75,sz:2+Math.random()*4,ph:Math.random()*6.28};
-  });
-  function frame(){
-    ctx.clearRect(0,0,W,H);
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#100a00'); g.addColorStop(1,'#1c1000');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    for(var i=0;i<4;i++){
-      var lx=(i*W*0.28+t*18)%W;
-      ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx+W*0.12,H);
-      ctx.strokeStyle='rgba(245,158,11,0.035)'; ctx.lineWidth=14; ctx.stroke();
-    }
-    drops.forEach(function(d){
-      d.y+=d.vy+Math.sin(t*2+d.ph)*0.18;
-      if(d.y>H+5){d.y=-5;d.x=Math.random()*W;}
-      var gd=ctx.createRadialGradient(d.x,d.y,0,d.x,d.y,d.sz*1.6);
-      gd.addColorStop(0,'rgba(253,224,71,0.95)');
-      gd.addColorStop(0.4,'rgba(245,158,11,0.6)');
-      gd.addColorStop(1,'rgba(245,158,11,0)');
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.sz*1.6,0,Math.PI*2);
-      ctx.fillStyle=gd; ctx.fill();
-    });
-    t+=0.025; requestAnimationFrame(frame);
+
+  // Draws an elegant, multi-layered fire tongue pointing "up" in local space
+  function drawFlameTongue(dist, height, width, speed, offset) {
+    var baseY = dist;
+    var tipY = dist + height;
+    
+    // Sway the tip elegantly
+    var tipSway = Math.sin(t * speed + offset) * (width * 0.3);
+    var breathe = Math.sin(t * speed * 0.7 + offset) * (height * 0.08);
+
+    // Layer 1: Deep Crimson Outer
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, baseY);
+    ctx.quadraticCurveTo(-width * 0.6, tipY * 0.6 + breathe, tipSway, tipY + breathe);
+    ctx.quadraticCurveTo(width * 0.6, tipY * 0.6 + breathe, width / 2, baseY);
+    ctx.closePath();
+    var g1 = ctx.createLinearGradient(0, baseY, 0, tipY + breathe);
+    g1.addColorStop(0, 'rgba(140, 10, 0, 0.9)');
+    g1.addColorStop(0.4, 'rgba(200, 30, 0, 0.7)');
+    g1.addColorStop(1, 'rgba(200, 50, 0, 0)');
+    ctx.fillStyle = g1;
+    ctx.fill();
+
+    // Layer 2: Bright Orange Middle
+    var mW = width * 0.6;
+    var mH = height * 0.75;
+    var mTipY = dist + mH;
+    var mSway = Math.sin(t * speed + offset) * (mW * 0.2);
+    var mBreathe = Math.sin(t * speed * 0.7 + offset) * (mH * 0.06);
+
+    ctx.beginPath();
+    ctx.moveTo(-mW / 2, baseY);
+    ctx.quadraticCurveTo(-mW * 0.5, mTipY * 0.6 + mBreathe, mSway, mTipY + mBreathe);
+    ctx.quadraticCurveTo(mW * 0.5, mTipY * 0.6 + mBreathe, mW / 2, baseY);
+    ctx.closePath();
+    var g2 = ctx.createLinearGradient(0, baseY, 0, mTipY + mBreathe);
+    g2.addColorStop(0, 'rgba(255, 140, 0, 0.95)');
+    g2.addColorStop(0.5, 'rgba(255, 200, 50, 0.7)');
+    g2.addColorStop(1, 'rgba(255, 220, 100, 0)');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    // Layer 3: White-Hot Core
+    var iW = width * 0.25;
+    var iH = height * 0.45;
+    var iTipY = dist + iH;
+    var iSway = Math.sin(t * speed + offset) * (iW * 0.1);
+
+    ctx.beginPath();
+    ctx.moveTo(-iW / 2, baseY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iSway, iTipY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iW / 2, baseY);
+    ctx.closePath();
+    var g3 = ctx.createLinearGradient(0, baseY, 0, iTipY);
+    g3.addColorStop(0, 'rgba(255, 255, 230, 0.9)');
+    g3.addColorStop(1, 'rgba(255, 240, 150, 0)');
+    ctx.fillStyle = g3;
+    ctx.fill();
   }
+
+  // Draws a perfect 8-pointed star (two overlapping squares)
+  function drawStar(cx, cy, radius, rotation, lineW, color, shadowCol, shadowBlur) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineW;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (shadowBlur > 0) {
+      ctx.shadowColor = shadowCol;
+      ctx.shadowBlur = shadowBlur;
+    }
+
+    // Square 1
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 4) + (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Square 2
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function frame() {
+    t += 0.012; // Slow, majestic time
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Deep Lapis Lazuli background
+    var bg = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, W*0.7);
+    bg.addColorStop(0, '#0c1020');
+    bg.addColorStop(0.5, '#060a14');
+    bg.addColorStop(1, '#020408');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Ambient fire glow behind everything
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 140);
+    glow.addColorStop(0, 'rgba(255, 120, 20, 0.2)');
+    glow.addColorStop(0.5, 'rgba(180, 40, 0, 0.1)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // LAYER 1: THE FIRE FLAMES
+    // We position 8 main flames and 8 smaller ones shooting outwards from the center
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    
+    for (var i = 0; i < 8; i++) {
+      ctx.save();
+      // Rotate to the 8 points of the star (0, 45, 90, 135... degrees)
+      var angle = (Math.PI / 4) * i;
+      ctx.rotate(angle);
+      
+      // Draw Main Flame (starts at radius 30, shoots out to ~120)
+      drawFlameTongue(30, 90, 35, 1.8, i * 1.2);
+      
+      // Draw Smaller Accent Flame (offset by 22.5 degrees)
+      ctx.save();
+      ctx.rotate(Math.PI / 8); 
+      drawFlameTongue(40, 60, 22, 2.2, i * 1.5 + 5);
+      ctx.restore();
+
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // LAYER 2: BACKGROUND GEOMETRY (Faint, large, counter-rotating for depth)
+    drawStar(W/2, H/2, 100, -t * 0.3, 1, 'rgba(180, 140, 50, 0.15)', 'rgba(0,0,0,0)', 0);
+
+    // LAYER 3: MAIN GOLD GEOMETRY (Crisp, glowing)
+    var goldGrad = ctx.createLinearGradient(W/2 - 70, H/2 - 70, W/2 + 70, H/2 + 70);
+    goldGrad.addColorStop(0, '#B8860B'); 
+    goldGrad.addColorStop(0.3, '#FFD700'); 
+    goldGrad.addColorStop(0.5, '#FFFACD'); 
+    goldGrad.addColorStop(0.7, '#FFD700'); 
+    goldGrad.addColorStop(1, '#B8860B'); 
+    
+    drawStar(W/2, H/2, 70, t * 0.2, 3.5, goldGrad, 'rgba(255, 200, 50, 0.8)', 20);
+
+    // LAYER 4: INNER GEOMETRY
+    drawStar(W/2, H/2, 35, -t * 0.4, 2, 'rgba(255, 230, 150, 0.6)', 'rgba(255, 200, 50, 0.5)', 10);
+
+    // LAYER 5: CENTER ORNAMENT
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 12, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 230, 150, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = 'rgba(255, 200, 50, 0.6)';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFACD';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Vignettes
+    var vt = ctx.createLinearGradient(0, 0, 0, 40);
+    vt.addColorStop(0, 'rgba(2,4,8,0.8)');
+    vt.addColorStop(1, 'rgba(2,4,8,0)');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, 40);
+
+    var vb = ctx.createLinearGradient(0, H - 40, 0, H);
+    vb.addColorStop(0, 'rgba(2,4,8,0)');
+    vb.addColorStop(1, 'rgba(2,4,8,0.8)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H - 40, W, 40);
+
+    var vl = ctx.createLinearGradient(0, 0, 40, 0);
+    vl.addColorStop(0, 'rgba(2,4,8,0.7)');
+    vl.addColorStop(1, 'rgba(2,4,8,0)');
+    ctx.fillStyle = vl; ctx.fillRect(0, 0, 40, H);
+
+    var vr = ctx.createLinearGradient(W - 40, 0, W, 0);
+    vr.addColorStop(0, 'rgba(2,4,8,0)');
+    vr.addColorStop(1, 'rgba(2,4,8,0.7)');
+    ctx.fillStyle = vr; ctx.fillRect(W - 40, 0, 40, H);
+
+    requestAnimationFrame(frame);
+  }
+
   frame();
 }
+
+// Call it when the page loads
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>

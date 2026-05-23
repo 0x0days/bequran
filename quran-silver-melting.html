@@ -209,9 +209,9 @@
   </button>
 </div>
 <a href="index.html" class="nav-home-fixed">
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"\/><\/svg>
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
   All lessons
-<\/a>
+</a>
 <div class="dot-field"></div>
 <div class="container">
 
@@ -545,36 +545,220 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
+  
   if (!c) return;
   var ctx = c.getContext('2d');
   var W = c.width, H = c.height, t = 0;
-  var drops = Array.from({length:24},function(){
-    return{x:Math.random()*W,y:Math.random()*H,vy:0.4+Math.random()*0.7,sz:2+Math.random()*4,ph:Math.random()*6.28};
-  });
-  function frame(){
-    ctx.clearRect(0,0,W,H);
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#090b10'); g.addColorStop(1,'#12151e');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    for(var i=0;i<4;i++){
-      var lx=(i*W*0.28+t*22)%W;
-      ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx+W*0.12,H);
-      ctx.strokeStyle='rgba(200,210,220,0.022)'; ctx.lineWidth=16; ctx.stroke();
-    }
-    drops.forEach(function(d){
-      d.y+=d.vy+Math.sin(t*3+d.ph)*0.15;
-      if(d.y>H+5){d.y=-5;d.x=Math.random()*W;}
-      var gd=ctx.createRadialGradient(d.x,d.y,0,d.x,d.y,d.sz*2);
-      gd.addColorStop(0,'rgba(215,220,230,0.92)');
-      gd.addColorStop(0.4,'rgba(170,180,195,0.55)');
-      gd.addColorStop(1,'rgba(150,160,180,0)');
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.sz*2,0,Math.PI*2);
-      ctx.fillStyle=gd; ctx.fill();
-    });
-    t+=0.025; requestAnimationFrame(frame);
+
+  // Draws an elegant, multi-layered COOL fire tongue (Blue/Cyan/White)
+  function drawFlameTongue(dist, height, width, speed, offset) {
+    var baseY = dist;
+    var tipY = dist + height;
+    
+    // Sway the tip elegantly
+    var tipSway = Math.sin(t * speed + offset) * (width * 0.3);
+    var breathe = Math.sin(t * speed * 0.7 + offset) * (height * 0.08);
+
+    // Layer 1: Deep Indigo Outer
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, baseY);
+    ctx.quadraticCurveTo(-width * 0.6, tipY * 0.6 + breathe, tipSway, tipY + breathe);
+    ctx.quadraticCurveTo(width * 0.6, tipY * 0.6 + breathe, width / 2, baseY);
+    ctx.closePath();
+    var g1 = ctx.createLinearGradient(0, baseY, 0, tipY + breathe);
+    g1.addColorStop(0, 'rgba(20, 20, 100, 0.9)');
+    g1.addColorStop(0.4, 'rgba(50, 40, 150, 0.7)');
+    g1.addColorStop(1, 'rgba(80, 60, 200, 0)');
+    ctx.fillStyle = g1;
+    ctx.fill();
+
+    // Layer 2: Bright Cyan Middle
+    var mW = width * 0.6;
+    var mH = height * 0.75;
+    var mTipY = dist + mH;
+    var mSway = Math.sin(t * speed + offset) * (mW * 0.2);
+    var mBreathe = Math.sin(t * speed * 0.7 + offset) * (mH * 0.06);
+
+    ctx.beginPath();
+    ctx.moveTo(-mW / 2, baseY);
+    ctx.quadraticCurveTo(-mW * 0.5, mTipY * 0.6 + mBreathe, mSway, mTipY + mBreathe);
+    ctx.quadraticCurveTo(mW * 0.5, mTipY * 0.6 + mBreathe, mW / 2, baseY);
+    ctx.closePath();
+    var g2 = ctx.createLinearGradient(0, baseY, 0, mTipY + mBreathe);
+    g2.addColorStop(0, 'rgba(50, 160, 255, 0.95)');
+    g2.addColorStop(0.5, 'rgba(120, 210, 255, 0.7)');
+    g2.addColorStop(1, 'rgba(150, 220, 255, 0)');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    // Layer 3: Blinding White/Silver Core
+    var iW = width * 0.25;
+    var iH = height * 0.45;
+    var iTipY = dist + iH;
+    var iSway = Math.sin(t * speed + offset) * (iW * 0.1);
+
+    ctx.beginPath();
+    ctx.moveTo(-iW / 2, baseY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iSway, iTipY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iW / 2, baseY);
+    ctx.closePath();
+    var g3 = ctx.createLinearGradient(0, baseY, 0, iTipY);
+    g3.addColorStop(0, 'rgba(230, 240, 255, 0.9)');
+    g3.addColorStop(1, 'rgba(200, 220, 255, 0)');
+    ctx.fillStyle = g3;
+    ctx.fill();
   }
+
+  // Draws a perfect 8-pointed star (two overlapping squares)
+  function drawStar(cx, cy, radius, rotation, lineW, color, shadowCol, shadowBlur) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineW;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (shadowBlur > 0) {
+      ctx.shadowColor = shadowCol;
+      ctx.shadowBlur = shadowBlur;
+    }
+
+    // Square 1
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 4) + (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Square 2
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function frame() {
+    t += 0.010; // Slightly slower than gold for a colder, calmer feel
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Pure pitch-black background to maximize the silver/chrome contrast
+    var bg = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, W*0.7);
+    bg.addColorStop(0, '#08080c');
+    bg.addColorStop(0.5, '#040406');
+    bg.addColorStop(1, '#000000');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Cool ambient cyan glow behind everything
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 140);
+    glow.addColorStop(0, 'rgba(60, 120, 200, 0.2)');
+    glow.addColorStop(0.5, 'rgba(30, 60, 150, 0.1)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // LAYER 1: THE SILVER/FROST FIRE FLAMES
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    
+    for (var i = 0; i < 8; i++) {
+      ctx.save();
+      var angle = (Math.PI / 4) * i;
+      ctx.rotate(angle);
+      
+      // Main Flame
+      drawFlameTongue(30, 90, 35, 1.5, i * 1.2);
+      
+      // Smaller Accent Flame
+      ctx.save();
+      ctx.rotate(Math.PI / 8); 
+      drawFlameTongue(40, 60, 22, 1.8, i * 1.5 + 5);
+      ctx.restore();
+
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // LAYER 2: BACKGROUND GEOMETRY
+    drawStar(W/2, H/2, 100, -t * 0.25, 1, 'rgba(120, 140, 160, 0.12)', 'rgba(0,0,0,0)', 0);
+
+    // LAYER 3: MAIN SILVER GEOMETRY (Sharp Chrome Gradient)
+    var silverGrad = ctx.createLinearGradient(W/2 - 70, H/2 - 70, W/2 + 70, H/2 + 70);
+    silverGrad.addColorStop(0, '#3a3a40');   // Dark shadow edge
+    silverGrad.addColorStop(0.2, '#808088'); // Medium grey
+    silverGrad.addColorStop(0.38, '#c0c0c8');// Bright silver
+    silverGrad.addColorStop(0.42, '#ffffff');// Razor sharp highlight
+    silverGrad.addColorStop(0.46, '#c0c0c8');// Bright silver
+    silverGrad.addColorStop(0.8, '#606068'); // Medium grey
+    silverGrad.addColorStop(1, '#2a2a30');   // Dark shadow edge
+    
+    drawStar(W/2, H/2, 70, t * 0.15, 3.5, silverGrad, 'rgba(150, 200, 255, 0.8)', 20);
+
+    // LAYER 4: INNER GEOMETRY (Icy Blue tint)
+    drawStar(W/2, H/2, 35, -t * 0.35, 2, 'rgba(180, 210, 240, 0.6)', 'rgba(100, 180, 255, 0.5)', 10);
+
+    // LAYER 5: CENTER ORNAMENT
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 12, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(200, 220, 240, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = 'rgba(100, 180, 255, 0.6)';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#e0f0ff'; // Pale ice-blue center dot
+    ctx.shadowColor = '#80c0ff';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Vignettes (Matching pure black background)
+    var vt = ctx.createLinearGradient(0, 0, 0, 40);
+    vt.addColorStop(0, 'rgba(0,0,0,0.8)');
+    vt.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, 40);
+
+    var vb = ctx.createLinearGradient(0, H - 40, 0, H);
+    vb.addColorStop(0, 'rgba(0,0,0,0)');
+    vb.addColorStop(1, 'rgba(0,0,0,0.8)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H - 40, W, 40);
+
+    var vl = ctx.createLinearGradient(0, 0, 40, 0);
+    vl.addColorStop(0, 'rgba(0,0,0,0.7)');
+    vl.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vl; ctx.fillRect(0, 0, 40, H);
+
+    var vr = ctx.createLinearGradient(W - 40, 0, W, 0);
+    vr.addColorStop(0, 'rgba(0,0,0,0)');
+    vr.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = vr; ctx.fillRect(W - 40, 0, 40, H);
+
+    requestAnimationFrame(frame);
+  }
+
   frame();
 }
+
+// Call it when the page loads
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>

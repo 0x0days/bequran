@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
   <link rel="stylesheet" href="theme.css">
-  <title>Quranic Numerics — Discover the Patterns</title>
+  <title>Quranic Miracles — Discover the Patterns</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -348,8 +348,8 @@
       </svg>
     </div>
     <div>
-      <div class="brand-name">Quranic Numerics</div>
-      <div class="brand-sub">Mathematical Discoveries</div>
+      <div class="brand-name">Quranic Miracles</div>
+      <div class="brand-sub">Scientific Discoveries</div>
     </div>
   </a>
   <div class="header-pills">
@@ -452,214 +452,214 @@
 <script>
 /* ── LESSON DATA ─────────────────────────────────── */
 var lessons = [
-  { id:'sea-land',   n:1,  title:'Sea & Land',             ar:'البحر والبر',
-    hook:'71%',       teaser:'Two Arabic words written 1,400 years ago encode Earth\'s ocean‑to‑land ratio with surprising precision.',
+  { id:'sea-land',   n:1,  hook:'Sea & Land',             ar:'البحر والبر',
+    title:'71%',       teaser:'Two Arabic words written 1,400 years ago encode Earth\'s ocean‑to‑land ratio with surprising precision.',
     cat:'biology',  catLabel:'Earth Science', accent:'#0ea5e9', url:'quran-sea-land.html' },
 
-  { id:'chromosomes', n:2, title:'The Bee & 16',           ar:'النحل والكروموسومات',
-    hook:'16 · 32',  teaser:'Surah 16 is named "The Bee." A drone bee has 16 chromosomes. A female bee has 32. The surah has 128 verses.',
+  { id:'chromosomes', n:2, hook:'The Bee & 16',           ar:'النحل والكروموسومات',
+    title:'16 · 32',  teaser:'Surah 16 is named "The Bee." A drone bee has 16 chromosomes. A female bee has 32. The surah has 128 verses.',
     cat:'biology',  catLabel:'Biology',     accent:'#f59e0b', url:'quran-chromosomes.html' },
 
-  { id:'bee-female',  n:3, title:'Female Bee',             ar:'النحلة الأنثى',
-    hook:'كُلِى',   teaser:'The Quran commands its bees with a feminine Arabic verb — 970 years before science confirmed worker bees are female.',
+  { id:'bee-female',  n:3, hook:'Female Bee',             ar:'النحلة الأنثى',
+    title:'كُلِى',   teaser:'The Quran commands its bees with a feminine Arabic verb — 970 years before science confirmed worker bees are female.',
     cat:'biology',  catLabel:'Biology',     accent:'#fbbf24', url:'quran-bee-female.html' },
 
-  { id:'fish',        n:4, title:'The Fish Verse',         ar:'آية السمك',
-    hook:'50',        teaser:'One verse about a fish contains exactly 50 letters — matching the chromosome count of carp, goldfish, and zebrafish.',
+  { id:'fish',        n:4, hook:'The Fish Verse',         ar:'آية السمك',
+    title:'50',        teaser:'One verse about a fish contains exactly 50 letters — matching the chromosome count of carp, goldfish, and zebrafish.',
     cat:'biology',  catLabel:'Biology',     accent:'#06b6d4', url:'quran-fish.html' },
 
-  { id:'man-woman',   n:5, title:'Man & Woman',            ar:'الرجل والمرأة',
-    hook:'23 = 23',  teaser:'The word for "man" appears 23 times. The word for "woman" appears 23 times. Every counting method confirms it.',
+  { id:'man-woman',   n:5, hook:'Man & Woman',            ar:'الرجل والمرأة',
+    title:'23 = 23',  teaser:'The word for "man" appears 23 times. The word for "woman" appears 23 times. Every counting method confirms it.',
     cat:'biology',  catLabel:'Biology',     accent:'#818cf8', url:'quran-man-woman.html' },
 
-  { id:'man-woman-chromosomes', n:6, title:'Chromosomes Split', ar:'توازن الكروموسومات',
-    hook:'23 + 23',  teaser:'A father contributes 23 chromosomes. A mother contributes 23. The Quran uses "man" 23 times and "woman" 23 times.',
+  { id:'man-woman-chromosomes', n:6, hook:'Chromosomes Split', ar:'توازن الكروموسومات',
+    title:'23 + 23',  teaser:'A father contributes 23 chromosomes. A mother contributes 23. The Quran uses "man" 23 times and "woman" 23 times.',
     cat:'biology',  catLabel:'Biology',     accent:'#a78bfa', url:'quran-man-woman-chromosomes.html' },
 
-  { id:'adam-jesus',  n:7, title:'Adam & Jesus',           ar:'آدم وعيسى',
-    hook:'25 = 25',  teaser:'Adam is named 25 times in the Quran. Jesus is named 25 times. The verse linking them makes this structural.',
+  { id:'adam-jesus',  n:7, hook:'Adam & Jesus',           ar:'آدم وعيسى',
+    title:'25 = 25',  teaser:'Adam is named 25 times in the Quran. Jesus is named 25 times. The verse linking them makes this structural.',
     cat:'balance',  catLabel:'Balance',     accent:'#34d399', url:'quran-adam-jesus.html' },
 
-  { id:'hell-paradise', n:8, title:'Hell & Paradise',      ar:'النار والجنة',
-    hook:'77 · 78',  teaser:'Hell is mentioned 77 times. Paradise 78 times. The difference of one encodes a Quranic teaching about their gates.',
+  { id:'hell-paradise', n:8, hook:'Hell & Paradise',      ar:'النار والجنة',
+    title:'77 · 78',  teaser:'Hell is mentioned 77 times. Paradise 78 times. The difference of one encodes a Quranic teaching about their gates.',
     cat:'balance',  catLabel:'Balance',     accent:'#f97316', url:'quran-hell-paradise.html' },
 
-  { id:'life-death',  n:9, title:'Life & Death',           ar:'الحياة والموت',
-    hook:'105 = 105', teaser:'Every noun form of "life" and every noun form of "death," counted across 6,236 verses, land on the same number.',
+  { id:'life-death',  n:9, hook:'Life & Death',           ar:'الحياة والموت',
+    title:'105 = 105', teaser:'Every noun form of "life" and every noun form of "death," counted across 6,236 verses, land on the same number.',
     cat:'balance',  catLabel:'Balance',     accent:'#22c55e', url:'quran-life-death.html' },
 
-  { id:'angels-devils', n:10, title:'Angels & Devils',     ar:'الملائكة والشياطين',
-    hook:'88 = 88',  teaser:'Angels appear in nominal form 88 times. The word for their adversaries — also exactly 88 times.',
+  { id:'angels-devils', n:10, hook:'Angels & Devils',     ar:'الملائكة والشياطين',
+    title:'88 = 88',  teaser:'Angels appear in nominal form 88 times. The word for their adversaries — also exactly 88 times.',
     cat:'balance',  catLabel:'Balance',     accent:'#c084fc', url:'quran-angels-devils.html' },
 
-  { id:'lightning-1313', n:11, title:'Lightning 13:13',    ar:'الرعد ١٣:١٣',
-    hook:'1 in 2.4T', teaser:'Five independent events — date, time, age, surah number, verse number — all converge on 13 on a single day.',
+  { id:'lightning-1313', n:11, hook:'Lightning 13:13',    ar:'الرعد ١٣:١٣',
+    title:'1 in 2.4T', teaser:'Five independent events — date, time, age, surah number, verse number — all converge on 13 on a single day.',
     cat:'numerics', catLabel:'Numerics',    accent:'#38bdf8', url:'quran-lightning-1313.html' },
 
-  { id:'calendar-cycles', n:12, title:'Calendar Cycles',   ar:'دورات التقويم',
-    hook:'365·354·29', teaser:'The Arabic word for "day" appears 478 times. Its grammatical forms separate perfectly into three complete calendar systems.',
+  { id:'calendar-cycles', n:12, hook:'Calendar Cycles',   ar:'دورات التقويم',
+    title:'365·354·29', teaser:'The Arabic word for "day" appears 478 times. Its grammatical forms separate perfectly into three complete calendar systems.',
     cat:'astronomy',catLabel:'Astronomy',   accent:'#818cf8', url:'quran-calendar-cycles.html' },
 
-  { id:'world-hereafter', n:13, title:'World & Hereafter', ar:'الدنيا والآخرة',
-    hook:'115 = 115', teaser:'"This world" and "the Hereafter" — two opposite realities — mentioned an identical number of times.',
+  { id:'world-hereafter', n:13, hook:'World & Hereafter', ar:'الدنيا والآخرة',
+    title:'115 = 115', teaser:'"This world" and "the Hereafter" — two opposite realities — mentioned an identical number of times.',
     cat:'balance',  catLabel:'Balance',     accent:'#a3e635', url:'quran-world-hereafter.html' },
 
-  { id:'sun-temperature', n:14, title:'Sun Temperature',   ar:'حرارة الشمس',
-    hook:'5,778 K',  teaser:'Count the verses between the first and last mention of the word "sun." That number is the Sun\'s surface temperature in Kelvin.',
+  { id:'sun-temperature', n:14, hook:'Sun Temperature',   ar:'حرارة الشمس',
+    title:'5,778 K',  teaser:'Count the verses between the first and last mention of the word "sun." That number is the Sun\'s surface temperature in Kelvin.',
     cat:'astronomy',catLabel:'Astronomy',   accent:'#fb923c', url:'quran-sun-temperature.html' },
 
-  { id:'silver-melting', n:15, title:'Silver Melting',     ar:'انصهار الفضة',
-    hook:'961°C',    teaser:'Two independent verse paths, both starting at the same anchor, both end at silver\'s exact melting point.',
+  { id:'silver-melting', n:15, hook:'Silver Melting',     ar:'انصهار الفضة',
+    title:'961°C',    teaser:'Two independent verse paths, both starting at the same anchor, both end at silver\'s exact melting point.',
     cat:'physics',  catLabel:'Physics',     accent:'#94a3b8', url:'quran-silver-melting.html' },
 
-  { id:'gold-melting', n:16, title:'Gold Melting',         ar:'انصهار الذهب',
-    hook:'1,064°C',  teaser:'Two completely different counting paths through the Quran both converge at gold\'s melting point in Celsius.',
+  { id:'gold-melting', n:16, hook:'Gold Melting',         ar:'انصهار الذهب',
+    title:'1,064°C',  teaser:'Two completely different counting paths through the Quran both converge at gold\'s melting point in Celsius.',
     cat:'physics',  catLabel:'Physics',     accent:'#fbbf24', url:'quran-gold-melting.html' },
 
-  { id:'sirius-distance', n:17, title:'Sirius Distance',   ar:'مسافة الشعرى',
-    hook:'8.6 ly',   teaser:'In Surah 53 ("The Star"), the distance to Sirius is encoded twice — once in letters, once in words — both exact.',
+  { id:'sirius-distance', n:17, hook:'Sirius Distance',   ar:'مسافة الشعرى',
+    title:'8.6 ly',   teaser:'In Surah 53 ("The Star"), the distance to Sirius is encoded twice — once in letters, once in words — both exact.',
     cat:'astronomy',catLabel:'Astronomy',   accent:'#93c5fd', url:'quran-sirius-distance.html' },
 
-  { id:'moon-landing', n:18, title:'Moon Landing',         ar:'الهبوط على القمر',
-    hook:'1389 AH',  teaser:'Count the verses after the moon‑split verse (54:1). That number is the Hijri year Apollo 11 landed on the moon.',
+  { id:'moon-landing', n:18, hook:'Moon Landing',         ar:'الهبوط على القمر',
+    title:'1389 AH',  teaser:'Count the verses after the moon‑split verse (54:1). That number is the Hijri year Apollo 11 landed on the moon.',
     cat:'astronomy',catLabel:'Astronomy',   accent:'#c7d2fe', url:'quran-moon-landing.html' },
 
-  { id:'carbon-creation', n:19, title:'Carbon Creation',   ar:'خلق الكربون',
-    hook:'6 · 12',   teaser:'The Quran describes 6 distinct creation materials — carbon\'s atomic number. Its clay word appears exactly 12 times — carbon\'s mass number.',
+  { id:'carbon-creation', n:19, hook:'Carbon Creation',   ar:'خلق الكربون',
+    title:'6 · 12',   teaser:'The Quran describes 6 distinct creation materials — carbon\'s atomic number. Its clay word appears exactly 12 times — carbon\'s mass number.',
     cat:'physics',  catLabel:'Physics',     accent:'#86efac', url:'quran-carbon-creation.html' },
 
-  { id:'wind-atmosphere', n:20, title:'Wind & Atmosphere',  ar:'الرِّيَاح وَالْغَلَاف الْجَوِّي',
-    hook:'100 km',  teaser:'A 7th-century text restricts wind to "between the sky and earth" — precisely where modern science drew the atmospheric boundary 1,400 years later.',
+  { id:'wind-atmosphere', n:20, hook:'Wind & Atmosphere',  ar:'الرِّيَاح وَالْغَلَاف الْجَوِّي',
+    title:'100 km',  teaser:'A 7th-century text restricts wind to "between the sky and earth" — precisely where modern science drew the atmospheric boundary 1,400 years later.',
     cat:'astronomy',catLabel:'Astronomy',   accent:'#2dd4bf', url:'quran-wind-atmosphere.html' },
 
-  { id:'prime-numbers', n:21, title:'Prime Numbers',        ar:'الأعداد الأولية',
-    hook:'5 primes', teaser:'Al-Fatiha\'s verse count, word count, and letter count are each prime. "Allah" appears 2,699 times (prime). The Quran\'s 326,159 total letters: also prime.',
+  { id:'prime-numbers', n:21, hook:'Prime Numbers',        ar:'الأعداد الأولية',
+    title:'5 primes', teaser:'Al-Fatiha\'s verse count, word count, and letter count are each prime. "Allah" appears 2,699 times (prime). The Quran\'s 326,159 total letters: also prime.',
     cat:'numerics', catLabel:'Numerics',    accent:'#f472b6', url:'quran-prime-numbers.html' },
 
-  { id:'pulsar-navigation', n:22, title:'Pulsar Navigation',   ar:'الملاحة بالنجوم',
-    hook:'1,408 yrs', teaser:'The Quran says humans navigate by stars — dismissed as a mistake. NASA confirmed in 2018 that pulsars (a type of star) are the universe\'s GPS, accurate to ±5 km.',
+  { id:'pulsar-navigation', n:22, hook:'Pulsar Navigation',   ar:'الملاحة بالنجوم',
+    title:'1,408 yrs', teaser:'The Quran says humans navigate by stars — dismissed as a mistake. NASA confirmed in 2018 that pulsars (a type of star) are the universe\'s GPS, accurate to ±5 km.',
     cat:'astronomy', catLabel:'Astronomy',  accent:'#fb7185', url:'quran-pulsar-navigation.html' },
 
-  { id:'human-embryo', n:23, title:'Human Embryo',           ar:'الجنين البشري',
-    hook:'2 words', teaser:'Two Arabic words — "leech" and "chewed" — describe the embryo\'s microscopic appearance at days 23–24 and week 6. No microscope existed in 7th-century Arabia.',
+  { id:'human-embryo', n:23, hook:'Human Embryo',           ar:'الجنين البشري',
+    title:'2 words', teaser:'Two Arabic words — "leech" and "chewed" — describe the embryo\'s microscopic appearance at days 23–24 and week 6. No microscope existed in 7th-century Arabia.',
     cat:'biology',  catLabel:'Biology',     accent:'#fdba74', url:'quran-human-embryo.html' },
 
-  { id:'red-giant', n:24, title:'Sun Swallows Earth',       ar:'الشَّمْسُ تَبْتَلِعُ الْأَرْضَ',
-    hook:'200×', teaser:'The Quran says the sun and moon will be joined. Science confirms the sun will expand 200× and engulf both Earth and Moon in ~5 billion years.',
+  { id:'red-giant', n:24, hook:'Sun Swallows Earth',       ar:'الشَّمْسُ تَبْتَلِعُ الْأَرْضَ',
+    title:'200×', teaser:'The Quran says the sun and moon will be joined. Science confirms the sun will expand 200× and engulf both Earth and Moon in ~5 billion years.',
     cat:'astronomy', catLabel:'Astronomy',  accent:'#e11d48', url:'quran-red-giant.html' },
 
-  { id:'wormholes', n:25, title:'Wormholes',               ar:'الْمَعَارِجُ',
-    hook:'50,000 yrs', teaser:'The Quran names Ma\'arej — ascending pathways angels use for long-distance travel. Einstein called the same mechanism "bridges in spacetime." The Quran gives a precise time-dilation ratio: 1 day inside = 50,000 years outside.',
+  { id:'wormholes', n:25, hook:'Wormholes',               ar:'الْمَعَارِجُ',
+    title:'50,000 yrs', teaser:'The Quran names Ma\'arej — ascending pathways angels use for long-distance travel. Einstein called the same mechanism "bridges in spacetime." The Quran gives a precise time-dilation ratio: 1 day inside = 50,000 years outside.',
     cat:'physics',  catLabel:'Physics',     accent:'#67e8f9', url:'quran-wormholes.html' },
 
-  { id:'pulsars-blackholes', n:26, title:'Pulsars &amp; Black Holes', ar:'النَّجْمُ الثَّاقِبُ',
-    hook:'1 verse', teaser:'Quran 86:3 calls a star "the knocker" and "the hole-maker" in the same breath. Pulsars knock with radio pulses; neutron stars collapse into black holes. Both discoveries described 1,400 years before astronomers found them.',
+  { id:'pulsars-blackholes', n:26, hook:'Pulsars &amp; Black Holes', ar:'النَّجْمُ الثَّاقِبُ',
+    title:'1 verse', teaser:'Quran 86:3 calls a star "the knocker" and "the hole-maker" in the same breath. Pulsars knock with radio pulses; neutron stars collapse into black holes. Both discoveries described 1,400 years before astronomers found them.',
     cat:'astronomy', catLabel:'Astronomy',  accent:'#facc15', url:'quran-pulsars-blackholes.html' },
 
-  { id:'age-of-universe', n:27, title:'Age of Universe',       ar:'عُمْرُ الْكَوْنِ',
-    hook:'1/3', teaser:'The Quran says Earth existed for 2 out of 6 creation days (2/6 = ⅓). Cosmologists measure Earth at 4.6 billion years and the universe at 13.8 billion years — exactly one third. Same ratio, different clocks.',
+  { id:'age-of-universe', n:27, hook:'Age of Universe',       ar:'عُمْرُ الْكَوْنِ',
+    title:'1/3', teaser:'The Quran says Earth existed for 2 out of 6 creation days (2/6 = ⅓). Cosmologists measure Earth at 4.6 billion years and the universe at 13.8 billion years — exactly one third. Same ratio, different clocks.',
     cat:'cosmology', catLabel:'Cosmology',  accent:'#c4b5fd', url:'quran-age-of-universe.html' },
 
-  { id:'big-bang', n:28, title:'Big Bang',                     ar:'الانفجار العظيم',
-    hook:'3 facts', teaser:'One verse in the Quran (21:30) describes the singularity (ratq), the expansion (fatq — torn in opposite directions), and water-based life — three 20th-century discoveries in a single 7th-century sentence.',
+  { id:'big-bang', n:28, hook:'Big Bang',                     ar:'الانفجار العظيم',
+    title:'3 facts', teaser:'One verse in the Quran (21:30) describes the singularity (ratq), the expansion (fatq — torn in opposite directions), and water-based life — three 20th-century discoveries in a single 7th-century sentence.',
     cat:'cosmology', catLabel:'Cosmology',  accent:'#f9a8d4', url:'quran-big-bang.html' },
 
-  { id:'internal-mountains', n:29, title:'Internal Mountains',  ar:'الجِبَالُ الدَّاخِلِيَّة',
-    hook:'400 mi', teaser:'400 miles below the surface, Earth has mountains taller than Everest. The Quran placed them فِي (inside) the Earth — not عَلَى (on top of it) — 1,400 years before geologists discovered them with seismic scanning.',
+  { id:'internal-mountains', n:29, hook:'Internal Mountains',  ar:'الجِبَالُ الدَّاخِلِيَّة',
+    title:'400 mi', teaser:'400 miles below the surface, Earth has mountains taller than Everest. The Quran placed them فِي (inside) the Earth — not عَلَى (on top of it) — 1,400 years before geologists discovered them with seismic scanning.',
     cat:'geology', catLabel:'Geology', accent:'#2dd4bf', url:'quran-internal-mountains.html' },
 
-  { id:'brain-functions', n:30, title:'Brain Functions',        ar:'وَظَائِفُ الدِّمَاغ',
-    hook:'ناصية', teaser:'The Quran called the forehead region "lying and sinful" in 96:16. Neuroscience confirms the prefrontal cortex — directly behind the forehead — is where the brain plans deception. A 2007 study found pathological liars have 23–36% more white matter there.',
+  { id:'brain-functions', n:30, hook:'Brain Functions',        ar:'وَظَائِفُ الدِّمَاغ',
+    title:'ناصية', teaser:'The Quran called the forehead region "lying and sinful" in 96:16. Neuroscience confirms the prefrontal cortex — directly behind the forehead — is where the brain plans deception. A 2007 study found pathological liars have 23–36% more white matter there.',
     cat:'biology', catLabel:'Biology', accent:'#f472b6', url:'quran-brain-functions.html' },
 
-  { id:'iron', n:31, title:'Iron',                             ar:'الْحَدِيد',
-    hook:'26 = 57 = 5100', teaser:'The Arabic word for iron has a gematrical value of 26 — iron\'s atomic number. The chapter is numbered 57 — matching isotope ⁵⁷Fe and the chapter name\'s own gematria. And the verse count to the Iron verse equals the depth of Earth\'s solid iron core: 5,100 km.',
+  { id:'iron', n:31, hook:'Iron',                             ar:'الْحَدِيد',
+    title:'26 = 57 = 5100', teaser:'The Arabic word for iron has a gematrical value of 26 — iron\'s atomic number. The chapter is numbered 57 — matching isotope ⁵⁷Fe and the chapter name\'s own gematria. And the verse count to the Iron verse equals the depth of Earth\'s solid iron core: 5,100 km.',
     cat:'chemistry', catLabel:'Chemistry', accent:'#fb7185', url:'quran-iron.html' },
 
-  { id:'dead-sea', n:32, title:'Dead Sea',                     ar:'أَدْنَى الْأَرْضِ',
-    hook:'−430 m', teaser:'The Quran says Romans were defeated in "أَدْنَى الأرض" — the word means both "nearest" and "lowest." Modern geography confirms: the Dead Sea is Earth\'s lowest land point at 430 metres below sea level. No 7th-century tool could measure this.',
+  { id:'dead-sea', n:32, hook:'Dead Sea',                     ar:'أَدْنَى الْأَرْضِ',
+    title:'−430 m', teaser:'The Quran says Romans were defeated in "أَدْنَى الأرض" — the word means both "nearest" and "lowest." Modern geography confirms: the Dead Sea is Earth\'s lowest land point at 430 metres below sea level. No 7th-century tool could measure this.',
     cat:'geology', catLabel:'Geology', accent:'#fdba74', url:'quran-dead-sea.html' },
 
-  { id:'mountains', n:33, title:'Mountains as Pegs',           ar:'الْجِبَالَ أَوْتَادًا',
-    hook:'250 km', teaser:'The Quran calls mountains أَوْتَادًا — pegs. Pegs are mostly underground. Modern geology confirms: Mount Everest stands 8.8 km tall but its root extends 250 km into the mantle — 28× deeper than the mountain is high, exactly like a peg.',
+  { id:'mountains', n:33, hook:'Mountains as Pegs',           ar:'الْجِبَالَ أَوْتَادًا',
+    title:'250 km', teaser:'The Quran calls mountains أَوْتَادًا — pegs. Pegs are mostly underground. Modern geology confirms: Mount Everest stands 8.8 km tall but its root extends 250 km into the mantle — 28× deeper than the mountain is high, exactly like a peg.',
     cat:'geology', catLabel:'Geology', accent:'#67e8f9', url:'quran-mountains.html' },
 
-  { id:'moving-mountains', n:34, title:'Moving Mountains',         ar:'الْجِبَالُ تَتَحَرَّكُ',
-    hook:'تَمُرُّ', teaser:'The Quran says mountains "move like clouds" — a claim dismissed as error for centuries. Plate tectonics, confirmed in the 1960s, proves every mountain on Earth drifts up to 100 mm per year on a moving plate.',
+  { id:'moving-mountains', n:34, hook:'Moving Mountains',         ar:'الْجِبَالُ تَتَحَرَّكُ',
+    title:'تَمُرُّ', teaser:'The Quran says mountains "move like clouds" — a claim dismissed as error for centuries. Plate tectonics, confirmed in the 1960s, proves every mountain on Earth drifts up to 100 mm per year on a moving plate.',
     cat:'geology', catLabel:'Geology', accent:'#a8a29e', url:'quran-moving-mountains.html' },
 
-  { id:'ants', n:35, title:'Ants', ar:'النمل',
-  hook:'The Ant', teaser:'The Quran described a worker ant as female 1,400 years before zoology confirmed it. Worker ants outside the nest are female and wingless.',
+  { id:'ants', n:35, hook:'Female Ants', ar:'النمل',
+  title:'The working ants', teaser:'The Quran described a worker ant as female 1,400 years before zoology confirmed it. Worker ants outside the nest are female and wingless.',
   cat:'zoology', catLabel:'Zoology', accent:'#d97706',
   url:'quran-ants.html' },
 
-  { id:'camel-drinking', n:36, title:'Fastest Drinkers', ar:'شُرْبَ الْهِيمِ',
-  hook:'Drink 200 L',
+  { id:'camel-drinking', n:36, hook:'Fastest Drinkers', ar:'شُرْبَ الْهِيمِ',
+  title:'Drink 200 L',
   teaser:'Camels drink 200 liters in 3 minutes — the fastest of any mammal. The Quran named them 1,400 years early. Quran 56:55 compares drinking in Hell to thirsty camels. Science only recently discovered that camels are the fastest drinkers on Earth.',
   cat:'zoology', catLabel:'Zoology', accent:'#c2855a',
   url:'quran-camel-drink.html' },
-  { id:'mosquito', n:37, title:'The Mosquito', ar:'بَعُوضَةً فَمَا فَوْقَهَا',
-  hook:'2:26',
+  { id:'mosquito', n:37, hook:'The Mosquito', ar:'بَعُوضَةً فَمَا فَوْقَهَا',
+  title:'2:26',
   teaser:'The Quran uses a mosquito as a parable — and modern science confirms mosquitoes are among the most complex animals on Earth, with more genes than a human.',
   cat:'biology', catLabel:'Biology', accent:'#38bdf8',
   url:'quran-mosquito.html' },
-  { id:'spider-web', n:38, title:'The Spider\'s Web', ar:'بَيْتُ الْعَنْكَبُوتِ',
-  hook:'29:41',
+  { id:'spider-web', n:38, hook:'The Spider\'s Web', ar:'بَيْتُ الْعَنْكَبُوتِ',
+  title:'29:41',
   teaser:'The Quran calls the spider\'s web the weakest of houses — and materials science confirms it is the weakest structure per anchor point of any known biological architecture.',
   cat:'biology', catLabel:'Biology', accent:'#5ea88f',
   url:'quran-spider-web.html' },
-  { id:'crow-funerals', n:39, title:'Crow Funerals', ar:'يُوَارِي سَوْءَةَ أَخِيهِ',
-  hook:'5:31',
+  { id:'crow-funerals', n:39, hook:'Crow Funerals', ar:'يُوَارِي سَوْءَةَ أَخِيهِ',
+  title:'5:31',
   teaser:'The Quran shows a crow teaching burial — 1,400 years before scientists discovered that crows actually hold funeral rituals and teach each other to bury the dead.',
   cat:'zoology', catLabel:'Zoology', accent:'#94a3b8',
   url:'quran-crow-funerals.html' },
-  { id:'pharaoh-mummy', n:40, title:"Pharaoh's Mummy", ar:'نُنَجِّيكَ بِبَدَنِكَ',
-  hook:'10:92',
+  { id:'pharaoh-mummy', n:40, hook:"Pharaoh's Mummy", ar:'نُنَجِّيكَ بِبَدَنِكَ',
+  title:'10:92',
   teaser:"The Quran said Allah preserved Pharaoh's body as a sign. His metal armor should have sunk it forever — yet it was found mummified inland. French scientist Dr. Bucaille accepted Islam on this discovery.",
   cat:'history', catLabel:'History', accent:'#fde68a',
   url:'quran-pharaoh-mummy.html' },
-  { id:'pharaoh-crucifixion', n:41, title:"Pharaoh's Stakes", ar:'وَفِرْعَوْنَ ذِي الْأَوْتَادِ',
-  hook:'89:10',
+  { id:'pharaoh-crucifixion', n:41, hook:"Pharaoh's Stakes", ar:'وَفِرْعَوْنَ ذِي الْأَوْتَادِ',
+  title:'89:10',
   teaser:"Skeptics said the Quran erred — crucifixion didn't exist in Pharaoh's Egypt. Papyrus Boulaq 18 and Egyptian hieroglyphs prove stake-impalement existed millennia before Rome.",
   cat:'history', catLabel:'History', accent:'#e879f9',
   url:'quran-pharaoh-crucifixion.html' },
-  { id:'haman', n:42, title:'Haman in Egypt', ar:'يَا هَامَانُ ابْنِ لِي صَرْحًا',
-  hook:'28:38',
+  { id:'haman', n:42, hook:'Haman in Egypt', ar:'يَا هَامَانُ ابْنِ لِي صَرْحًا',
+  title:'28:38',
   teaser:"The Bible says Haman was in Persia, centuries after Moses. The Quran says he was in Egypt. Egyptologists found his name in hieroglyphs — with the title 'Overseer of the stone-quarry workers.'",
   cat:'history', catLabel:'History', accent:'#4ade80',
   url:'quran-haman.html' },
-  { id:'paper-money', n:43, title:'Paper Money', ar:'بِوَرِقِكُمْ هَٰذِهِ',
-  hook:'18:19',
+  { id:'paper-money', n:43, hook:'Paper Money', ar:'بِوَرِقِكُمْ هَٰذِهِ',
+  title:'18:19',
   teaser:"7th-century Arabia used only metal coins. Yet Quran 18:19 uses the word بِوَرِقِكُمْ — 'your paper money.' The first paper currency in history appeared in China 400 years later.",
   cat:'history', catLabel:'History', accent:'#7dd3fc',
   url:'quran-paper-money.html' },
-  { id:'pharaoh-mourning', n:44, title:'Mourning of Pharaoh', ar:'فَمَا بَكَتْ عَلَيْهِمُ السَّمَاءُ',
-  hook:'44:29',
+  { id:'pharaoh-mourning', n:44, hook:'Mourning of Pharaoh', ar:'فَمَا بَكَتْ عَلَيْهِمُ السَّمَاءُ',
+  title:'44:29',
   teaser:"Quran 44:29 says the sky did not weep for Pharaoh. Egyptologists later found pyramid texts saying exactly that — the sky weeps for dead pharaohs. Sealed in undecipherable hieroglyphs for 1,200 years.",
   cat:'history', catLabel:'History', accent:'#a5f3fc',
   url:'quran-pharaoh-mourning.html' },
-  { id:'reading', n:45, title:'Reading', ar:'اقْرَأْ بِاسْمِ رَبِّكَ',
-  hook:'96:1',
+  { id:'reading', n:45, hook:'Reading', ar:'اقْرَأْ بِاسْمِ رَبِّكَ',
+  title:'96:1',
   teaser:"The first word ever revealed in the Quran is 'Read.' Neuroscientists discovered in 2020 that human brains are born prewired with a reading center — the VWFA — already connected to language at birth.",
   cat:'biology', catLabel:'Biology', accent:'#f0abfc',
   url:'quran-reading.html' },
-  { id:'brainstem', n:46, title:'Brainstem', ar:'يَتَوَفَّى الْأَنْفُسَ حِينَ مَوْتِهَا',
-  hook:'39:42',
+  { id:'brainstem', n:46, hook:'Brainstem', ar:'يَتَوَفَّى الْأَنْفُسَ حِينَ مَوْتِهَا',
+  title:'39:42',
   teaser:"Quran 39:42 links sleep and death as one event. Science confirmed: the brainstem governs sleep — and brainstem death is legally certified as death itself.",
   cat:'biology', catLabel:'Biology', accent:'#22d3ee',
   url:'quran-brainstem.html' },
-  { id:'inner-ear', n:47, title:'Inner Ear', ar:'فَضَرَبْنَا عَلَىٰ آذَانِهِمْ',
-  hook:'18:11',
+  { id:'inner-ear', n:47, hook:'Inner Ear', ar:'فَضَرَبْنَا عَلَىٰ آذَانِهِمْ',
+  title:'18:11',
   teaser:"1,400 years before science, ears were thought to only hear. The Quran described striking the ear to cause unconsciousness — exactly how the inner ear's vestibular system works.",
   cat:'biology', catLabel:'Biology', accent:'#fde68a',
   url:'quran-inner-ear.html' },
-  { id:'skin-memory', n:48, title:'Skin Memory', ar:'وَجُلُودُهُمْ بِمَا كَانُوا يَعْمَلُونَ',
-  hook:'41:20',
+  { id:'skin-memory', n:48, hook:'Skin Memory', ar:'وَجُلُودُهُمْ بِمَا كَانُوا يَعْمَلُونَ',
+  title:'41:20',
   teaser:"Skeptics said it was impossible: skin can't store memories. In 2024, NYU proved them wrong — non-neural cells including skin can store and retrieve memories.",
   cat:'biology', catLabel:'Biology', accent:'#d946ef',
   url:'quran-skin-memory.html' },
-  { id:'atmosphere', n:49, title:'Atmospheric Pressure', ar:'يَصَّعَّدُ فِي السَّمَاءِ',
-  hook:'6:125',
+  { id:'atmosphere', n:49, hook:'Atmospheric Pressure', ar:'يَصَّعَّدُ فِي السَّمَاءِ',
+  title:'6:125',
   teaser:"The Quran describes chests 'tight and constricted as if ascending to the sky.' Science confirms: above 8,000m the Death Zone begins — where oxygen is too thin for human life.",
   cat:'physics', catLabel:'Physics', accent:'#bae6fd',
   url:'quran-atmosphere.html' },
@@ -1078,6 +1078,9 @@ setTimeout(function() {
       ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
     }
 
+    /* ── side panels: drawn after vignette so they punch through ── */
+    if (!isLight) drawSidePanels(base);
+
     t++;
     requestAnimationFrame(frame);
   }
@@ -1209,6 +1212,59 @@ setTimeout(function() {
       ctx.strokeStyle = isLight ? 'rgba(10,120,90,' + pa + ')' : 'rgba(167,243,208,' + pa + ')';
       ctx.lineWidth = 0.52; ctx.stroke();
     }
+  }
+
+  function drawSidePanels(base) {
+    /* Larger, brighter star grid drawn only in the side corridors where
+       the central mandala doesn't reach — two overlapping layers for depth */
+    var layers = [
+      { step:78, szf:0.30, irf:0.41, spd:0.038, alpha:0.85 },
+      { step:52, szf:0.26, irf:0.44, spd:0.065, alpha:0.55 },
+    ];
+    for (var li = 0; li < layers.length; li++) {
+      var lyr = layers[li];
+      var tRot = base * lyr.spd;
+      for (var gy = -lyr.step; gy < H + lyr.step; gy += lyr.step) {
+        var xOff = (Math.floor((gy / lyr.step + 200)) % 2 === 0) ? 0 : lyr.step * 0.5;
+        for (var gx = -lyr.step + xOff; gx < W + lyr.step; gx += lyr.step) {
+          var dx = gx - cx, dy = gy - cy;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          /* visible only beyond the mandala's reach */
+          var fade = Math.max(0, Math.min(1, (dist - R * 0.46) / (lyr.step * 2.6)));
+          if (fade <= 0.02) continue;
+          /* brightest at outer edges, smooth falloff toward center */
+          var edgePull = Math.max(0, Math.min(1, (Math.abs(dx) - R * 0.42) / (lyr.step * 3.0)));
+          var alpha = fade * edgePull * lyr.alpha;
+          if (alpha < 0.018) continue;
+          var sz = lyr.step * lyr.szf, ir = sz * lyr.irf;
+          ctx.beginPath();
+          for (var si = 0; si < 16; si++) {
+            var sa = tRot + (si / 16) * Math.PI * 2;
+            var sr = si % 2 === 0 ? sz : ir;
+            si === 0 ? ctx.moveTo(gx + Math.cos(sa) * sr, gy + Math.sin(sa) * sr)
+                     : ctx.lineTo(gx + Math.cos(sa) * sr, gy + Math.sin(sa) * sr);
+          }
+          ctx.closePath();
+          ctx.fillStyle   = 'rgba(30,80,180,'  + (alpha * 0.45) + ')';
+          ctx.strokeStyle = 'rgba(99,162,246,' + alpha + ')';
+          ctx.lineWidth = 0.72;
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+    }
+    /* soft glowing curtain at each horizontal edge */
+    var curtainW = Math.min(W * 0.20, 200);
+    var gL = ctx.createLinearGradient(0, 0, curtainW, 0);
+    gL.addColorStop(0,   'rgba(10,40,120,0.72)');
+    gL.addColorStop(0.4, 'rgba(10,40,120,0.28)');
+    gL.addColorStop(1,   'transparent');
+    ctx.fillStyle = gL; ctx.fillRect(0, 0, curtainW, H);
+    var gR = ctx.createLinearGradient(W, 0, W - curtainW, 0);
+    gR.addColorStop(0,   'rgba(10,40,120,0.72)');
+    gR.addColorStop(0.4, 'rgba(10,40,120,0.28)');
+    gR.addColorStop(1,   'transparent');
+    ctx.fillStyle = gR; ctx.fillRect(W - curtainW, 0, curtainW, H);
   }
 
   function drawBgTile(base, isLight) {

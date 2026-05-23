@@ -259,7 +259,7 @@
 
     <div class="next-teaser">
       <div class="next-teaser-label">But there is a second miracle in this same surah</div>
-      <div class="next-teaser-title">The Quran addresses bees with three commands — all in the feminine. In 7th-century Arabia, hive workers were assumed to be male.</div>
+      <div class="next-teaser-title">The Quran addresses bees with three commands, all in the feminine. In 7th-century Arabia, hive workers were assumed to be male.</div>
       <a href="quran-bee-female.html" class="btn" style="background:var(--accent);color:#fff">
         Continue · The Female Worker →
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -405,32 +405,275 @@ function initHeroCanvas() {
   if (!c) return;
   var ctx = c.getContext('2d');
   var W = c.width, H = c.height, t = 0;
-  function frame(){
-    ctx.clearRect(0,0,W,H);
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#060d18'); g.addColorStop(1,'#0c1828');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    var steps=60, pts1=[], pts2=[];
-    for(var i=0;i<=steps;i++){
-      var x=i/steps*W;
-      var angle=i/steps*Math.PI*4-t*1.5;
-      var amp=H*0.3;
-      pts1.push({x:x,y:H*0.5+Math.sin(angle)*amp});
-      pts2.push({x:x,y:H*0.5+Math.sin(angle+Math.PI)*amp});
-    }
-    for(var i=0;i<steps;i+=4){
-      var vis=Math.abs(pts1[i].y-pts2[i].y)/(H*0.6);
-      ctx.beginPath(); ctx.moveTo(pts1[i].x,pts1[i].y); ctx.lineTo(pts2[i].x,pts2[i].y);
-      ctx.strokeStyle='rgba(139,92,246,'+(0.12+vis*0.28)+')'; ctx.lineWidth=1.5; ctx.stroke();
-    }
-    [pts1,pts2].forEach(function(pts,si){
-      ctx.beginPath();
-      pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
-      ctx.strokeStyle=si===0?'rgba(52,211,153,0.8)':'rgba(139,92,246,0.8)';
-      ctx.lineWidth=2.5; ctx.stroke();
+  var chromos = [];
+  // Left side: Female Diploid (16 pairs = 32 total). We draw 7 distinct pairs to represent density.
+  for (var i = 0; i < 7; i++) {
+    chromos.push({
+      x: W * 0.08 + Math.random() * (W * 0.38),
+      y: H * 0.1 + Math.random() * (H * 0.8),
+      size: 10 + Math.random() * 10,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.008,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.15,
+      ph: Math.random() * Math.PI * 2,
+      paired: true,
+      color: 'rgba(245,180,40,' // Warm gold for female
     });
-    t+=0.02; requestAnimationFrame(frame);
   }
+  // Right side: Male Haploid (16 singles). We draw 7 distinct singles.
+  for (var i = 0; i < 7; i++) {
+    chromos.push({
+      x: W * 0.55 + Math.random() * (W * 0.38),
+      y: H * 0.1 + Math.random() * (H * 0.8),
+      size: 10 + Math.random() * 10,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.008,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.18,
+      ph: Math.random() * Math.PI * 2,
+      paired: false,
+      color: 'rgba(200,220,245,' // Cool pale blue/silver for male
+    });
+  }
+
+  var spindles = [];
+  for (var i = 0; i < 12; i++) {
+    spindles.push({
+      y: (H / 12) * i + Math.random() * 20,
+      ph: Math.random() * Math.PI * 2,
+      alpha: 0.05 + Math.random() * 0.08
+    });
+  }
+
+  var particles = [];
+  for (var i = 0; i < 40; i++) {
+    particles.push({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.8 + 0.3,
+      alpha: Math.random() * 0.3 + 0.1,
+      ph: Math.random() * Math.PI * 2
+    });
+  }
+
+  function drawChromo(c) {
+    var pulse = 0.85 + Math.sin(t * 1.5 + c.ph) * 0.15;
+    var col = c.color + pulse + ')';
+    
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+
+    // Chromosome Glow
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 14;
+
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    var s = c.size;
+
+    // Draw X shape (Left arm to Right arm, crossing)
+    ctx.beginPath();
+    ctx.moveTo(-s, -s * 0.75);
+    ctx.quadraticCurveTo(-s*0.2, -s*0.15, 0, 0);
+    ctx.quadraticCurveTo(s*0.2, s*0.15, s, s * 0.75);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(s, -s * 0.75);
+    ctx.quadraticCurveTo(s*0.2, -s*0.15, 0, 0);
+    ctx.quadraticCurveTo(-s*0.2, s*0.15, -s, s * 0.75);
+    ctx.stroke();
+
+    // Centromere (Center Dot)
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = 0.9 * pulse;
+    ctx.beginPath();
+    ctx.arc(0, 0, 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // If paired (Female Diploid), draw sister chromatid next to it
+    if (c.paired) {
+      ctx.globalAlpha = 0.6 * pulse;
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 2.8;
+
+      var offX = 9;
+      var offY = 9;
+
+      ctx.beginPath();
+      ctx.moveTo(-s + offX, -s * 0.75 + offY);
+      ctx.quadraticCurveTo(-s*0.2 + offX, -s*0.15 + offY, offX, offY);
+      ctx.quadraticCurveTo(s*0.2 + offX, s*0.15 + offY, s + offX, s * 0.75 + offY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(s + offX, -s * 0.75 + offY);
+      ctx.quadraticCurveTo(s*0.2 + offX, -s*0.15 + offY, offX, offY);
+      ctx.quadraticCurveTo(-s*0.2 + offX, s*0.15 + offY, -s + offX, s * 0.75 + offY);
+      ctx.stroke();
+
+      // Kinetochore connections (tiny lines linking the pair at the center)
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.lineTo(offX, offY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-2, 2); ctx.lineTo(offX - 2, offY + 2);
+      ctx.stroke();
+      
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
+  function drawSpindles() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    spindles.forEach(function(sp) {
+      var sway = Math.sin(t * 0.8 + sp.ph) * 15;
+      var a = sp.alpha + Math.sin(t + sp.ph) * 0.03;
+      ctx.strokeStyle = 'rgba(255, 200, 100, ' + a + ')';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(0, sp.y + sway);
+      ctx.quadraticCurveTo(W * 0.5, sp.y + sway * 0.5, W, sp.y - sway);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    particles.forEach(function(p) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x > W + 5) p.x = -5;
+      if (p.x < -5) p.x = W + 5;
+      if (p.y > H + 5) p.y = -5;
+      if (p.y < -5) p.y = H + 5;
+      
+      var pa = p.alpha + Math.sin(t * 0.5 + p.ph) * 0.1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(180, 160, 120, ' + pa + ')';
+      ctx.fill();
+    });
+  }
+
+  function drawLabels() {
+    ctx.save();
+    ctx.font = '600 10px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '1px';
+
+    // Female Label
+    ctx.fillStyle = 'rgba(245, 190, 60, 0.6)';
+    ctx.fillText('FEMALE · WORKER', W * 0.25, H - 18);
+    ctx.font = '700 12px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(245, 190, 60, 0.85)';
+    ctx.fillText('16 PAIRS (32)', W * 0.25, H - 5);
+
+    // Male Label
+    ctx.font = '600 10px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(180, 200, 230, 0.6)';
+    ctx.fillText('MALE · DRONE', W * 0.75, H - 18);
+    ctx.font = '700 12px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(180, 200, 230, 0.85)';
+    ctx.fillText('16 SINGLES (16)', W * 0.75, H - 5);
+
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Deep cellular background
+    var bg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.7);
+    bg.addColorStop(0, '#0c0a05');
+    bg.addColorStop(0.6, '#080604');
+    bg.addColorStop(1, '#040302');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle cell membrane
+    ctx.beginPath();
+    ctx.ellipse(W/2, H/2, W*0.46, H*0.44, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255, 200, 100, 0.04)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    drawSpindles();
+    drawParticles();
+
+    // Update and draw chromosomes
+    chromos.forEach(function(c) {
+      c.rot += c.rotSpeed;
+      c.x += c.vx;
+      c.y += c.vy;
+
+      // Soft boundary collision
+      if (c.paired && (c.x < W*0.03 || c.x > W*0.47)) c.vx *= -1;
+      if (!c.paired && (c.x < W*0.53 || c.x > W*0.97)) c.vx *= -1;
+      if (c.y < H*0.05 || c.y > H*0.78) c.vy *= -1;
+
+      drawChromo(c);
+    });
+
+    // Central dividing line (Metaphase plate representation)
+    ctx.save();
+    ctx.setLineDash([4, 6]);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W/2, H*0.05);
+    ctx.lineTo(W/2, H*0.8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    drawLabels();
+
+    // Vignette (Matching the honeycomb canvas exactly)
+    var vt = ctx.createLinearGradient(0, 0, 0, 35);
+    vt.addColorStop(0, 'rgba(11,22,34,0.55)');
+    vt.addColorStop(1, 'rgba(11,22,34,0)');
+    ctx.fillStyle = vt;
+    ctx.fillRect(0, 0, W, 35);
+
+    var vb = ctx.createLinearGradient(0, H - 35, 0, H);
+    vb.addColorStop(0, 'rgba(11,22,34,0)');
+    vb.addColorStop(1, 'rgba(11,22,34,0.55)');
+    ctx.fillStyle = vb;
+    ctx.fillRect(0, H - 35, W, 35);
+
+    var vl = ctx.createLinearGradient(0, 0, 35, 0);
+    vl.addColorStop(0, 'rgba(11,22,34,0.45)');
+    vl.addColorStop(1, 'rgba(11,22,34,0)');
+    ctx.fillStyle = vl;
+    ctx.fillRect(0, 0, 35, H);
+
+    var vr = ctx.createLinearGradient(W - 35, 0, W, 0);
+    vr.addColorStop(0, 'rgba(11,22,34,0)');
+    vr.addColorStop(1, 'rgba(11,22,34,0.45)');
+    ctx.fillStyle = vr;
+    ctx.fillRect(W - 35, 0, 35, H);
+
+    t += 0.015;
+    rafId = requestAnimationFrame(frame);
+  }
+
   frame();
 }
 initHeroCanvas();
