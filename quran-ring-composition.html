@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css">
+  <title>Ring Composition · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0b1622;--surface:#111e2e;--surface2:#182840;
+      --border:rgba(255,255,255,0.08);--text:#e2ddd4;--muted:#7a8fa3;
+      --gold:#f59e0b;--gold-light:#fcd34d;
+      --ok:#22c55e;--ok-bg:#052e16;--ok-border:#166534;
+      --err-light:#f87171;--err-bg:#2d0707;--err-border:#991b1b;
+      --accent:#4ade80;--accent-light:#86efac;
+      --accent-dim:rgba(74,222,128,0.12);--accent-ring:rgba(74,222,128,0.28);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:44px 20px 160px;}
+    .container{max-width:660px;margin:0 auto;}
+    .dot-field{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:28px 28px;}
+    .container{position:relative;z-index:1;}
+    .nav-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;transition:color .2s;}
+    .nav-back:hover{color:var(--text);}
+    .stage{display:none;}
+    .stage.active{display:block;animation:rise .4s ease;}
+    @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .lesson-bar-wrap{background:var(--surface2);border-radius:100px;height:10px;margin-bottom:6px;overflow:hidden;}
+    .lesson-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .65s cubic-bezier(.4,0,.2,1);width:0%;}
+    .lesson-meta{font-size:11px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:36px;}
+    .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:14px;color:var(--accent);}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);line-height:1.22;margin-bottom:16px;}
+    .body-text{font-size:15px;line-height:1.85;color:var(--muted);margin-bottom:22px;}
+    .prompt{font-family:'Playfair Display',serif;font-size:clamp(18px,4vw,22px);line-height:1.4;margin-bottom:22px;}
+    .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-accent{background:var(--accent);color:#052e16;}
+    .btn-accent:hover{filter:brightness(1.1);}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+    .insight-box{background:var(--surface);border-radius:10px;border-left:3px solid var(--accent);padding:16px 20px;font-size:14px;color:var(--muted);line-height:1.8;margin:20px 0;}
+    .insight-box strong{color:var(--text);}
+
+    /* ── ANSWER CARDS ── */
+    .answer-card{background:var(--surface);border:2px solid rgba(255,255,255,0.1);border-bottom:4px solid rgba(0,0,0,0.28);border-radius:14px;padding:15px 18px;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;margin-bottom:11px;display:flex;align-items:flex-start;gap:14px;user-select:none;}
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong){border-color:var(--accent-light);transform:translateY(-2px);}
+    .answer-card.ac-correct{border-color:var(--ok);background:rgba(34,197,94,0.08);pointer-events:none;}
+    .answer-card.ac-wrong{animation:shake .4s ease;border-color:var(--err-light)!important;}
+    .answer-card.ac-disabled{opacity:.38;pointer-events:none;}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+    .ac-letter{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;color:var(--muted);}
+    .answer-card.ac-correct .ac-letter{background:rgba(34,197,94,0.2);border-color:var(--ok);color:var(--ok);}
+    .ac-body{flex:1;}
+    .ac-big{font-size:15px;font-weight:600;color:var(--text);line-height:1.45;}
+    .ac-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+    /* ── VERSE BOX ── */
+    .verse-box{background:var(--surface);border:1px solid var(--accent-ring);border-radius:14px;padding:24px;text-align:center;margin:22px 0;}
+    .vb-ref{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .vb-ar{font-family:'Amiri',serif;direction:rtl;font-size:clamp(20px,5vw,28px);line-height:2.1;color:var(--text);}
+    .vb-hl{color:#fcd34d;font-weight:700;}
+    .vb-tr{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;border-top:1px solid var(--border);padding-top:12px;font-style:italic;}
+    .vb-hl-en{color:#fcd34d;font-style:normal;font-weight:600;}
+
+    /* ── BAQARAH RING VISUAL ── */
+    .rng-wrap{margin:22px 0;}
+    .rng-pair{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:0;margin-bottom:6px;opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease;}
+    .rng-pair.vis{opacity:1;transform:translateY(0);}
+    .rng-sect{padding:10px 14px;border-radius:8px;display:flex;flex-direction:column;gap:2px;}
+    .rng-sect.lft{border-left:3px solid var(--pc);align-items:flex-start;}
+    .rng-sect.rgt{border-right:3px solid var(--pc);align-items:flex-end;text-align:right;}
+    .rng-lbl{font-size:11px;font-weight:700;color:var(--pc);letter-spacing:.06em;}
+    .rng-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+    .rng-ref{font-size:10px;color:var(--muted);}
+    .rng-arrow{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);}
+    .rng-center{background:rgba(252,211,77,0.08);border:2px solid rgba(252,211,77,0.35);border-radius:10px;padding:14px 18px;text-align:center;margin-top:6px;opacity:0;transition:opacity .5s ease .1s;}
+    .rng-center.vis{opacity:1;}
+    .rng-center-lbl{font-size:11px;font-weight:700;color:#fcd34d;letter-spacing:.08em;margin-bottom:4px;}
+    .rng-center-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);margin-bottom:4px;}
+    .rng-center-ref{font-size:11px;color:#fcd34d;font-weight:600;}
+    .rng-center-ar{font-family:'Amiri',serif;direction:rtl;font-size:18px;color:#fcd34d;margin-top:8px;line-height:2;}
+    .rng-note{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 20px;line-height:1.7;opacity:0;transition:opacity .5s ease;}
+    .rng-note.vis{opacity:1;}
+
+    /* ── NUMBER GAME ── */
+    .num-game{background:var(--surface);border-radius:14px;padding:24px;text-align:center;margin:22px 0;}
+    .ng-step{font-size:28px;font-family:'Playfair Display',serif;font-weight:700;color:var(--muted);margin-bottom:10px;min-height:40px;}
+    .ng-step span{color:var(--accent);}
+    .ng-step .ng-result{color:#fcd34d;}
+    .ng-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px;}
+
+    /* ── AYAT AL-KURSI RING ── */
+    .kursi-wrap{margin:22px 0;}
+    .kursi-clause{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;margin-bottom:4px;transition:background .2s;}
+    .kursi-clause:hover{background:rgba(255,255,255,0.03);}
+    .kc-lbl{font-size:11px;font-weight:700;min-width:28px;padding-top:2px;flex-shrink:0;}
+    .kc-text{font-size:14px;line-height:1.6;color:var(--muted);}
+    .kc-text strong{color:var(--text);}
+    .kc-text mark{background:rgba(252,211,77,0.18);color:#fcd34d;border-radius:3px;padding:1px 4px;font-style:normal;font-weight:600;}
+    .kursi-center{background:rgba(252,211,77,0.08);border:2px solid rgba(252,211,77,0.4);border-radius:10px;padding:14px 16px;margin:8px 0;display:flex;align-items:flex-start;gap:10px;}
+    .kursi-divider{height:1px;background:var(--border);margin:10px 0;}
+    .kursi-tip{font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:10px 14px;margin-top:14px;line-height:1.7;}
+    .kursi-tip strong{color:var(--text);}
+
+    /* ── XP BADGE ── */
+    .xp-badge{display:none;align-items:center;gap:10px;background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:12px;padding:12px 18px;margin-bottom:24px;font-size:14px;font-weight:600;color:var(--ok);}
+    .xp-badge.show{display:flex;animation:rise .4s ease;}
+
+    /* ── VERDICT ── */
+    .v-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0;}
+    .v-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+    .v-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--accent);line-height:1;}
+    .v-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:6px;}
+    .verdict-quote{font-family:'Playfair Display',serif;font-size:clamp(18px,4vw,22px);line-height:1.5;color:var(--text);margin:24px 0 18px;border-left:3px solid var(--accent);padding-left:18px;}
+
+    /* ── FB PANEL ── */
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);padding:14px 24px;display:none;justify-content:space-between;align-items:center;gap:16px;z-index:100;}
+    .fb-panel.show{display:flex;animation:slideup .3s ease;}
+    @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .fb-panel.fb-ok{border-top-color:var(--ok-border);background:var(--ok-bg);}
+    .fb-left{display:flex;align-items:center;gap:14px;}
+    .fb-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+    .fb-panel.fb-ok .fb-icon{background:rgba(34,197,94,0.2);color:var(--ok);}
+    .fb-title{font-weight:700;font-size:16px;}
+    .fb-sub{font-size:13px;color:var(--muted);line-height:1.5;max-width:380px;}
+    .fb-btn{padding:12px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;background:var(--ok);color:#fff;}
+  </style>
+</head>
+<body>
+<div class="dot-field"></div>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  <button class="tt-btn" data-theme-val="system" title="System"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+  <button class="tt-btn" data-theme-val="light" title="Light"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="container">
+  <a href="quran-atmosphere.html" class="nav-back">← Atmospheric Pressure</a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <p class="lesson-meta" id="lmeta">Lesson · Ring Composition</p>
+
+  <!-- ══════════════ S0 — INTRO ══════════════ -->
+  <div id="s0" class="stage active">
+    <p class="eyebrow">Lesson 50 · Literary Structure</p>
+    <h1 class="hero-title">The Hidden Mirror Inside the Quran</h1>
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:26px;display:block;"></canvas>
+
+    <p class="body-text">Imagine a story that goes <strong style="color:var(--text)">A → B → C → B' → A'</strong> — where the end perfectly mirrors the beginning and the center holds the most important message. This is called <strong style="color:var(--text)">ring composition</strong>.</p>
+
+    <div class="insight-box">
+      <strong>Surah Al-Baqarah (The Cow)</strong> is the longest chapter in the Quran — 286 verses, revealed to Prophet Muhammad over 9 years, out of sequential order, with no editorial process. Modern scholars discovered it forms a perfect mathematical mirror, detectable only with 20th-century literary analysis tools — invisible for 1,400 years.
+    </div>
+
+    <p class="body-text">In this lesson you will see <em>two</em> examples of this structure: the whole chapter of Al-Baqarah, and then a single verse inside it — Ayat al-Kursi — which has its own perfect ring nested within the larger one.</p>
+
+    <button class="btn btn-accent" onclick="go(1)">Start Lesson →</button>
+  </div>
+
+  <!-- ══════════════ S1 — BAQARAH RING VISUAL ══════════════ -->
+  <div id="s1" class="stage">
+    <p class="eyebrow">Example 1 · Surah Al-Baqarah</p>
+    <h2 class="hero-title">The Mirror of 286 Verses</h2>
+
+    <p class="body-text">Al-Baqarah's 286 verses can be divided into 9 sections by theme. Look at how the sections pair up — revealed years apart, yet matching perfectly:</p>
+
+    <div class="rng-wrap" id="rngWrap">
+
+      <div class="rng-pair" id="rp0" style="--pc:#e879f9">
+        <div class="rng-sect lft" style="background:rgba(232,121,249,0.07)">
+          <span class="rng-lbl">A · Verses 1–20</span>
+          <span class="rng-title">Faith &amp; Unbelief</span>
+          <span class="rng-ref">Who believes and who rejects</span>
+        </div>
+        <div class="rng-arrow">⟷</div>
+        <div class="rng-sect rgt" style="background:rgba(232,121,249,0.07)">
+          <span class="rng-lbl">A' · Verses 285–286</span>
+          <span class="rng-title">Faith &amp; Unbelief</span>
+          <span class="rng-ref">Same theme, mirroring section A</span>
+        </div>
+      </div>
+
+      <div class="rng-pair" id="rp1" style="--pc:#a78bfa">
+        <div class="rng-sect lft" style="background:rgba(167,139,250,0.07)">
+          <span class="rng-lbl">B · Verses 21–39</span>
+          <span class="rng-title">Creation &amp; Knowledge</span>
+          <span class="rng-ref">Allah creates Adam, sends him to earth</span>
+        </div>
+        <div class="rng-arrow">⟷</div>
+        <div class="rng-sect rgt" style="background:rgba(167,139,250,0.07)">
+          <span class="rng-lbl">B' · Verses 254–284</span>
+          <span class="rng-title">Creation &amp; Knowledge</span>
+          <span class="rng-ref">Ayat al-Kursi — Allah\'s throne &amp; knowledge</span>
+        </div>
+      </div>
+
+      <div class="rng-pair" id="rp2" style="--pc:#60a5fa">
+        <div class="rng-sect lft" style="background:rgba(96,165,250,0.07)">
+          <span class="rng-lbl">C · Verses 40–103</span>
+          <span class="rng-title">Laws Given to the Jews</span>
+          <span class="rng-ref">Commands and covenant with Israel</span>
+        </div>
+        <div class="rng-arrow">⟷</div>
+        <div class="rng-sect rgt" style="background:rgba(96,165,250,0.07)">
+          <span class="rng-lbl">C' · Verses 178–253</span>
+          <span class="rng-title">Laws Given to Muslims</span>
+          <span class="rng-ref">The same framework — now for the new community</span>
+        </div>
+      </div>
+
+      <div class="rng-pair" id="rp3" style="--pc:#4ade80">
+        <div class="rng-sect lft" style="background:rgba(74,222,128,0.07)">
+          <span class="rng-lbl">D · Verses 104–141</span>
+          <span class="rng-title">Ibrahim Was Tested</span>
+          <span class="rng-ref">The patriarch faces God\'s trials</span>
+        </div>
+        <div class="rng-arrow">⟷</div>
+        <div class="rng-sect rgt" style="background:rgba(74,222,128,0.07)">
+          <span class="rng-lbl">D' · Verses 153–177</span>
+          <span class="rng-title">Muslims Will Be Tested</span>
+          <span class="rng-ref">The new community faces the same pattern</span>
+        </div>
+      </div>
+
+      <div class="rng-center" id="rngCenter">
+        <div class="rng-center-lbl">E · VERSE 143 · THE CENTER</div>
+        <div class="rng-center-title">The Ka'ba — New Direction of Prayer</div>
+        <div class="rng-center-ar">وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً وَسَطًا</div>
+        <div class="rng-center-ref">"And thus We have made you a middle nation"</div>
+      </div>
+    </div>
+
+    <p class="rng-note" id="rngNote">Every outer section mirrors its partner. The first half of the chapter matches the second half — revealed years apart.</p>
+
+    <div style="height:20px"></div>
+    <p class="prompt">Section A (verses 1–20) covers Faith &amp; Unbelief. What does section A' (verses 285–286) address?</p>
+
+    <div onclick="pickEx(this,1,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Laws given to Muslims about prayer and fasting</div></div>
+    </div>
+    <div onclick="pickEx(this,1,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Faith &amp; Unbelief — the exact same theme as section A</div>
+        <div class="ac-sub">The end mirrors the beginning — that is ring composition</div>
+      </div>
+    </div>
+    <div onclick="pickEx(this,1,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Stories of the prophets Ibrahim and Musa</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ S2 — THE CENTER VERSE ══════════════ -->
+  <div id="s2" class="stage">
+    <p class="eyebrow">The Numbers Game</p>
+    <h2 class="hero-title">The Center of 286 Verses</h2>
+
+    <p class="body-text">Ring composition says the most important message sits at the <strong style="color:var(--text)">exact center</strong> of the structure. Al-Baqarah has 286 verses. Let\'s do the math:</p>
+
+    <div class="num-game">
+      <div class="ng-step" id="ngStep1">286 verses</div>
+      <div class="ng-step" id="ngStep2" style="opacity:0">÷ 2 = <span class="ng-result">143</span></div>
+      <div class="ng-sub" id="ngSub" style="opacity:0">Verse 143 is the exact center of the longest chapter in the Quran.</div>
+    </div>
+
+    <div class="verse-box" id="v143" style="opacity:0;transition:opacity .5s ease .3s">
+      <div class="vb-ref">Surah Al-Baqarah · Verse 143</div>
+      <div class="vb-ar">وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً <span class="vb-hl">وَسَطًا</span></div>
+      <div class="vb-tr">"And thus We have made you a <span class="vb-hl-en">middle</span> nation"</div>
+    </div>
+
+    <div class="insight-box" id="v143insight" style="opacity:0;transition:opacity .5s ease .5s">
+      <strong>وَسَطًا (Wasatan)</strong> means <strong>MIDDLE</strong> in Arabic. The center verse of the longest chapter in the Quran literally contains the word "middle." This verse also describes the changing of the Qibla — the direction of prayer — from Jerusalem to Mecca. It is the <em>turning point</em> of the chapter, placed at the exact turning point of the structure.
+    </div>
+
+    <p class="prompt" id="s2prompt" style="opacity:0;transition:opacity .4s ease .7s">The Arabic word وَسَطًا (Wasatan) in verse 143 means:</p>
+
+    <div id="s2mc" style="opacity:0;transition:opacity .4s ease .8s">
+      <div onclick="pickEx(this,2,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body"><div class="ac-big">Prophet</div></div>
+      </div>
+      <div onclick="pickEx(this,2,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Middle</div>
+          <div class="ac-sub">The center word of the center verse of the longest chapter</div>
+        </div>
+      </div>
+      <div onclick="pickEx(this,2,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body"><div class="ac-big">Prayer</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ S3 — AYAT AL-KURSI ══════════════ -->
+  <div id="s3" class="stage">
+    <p class="eyebrow">Example 2 · A Ring Within a Ring</p>
+    <h2 class="hero-title">Ayat al-Kursi — 9 Clauses, Perfect Mirror</h2>
+
+    <p class="body-text">Verse 2:255 — <strong style="color:var(--text)">Ayat al-Kursi</strong> (The Throne Verse) — is considered the most excellent verse in the Quran. It has 9 clauses. Scholars discovered it too forms a perfect ring, nested inside the larger ring of Al-Baqarah itself. Read each clause:</p>
+
+    <div class="kursi-wrap">
+
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#e879f9">A</span>
+        <div class="kc-text"><strong>Allah — there is no God but Him, He is the Living, the Sustaining</strong></div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#a78bfa">B</span>
+        <div class="kc-text">Neither tiredness nor sleep overtakes Him</div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#60a5fa">C</span>
+        <div class="kc-text">He owns what is in the heavens and the earth</div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#4ade80">D</span>
+        <div class="kc-text">Who could possibly intercede with Him except by His permission?</div>
+      </div>
+
+      <div class="kursi-center">
+        <span class="kc-lbl" style="color:#fcd34d;font-size:14px;padding-top:1px">E</span>
+        <div class="kc-text" style="color:var(--text)">He knows what is <mark>BEFORE</mark> them and what is <mark>AFTER</mark> them
+          <div style="font-size:11px;color:#fcd34d;margin-top:5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;">★ The center clause — mentions "before" and "after" ★</div>
+        </div>
+      </div>
+
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#4ade80">D'</span>
+        <div class="kc-text">And they do not encompass anything from His knowledge except what He wills</div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#60a5fa">C'</span>
+        <div class="kc-text">His throne encompasses the heavens and the earth</div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#a78bfa">B'</span>
+        <div class="kc-text">Their preservation does not exhaust Him</div>
+      </div>
+      <div class="kursi-clause">
+        <span class="kc-lbl" style="color:#e879f9">A'</span>
+        <div class="kc-text"><strong>He is the Most High, the Most Supreme</strong></div>
+      </div>
+
+      <div class="kursi-tip">
+        <strong>See the mirrors:</strong> A talks about Allah as <em>the Living</em> — A' confirms He is <em>the Supreme</em>. B says nothing tires Him — B' confirms preservation doesn\'t exhaust Him. C says He owns the heavens — C\' says His throne <em>encompasses</em> the heavens. The same color = the same ring pair.
+      </div>
+    </div>
+
+    <p class="prompt">What appears at the exact center of Ayat al-Kursi (clause E)?</p>
+
+    <div onclick="pickEx(this,3,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">His throne encompasses the heavens and the earth</div></div>
+    </div>
+    <div onclick="pickEx(this,3,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">"He knows what is BEFORE them and what is AFTER them"</div>
+        <div class="ac-sub">The center clause literally mentions "before" and "after" — the mirror concept itself</div>
+      </div>
+    </div>
+    <div onclick="pickEx(this,3,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Who could intercede with Him?</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ S4 — VERDICT ══════════════ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>Lesson complete · +30 XP</span>
+    </div>
+
+    <p class="eyebrow">The Impossible</p>
+    <h2 class="hero-title">An Illiterate Man. No Editing. Out of Order.</h2>
+
+    <div class="v-grid">
+      <div class="v-card">
+        <div class="v-num" id="vn1">0</div>
+        <div class="v-lbl">Verses in Al-Baqarah</div>
+      </div>
+      <div class="v-card">
+        <div class="v-num" id="vn2">0</div>
+        <div class="v-lbl">Years of revelation</div>
+      </div>
+    </div>
+
+    <blockquote class="verdict-quote">The center verse of the longest chapter contains the Arabic word for "middle." The center clause of the most excellent verse talks about "before and after." These are not coincidences — they are a signature.</blockquote>
+
+    <div class="insight-box">
+      <strong>What makes this impossible to plan as a human:</strong> Muhammad (peace be upon him) could not read or write. Verses were revealed out of sequential order, responding to unexpected events — not written in advance. Each verse was immediately fixed in its final position with no review or editing allowed. Other texts with ring composition (Homer, the Bible) were written sequentially by literate authors with full editorial freedom. The Quran had neither.
+    </div>
+
+    <div class="insight-box" style="border-left-color:#fcd34d">
+      <strong>Hidden for 1,400 years:</strong> The ring structure was discovered by 20th-century scholars using modern literary analysis tools. The Quran had been memorized and recited perfectly for 14 centuries before anyone realized the mathematical mirror was there.
+    </div>
+
+    <div style="margin-top:28px;">
+      <a href="index.html" class="btn btn-ghost">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Return to All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Ring Composition', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+
+  if (n === 1) setTimeout(revealRing, 100);
+  if (n === 2) setTimeout(revealNumbers, 300);
+  if (n === 4) {
+    saveProgress('ring-composition');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('vn1'), 0, 286, 1200);
+        animFrom(document.getElementById('vn2'), 0, 9, 900);
+      }, 400);
+    }, 300);
+  }
+}
+
+/* ── Baqarah ring reveal ── */
+function revealRing() {
+  var pairs = ['rp0','rp1','rp2','rp3'];
+  pairs.forEach(function(id, i) {
+    setTimeout(function() {
+      document.getElementById(id).classList.add('vis');
+    }, i * 380);
+  });
+  setTimeout(function() {
+    document.getElementById('rngCenter').classList.add('vis');
+    document.getElementById('rngNote').classList.add('vis');
+  }, pairs.length * 380 + 200);
+}
+
+/* ── Number game reveal ── */
+function revealNumbers() {
+  var step1 = document.getElementById('ngStep1');
+  var step2 = document.getElementById('ngStep2');
+  var sub   = document.getElementById('ngSub');
+  var v143  = document.getElementById('v143');
+  var ins   = document.getElementById('v143insight');
+  var prmt  = document.getElementById('s2prompt');
+  var mc    = document.getElementById('s2mc');
+
+  step1.style.color = 'var(--accent)';
+  setTimeout(function() {
+    step2.style.opacity = '1';
+    setTimeout(function() {
+      sub.style.opacity = '1';
+      v143.style.opacity = '1';
+      ins.style.opacity = '1';
+      prmt.style.opacity = '1';
+      mc.style.opacity = '1';
+    }, 800);
+  }, 700);
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  document.getElementById('fbPanel').className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+var SUBS = {
+  1: 'Section A\' mirrors section A exactly — both cover Faith & Unbelief. The end of the chapter matches the beginning. This is ring composition.',
+  2: 'Verse 143 sits at the exact center of Al-Baqarah. It contains the word وَسَطًا — meaning MIDDLE — while being the middle verse. The chapter literally labels its own center.',
+  3: 'The center clause of Ayat al-Kursi says "He knows what is BEFORE and AFTER" — it speaks of the very concept of ring composition from the inside of the ring itself.'
+};
+
+var NEXT = { 1: 2, 2: 3, 3: 4 };
+
+function pickEx(el, stageN, correct) {
+  var selector = '#s' + stageN + ' .answer-card';
+  if (document.querySelector('#s' + stageN + ' .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll(selector).forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk(SUBS[stageN], function() { go(NEXT[stageN]); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HERO CANVAS ── */
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+  var COLS = [
+    {r:232,g:121,b:249},{r:167,g:139,b:250},{r:96,g:165,b:250},{r:74,g:222,b:128},
+    {r:252,g:211,b:77},
+    {r:74,g:222,b:128},{r:96,g:165,b:250},{r:167,g:139,b:250},{r:232,g:121,b:249}
+  ];
+  var LABELS = ['A','B','C','D','E',"D'","C'","B'","A'"];
+  var margin = 38, baseY = H * 0.78, topY = H * 0.16;
+
+  function rgba(c, a) { return 'rgba('+c.r+','+c.g+','+c.b+','+a+')'; }
+
+  function nodePos(i) {
+    return {
+      x: margin + i * (W - 2 * margin) / 8,
+      y: baseY - (baseY - topY) * Math.sin(Math.PI * i / 8)
+    };
+  }
+
+  function frame() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* mirror arcs below arch */
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i);
+      var depth = (n2.x - n1.x) * 0.34;
+      var my = Math.max(n1.y, n2.y) + depth;
+      var pulse = 0.28 + Math.sin(t * 0.04 + i * 0.9) * 0.10;
+      ctx.beginPath();
+      ctx.moveTo(n1.x, n1.y);
+      ctx.bezierCurveTo(n1.x, my, n2.x, my, n2.x, n2.y);
+      ctx.strokeStyle = rgba(COLS[i], pulse);
+      ctx.lineWidth = 1.1; ctx.stroke();
+    }
+
+    /* nodes */
+    for (var i = 0; i < 9; i++) {
+      var nd = nodePos(i), r = i === 4 ? 6.5 : 4.5;
+      var pulse = 0.35 + Math.sin(t * 0.05 + i * 0.7) * 0.15;
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, r * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(COLS[i], pulse * 0.10); ctx.fill();
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(COLS[i], 0.88); ctx.fill();
+      ctx.fillStyle = rgba(COLS[i], 0.75);
+      ctx.font = (i === 4 ? 'bold 9px' : '8px') + ' sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(LABELS[i], nd.x, nd.y + r + 11);
+    }
+
+    /* traveling dot on outermost arc */
+    var phase = (t * 0.006) % 1;
+    var n1 = nodePos(0), n2 = nodePos(8);
+    var depth0 = (n2.x - n1.x) * 0.34;
+    var my0 = Math.max(n1.y, n2.y) + depth0;
+    var bx = bezierPoint(n1.x, n1.x, n2.x, n2.x, phase);
+    var by = bezierPoint(n1.y, my0, my0, n2.y, phase);
+    ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fill();
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function bezierPoint(p0, p1, p2, p3, t) {
+  var mt = 1 - t;
+  return mt*mt*mt*p0 + 3*mt*mt*t*p1 + 3*mt*t*t*p2 + t*t*t*p3;
+}
+
+initHeroCanvas();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

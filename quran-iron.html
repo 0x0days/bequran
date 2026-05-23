@@ -89,6 +89,27 @@
     .ex-unit { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 5px; }
     .ex-eq { display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 32px; color: var(--muted); flex-shrink: 0; }
 
+    /* ── IRON MATCH GROUPS ── */
+    .iron-matches { display:flex; flex-direction:column; gap:14px; margin:24px 0; }
+    .imatch { background:var(--gd); border:1px solid var(--gs); border-radius:16px; padding:18px 16px; position:relative; overflow:hidden; animation:rise .5s ease both; }
+    .imatch::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gc),transparent); opacity:.65; }
+    .imatch-tag { font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--gc); font-weight:700; margin-bottom:13px; opacity:.85; }
+    .imatch-row { display:flex; align-items:stretch; gap:8px; }
+    .im-card { flex:1; text-align:center; padding:16px 10px; background:rgba(0,0,0,0.28); border-radius:10px; border:1px solid rgba(255,255,255,0.05); min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:110px; }
+    .im-source { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--gc); opacity:.75; margin-bottom:9px; line-height:1.55; font-weight:600; }
+    .im-num { font-family:'Playfair Display',serif; font-size:clamp(36px,8vw,52px); font-weight:700; color:var(--gc); line-height:1; text-shadow:0 0 28px var(--gs); }
+    .im-sub { font-size:10px; color:rgba(122,143,163,0.75); margin-top:7px; line-height:1.5; }
+    .im-ar { font-family:'Amiri',serif; direction:rtl; display:block; }
+    .im-eq { font-family:'Playfair Display',serif; font-size:24px; color:var(--gc); opacity:.55; flex-shrink:0; align-self:center; text-shadow:0 0 14px var(--gs); }
+    /* light mode */
+    html[data-theme="light"] .imatch { background:rgba(255,255,255,0.85); border-width:2px; }
+    html[data-theme="light"] .im-card { background:rgba(255,255,255,0.95); border:1px solid rgba(0,0,0,0.08); }
+    html[data-theme="light"] .im-num { text-shadow:none; }
+    html[data-theme="light"] .im-source { opacity:1; }
+    html[data-theme="light"] .im-sub { color:rgba(60,80,100,0.7); }
+    html[data-theme="light"] .im-eq { opacity:.7; text-shadow:none; }
+    html[data-theme="light"] .imatch-tag { opacity:1; }
+
     /* S4 verdict */
     .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
     .xp-badge.show { opacity: 1; transform: none; }
@@ -189,7 +210,7 @@
       </div>
     </div>
 
-    <p class="body-text">Iron was known and used long before the Quran, yet the Quran called it "sent down" — a claim that seemed absurd when everything iron touched was clearly made on Earth. Today, astrophysics confirms: iron cannot be produced on Earth. It is forged inside stars and scattered by supernovas. Three numbers hidden in the Quran's description of iron each match a real scientific measurement.</p>
+    <p class="body-text">Iron was used for centuries before the Quran. Yet the Quran made a precise claim: iron was <strong style="color:var(--text)">sent down</strong> from the heavens (وَأَنزَلْنَا). At the time, this seemed wrong — all iron clearly came from the ground. Today astrophysics confirms: iron <strong style="color:var(--text)">cannot form on Earth</strong> through any chemical reaction. It is forged only in the cores of massive dying stars. When those stars explode as supernovae, they hurl iron across the universe. Meteorites carry it to Earth — literally from the sky. The Quran's verb "sent down" is not poetic. It is astrophysically exact. And inside that same verse, three numbers each align with a real scientific measurement of iron.</p>
 
     <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Begin the lesson →</button>
   </div>
@@ -234,6 +255,9 @@
   <div class="stage" id="s2">
     <p class="step-lbl">Exercise 2 of 3</p>
     <p class="prompt">Count the verses from the Quran's opening to the Iron verse, then compare.</p>
+
+    <canvas id="earthCanvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:14px;margin-bottom:18px;display:block;"></canvas>
 
     <div class="ex-arena" id="dualArena">
       <div class="ex-panel" id="panelVerses">
@@ -308,37 +332,69 @@
       </div>
     </div>
 
-    <table class="sci-table" style="margin-top:28px">
-      <thead>
-        <tr><th>Fact</th><th>Value</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Gematrical value of <span style="font-family:'Amiri',serif">حديد</span> (ḥadīd = iron)</td>
-          <td class="td-v">26</td>
-        </tr>
-        <tr>
-          <td>Atomic number of iron in the periodic table</td>
-          <td class="td-v">26</td>
-        </tr>
-        <tr>
-          <td>Surah Al-Hadid chapter number</td>
-          <td class="td-v">57</td>
-        </tr>
-        <tr>
-          <td>One of iron's 4 stable isotopes (matching the chapter)</td>
-          <td class="td-v">⁵⁷Fe</td>
-        </tr>
-        <tr>
-          <td>Gematrical value of <span style="font-family:'Amiri',serif">الحديد</span> (the chapter name)</td>
-          <td class="td-v">57</td>
-        </tr>
-        <tr class="hl">
-          <td>Verses from Quran opening to 57:25 = depth of solid iron core</td>
-          <td class="td-v"><strong>5,100</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="iron-matches" style="margin-top:28px">
+
+      <!-- ── MATCH 1: 26 = 26 ── -->
+      <div class="imatch" style="--gc:#fb7185;--gd:rgba(251,113,133,0.09);--gs:rgba(251,113,133,0.30);animation-delay:.05s">
+        <div class="imatch-tag">Match 1 of 3 · The Word</div>
+        <div class="imatch-row">
+          <div class="im-card">
+            <div class="im-source">Arabic Gematria of<br><span class="im-ar" style="font-size:22px;color:#fda4af">حديد</span></div>
+            <div class="im-num">26</div>
+            <div class="im-sub">ح=8 &thinsp;+&thinsp; د=4 &thinsp;+&thinsp; ي=10 &thinsp;+&thinsp; د=4</div>
+          </div>
+          <div class="im-eq">=</div>
+          <div class="im-card">
+            <div class="im-source">Atomic Number of Iron</div>
+            <div class="im-num">26</div>
+            <div class="im-sub">Fe on the periodic table</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MATCH 2: 57 = 57 = 57 (triple) ── -->
+      <div class="imatch" style="--gc:#fcd34d;--gd:rgba(252,211,77,0.08);--gs:rgba(252,211,77,0.28);animation-delay:.18s">
+        <div class="imatch-tag">Match 2 of 3 · The Chapter — Triple Coincidence</div>
+        <div class="imatch-row">
+          <div class="im-card">
+            <div class="im-source">Chapter Number</div>
+            <div class="im-num">57</div>
+            <div class="im-sub">Surah Al-Ḥadīd</div>
+          </div>
+          <div class="im-eq">=</div>
+          <div class="im-card">
+            <div class="im-source">Stable Iron Isotope</div>
+            <div class="im-num" style="font-size:clamp(28px,6vw,40px)">⁵⁷Fe</div>
+            <div class="im-sub">1 of 4 stable iron isotopes</div>
+          </div>
+          <div class="im-eq">=</div>
+          <div class="im-card">
+            <div class="im-source">Gematria of<br><span class="im-ar" style="font-size:18px;color:#fcd34d">الحديد</span></div>
+            <div class="im-num">57</div>
+            <div class="im-sub">ا=1 · ل=30 · ح=8 · د=4 · ي=10 · د=4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MATCH 3: 5,100 = 5,100 ── -->
+      <div class="imatch" style="--gc:#67e8f9;--gd:rgba(103,232,249,0.08);--gs:rgba(103,232,249,0.26);animation-delay:.32s">
+        <div class="imatch-tag">Match 3 of 3 · The Verse Count</div>
+        <div class="imatch-row">
+          <div class="im-card">
+            <div class="im-source">Verses from Quran's opening to 57:25</div>
+            <div class="im-num" style="font-size:clamp(30px,6.5vw,46px)">5,100</div>
+            <div class="im-sub">Counting from Al-Fatihah to the Iron verse</div>
+          </div>
+          <div class="im-eq">=</div>
+          <div class="im-card">
+            <div class="im-source">Depth to Solid Iron Core</div>
+            <div class="im-num" style="font-size:clamp(30px,6.5vw,46px)">5,100</div>
+            <div class="im-sub">Kilometres below Earth's surface · Britannica</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <div class="insight-box">
       <strong>Not a coincidence — three independent measurements:</strong> The word's gematria, the chapter's number, and a verse count all resolve to iron-specific facts. The gematria of حديد (8+4+10+4=26) equals iron's atomic number. Chapter 57 matches both isotope ⁵⁷Fe and the gematria of الحديد (1+30+8+4+10+4=57). The verse count to 57:25 from the Quran's start matches the depth of Earth's solid iron core to the kilometer.
@@ -412,6 +468,7 @@ function go(n) {
   document.getElementById('lmeta').textContent = metaMap[n];
   window.scrollTo(0, 0);
   if (n === 1) setTimeout(initGematriaCanvas, 100);
+  if (n === 2) setTimeout(initEarthCanvas, 100);
   if (n === 4) {
     setTimeout(function() {
       document.getElementById('xpBadge').classList.add('show');
@@ -608,13 +665,13 @@ function runDualCount() {
   /* Animate both counters to 5,100 simultaneously */
   animFrom(vEl, 0, 5100, 2200, null);
   animFrom(dEl, 0, 5100, 2200, function() {
-    /* Highlight panels when both reach 5,100 */
     document.getElementById('panelVerses').classList.add('lit');
     document.getElementById('panelDepth').classList.add('lit');
     document.getElementById('depthNote').style.display = 'block';
-
+    var ec = document.getElementById('earthCanvas');
+    if (ec && ec._glow) ec._glow();
     setTimeout(function() {
-      showOk('5,100 verses from the Quran\'s opening lead to the Iron verse — and 5,100 km below the surface is where Earth\'s solid iron core begins (Britannica, 2019).', function() { go(3); });
+      showOk('5,100 verses from the Quran\'s opening lead to the Iron verse — and 5,100 km is where Earth\'s solid iron core begins (Britannica).', function() { go(3); });
     }, 900);
   });
 }
@@ -634,111 +691,281 @@ function pickEx3(el, correct) {
   }
 }
 
+
+
+/* ── imoryt─────────────────────────────────────────────── */
+
+
+/* ── EARTH CROSS-SECTION CANVAS (S2) ─────────────────────────── */
+function initEarthCanvas() {
+  var c = document.getElementById('earthCanvas');
+  if (!c || c._running) return;
+  c._running = true;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var f = 0;
+  var glowing = false, glowT = 0;
+  c._glow = function() { glowing = true; glowT = f; };
+
+  /* ── EXACT EARTH DATA IMPLEMENTATION ── */
+  var R_EQ = 6378.1; 
+  var R_POL = 6356.8; 
+  var DEPTH_OUTER = 2890;
+  var DEPTH_INNER = 5100;
+
+  /* Canvas Geometry: Map Polar Radius to pixels */
+  var CX = 140, CY = H / 2;
+  var b = 88; /* Vertical semi-axis (Polar) */
+  var a = b * (R_EQ / R_POL); /* Horizontal semi-axis (Equatorial) */
+
+  /* Calculate exact core boundaries based on Polar depth */
+  var rO = b * ((R_POL - DEPTH_OUTER) / R_POL); 
+  var rS = b * ((R_POL - DEPTH_INNER) / R_POL); 
+  
+  /* Vertical Scale Ruler Position */
+  var SLX = CX + a + 30; 
+  var topY = CY - b;
+  var botY = CY + b;
+  var y5100 = topY + (DEPTH_INNER / (R_POL * 2)) * (botY - topY); 
+
+  /* ── BULLETPROOF DARK/LIGHT MODE DETECTOR ── */
+  var isDark = true;
+  function checkTheme() {
+    var bg = getComputedStyle(document.body).backgroundColor;
+    var m = bg.match(/\d+/g);
+    if (m) {
+      var lum = (0.299 * parseInt(m[0]) + 0.587 * parseInt(m[1]) + 0.114 * parseInt(m[2]));
+      isDark = lum < 140;
+    }
+  }
+  checkTheme();
+  setInterval(checkTheme, 1000);
+
+  /* Crisp Label Helper */
+  function drawLabel(txt, x, y, size, weight, color, align) {
+    ctx.font = weight + ' ' + size + 'px DM Sans, sans-serif';
+    ctx.textAlign = align || 'left';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = size >= 14 ? 3.5 : 2.5;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = isDark ? 'rgba(4,8,16,0.95)' : 'rgba(255,255,255,0.95)';
+    ctx.strokeText(txt, x, y);
+    ctx.fillStyle = color || (isDark ? '#e5e7eb' : '#1f2937');
+    ctx.fillText(txt, x, y);
+  }
+
+  /* Sharp Boundary Stroke Color */
+  var bCol = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H); 
+
+    var ga = glowing ? Math.min((f - glowT) / 40, 1) : 0;
+    var pulse = glowing ? 0.7 + Math.sin(f * 0.05) * 0.3 : 0;
+    var gi = ga * pulse;
+    
+    /* Update boundary color on the fly in case of theme switch */
+    bCol = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+    var subLabelCol = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
+    var rulerColor = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+    var tickColor = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+
+    /* ── 1. SHARP EARTH LAYERS (No muddy gradients) ── */
+    
+    // Mantle: Deep Cool Brown
+    ctx.beginPath(); ctx.ellipse(CX, CY, a, b, 0, 0, 6.2832);
+    ctx.fillStyle = '#3E2723'; ctx.fill();
+    ctx.strokeStyle = bCol; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Outer Core: Hard Crimson Red
+    ctx.beginPath(); ctx.arc(CX, CY, rO, 0, 6.2832);
+    ctx.fillStyle = '#C62828'; ctx.fill();
+    ctx.strokeStyle = bCol; ctx.lineWidth = 1; ctx.stroke();
+
+    // Inner Core Glow: Tight, bright bloom (no fuzzy bleeding)
+    if (glowing) {
+      var glowGrad = ctx.createRadialGradient(CX, CY, rS * 0.8, CX, CY, rS * 1.6);
+      glowGrad.addColorStop(0, 'rgba(253, 224, 71, ' + (0.8 * gi) + ')');
+      glowGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath(); ctx.arc(CX, CY, rS * 1.6, 0, 6.2832); ctx.fill();
+    }
+
+    // Inner Core: Bright Flat Yellow/Gold
+    ctx.beginPath(); ctx.arc(CX, CY, rS, 0, 6.2832);
+    ctx.fillStyle = glowing ? '#FDD835' : '#F9A825'; 
+    ctx.fill();
+    ctx.strokeStyle = bCol; ctx.lineWidth = 1; ctx.stroke();
+
+    /* ── 2. SUBTLE CENTER LINE ── */
+    ctx.setLineDash([2, 4]);
+    ctx.beginPath(); ctx.moveTo(CX - a, CY); ctx.lineTo(CX + a, CY);
+    ctx.strokeStyle = rulerColor; ctx.lineWidth = 0.5; ctx.stroke();
+    ctx.setLineDash([]);
+    
+    drawLabel('12,756 km', CX + a/2, CY - 8, 7, '600', subLabelCol, 'center');
+
+    /* ── 3. THE VERTICAL DEPTH RULER ── */
+    ctx.beginPath();
+    ctx.moveTo(SLX, topY); ctx.lineTo(SLX, botY);
+    ctx.strokeStyle = rulerColor; ctx.lineWidth = 1; ctx.stroke();
+
+    var ticks = [
+      { y: topY, txt: '0 km' },
+      { y: CY, txt: '6,356.8 km' }, 
+      { y: botY, txt: '12,713.6 km' }
+    ];
+    ticks.forEach(function(t) {
+      ctx.beginPath(); ctx.moveTo(SLX - 4, t.y); ctx.lineTo(SLX + 4, t.y);
+      ctx.strokeStyle = tickColor; ctx.lineWidth = 1; ctx.stroke();
+      drawLabel(t.txt, SLX + 10, t.y, 8, '500', subLabelCol, 'left');
+    });
+
+    /* ── 4. THE 5,100 KM LINE (Crisp & Solid) ── */
+    var lineCol = glowing ? '#FDD835' : '#EF4444';
+    
+    ctx.beginPath();
+    ctx.moveTo(SLX - 6, y5100);
+    ctx.lineTo(CX, y5100); 
+    ctx.strokeStyle = lineCol;
+    ctx.lineWidth = glowing ? 2.5 : 1.5;
+    ctx.setLineDash(glowing ? [] : [5, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Ruler Tick */
+    ctx.beginPath(); ctx.moveTo(SLX - 6, y5100); ctx.lineTo(SLX + 6, y5100);
+    ctx.strokeStyle = lineCol; ctx.lineWidth = 2; ctx.stroke();
+
+    /* Sharp Node Dot */
+    ctx.beginPath(); ctx.arc(CX, y5100, 3.5, 0, 6.2832);
+    ctx.fillStyle = lineCol; ctx.fill();
+    ctx.strokeStyle = isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    /* ── 5. PROMINENT "5,100 km" TYPOGRAPHY ── */
+    var bigTxtX = SLX + 15;
+    var bigTxtY = y5100 - 8;
+    
+    /* Arrow */
+    ctx.beginPath();
+    ctx.moveTo(bigTxtX, bigTxtY + 12);
+    ctx.lineTo(bigTxtX - 6, bigTxtY + 6);
+    ctx.lineTo(bigTxtX - 6, bigTxtY + 18);
+    ctx.closePath();
+    ctx.fillStyle = lineCol; ctx.fill();
+
+    var numColor = glowing ? '#FDD835' : (isDark ? '#F3F4F6' : '#111827');
+    drawLabel('5,100', bigTxtX + 5, bigTxtY, 24, '800', numColor, 'left');
+    drawLabel('km below surface', bigTxtX + 8, bigTxtY + 22, 9, '500', subLabelCol, 'left');
+
+    /* ── 6. SHARP TRAVELING PARTICLE ── */
+    if (glowing && ga < 1) {
+      var prog = Math.min((f - glowT) / 30, 1);
+      var px = SLX - (SLX - CX) * prog;
+      var py = topY + (y5100 - topY) * prog; 
+      ctx.beginPath(); ctx.arc(px, py, 4, 0, 6.2832);
+      ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    }
+
+    f++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── imprtandtAS ─────────────────────────────────────────────── */
+
+
 /* ── HERO CANVAS ─────────────────────────────────────────────── */
 function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  var W = c.width, H = c.height; // 640 × 130
+  var W = c.width, H = c.height;
   var t = 0;
 
-  function makeRng(seed) {
-    var s = seed;
-    return function() {
-      s = (s * 1664525 + 1013904223) & 0xffffffff;
-      return (s >>> 0) / 0xffffffff;
-    };
-  }
+  function rng(seed) { var s=seed; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; }
 
-  /* Drifting iron particles */
-  var particles = [];
-  (function() {
-    var rng = makeRng(31);
-    for (var i = 0; i < 22; i++) {
-      particles.push({
-        x: rng() * W,
-        y: rng() * H,
-        vx: -0.35 - rng() * 0.5,
-        vy:  0.20 + rng() * 0.35,
-        r:   0.9 + rng() * 1.6,
-        phase: rng() * Math.PI * 2
-      });
-    }
-  })();
+  /* Static star field */
+  var stars = [];
+  (function(){ var r=rng(44); for(var i=0;i<38;i++) stars.push({x:r()*W,y:r()*H,a:r(),ph:r()*Math.PI*2}); })();
+
+  /* Iron particles streaming from supernova (right) → Earth (left) */
+  var parts = [];
+  (function(){ var r=rng(77); for(var i=0;i<36;i++) parts.push({
+    x: W*0.55 + r()*W*0.45, y: r()*H,
+    vx: -(0.55+r()*0.9), vy: (r()-0.5)*0.4,
+    r: 0.8+r()*1.4, ph: r()*Math.PI*2
+  }); })();
+
+  /* Earth at left, star at right */
+  var EX = W*0.10, EY = H*0.50, ER2 = H*0.30;
+  var SX = W*0.86, SY = H*0.28;
 
   function frame() {
-    ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#040810';
     ctx.fillRect(0, 0, W, H);
 
-    /* Background stars */
-    var rng = makeRng(88);
-    for (var i = 0; i < 28; i++) {
-      var sx = rng() * W, sy = rng() * H;
-      var sa = 0.10 + 0.18 * Math.sin(t * 0.4 + i * 0.7);
-      ctx.beginPath();
-      ctx.arc(sx, sy, 0.7, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,' + sa + ')';
-      ctx.fill();
-    }
-
-    /* Star burst (upper-right): the iron source */
-    var sx = W * 0.84, sy = H * 0.22;
-    var starPulse = 0.7 + 0.25 * Math.sin(t * 1.5);
-    var sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 38);
-    sg.addColorStop(0, 'rgba(253,200,100,' + (0.55 * starPulse) + ')');
-    sg.addColorStop(0.4, 'rgba(251,113,133,' + (0.20 * starPulse) + ')');
-    sg.addColorStop(1, 'rgba(251,113,133,0)');
-    ctx.fillStyle = sg;
-    ctx.fillRect(0, 0, W, H);
-
-    /* Star core point */
-    ctx.beginPath();
-    ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,230,140,' + (0.85 * starPulse) + ')';
-    ctx.fill();
-
-    /* Fe element symbol — centered */
-    var cx = W * 0.5, cy = H * 0.50;
-    var glowPulse = 0.65 + 0.22 * Math.sin(t * 1.1);
-
-    var gg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 65);
-    gg.addColorStop(0, 'rgba(251,113,133,' + (0.18 * glowPulse) + ')');
-    gg.addColorStop(1, 'rgba(251,113,133,0)');
-    ctx.fillStyle = gg;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = 'rgba(253,164,175,' + (0.80 + 0.15 * Math.sin(t * 0.9)) + ')';
-    ctx.font = 'bold 54px Playfair Display, serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Fe', cx, cy - 6);
-
-    ctx.fillStyle = 'rgba(253,164,175,0.48)';
-    ctx.font = '500 12px DM Sans, sans-serif';
-    ctx.fillText('26', cx + 30, cy + 22);
-
-    /* Iron particles drifting (from star direction) */
-    particles.forEach(function(p) {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0)  p.x = W;
-      if (p.y > H)  p.y = 0;
-      var pa = 0.25 + 0.45 * Math.sin(t * 0.9 + p.phase);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(251,113,133,' + Math.max(0, pa) + ')';
-      ctx.fill();
+    /* Stars */
+    stars.forEach(function(s){
+      var a = 0.08 + 0.14*Math.sin(t*0.4+s.ph);
+      ctx.beginPath(); ctx.arc(s.x,s.y,0.65,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+a+')'; ctx.fill();
     });
 
-    /* Subtle chapter label */
-    ctx.fillStyle = 'rgba(122,143,163,0.30)';
-    ctx.font = '10px DM Sans, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText('Surah Al-Ḥadīd · Chapter 57', W - 14, H - 9);
+    /* Supernova glow (right) */
+    var sp = 0.7 + 0.28*Math.sin(t*1.6);
+    var sg = ctx.createRadialGradient(SX,SY,0,SX,SY,50);
+    sg.addColorStop(0,'rgba(255,220,100,'+(0.70*sp)+')');
+    sg.addColorStop(0.35,'rgba(251,113,133,'+(0.28*sp)+')');
+    sg.addColorStop(1,'rgba(251,113,133,0)');
+    ctx.fillStyle=sg; ctx.fillRect(0,0,W,H);
+    /* core point */
+    ctx.beginPath(); ctx.arc(SX,SY,3+sp*1.2,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,240,160,'+(0.9*sp)+')'; ctx.fill();
+    /* label */
+    ctx.fillStyle='rgba(253,164,175,0.48)'; ctx.font='9px DM Sans,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('supernova',SX,SY+18);
 
-    t += 0.017;
+    /* Earth (left) */
+    var eg = ctx.createRadialGradient(EX,EY,0,EX,EY,ER2);
+    eg.addColorStop(0,'#1a3a6b'); eg.addColorStop(0.5,'#0e2244'); eg.addColorStop(1,'#080e1a');
+    ctx.beginPath(); ctx.arc(EX,EY,ER2,0,Math.PI*2);
+    ctx.fillStyle=eg; ctx.fill();
+    ctx.strokeStyle='rgba(96,165,250,0.22)'; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.fillStyle='rgba(96,165,250,0.18)'; ctx.font='9px DM Sans,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('Earth',EX,EY+ER2+4);
+
+    /* Fe symbol — center */
+    var CX=W*0.50, CY=H*0.50;
+    var gp=0.60+0.22*Math.sin(t*1.1);
+    var gg=ctx.createRadialGradient(CX,CY,0,CX,CY,62);
+    gg.addColorStop(0,'rgba(251,113,133,'+(0.20*gp)+')'); gg.addColorStop(1,'rgba(251,113,133,0)');
+    ctx.fillStyle=gg; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(253,164,175,'+(0.78+0.18*Math.sin(t*0.9))+')';
+    ctx.font='bold 50px Playfair Display,serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Fe',CX,CY-4);
+    ctx.fillStyle='rgba(253,164,175,0.45)'; ctx.font='500 11px DM Sans,sans-serif';
+    ctx.fillText('26',CX+28,CY+18);
+
+    /* Iron particles streaming right→left */
+    parts.forEach(function(p){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x < EX+ER2) { p.x=W*0.60+Math.random()*W*0.35; p.y=Math.random()*H; }
+      var pa=0.20+0.45*Math.sin(t*0.9+p.ph);
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(251,113,133,'+Math.max(0,pa)+')'; ctx.fill();
+    });
+
+    /* label */
+    ctx.fillStyle='rgba(122,143,163,0.28)'; ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='right'; ctx.textBaseline='alphabetic';
+    ctx.fillText('Surah Al-Ḥadīd · 57:25',W-14,H-9);
+
+    t+=0.017;
     requestAnimationFrame(frame);
   }
   frame();

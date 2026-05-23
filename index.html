@@ -380,7 +380,7 @@
   <canvas id="bgCanvas"></canvas>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">49 Discoveries · Verified by Modern Science</p>
+    <p class="hero-eyebrow">53 Discoveries · Verified by Modern Science</p>
     <h1 class="hero-hl">Patterns hidden<br>for 1,400 years.</h1>
     <p class="hero-sub">Mathematical and scientific discoveries encoded in the Quran — each confirmed by physics, biology, or astronomy developed centuries later. Each lesson takes 5 minutes.</p>
     <a href="#lessons" class="hero-cta">
@@ -393,7 +393,7 @@
 <!-- ── STATS BAR ─────────────────────────────────── -->
 <div class="stats-bar">
   <div class="stat-block">
-    <div class="stat-n">49</div>
+    <div class="stat-n">53</div>
     <div class="stat-lbl">Total Lessons</div>
   </div>
   <div class="stat-block">
@@ -428,7 +428,7 @@
   </div>
 
   <div class="filter-row" id="filterRow">
-    <button class="ftab active" data-cat="all">All &thinsp;49</button>
+    <button class="ftab active" data-cat="all">All &thinsp;53</button>
     <button class="ftab" data-cat="biology">Biology</button>
     <button class="ftab" data-cat="balance">Balance</button>
     <button class="ftab" data-cat="astronomy">Astronomy</button>
@@ -472,7 +472,7 @@ var lessons = [
     title:'23 = 23',  teaser:'The word for "man" appears 23 times. The word for "woman" appears 23 times. Every counting method confirms it.',
     cat:'biology',  catLabel:'Biology',     accent:'#818cf8', url:'quran-man-woman.html' },
 
-  { id:'man-woman-chromosomes', n:6, hook:'Chromosomes Split', ar:'توازن الكروموسومات',
+  { id:'man-woman-chromosomes', n:6, hook:'Human Chromosomes', ar:'توازن الكروموسومات',
     title:'23 + 23',  teaser:'A father contributes 23 chromosomes. A mother contributes 23. The Quran uses "man" 23 times and "woman" 23 times.',
     cat:'biology',  catLabel:'Biology',     accent:'#a78bfa', url:'quran-man-woman-chromosomes.html' },
 
@@ -663,6 +663,10 @@ var lessons = [
   teaser:"The Quran describes chests 'tight and constricted as if ascending to the sky.' Science confirms: above 8,000m the Death Zone begins — where oxygen is too thin for human life.",
   cat:'physics', catLabel:'Physics', accent:'#bae6fd',
   url:'quran-atmosphere.html' },
+  { id:'ring-composition', n:50, title:'Ring Composition', ar:'وَسَطًا', hook:'2:143', teaser:'An illiterate man revealed 286 verses over 9 years. Modern scholars found a perfect mathematical mirror hidden inside.', cat:'numerics', catLabel:'Numerics', accent:'#4ade80', url:'quran-ring-composition.html' },
+  { id:'celestial-orbits', n:51, title:'Celestial Orbits', ar:'كُلٌّۭ فِى فَلَكٍۢ يَسْبَحُونَ', hook:'21:33', teaser:'Galileo was sentenced for saying Earth moves. The Quran said it 1,000 years earlier — and proved it in the grammar.', cat:'astronomy', catLabel:'Astronomy', accent:'#7dd3fc', url:'quran-celestial-orbits.html' },
+  { id:'venus', n:52, title:'Venus', ar:'كَوْكَبًا', hook:'6:76', teaser:'Every ancient civilisation called Venus a star. The Quran used the precise Arabic word for planet — 1,400 years before astronomy confirmed it.', cat:'astronomy', catLabel:'Astronomy', accent:'#fef08a', url:'quran-venus.html' },
+  { id:'expanding-universe', n:53, title:'Expanding Universe', ar:'لَمُوسِعُونَ', hook:'51:47', teaser:'Einstein trusted the Bible and assumed a static universe. He was wrong. The Quran described expansion 1,400 years before Hubble confirmed it.', cat:'astronomy', catLabel:'Astronomy', accent:'#6366f1', url:'quran-expanding-universe.html' }
 ];
 
 /* ── CATEGORY COLORS ─────────────────────────────── */
@@ -835,7 +839,7 @@ document.getElementById('xpN').textContent = xp.toLocaleString();
 setTimeout(function() {
   countUp(document.getElementById('completedN'), done.size, 900);
   countUp(document.getElementById('xpTotal'), xp, 1200);
-  document.getElementById('progressFill').style.width = (done.size / 49 * 100).toFixed(1) + '%';
+  document.getElementById('progressFill').style.width = (done.size / 53 * 100).toFixed(1) + '%';
 }, 300);
 
 /* ── HERO CANVAS — Islamic Geometric Art ─ */
