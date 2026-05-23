@@ -757,8 +757,17 @@ function veRenderP(pn,dir){
 }
 function veScrollTgt(){
   var t=ve_comb[ve_gIdx];if(!t)return;
-  var el=document.getElementById('vev-'+t.s+'-'+t.a);
-  if(el)setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'});},80);
+  setTimeout(function(){
+    var el=document.getElementById('vev-'+t.s+'-'+t.a);
+    if(!el)return;
+    var content=document.getElementById('veContent');
+    /* Scroll only the inner content div — never touch the main page scroll */
+    var elRect=el.getBoundingClientRect();
+    var cRect=content.getBoundingClientRect();
+    var relTop=elRect.top-cRect.top+content.scrollTop;
+    var target=relTop-(content.clientHeight/2)+(el.clientHeight/2);
+    content.scrollTo({top:Math.max(0,target),behavior:'smooth'});
+  },80);
 }
 function veUpdGuide(){
   if(ve_gIdx>=ve_comb.length){veCheckDone();return;}
