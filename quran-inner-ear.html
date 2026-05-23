@@ -264,6 +264,8 @@
       <div class="source-quote">"Providing balance, when moving or stationary, is also a central function of the ear. The ear facilitates two types of balance: static balance, which allows a person to feel the effects of gravity, and dynamic balance, which allows a person to sense acceleration."</div>
     </div>
 
+    <div id="qv-inner-ear"></div>
+
     <div class="nav-next-wrap">
       <a href="quran-skin-memory.html" class="btn btn-primary">
         Next: Skin Memory
@@ -287,6 +289,19 @@
 </div>
 
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 18:11 — فَضَرَبْنَا عَلَىٰ آذَانِهِمْ "We struck upon their ears."
+   A blow to the inner ear causes total unconsciousness — confirmed by vestibular science. */
+QuranValidator.attach('qv-inner-ear',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 18:11 — "We struck upon their ears." The inner ear controls consciousness and balance — confirmed by neuroscience.',
+  groups:[
+    {id:'ear', label:'Struck their ears — unconscious for years', arabic:'آذَانِهِمْ', color:'#fde68a', occurrences:[[18,11]]}
+  ]
+});
+</script>
 <script>
 var stage = 0;
 var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };

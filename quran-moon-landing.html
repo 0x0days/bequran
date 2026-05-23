@@ -386,6 +386,8 @@
       <strong>Probability:</strong> A random verse in the Quran being followed by a count that matches a specific historical Hijri year is approximately 1 in 6,236. The thematic coherence — the moon verse producing the moon-landing year — makes the match structurally coherent in a way that random matches are not.
     </div>
 
+    <div id="qv-moon"></div>
+
     <a href="quran-sirius-distance.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sirius Distance</a>
     <a href="quran-carbon-creation.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Carbon Creation →</a>
   </div>
@@ -551,5 +553,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 54:1 — ٱنشَقَّ ٱلْقَمَرُ "the moon has split." Surah 54 = Al-Qamar (The Moon).
+   Counting from 54:1 forward gives Hijri year 1389 = Apollo 11 moon landing year. */
+QuranValidator.attach('qv-moon',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 54:1 — "the moon has split." Surah 54 = Al-Qamar (The Moon). Apollo 11 landed in Hijri year 1389.',
+  groups:[
+    {id:'moon', label:'The moon has split', arabic:'ٱلْقَمَرُ', color:'#4338ca', occurrences:[[54,1],[54,2]]}
+  ]
+});
+</script>
 </body>
 </html>

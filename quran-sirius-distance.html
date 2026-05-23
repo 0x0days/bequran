@@ -505,6 +505,8 @@
       <strong>The surah's own name is النجم — "The Star."</strong> The distance encoding is not hidden in an arbitrary passage. It sits in the surah explicitly devoted to the star, with the anchor verses being the star oath (53:1), the human origin (53:32), and the only named star in the Quran (53:49).
     </div>
 
+    <div id="qv-sirius"></div>
+
     <a href="quran-gold-melting.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Gold Melting</a>
     <a href="quran-moon-landing.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Moon Landing →</a>
   </div>
@@ -695,5 +697,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 53:1 (oath by the star), 53:49 (الشعرى — Sirius, only named star in Quran).
+   861 letters between them encode 8.61 light-years — Earth–Sirius distance. */
+QuranValidator.attach('qv-sirius',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 53:1 "By the star" and 53:49 "the Sirius (الشعرى)." 861 letters between them = 8.61 light-years to Sirius.',
+  groups:[
+    {id:'star',   label:'By the Star (oath)',    arabic:'ٱلنَّجْمِ',  color:'#93c5fd', occurrences:[[53,1]]},
+    {id:'sirius', label:'Sirius — only named star', arabic:'ٱلشِّعْرَىٰ', color:'#fcd34d', occurrences:[[53,49]]}
+  ]
+});
+</script>
 </body>
 </html>

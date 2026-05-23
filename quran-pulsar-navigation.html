@@ -393,6 +393,8 @@
       <div class="gs">No 7th-century human knew that stars could be classified into types — let alone that one type would spin 700 times per second and emit signals precise enough to navigate by. The claim was either an extraordinary guess, or something else entirely.</div>
     </div>
 
+    <div id="qv-pulsar-nav"></div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
       <a href="quran-prime-numbers.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Prime Numbers</a>
       <a href="quran-human-embryo.html" class="btn" style="background:var(--accent);color:#1a0007">Next &middot; Human Embryo &rarr;</a>
@@ -644,5 +646,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 16:16 — وَبِالنَّجْمِ هُمْ يَهْتَدُونَ "by the star they guide themselves."
+   Also 6:97 — same claim. XNAV (pulsar navigation) first demonstrated 2017. */
+QuranValidator.attach('qv-pulsar-nav',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 16:16 — "by the star they guide themselves." XNAV pulsar navigation first demonstrated 2017 — 1,407 years later.',
+  groups:[
+    {id:'star-nav', label:'Navigate by the star', arabic:'بِالنَّجْمِ', color:'#38bdf8', occurrences:[[16,16],[6,97]]}
+  ]
+});
+</script>
 </body>
 </html>

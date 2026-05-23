@@ -374,6 +374,8 @@
       <div class="gs">In the 7th century, no human had ever left the atmosphere to observe this. The only way to know wind does not exist beyond it is to go there — or to receive that knowledge from another source. The statement was verified for the first time when humans reached space in the 20th century.</div>
     </div>
 
+    <div id="qv-wind"></div>
+
     <a href="quran-carbon-creation.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Carbon Creation</a>
     <a href="quran-prime-numbers.html" class="btn" style="background:var(--accent);color:#0d2626;margin-left:12px">Next &middot; Prime Numbers &rarr;</a>
   </div>
@@ -651,5 +653,18 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate 2:164 — wind "between the sky and earth." Also 30:48 — wind carries clouds.
+   Confirmed: wind exists only within Earth's atmosphere (below the Kármán Line). */
+QuranValidator.attach('qv-wind',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 2:164 — winds "between the sky and earth." Confirmed by space travel: wind stops at the Kármán Line, 100 km up.',
+  groups:[
+    {id:'wind', label:'Wind between sky and earth', arabic:'الرِّيَاحِ', color:'#2dd4bf', occurrences:[[2,164],[30,48]]}
+  ]
+});
+</script>
 </body>
 </html>

@@ -368,6 +368,8 @@
       <strong>The counting rule is the most natural possible: first occurrence to last occurrence, exclusive.</strong> There is no selection from 33 available tokens. First and last are not choices — they are facts. The result is 5,778.
     </div>
 
+    <div id="qv-sun"></div>
+
     <a href="quran-world-hereafter.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to World &amp; Hereafter</a>
     <a href="quran-silver-melting.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Silver Melting →</a>
   </div>
@@ -537,5 +539,19 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* First الشمس: 2:258. Last الشمس: 91:1. Verses between them (exclusive) = 5,778.
+   Sun's effective surface temperature = 5,778 Kelvin (NASA). */
+QuranValidator.attach('qv-sun',{
+  mode:'locate',
+  title:'Read the two endpoint verses yourself',
+  subtitle:'First الشمس at 2:258. Last الشمس at 91:1. Verses between them = 5,778 = sun\'s surface temperature in Kelvin.',
+  groups:[
+    {id:'first-sun', label:'First الشمس — 2:258', arabic:'ٱلشَّمْسِ', color:'#fb923c', occurrences:[[2,258]]},
+    {id:'last-sun',  label:'Last الشمس — 91:1',   arabic:'ٱلشَّمْسِ', color:'#fbbf24', occurrences:[[91,1]]}
+  ]
+});
+</script>
 </body>
 </html>

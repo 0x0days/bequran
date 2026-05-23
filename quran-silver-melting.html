@@ -385,6 +385,8 @@
       <strong>The verse that describes metal being heated (9:35) is 962 verses from the first gold-and-silver verse (3:14).</strong> Silver — the lower-melting of the two metals named — melts at 961.78°C, rounded to 962. The Quran does not name a temperature. It provides two verse counts that bracket it.
     </div>
 
+    <div id="qv-silver"></div>
+
     <a href="quran-sun-temperature.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sun Temperature</a>
     <a href="quran-gold-melting.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Gold Melting →</a>
   </div>
@@ -762,5 +764,22 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Both paths start at 3:14 (first gold+silver verse).
+   Path A ends at 9:34 (second gold+silver) = 961 verses.
+   Path B ends at 9:35 (metals heated in fire) = 962 verses.
+   Silver melting point = 961.78°C — trapped between 961 and 962. */
+QuranValidator.attach('qv-silver',{
+  mode:'locate',
+  title:'Read the anchor verses yourself',
+  subtitle:'3:14 is the start (first gold+silver). 9:34 = 961 verses away. 9:35 = 962 verses away. Silver melts at 961.78°C — between them.',
+  groups:[
+    {id:'start',  label:'Start — first gold & silver verse', arabic:'الذَّهَبَ وَالْفِضَّةَ', color:'#94a3b8', occurrences:[[3,14]]},
+    {id:'path-a', label:'Path A end — second gold & silver', arabic:'الذَّهَبَ',              color:'#cbd5e1',  occurrences:[[9,34]]},
+    {id:'path-b', label:'Path B end — metals heated in fire', arabic:'فَتُكْوَىٰ',            color:'#fb923c',  occurrences:[[9,35]]}
+  ]
+});
+</script>
 </body>
 </html>

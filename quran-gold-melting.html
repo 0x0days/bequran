@@ -422,6 +422,8 @@
       <strong>The counting rules are not retroactively fitted.</strong> Path A: first gold mention → fire verse, exclusive count. Path B: gold-in-paradise → scorching-heat verse, inclusive count. Both rules are independently motivated. Both return 1064 with no rounding.
     </div>
 
+    <div id="qv-gold"></div>
+
     <a href="quran-silver-melting.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Silver Melting</a>
     <a href="quran-sirius-distance.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Sirius Distance →</a>
   </div>
@@ -788,5 +790,20 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+<script src="quran-validator.js"></script>
+<script>
+/* Locate the anchor verses of Path A: 3:14 (first gold mention) and 10:8 (fire verse).
+   And Path B anchors: 22:23 (gold in paradise) and 35:21 (scorching heat).
+   Both paths count to 1064 = gold melting point in °C. */
+QuranValidator.attach('qv-gold',{
+  mode:'locate',
+  title:'Read the anchor verses yourself',
+  subtitle:'Path A: 3:14 (gold) → 10:8 (fire) = 1064. Path B: 22:23 (gold paradise) → 35:21 (scorching heat) = 1064. Gold melts at 1064.18°C.',
+  groups:[
+    {id:'gold-a', label:'Path A — gold to fire',         arabic:'الذَّهَبِ',  color:'#fbbf24', occurrences:[[3,14],[10,8]]},
+    {id:'gold-b', label:'Path B — paradise gold to heat', arabic:'ذَهَبٍ',    color:'#f59e0b', occurrences:[[22,23],[35,21]]}
+  ]
+});
+</script>
 </body>
 </html>
