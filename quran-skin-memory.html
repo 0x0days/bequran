@@ -142,7 +142,7 @@
 
     <p class="hero-eyebrow">Biology · 41:20-21</p>
     <h1 class="hero-title">Your Skin Remembers Everything</h1>
-    <p class="hero-sub">For centuries, critics said this verse was scientifically impossible. Memory only lives in neurons — skin can't store anything. In 2024, New York University proved them wrong.</p>
+    <p class="hero-sub">For centuries, critics said this verse was scientifically impossible. Memory only lives in neurons skin can't store anything. In 2024, New York University proved them wrong.</p>
 
     <div class="controversy-box">
       <div class="controversy-label">The Skeptic's Objection</div>
@@ -158,7 +158,7 @@
 
     <div class="claim-box">
       <div class="claim-label">The Logic</div>
-      <div class="claim-text">For skin to <strong>testify</strong>, it must be able to <strong>remember</strong>. Testimony without memory is impossible. The Quran does not say the brain testifies — it says the skin does. That is a precise, falsifiable claim. <strong>New York University, 2024: non-neural cells — including skin — can store and retrieve memories.</strong></div>
+      <div class="claim-text">For skin to <strong>testify</strong>, it must be able to <strong>remember</strong>. Testimony without memory is impossible. The Quran does not say the brain testifies it says the skin does. That is a precise, falsifiable claim. <strong>New York University, 2024: non-neural cells including skin can store and retrieve memories.</strong></div>
     </div>
 
     <button onclick="go(1)" class="btn btn-primary" style="margin-top:8px;">
@@ -212,7 +212,7 @@
       <div class="ac-letter">B</div>
       <div class="ac-body">
         <div class="ac-big">Skin and liver</div>
-        <div class="ac-sub">"Can skin and liver remember?" — Times of India, 2024</div>
+        <div class="ac-sub">"Can skin and liver remember?" Times of India, 2024</div>
       </div>
     </div>
     <div onclick="pickEx2(this, false)" class="answer-card">
@@ -234,7 +234,7 @@
     <div onclick="pickEx3(this, true)" class="answer-card">
       <div class="ac-letter">B</div>
       <div class="ac-body">
-        <div class="ac-big">Memory is a specialized function of neural circuits in the brain — no other cells were believed capable of storing memories</div>
+        <div class="ac-big">Memory is a specialized function of neural circuits in the brain no other cells were believed capable of storing memories</div>
       </div>
     </div>
     <div onclick="pickEx3(this, false)" class="answer-card">
@@ -264,8 +264,8 @@
     </div>
 
     <div class="verdict-text">
-      <strong>The Quran stated in 624 CE that human skin stores memories of actions.</strong> Critics used this as evidence against the Quran for centuries — "skin can't remember, only neurons can." The entire field of neuroscience agreed with the critics.<br><br>
-      In 2024, New York University researchers discovered that non-neural cells — including skin and liver — can store and retrieve memories. The Quran named skin specifically. The critics were not just wrong — they were 1,400 years behind.
+      <strong>The Quran stated in 624 CE that human skin stores memories of actions.</strong> Critics used this as evidence against the Quran for centuries "skin can't remember, only neurons can." The entire field of neuroscience agreed with the critics.<br><br>
+      In 2024, New York University researchers discovered that non-neural cells including skin and liver can store and retrieve memories. The Quran named skin specifically. The critics were not just wrong they were 1,400 years behind.
     </div>
 
     <div class="source-box">
@@ -299,14 +299,14 @@
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* Locate 41:20 — skin testifies against its owner. NYU 2024 confirmed skin can store memories.
+/* Locate 41:20 skin testifies against its owner. NYU 2024 confirmed skin can store memories.
    For 1,400 years critics called this the Quran's biggest scientific error. */
 QuranValidator.attach('qv-skin',{
   mode:'locate',
   title:'Read it yourself in the Quran',
-  subtitle:'Find 41:20 — skin testifies against its owner. NYU 2024: non-neural cells including skin can store and retrieve memories.',
+  subtitle:'Find 41:20 skin testifies against its owner. NYU 2024: non-neural cells including skin can store and retrieve memories.',
   groups:[
-    {id:'skin', label:'Skin testifies — stores memory', arabic:'جُلُودُهُمْ', color:'#d946ef', occurrences:[[41,20],[41,21]]}
+    {id:'skin', label:'Skin testifies stores memory', arabic:'جُلُودُهُمْ', color:'#d946ef', occurrences:[[41,20],[41,21]]}
   ]
 });
 </script>
@@ -388,7 +388,7 @@ function pickEx2(el, correct) {
     document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('The Times of India (2024) specifically asked: "Can skin and liver remember?" — both named after a New York University study on non-neural memory.', function() { go(3); });
+    showOk('The Times of India (2024) specifically asked: "Can skin and liver remember?" both named after a New York University study on non-neural memory.', function() { go(3); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);

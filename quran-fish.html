@@ -176,7 +176,7 @@
 
   <div class="stage" id="s2">
     <div class="step-lbl">Exercise 2 of 3</div>
-    <div class="prompt">Count every letter in the verse — one word at a time.</div>
+    <div class="prompt">Count every letter in the verse one word at a time.</div>
     <div class="scan-panel">
       <div class="scan-counter">
         <div class="scan-num" id="scanNum">0</div>
@@ -231,11 +231,11 @@
 
     <div class="gold-box">
       <div class="gt">50 letters in the verse about the fish. 50 chromosomes in the fish. No rounding. No approximation. No selection.</div>
-      <div class="gs">50 is the chromosome count of carp, goldfish, and zebrafish — and the modal number across teleost fish, the largest vertebrate group on Earth. The verse was fixed in the 7th century. Fish chromosome counts were not confirmed until 1956. The number was already in the text.</div>
+      <div class="gs">50 is the chromosome count of carp, goldfish, and zebrafish and the modal number across teleost fish, the largest vertebrate group on Earth. The verse was fixed in the 7th century. Fish chromosome counts were not confirmed until 1956. The number was already in the text.</div>
     </div>
 
     <div class="insight-box">
-      <strong>Why حوتهما?</strong> The root حوت (ḥūt) means a large fish. In 18:61, حوتهما (their fish) is the narrative pivot — the moment the fish escapes marks exactly where Moses must turn back. It is the only verse in the Quran where a fish plays a direct, central narrative role. And it contains exactly 50 letters.
+      <strong>Why حوتهما?</strong> The root حوت (ḥūt) means a large fish. In 18:61, حوتهما (their fish) is the narrative pivot the moment the fish escapes marks exactly where Moses must turn back. It is the only verse in the Quran where a fish plays a direct, central narrative role. And it contains exactly 50 letters.
     </div>
 
     <a href="quran-bee-female.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to The Female Worker</a>
@@ -308,7 +308,7 @@ function pickEx1(el, correct) {
     document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('Exactly 50 letters — no diacritics, no vowel marks counted. We will verify every word now.', function() { go(2); });
+    showOk('Exactly 50 letters no diacritics, no vowel marks counted. We will verify every word now.', function() { go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -327,7 +327,7 @@ function runScanner() {
 
   function nextWord() {
     if (wi >= words.length) {
-      showOk('50 letters confirmed — every word highlighted, every letter counted.', function() { go(3); });
+      showOk('50 letters confirmed every word highlighted, every letter counted.', function() { go(3); });
       return;
     }
     const word = words[wi];

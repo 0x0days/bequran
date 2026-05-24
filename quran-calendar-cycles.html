@@ -202,7 +202,7 @@
   <div class="stage active" id="s0">
     <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
     <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · Calendar Cycles</p>
-    <h1 class="hero-title">The Quran's word for "day" encodes the solar year, the Hijri year, and the lunar month — using grammar alone.</h1>
+    <h1 class="hero-title">The Quran's word for "day" encodes the solar year, the Hijri year, and the lunar month using grammar alone.</h1>
 
     <div class="cal-badges">
       <div class="cbadge s" id="cb0"><div class="cnum">365</div><div class="clbl">Solar days</div></div>
@@ -212,11 +212,11 @@
 
     <div class="word-hero">
       <div class="ar">يوم</div>
-      <div class="sub">yawm — "day"</div>
+      <div class="sub">yawm "day"</div>
     </div>
     <div class="source-tag">478 occurrences · Tanzil Ḥafṣ/Uthmānī text · verified by corpus analysis</div>
 
-    <p class="body-text">This single root word appears 478 times across the Quran. Each occurrence carries a precise grammatical form. Sorting those 478 tokens by their standard Arabic morphological categories — simple, definite, tanwīn, possessive — produces all three astronomical constants. No numbers are stated anywhere in the text.</p>
+    <p class="body-text">This single root word appears 478 times across the Quran. Each occurrence carries a precise grammatical form. Sorting those 478 tokens by their standard Arabic morphological categories simple, definite, tanwīn, possessive produces all three astronomical constants. No numbers are stated anywhere in the text.</p>
 
     <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Show me how →</button>
   </div>
@@ -227,7 +227,7 @@
     <p class="prompt">The Arabic word يوم (yawm, meaning "day") appears throughout the Quran. How many times does it appear in total across all its forms?</p>
     <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">354</div><div class="ac-sub">The Hijri calendar days per year</div></div></div>
     <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">365</div><div class="ac-sub">The solar calendar days per year</div></div></div>
-    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">478</div><div class="ac-sub">Total count — which contains all three calendars</div></div></div>
+    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">478</div><div class="ac-sub">Total count which contains all three calendars</div></div></div>
   </div>
 
   <!-- ── STAGE 2: Calendar Calculator ── -->
@@ -255,8 +255,8 @@
       <div class="cat-card c-shared span2" data-cid="simple" onclick="addCat('simple',274,'both',this)">
         <div class="cat-ar">يوم</div>
         <div class="cat-body">
-          <div class="cat-name">Simple forms — base + single modification (≤5 chars)</div>
-          <div class="cat-meta">Shared — feeds both solar and Hijri</div>
+          <div class="cat-name">Simple forms base + single modification (≤5 chars)</div>
+          <div class="cat-meta">Shared feeds both solar and Hijri</div>
           <div class="cat-n">274</div>
         </div>
       </div>
@@ -309,7 +309,7 @@
       <div class="cat-card c-hijri" data-cid="lunarpl" onclick="addCat('lunarpl',26,'lunar',this)">
         <div class="cat-ar">أيام</div>
         <div class="cat-body">
-          <div class="cat-name">Plural — "days"</div>
+          <div class="cat-name">Plural "days"</div>
           <div class="cat-meta">Lunar only</div>
           <div class="cat-n">26</div>
         </div>
@@ -318,7 +318,7 @@
       <div class="cat-card c-hijri" data-cid="lunardu" onclick="addCat('lunardu',3,'lunar',this)">
         <div class="cat-ar">يومين</div>
         <div class="cat-body">
-          <div class="cat-name">Dual — "two days"</div>
+          <div class="cat-name">Dual "two days"</div>
           <div class="cat-meta">Lunar only</div>
           <div class="cat-n">3</div>
         </div>
@@ -378,9 +378,9 @@
 
     <div class="timeline">
       <div class="tl-item">
-        <div class="tl-year">610–632 CE — Arabia</div>
+        <div class="tl-year">610–632 CE Arabia</div>
         <div class="tl-text">
-          Quranic verses are revealed over 23 years across different occasions and cities. The Hijri calendar does not exist — it is established in 638 CE, six years after the Quran's completion.
+          Quranic verses are revealed over 23 years across different occasions and cities. The Hijri calendar does not exist it is established in 638 CE, six years after the Quran's completion.
           <span class="tl-sub">No author tracking 478 word-tokens across 23 years of composition could produce this by design.</span>
         </div>
       </div>
@@ -394,8 +394,8 @@
     </div>
 
     <div class="gold-box">
-      <div class="gt">Both the solar and Hijri years emerge from the same 478 tokens of one word — sorted only by grammar. The two calendar systems share 274 tokens as their foundation. Neither calendar was established when those tokens were written.</div>
-      <div class="gs">The 274 shared forms cannot be removed from either count without destroying both results. They are the linchpin — simultaneously foundational to a solar year that existed, and a lunar calendar that had not yet been named. Probability of all three patterns by chance: 1 in 2,500 to 7,000.</div>
+      <div class="gt">Both the solar and Hijri years emerge from the same 478 tokens of one word sorted only by grammar. The two calendar systems share 274 tokens as their foundation. Neither calendar was established when those tokens were written.</div>
+      <div class="gs">The 274 shared forms cannot be removed from either count without destroying both results. They are the linchpin simultaneously foundational to a solar year that existed, and a lunar calendar that had not yet been named. Probability of all three patterns by chance: 1 in 2,500 to 7,000.</div>
     </div>
 
     <div class="insight-box">
@@ -484,7 +484,7 @@ function pickEx1(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
-    showOk('478 total — and when you categorize each form by meaning, they separate naturally into 365 (solar), 354 (Hijri), and 29 (lunar).', function(){ go(2); });
+    showOk('478 total and when you categorize each form by meaning, they separate naturally into 365 (solar), 354 (Hijri), and 29 (lunar).', function(){ go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
@@ -496,7 +496,7 @@ function pickEx3(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
-    showOk('12 — and Quran 9:36 confirms it directly: "The number of months in the sight of Allah is twelve months."', function(){ go(4); });
+    showOk('12 and Quran 9:36 confirms it directly: "The number of months in the sight of Allah is twelve months."', function(){ go(4); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
@@ -557,7 +557,7 @@ function checkAllBadgesDone() {
   if (sdone && hdone && ldone && !allBadgesDone) {
     allBadgesDone = true;
     setTimeout(function() {
-      showOk('Three complete calendar systems hidden inside one word — solar year 365, Hijri year 354, lunar month 29.', function(){ go(3); });
+      showOk('Three complete calendar systems hidden inside one word solar year 365, Hijri year 354, lunar month 29.', function(){ go(3); });
     }, 500);
   }
 }

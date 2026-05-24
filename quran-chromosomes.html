@@ -143,7 +143,7 @@
     <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
     <div class="eyebrow" style="color:var(--accent-light)">Pattern 2a · The Bee Surah</div>
     <h1 class="hero-title">The Quran's 16th chapter is named "The Bee." The number 16 encodes exact bee chromosome biology.</h1>
-    <p class="body-text">Every surah has a number. The 16th surah is An-Nahl. That number — 16 — turns out to be the precise chromosome count of the male bee, and a root for every other biological number in the hive. No 7th-century human knew this.</p>
+    <p class="body-text">Every surah has a number. The 16th surah is An-Nahl. That number 16 turns out to be the precise chromosome count of the male bee, and a root for every other biological number in the hive. No 7th-century human knew this.</p>
     <div class="surah-hero">
       <div class="surah-num">16</div>
       <div class="surah-name-ar">النَّحْل</div>
@@ -181,7 +181,7 @@
   <div class="stage" id="s2">
     <div class="step-lbl">Exercise 2 of 3</div>
     <div class="prompt">How many chromosomes does a male honeybee (drone) have?</div>
-    <p class="body-text" style="margin-bottom:20px">Male bees develop from unfertilised eggs, making them haploid — they carry only one set of chromosomes. This was confirmed by cytogeneticists in the 1950s.</p>
+    <p class="body-text" style="margin-bottom:20px">Male bees develop from unfertilised eggs, making them haploid they carry only one set of chromosomes. This was confirmed by cytogeneticists in the 1950s.</p>
     <div class="answers-grid" style="grid-template-columns:1fr 1fr">
       <div class="answer-card" onclick="pickEx2(this,false)" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">8</div>
       <div class="answer-card" onclick="pickEx2(this,true)"  style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">16</div>
@@ -192,7 +192,7 @@
 
   <div class="stage" id="s3">
     <div class="step-lbl">Exercise 3 of 3</div>
-    <div class="prompt">Watch how 16 multiplies through bee biology — and through the surah itself.</div>
+    <div class="prompt">Watch how 16 multiplies through bee biology and through the surah itself.</div>
     <div class="chr-grid">
       <div class="chr-card" id="cc0">
         <div class="chr-mult">16 × 1</div>
@@ -253,7 +253,7 @@
     </div>
 
     <div class="gold-box" style="margin-top:28px">
-      <div class="gt">16 = drone chromosomes. 32 = female bee chromosomes. 128 = verses in the surah. Every number is 16 × an integer — and 16 is the surah's own number.</div>
+      <div class="gt">16 = drone chromosomes. 32 = female bee chromosomes. 128 = verses in the surah. Every number is 16 × an integer and 16 is the surah's own number.</div>
       <div class="gs">Bee chromosome counts were established by cytogenetics in the 1950s. The surah was fixed in the 7th century. The surah number, verse count, and chromosome biology all resolve to the same unit. No rounding was used.</div>
     </div>
 
@@ -348,7 +348,7 @@ function pickEx1(el, correct) {
     document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('Surah 16 is An-Nahl — The Bee. It is the only Quranic chapter named after an insect.', function() { go(2); });
+    showOk('Surah 16 is An-Nahl The Bee. It is the only Quranic chapter named after an insect.', function() { go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -362,7 +362,7 @@ function pickEx2(el, correct) {
     document.querySelectorAll('#s2 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('Drone bees are haploid with exactly 16 chromosomes — the same number as the surah that bears their name.', function() { go(3); });
+    showOk('Drone bees are haploid with exactly 16 chromosomes the same number as the surah that bears their name.', function() { go(3); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -683,13 +683,13 @@ initHeroCanvas();
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* النحل (the bee) appears exactly once in the Quran — at 16:68.
+/* النحل (the bee) appears exactly once in the Quran at 16:68.
    The chapter IS numbered 16 = drone chromosomes.
    Navigate there and read it yourself. */
 QuranValidator.attach('qv-chromosomes-bee',{
   mode:'locate',
   title:'Find it yourself in the Quran',
-  subtitle:'The word النحل (the bee) appears once — in Surah 16, verse 68. Surah 16 = drone bee chromosomes.',
+  subtitle:'The word النحل (the bee) appears once in Surah 16, verse 68. Surah 16 = drone bee chromosomes.',
   groups:[
     {id:'bee', label:'The Bee', arabic:'النحل', color:'#fbbf24', occurrences:[[16,68],[16,69]]}
   ]

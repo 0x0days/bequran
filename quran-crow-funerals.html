@@ -187,7 +187,7 @@
     </button>
   </div>
 
-  <!-- ── S1 — VISUAL COMPARISON ── -->
+  <!-- ── S1 VISUAL COMPARISON ── -->
   <div id="s1" class="stage">
     <p class="prompt">What specific action does Quran 5:31 attribute to the crow to teach a lesson about mortality?</p>
 
@@ -220,9 +220,9 @@
     </div>
   </div>
 
-  <!-- ── S2 — CORVID GATHERING SIMULATION ── -->
+  <!-- ── S2 CORVID GATHERING SIMULATION ── -->
   <div id="s2" class="stage">
-    <p class="prompt">Watch the corvids assemble — see how their collective vigilance spikes.</p>
+    <p class="prompt">Watch the corvids assemble see how their collective vigilance spikes.</p>
     <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">This simulation tracks real-world corvid behaviors. When a dead peer is discovered, crows fly down from surrounding trees, land nearby, and broadcast alarms to initiate a community risk assessment.</p>
 
     <canvas id="s2Canvas" width="640" height="220" style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
@@ -251,7 +251,7 @@
     </div>
   </div>
 
-  <!-- ── S3 — SCIENTIFIC INQUIRY ── -->
+  <!-- ── S3 SCIENTIFIC INQUIRY ── -->
   <div id="s3" class="stage">
     <p class="prompt">What did a landmark 2015 study in *Animal Behaviour* discover about why crows gather around their dead?</p>
 
@@ -287,7 +287,7 @@
       <span class="xp-text">Lesson complete · +30 XP</span>
     </div>
 
-    <h2 class="verdict-title">The crow as a teacher of death — confirmed by science.</h2>
+    <h2 class="verdict-title">The crow as a teacher of death confirmed by science.</h2>
     <p class="verdict-sub">The verse portrays a crow performing a purposeful action—digging the ground—to serve as an instructive model for human behavior. Modern animal biology has proved that crows display uniquely advanced social responses to death, a fact completely unrecorded in ancient literature.</p>
 
     <div class="stat-row">
@@ -503,7 +503,7 @@ function pickEx3(el, correct) {
   }
 }
 
-/* ── HERO CANVAS — Crow Flying over Verse ── */
+/* ── HERO CANVAS Crow Flying over Verse ── */
 function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
@@ -515,7 +515,7 @@ function initHeroCanvas() {
   function frame() {
     ctx.clearRect(0, 0, W, H);
 
-    // Dusk sky — deep violet top fading to amber horizon
+    // Dusk sky deep violet top fading to amber horizon
     var sky = ctx.createLinearGradient(0, 0, 0, H);
     sky.addColorStop(0,    '#060818');
     sky.addColorStop(0.42, '#12203a');
@@ -563,7 +563,7 @@ function initHeroCanvas() {
   frame();
 }
 
-/* ── S1 CANVAS — Comparative Behavior Panels ── */
+/* ── S1 CANVAS Comparative Behavior Panels ── */
 function initS1Canvas() {
   var cv = document.getElementById('s1Canvas');
   if (!cv) return;
@@ -644,7 +644,7 @@ function initS1Canvas() {
   requestAnimationFrame(drawFrame);
 }
 
-/* ── S2 CANVAS — Dynamic Corvid Funeral Sim ── */
+/* ── S2 CANVAS Dynamic Corvid Funeral Sim ── */
 var s2Running = false;
 var flock = [];
 
@@ -738,12 +738,12 @@ initHeroCanvas();
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* Locate 5:31 — a crow digging the earth to show how to bury a body.
+/* Locate 5:31 a crow digging the earth to show how to bury a body.
    Confirmed 2015: crows hold structured death vigils to learn from their dead. */
 QuranValidator.attach('qv-crow',{
   mode:'locate',
   title:'Read it yourself in the Quran',
-  subtitle:'Find 5:31 — a crow shows Cain how to bury. Science confirmed crows hold structured "funerals" (Animal Behaviour, 2015).',
+  subtitle:'Find 5:31 a crow shows Cain how to bury. Science confirmed crows hold structured "funerals" (Animal Behaviour, 2015).',
   groups:[
     {id:'crow', label:'The crow teaches burial', arabic:'غُرَابًا', color:'#94a3b8', occurrences:[[5,31]]}
   ]

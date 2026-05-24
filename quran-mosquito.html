@@ -166,7 +166,7 @@
     <div class="verse-block">
       <div class="verse-ref">2:26 · Surah Al-Baqarah</div>
       <div class="verse-ar">إِنَّ اللَّهَ لَا يَسْتَحْيِي أَنْ يَضْرِبَ مَثَلًا مَا <span class="hl">بَعُوضَةً فَمَا فَوْقَهَا</span> ۚ فَأَمَّا الَّذِينَ آمَنُوا فَيَعْلَمُونَ أَنَّهُ الْحَقُّ مِنْ رَبِّهِمْ</div>
-      <div class="verse-en">"Indeed, Allah is not timid to present an example — that of a mosquito <span class="hl">and what is above it.</span> And those who have believed know that it is the truth from their Lord..."</div>
+      <div class="verse-en">"Indeed, Allah is not timid to present an example that of a mosquito <span class="hl">and what is above it.</span> And those who have believed know that it is the truth from their Lord..."</div>
     </div>
 
     <div class="claim-box">
@@ -586,7 +586,7 @@ function initHeroCanvas() {
   frame();
 }
 
-/* ── S1 CANVAS RENDER — COMPARATIVE REALITIES ────── */
+/* ── S1 CANVAS RENDER COMPARATIVE REALITIES ────── */
 function initS1Canvas() {
   var cv = document.getElementById('s1Canvas');
   if (!cv) return;
@@ -658,7 +658,7 @@ function initS1Canvas() {
   requestAnimationFrame(drawFrame);
 }
 
-/* ── S2 CANVAS RENDER — PARASITE INTERACTIVE DOCK ── */
+/* ── S2 CANVAS RENDER PARASITE INTERACTIVE DOCK ── */
 var s2Active = false;
 var parasiteGroup = [];
 
@@ -740,14 +740,14 @@ initHeroCanvas();
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* Locate 2:26 — بَعُوضَةً (feminine mosquito) فَمَا فَوْقَهَا (and what is above it).
-   Female mosquitoes carry parasites that live on top of them — confirmed by modern biology. */
+/* Locate 2:26 بَعُوضَةً (feminine mosquito) فَمَا فَوْقَهَا (and what is above it).
+   Female mosquitoes carry parasites that live on top of them confirmed by modern biology. */
 QuranValidator.attach('qv-mosquito',{
   mode:'locate',
   title:'Read it yourself in the Quran',
-  subtitle:'Find 2:26 — بَعُوضَةً (female mosquito) "and what is above it." Scientists found midges that live on top of female mosquitoes.',
+  subtitle:'Find 2:26 بَعُوضَةً (female mosquito) "and what is above it." Scientists found midges that live on top of female mosquitoes.',
   groups:[
-    {id:'mosquito', label:'Female mosquito — and what rides it', arabic:'بَعُوضَةً', color:'#86efac', occurrences:[[2,26]]}
+    {id:'mosquito', label:'Female mosquito and what rides it', arabic:'بَعُوضَةً', color:'#86efac', occurrences:[[2,26]]}
   ]
 });
 </script>

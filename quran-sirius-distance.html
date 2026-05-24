@@ -54,7 +54,7 @@
     .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
     .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
 
-    /* Stage 0 — cascade flow */
+    /* Stage 0 cascade flow */
     .cascade { display: flex; flex-direction: column; align-items: center; margin: 28px 0 8px; }
     .cnode { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 28px; text-align: center; min-width: 176px; opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s; }
     .cnode.show { opacity: 1; transform: none; }
@@ -75,7 +75,7 @@
     .dist-label { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 25px); color: var(--gold); text-align: center; opacity: 0; transform: translateY(8px); transition: opacity .7s, transform .7s; margin: 10px 0 32px; }
     .dist-label.show { opacity: 1; transform: none; }
 
-    /* Stage 2 — dual counting */
+    /* Stage 2 dual counting */
     .paths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
     @media (max-width: 480px) { .paths-grid { grid-template-columns: 1fr; } }
     .path-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: border-color .4s, box-shadow .4s; }
@@ -237,7 +237,7 @@
   <div class="stage active" id="s0">
     <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
     <p class="eyebrow" style="color:var(--star)">Quranic Numerics · Earth–Sirius Distance</p>
-    <h1 class="hero-title">Surah 53 is "The Star." It names exactly one star in the entire Quran: Sirius. The distance to Sirius — 8.6 light-years — is encoded in that same surah twice, in two different units.</h1>
+    <h1 class="hero-title">Surah 53 is "The Star." It names exactly one star in the entire Quran: Sirius. The distance to Sirius 8.6 light-years is encoded in that same surah twice, in two different units.</h1>
 
     <div class="cascade">
       <div class="cnode star-node" id="cn0">
@@ -271,7 +271,7 @@
     </div>
     <div class="dist-label" id="drev">= 8.6 light-years from Earth</div>
 
-    <p class="body-text">861 letters from the Star verse to the Earth verse — encoding 8.61 light-years. Then 86 words from the Earth verse to Sirius — encoding 8.6 light-years. Both measurements point to the same astronomical fact. The surah was named "The Star" 1,200 years before stellar distances could be measured.</p>
+    <p class="body-text">861 letters from the Star verse to the Earth verse encoding 8.61 light-years. Then 86 words from the Earth verse to Sirius encoding 8.6 light-years. Both measurements point to the same astronomical fact. The surah was named "The Star" 1,200 years before stellar distances could be measured.</p>
 
     <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Begin the lesson →</button>
   </div>
@@ -301,7 +301,7 @@
       <div class="ac-letter">C</div>
       <div class="ac-body">
         <div class="ac-big">The Star</div>
-        <div class="ac-sub">An-najm — the only surah named after a star</div>
+        <div class="ac-sub">An-najm the only surah named after a star</div>
       </div>
     </div>
   </div>
@@ -310,7 +310,7 @@
   <div class="stage" id="s2">
     <p class="step-lbl">Exercise 2 of 3</p>
     <h2 class="hero-title">Two units. Two segments. The same distance encoded at two levels of precision.</h2>
-    <p class="body-text">Count the letters in the first segment and the words in the second. They are independent — run them in any order.</p>
+    <p class="body-text">Count the letters in the first segment and the words in the second. They are independent run them in any order.</p>
 
     <div class="paths-grid">
       <div class="path-card" id="pcl">
@@ -365,7 +365,7 @@
           <div class="cp-sub">words</div>
         </div>
       </div>
-      <div class="cp-dist">Both encode: 8.6 light-years — Earth to Sirius</div>
+      <div class="cp-dist">Both encode: 8.6 light-years Earth to Sirius</div>
       <div class="cp-dsub">8.61 ly (letters) · 8.6 ly (words) · Actual: 8.60 ± 0.04 ly</div>
     </div>
   </div>
@@ -395,7 +395,7 @@
       <div class="ac-letter">C</div>
       <div class="ac-body">
         <div class="ac-big">Both encodings fall within the uncertainty range</div>
-        <div class="ac-sub">8.56 to 8.64 ly — both 8.6 and 8.61 are inside</div>
+        <div class="ac-sub">8.56 to 8.64 ly both 8.6 and 8.61 are inside</div>
       </div>
     </div>
   </div>
@@ -437,7 +437,7 @@
     </div>
 
     <div class="insight-box">
-      <strong>The scale relationship is exact:</strong> 8.61 light-years = 861 centi-light-years. 8.6 light-years = 86 deci-light-years. The letter count encodes one more decimal of precision than the word count — and both are measured within the same 18-verse surah, with Earth as the midpoint between the Star and Sirius.
+      <strong>The scale relationship is exact:</strong> 8.61 light-years = 861 centi-light-years. 8.6 light-years = 86 deci-light-years. The letter count encodes one more decimal of precision than the word count and both are measured within the same 18-verse surah, with Earth as the midpoint between the Star and Sirius.
     </div>
 
     <table class="sci-table">
@@ -474,21 +474,21 @@
 
     <div class="timeline">
       <div class="tl-item">
-        <div class="tl-year">7th century Arabia — 610 CE</div>
+        <div class="tl-year">7th century Arabia 610 CE</div>
         <div class="tl-text">
-          The Quran is revealed. Surah 53 opens with an oath by the star. It names Sirius as being under God's lordship — addressing tribes who worshipped it. The word "الشعرى" appears for the first and only time in the Quran.
+          The Quran is revealed. Surah 53 opens with an oath by the star. It names Sirius as being under God's lordship addressing tribes who worshipped it. The word "الشعرى" appears for the first and only time in the Quran.
           <span class="tl-sub">Stellar distances: completely impossible to measure anywhere on Earth. The concept of a light-year does not exist.</span>
         </div>
       </div>
       <div class="tl-item">
-        <div class="tl-year">1838 CE — Königsberg, Prussia</div>
+        <div class="tl-year">1838 CE Königsberg, Prussia</div>
         <div class="tl-text">
-          Friedrich Bessel measures the first stellar parallax — for the star 61 Cygni. This is the first time any stellar distance is measured. Humanity now knows that stars are light-years away.
+          Friedrich Bessel measures the first stellar parallax for the star 61 Cygni. This is the first time any stellar distance is measured. Humanity now knows that stars are light-years away.
           <span class="tl-sub">~1,228 years after the Quran. Sirius's distance measured with precision only decades later.</span>
         </div>
       </div>
       <div class="tl-item">
-        <div class="tl-year">Modern — Hipparcos satellite (1989)</div>
+        <div class="tl-year">Modern Hipparcos satellite (1989)</div>
         <div class="tl-text">
           The European Space Agency's Hipparcos mission measures Sirius's parallax to unprecedented precision: 8.60 ± 0.04 light-years. The Quranic letter count of 861 falls within this uncertainty range. The word count of 86 encodes the same value at one decimal place.
           <span class="tl-sub">Verified: Tanzil Ḥafṣ/Uthmānī text · arabic letters only, no diacritics</span>
@@ -497,12 +497,12 @@
     </div>
 
     <div class="gold-box">
-      <div class="gt">A 7th-century text in Arabia names the brightest star in the sky by name. Within the surah named "The Star," the precise distance to that star is embedded twice — once in letters, once in words. The Earth sits exactly between these two encodings, as the midpoint verse.</div>
-      <div class="gs">The star was named. The distance was unknown. The encoding was already in the text — waiting 1,200 years for the science to catch up and confirm it. Both figures land inside the modern measurement uncertainty of 8.60 ± 0.04 light-years.</div>
+      <div class="gt">A 7th-century text in Arabia names the brightest star in the sky by name. Within the surah named "The Star," the precise distance to that star is embedded twice once in letters, once in words. The Earth sits exactly between these two encodings, as the midpoint verse.</div>
+      <div class="gs">The star was named. The distance was unknown. The encoding was already in the text waiting 1,200 years for the science to catch up and confirm it. Both figures land inside the modern measurement uncertainty of 8.60 ± 0.04 light-years.</div>
     </div>
 
     <div class="insight-box">
-      <strong>The surah's own name is النجم — "The Star."</strong> The distance encoding is not hidden in an arbitrary passage. It sits in the surah explicitly devoted to the star, with the anchor verses being the star oath (53:1), the human origin (53:32), and the only named star in the Quran (53:49).
+      <strong>The surah's own name is النجم "The Star."</strong> The distance encoding is not hidden in an arbitrary passage. It sits in the surah explicitly devoted to the star, with the anchor verses being the star oath (53:1), the human origin (53:32), and the only named star in the Quran (53:49).
     </div>
 
     <div id="qv-sirius"></div>
@@ -592,7 +592,7 @@ function pickEx1(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
-    showOk('An-najm means "The Star." The surah opens with an oath by a star (53:1), refers to Earth (53:32), and names Sirius by name (53:49) — the only star named in the entire Quran.', function(){ go(2); });
+    showOk('An-najm means "The Star." The surah opens with an oath by a star (53:1), refers to Earth (53:32), and names Sirius by name (53:49) the only star named in the entire Quran.', function(){ go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
@@ -699,15 +699,15 @@ initHeroCanvas();
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* Locate 53:1 (oath by the star), 53:49 (الشعرى — Sirius, only named star in Quran).
-   861 letters between them encode 8.61 light-years — Earth–Sirius distance. */
+/* Locate 53:1 (oath by the star), 53:49 (الشعرى Sirius, only named star in Quran).
+   861 letters between them encode 8.61 light-years Earth–Sirius distance. */
 QuranValidator.attach('qv-sirius',{
   mode:'locate',
   title:'Read it yourself in the Quran',
   subtitle:'Find 53:1 "By the star" and 53:49 "the Sirius (الشعرى)." 861 letters between them = 8.61 light-years to Sirius.',
   groups:[
     {id:'star',   label:'By the Star (oath)',    arabic:'ٱلنَّجْمِ',  color:'#93c5fd', occurrences:[[53,1]]},
-    {id:'sirius', label:'Sirius — only named star', arabic:'ٱلشِّعْرَىٰ', color:'#fcd34d', occurrences:[[53,49]]}
+    {id:'sirius', label:'Sirius only named star', arabic:'ٱلشِّعْرَىٰ', color:'#fcd34d', occurrences:[[53,49]]}
   ]
 });
 </script>

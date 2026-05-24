@@ -162,7 +162,7 @@
     </div>
 
     <div class="claim-box">
-      <p>The People of the Cave appear awake to observers — eyes open, bodies intact — yet cannot be roused. The Quran says God <strong>"struck their ears."</strong> A boxing punch to the ear causes the same: <strong>complete unconsciousness</strong> that no sound can break. Normal sleep is broken by any noise. A knocked-out person is not.</p>
+      <p>The People of the Cave appear awake to observers eyes open, bodies intact yet cannot be roused. The Quran says God <strong>"struck their ears."</strong> A boxing punch to the ear causes the same: <strong>complete unconsciousness</strong> that no sound can break. Normal sleep is broken by any noise. A knocked-out person is not.</p>
     </div>
 
     <button onclick="go(1)" class="btn btn-primary" style="margin-top:8px;">
@@ -185,7 +185,7 @@
     </div>
     <div onclick="pickEx1(this, true)" class="answer-card">
       <div class="ac-letter">C</div>
-      <div class="ac-body"><div class="ac-big">The inner ear was struck, causing deep unconsciousness — like a knockout — impossible to wake from sound alone</div></div>
+      <div class="ac-body"><div class="ac-big">The inner ear was struck, causing deep unconsciousness like a knockout impossible to wake from sound alone</div></div>
     </div>
   </div>
 
@@ -198,7 +198,7 @@
 
     <div class="evidence-wrap">
       <img src="pics/inner-ear.jpeg" alt="Anatomy of the Internal Ear showing cochlea and semicircular canals">
-      <div class="evidence-cap">Inner ear anatomy: cochlea (hearing) + 3 semicircular canals (balance) — Cranial Nerve VIII</div>
+      <div class="evidence-cap">Inner ear anatomy: cochlea (hearing) + 3 semicircular canals (balance) Cranial Nerve VIII</div>
     </div>
 
     <p class="prompt" style="margin-top:18px;">According to modern science, what does the inner ear control <em>besides</em> hearing?</p>
@@ -208,7 +208,7 @@
     </div>
     <div onclick="pickEx2(this, true)" class="answer-card">
       <div class="ac-letter">B</div>
-      <div class="ac-body"><div class="ac-big">Balance — static balance (sensing gravity) and dynamic balance (sensing acceleration and rotation)</div></div>
+      <div class="ac-body"><div class="ac-big">Balance static balance (sensing gravity) and dynamic balance (sensing acceleration and rotation)</div></div>
     </div>
     <div onclick="pickEx2(this, false)" class="answer-card">
       <div class="ac-letter">C</div>
@@ -219,18 +219,18 @@
   <!-- ── S3 EXERCISE 3 ──────────────────────────── -->
   <div id="s3" class="stage">
     <p class="hero-eyebrow">Exercise 3 of 3</p>
-    <p class="prompt">How many semicircular canals does the inner ear contain — each sensing rotation in a different plane of space?</p>
+    <p class="prompt">How many semicircular canals does the inner ear contain each sensing rotation in a different plane of space?</p>
     <div onclick="pickEx3(this, false)" class="answer-card">
       <div class="ac-letter">A</div>
-      <div class="ac-body"><div class="ac-big">1 — one canal for all rotational motion</div></div>
+      <div class="ac-body"><div class="ac-big">1 one canal for all rotational motion</div></div>
     </div>
     <div onclick="pickEx3(this, false)" class="answer-card">
       <div class="ac-letter">B</div>
-      <div class="ac-body"><div class="ac-big">2 — one for horizontal, one for vertical</div></div>
+      <div class="ac-body"><div class="ac-big">2 one for horizontal, one for vertical</div></div>
     </div>
     <div onclick="pickEx3(this, true)" class="answer-card">
       <div class="ac-letter">C</div>
-      <div class="ac-body"><div class="ac-big">3 — anterior, posterior, and lateral canals — covering all three axes of 3D space</div></div>
+      <div class="ac-body"><div class="ac-big">3 anterior, posterior, and lateral canals covering all three axes of 3D space</div></div>
     </div>
   </div>
 
@@ -255,8 +255,8 @@
     </div>
 
     <div class="verdict-text">
-      <strong>1,400 years before neuroscience mapped the vestibular system,</strong> the Quran described "striking the ears" as the mechanism of sustained unconsciousness. People at the time understood ears only as hearing organs. The idea that a blow to the ear — not a blow to the head, not a sedative — could render someone unconscious for years was unknown.<br><br>
-      The inner ear contains three semicircular canals that detect rotational acceleration in all three planes of space. Disrupting them causes vertigo, loss of balance, and loss of consciousness — exactly what "we struck their ears" physiologically describes.
+      <strong>1,400 years before neuroscience mapped the vestibular system,</strong> the Quran described "striking the ears" as the mechanism of sustained unconsciousness. People at the time understood ears only as hearing organs. The idea that a blow to the ear not a blow to the head, not a sedative could render someone unconscious for years was unknown.<br><br>
+      The inner ear contains three semicircular canals that detect rotational acceleration in all three planes of space. Disrupting them causes vertigo, loss of balance, and loss of consciousness exactly what "we struck their ears" physiologically describes.
     </div>
 
     <div class="source-box">
@@ -291,14 +291,14 @@
 <script src="theme.js"></script>
 <script src="quran-validator.js"></script>
 <script>
-/* Locate 18:11 — فَضَرَبْنَا عَلَىٰ آذَانِهِمْ "We struck upon their ears."
-   A blow to the inner ear causes total unconsciousness — confirmed by vestibular science. */
+/* Locate 18:11 فَضَرَبْنَا عَلَىٰ آذَانِهِمْ "We struck upon their ears."
+   A blow to the inner ear causes total unconsciousness confirmed by vestibular science. */
 QuranValidator.attach('qv-inner-ear',{
   mode:'locate',
   title:'Read it yourself in the Quran',
-  subtitle:'Find 18:11 — "We struck upon their ears." The inner ear controls consciousness and balance — confirmed by neuroscience.',
+  subtitle:'Find 18:11 "We struck upon their ears." The inner ear controls consciousness and balance confirmed by neuroscience.',
   groups:[
-    {id:'ear', label:'Struck their ears — unconscious for years', arabic:'آذَانِهِمْ', color:'#fde68a', occurrences:[[18,11]]}
+    {id:'ear', label:'Struck their ears unconscious for years', arabic:'آذَانِهِمْ', color:'#fde68a', occurrences:[[18,11]]}
   ]
 });
 </script>
@@ -366,7 +366,7 @@ function pickEx1(el, correct) {
     document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('Like a knockout punch in boxing — the inner ear disruption overrides consciousness entirely. Normal sleep can be broken by sound; this cannot.', function() { go(2); });
+    showOk('Like a knockout punch in boxing the inner ear disruption overrides consciousness entirely. Normal sleep can be broken by sound; this cannot.', function() { go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -394,7 +394,7 @@ function pickEx3(el, correct) {
     document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk('Three semicircular canals — one for each axis of rotation in 3D space — are housed in the inner ear alongside the cochlea. A strike to the ear disrupts all three.', function() { go(4); });
+    showOk('Three semicircular canals one for each axis of rotation in 3D space are housed in the inner ear alongside the cochlea. A strike to the ear disrupts all three.', function() { go(4); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -678,7 +678,7 @@ function initS2Canvas() {
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(mid, 10); ctx.lineTo(mid, H - 10); ctx.stroke();
 
-    // LEFT panel: Old belief — hearing only (red)
+    // LEFT panel: Old belief hearing only (red)
     var lx = mid * 0.45, ly = H * 0.5;
     drawEarOutline(lx, ly, 1.1, 'rgba(248,113,113,0.7)');
     drawSoundWaves(lx - 30, ly, 1.1, '#f87171');
@@ -694,7 +694,7 @@ function initS2Canvas() {
     ctx.font = '10px DM Sans,sans-serif';
     ctx.fillText('Hearing Only', mid * 0.45, 32);
 
-    // RIGHT panel: Modern science — hearing + balance (gold)
+    // RIGHT panel: Modern science hearing + balance (gold)
     var rx = mid + mid * 0.45, ry = H * 0.5;
     drawEarOutline(rx, ry, 1.1, 'rgba(253,230,138,0.7)');
     drawSoundWaves(rx - 30, ry, 1.1, ACCENT);

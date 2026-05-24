@@ -439,7 +439,7 @@
             <tr style="border-top:1px solid var(--border)"><td colspan="2" style="font-weight:500">Total</td><td>45</td><td>100%</td></tr>
           </tbody>
         </table>
-        <p style="font-size:13px;color:var(--muted);line-height:1.75">Including يَبَسًا moves the ratio to <strong style="color:var(--text)">71.11% : 28.89%</strong> — actually <span style="color:var(--accent-light)">closer</span> to Earth's known composition, with a margin of just <strong style="color:var(--text)">±0.11%</strong>. Whether you include it or not, the ratio holds.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.75">Including يَبَسًا moves the ratio to <strong style="color:var(--text)">71.11% : 28.89%</strong> actually <span style="color:var(--accent-light)">closer</span> to Earth's known composition, with a margin of just <strong style="color:var(--text)">±0.11%</strong>. Whether you include it or not, the ratio holds.</p>
       </div>
     </div>
 
@@ -447,7 +447,7 @@
       <div class="toggle-row">
         <div class="toggle-info">
           <h4>Validate it yourself</h4>
-          <p>Open the full Quran — count البحر and البر with your own eyes</p>
+          <p>Open the full Quran count البحر (sea, 32) and البر + يَبَسًا (land, 12+1=13) with your own eyes</p>
         </div>
         <label class="switch">
           <input type="checkbox" id="vswitch" onchange="toggleValidator(this.checked)">
@@ -630,7 +630,7 @@ function pickEx3(el, correct) {
     document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
       if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
     });
-    showOk("Earth’s ocean coverage is 71% — confirmed by NASA satellite measurement. The Quran’s ratio is 71.11%. The gap is 0.115 percentage points.", function() { go(4); });
+    showOk("Earth’s ocean coverage is 71% confirmed by NASA satellite measurement. The Quran’s ratio is 71.11%. The gap is 0.115 percentage points.", function() { go(4); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
@@ -691,9 +691,10 @@ var VE_YABAS=[[20,77]];
 var VE_SN={1:"Al-Fatihah",2:"Al-Baqarah",3:"Ali 'Imran",4:"An-Nisa",5:"Al-Ma'idah",6:"Al-An'am",7:"Al-A'raf",8:"Al-Anfal",9:"At-Tawbah",10:"Yunus",11:"Hud",12:"Yusuf",13:"Ar-Ra'd",14:"Ibrahim",15:"Al-Hijr",16:"An-Nahl",17:"Al-Isra",18:"Al-Kahf",19:"Maryam",20:"Ta-Ha",21:"Al-Anbiya",22:"Al-Hajj",23:"Al-Mu'minun",24:"An-Nur",25:"Al-Furqan",26:"Ash-Shu'ara",27:"An-Naml",28:"Al-Qasas",29:"Al-'Ankabut",30:"Ar-Rum",31:"Luqman",32:"As-Sajdah",35:"Fatir",42:"Ash-Shura",44:"Ad-Dukhan",45:"Al-Jathiyah",52:"At-Tur",55:"Ar-Rahman"};
 
 function veBuildComb(){
+  /* يَبَسًا (dry land, 20:77) is always included it IS one of the 13 land words */
   ve_comb=VE_SEA.map(function(x){return{s:x[0],a:x[1],t:'sea'};})
-    .concat(VE_LAND.map(function(x){return{s:x[0],a:x[1],t:'land'};}));
-  if(ve_useEnhanced) ve_comb=ve_comb.concat(VE_YABAS.map(function(x){return{s:x[0],a:x[1],t:'yabas'};}));
+    .concat(VE_LAND.map(function(x){return{s:x[0],a:x[1],t:'land'};}))
+    .concat(VE_YABAS.map(function(x){return{s:x[0],a:x[1],t:'yabas'};}));
   ve_comb.sort(function(a,b){return a.s!==b.s?a.s-b.s:a.a-b.a;});
 }
 function veNorm(t){return t.replace(/[ً-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]/g,'').replace(/[ٱأإآ]/g,'ا');}
@@ -701,7 +702,7 @@ function veAr(n){return String(n).replace(/[0-9]/g,function(d){return '٠١٢٣�
 function veEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function veIsSea(s,a){return VE_SEA.some(function(x){return x[0]===s&&x[1]===a;});}
 function veIsLand(s,a){return VE_LAND.some(function(x){return x[0]===s&&x[1]===a;});}
-function veIsYabas(s,a){return ve_useEnhanced&&VE_YABAS.some(function(x){return x[0]===s&&x[1]===a;});}
+function veIsYabas(s,a){return VE_YABAS.some(function(x){return x[0]===s&&x[1]===a;});}
 function veVIdx(s,a){for(var i=0;i<ve_allV.length;i++)if(ve_allV[i].s===s&&ve_allV[i].a===a)return i;return 0;}
 function veCCnt(t){var n=0;for(var k in ve_conf)if(ve_conf[k]&&k.split(':')[2]===t)n++;return n;}
 
@@ -761,7 +762,7 @@ function veScrollTgt(){
     var el=document.getElementById('vev-'+t.s+'-'+t.a);
     if(!el)return;
     var content=document.getElementById('veContent');
-    /* Scroll only the inner content div — never touch the main page scroll */
+    /* Scroll only the inner content div never touch the main page scroll */
     var elRect=el.getBoundingClientRect();
     var cRect=content.getBoundingClientRect();
     var relTop=elRect.top-cRect.top+content.scrollTop;
@@ -784,10 +785,10 @@ function veUpdGuide(){
   document.getElementById('veBC').disabled=!!(ve_conf[o.s+':'+o.a+':'+o.t]);
 }
 function veUpdProg(){
-  var sc=veCCnt('sea'),lc=veCCnt('land');
-  var sl=VE_SEA.length,ll=VE_LAND.length;
+  var sc=veCCnt('sea'),lc=veCCnt('land'),yc=veCCnt('yabas');
+  var sl=VE_SEA.length,ll=VE_LAND.length+VE_YABAS.length;
   document.getElementById('veSeaP').textContent=sc+'/'+sl;
-  document.getElementById('veLandP').textContent=lc+'/'+ll;
+  document.getElementById('veLandP').textContent=(lc+yc)+'/'+ll;
 }
 function veGoTo(idx){
   if(idx<0||idx>=ve_comb.length)return;
@@ -819,13 +820,13 @@ function vePrevPage(){if(ve_curP>0)veRenderP(ve_curP-1,'b');}
 function veNextPage(){if(ve_curP<ve_totP-1)veRenderP(ve_curP+1,'f');}
 function veCheckDone(){
   var sc=veCCnt('sea'),lc=veCCnt('land'),yc=veCCnt('yabas');
-  var need=VE_SEA.length+VE_LAND.length+(ve_useEnhanced?VE_YABAS.length:0);
+  /* يَبَسًا is always required it is the 13th land word */
+  var need=VE_SEA.length+VE_LAND.length+VE_YABAS.length;
   if(sc+lc+yc<need)return;
   var tot=sc+lc+yc,rat=(sc/tot*100).toFixed(1);
   document.getElementById('veDoneEq').textContent=sc+' ÷ '+tot+' = '+rat+'%';
-  var sub='البحر (sea): '+sc+' · البر (land): '+lc;
-  if(ve_useEnhanced)sub+='\nيَبَسًا (dry land): '+yc;
-  sub+='\nEarth ocean coverage: 71%';
+  var sub='البحر (sea): '+sc+' · البر (land): '+lc+' · يَبَسًا (dry land): '+yc;
+  sub+='\nTotal land words: '+(lc+yc)+' · Earth ocean coverage: 71%';
   document.getElementById('veDoneSub').textContent=sub;
   document.getElementById('vePage').style.display='none';
   document.getElementById('veDone').classList.add('vis');
@@ -901,5 +902,6 @@ function initHeroCanvas() {
 initHeroCanvas();
 </script>
 <script src="theme.js"></script>
+
 </body>
 </html>

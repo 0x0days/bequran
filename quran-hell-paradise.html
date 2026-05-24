@@ -91,7 +91,7 @@
     .vs-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(17px, 2.8vw, 21px); line-height: 2.2; color: var(--text); margin-bottom: 10px; }
     .vs-tr { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; }
 
-    /* Stage 2 — dual counter */
+    /* Stage 2 dual counter */
     .count-duel { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-bottom: 20px; }
     .cd-side { text-align: center; }
     .cd-arabic { font-family: 'Amiri', serif; font-size: 40px; direction: rtl; margin-bottom: 6px; line-height: 1.2; }
@@ -233,7 +233,7 @@
   <div class="stage active" id="s0">
     <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
     <div class="eyebrow" style="color:var(--gold-light)">Pattern 6 · Hell &amp; Paradise</div>
-    <h1 class="hero-title">Hell has <span style="color:var(--hell-light)">7 gates.</span> Paradise has <span style="color:var(--para-light)">8 gates.</span> Count how many times each word appears in the Quran — and the gate numbers appear inside the counts.</h1>
+    <h1 class="hero-title">Hell has <span style="color:var(--hell-light)">7 gates.</span> Paradise has <span style="color:var(--para-light)">8 gates.</span> Count how many times each word appears in the Quran and the gate numbers appear inside the counts.</h1>
     <p class="body-text">The gate counts are not a researcher's observation. They are stated directly in scripture. The word frequency encodes them.</p>
 
     <div class="gates-row">
@@ -250,7 +250,7 @@
         </div>
         <div class="gate-big hell-n">7</div>
         <div class="gate-lbl">gates</div>
-        <div class="gate-src">Quran 15:44 — "It has seven gates; for each gate is an assigned portion."</div>
+        <div class="gate-src">Quran 15:44 "It has seven gates; for each gate is an assigned portion."</div>
       </div>
       <div class="gate-group">
         <div class="gate-label para-lbl">Paradise · الجنة</div>
@@ -266,12 +266,12 @@
         </div>
         <div class="gate-big para-n">8</div>
         <div class="gate-lbl">gates</div>
-        <div class="gate-src">Hadith Bukhari 3257 — "Paradise has eight gates, one is called Ar-Rayyan."</div>
+        <div class="gate-src">Hadith Bukhari 3257 "Paradise has eight gates, one is called Ar-Rayyan."</div>
       </div>
     </div>
 
     <div class="verse-strip">
-      <div class="vs-ref">Quran 15:44 — seven gates of Hell</div>
+      <div class="vs-ref">Quran 15:44 seven gates of Hell</div>
       <div class="vs-ar">لَهَا سَبْعَةُ أَبْوَٰبٍ لِّكُلِّ بَابٍ مِّنْهُمْ جُزْءٌ مَّقْسُومٌ</div>
       <div class="vs-tr">"It has seven gates; for each gate is an assigned portion of them."</div>
     </div>
@@ -288,7 +288,7 @@
   ══════════════════════════════════════ -->
   <div class="stage" id="s1">
     <div class="step-lbl">Exercise 1 of 3</div>
-    <div class="prompt">How many times does the word جهنم (Jahannam — Hell) appear in the entire Quran?</div>
+    <div class="prompt">How many times does the word جهنم (Jahannam Hell) appear in the entire Quran?</div>
     <p class="body-text" style="margin-bottom:20px">Count every grammatical form of the word across all 114 chapters. Make your best guess before we count together.</p>
     <div class="answers-grid" style="grid-template-columns:1fr 1fr">
       <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">44</div>
@@ -300,11 +300,11 @@
 
 
   <!-- ══════════════════════════════════════
-       STAGE 2 · EXERCISE 2 — DUAL COUNTER
+       STAGE 2 · EXERCISE 2 DUAL COUNTER
   ══════════════════════════════════════ -->
   <div class="stage" id="s2">
     <div class="step-lbl">Exercise 2 of 3</div>
-    <div class="prompt">Count both words side by side — and watch what the numbers reveal.</div>
+    <div class="prompt">Count both words side by side and watch what the numbers reveal.</div>
     <p class="body-text" style="margin-bottom:16px">Run the count for both جهنم (Hell) and الجنة (Paradise) simultaneously. Look closely at the digits.</p>
 
     <div class="count-duel">
@@ -332,11 +332,11 @@
   ══════════════════════════════════════ -->
   <div class="stage" id="s3">
     <div class="step-lbl">Exercise 3 of 3</div>
-    <div class="prompt">Paradise appears 78 times — one more than Hell's 77. In the Quran and Hadith, this asymmetry represents…</div>
+    <div class="prompt">Paradise appears 78 times one more than Hell's 77. In the Quran and Hadith, this asymmetry represents…</div>
     <div class="answers-grid">
       <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
         <strong style="color:var(--text)">A transcription rounding</strong>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">The counts are essentially equal — the difference is noise</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">The counts are essentially equal the difference is noise</div>
       </div>
       <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,true)">
         <strong style="color:var(--text)">Mercy precedes wrath</strong>
@@ -348,7 +348,7 @@
       </div>
       <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
         <strong style="color:var(--text)">The difference is coincidental</strong>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">No theological meaning — just how the words fell</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">No theological meaning just how the words fell</div>
       </div>
     </div>
   </div>
@@ -363,7 +363,7 @@
       <span class="xp-text">Lesson complete · +30 XP</span>
     </div>
 
-    <h2 class="hero-title">Hell: 77 mentions — both digits are 7. Paradise: 78 mentions — the last digit is 8. The gate counts are written into the word counts.</h2>
+    <h2 class="hero-title">Hell: 77 mentions both digits are 7. Paradise: 78 mentions the last digit is 8. The gate counts are written into the word counts.</h2>
 
     <div class="digit-lock">
       <div class="dl-card hell-card" id="dlc0">
@@ -376,7 +376,7 @@
         <div class="dl-bottom">
           <div class="dl-word-lbl">جهنم appears</div>
           <div class="dl-word-num" style="color:var(--hell-light)"><span class="dh dh-hell">7</span><span class="dh dh-hell">7</span></div>
-          <div class="dl-count-lbl">times — digit 7 in every position</div>
+          <div class="dl-count-lbl">times digit 7 in every position</div>
         </div>
       </div>
       <div class="dl-card para-card" id="dlc1">
@@ -389,14 +389,14 @@
         <div class="dl-bottom">
           <div class="dl-word-lbl">الجنة appears</div>
           <div class="dl-word-num" style="color:var(--para-light)">7<span class="dh dh-para">8</span></div>
-          <div class="dl-count-lbl">times — final digit is 8</div>
+          <div class="dl-count-lbl">times final digit is 8</div>
         </div>
       </div>
     </div>
 
     <div class="insight-box">
-      <strong>77:</strong> Both digits are 7. Hell has <em>7</em> gates. Seventy-seven doubles the gate count inside its own digit structure — the digit 7 is impossible to miss.<br><br>
-      <strong>78:</strong> The units digit is 8. Paradise has <em>8</em> gates. The word for Paradise appears seventy-eight times — where 8 is the final digit, the last word on the count.
+      <strong>77:</strong> Both digits are 7. Hell has <em>7</em> gates. Seventy-seven doubles the gate count inside its own digit structure the digit 7 is impossible to miss.<br><br>
+      <strong>78:</strong> The units digit is 8. Paradise has <em>8</em> gates. The word for Paradise appears seventy-eight times where 8 is the final digit, the last word on the count.
     </div>
 
     <p class="body-text" style="margin-bottom:10px">The counts are not equal. Paradise exceeds Hell by exactly one:</p>
@@ -419,16 +419,16 @@
       <div class="om-num">+1</div>
       <div class="om-lbl">
         <strong>Paradise mentioned one more time.</strong><br>
-        Not equal. Not less. Exactly one more — consistent with the Quranic principle stated in both text and Hadith.
+        Not equal. Not less. Exactly one more consistent with the Quranic principle stated in both text and Hadith.
       </div>
     </div>
 
     <div class="insight-box" style="border-left-color:var(--para-light)">
       <strong>Hadith Qudsi (Bukhari 7553):</strong> Allah said, <em>"My mercy precedes my wrath."</em><br><br>
-      <strong>Quran 7:156:</strong> <em>"My punishment — I afflict with it whom I will. But My mercy encompasses all things."</em>
+      <strong>Quran 7:156:</strong> <em>"My punishment I afflict with it whom I will. But My mercy encompasses all things."</em>
     </div>
 
-    <p class="body-text" style="margin-bottom:10px">The complete count methodology — nothing omitted, nothing added:</p>
+    <p class="body-text" style="margin-bottom:10px">The complete count methodology nothing omitted, nothing added:</p>
 
     <div class="meth-cards">
       <div class="meth-card included" id="mc0">
@@ -440,7 +440,7 @@
         <div class="mc-yes">✓ 78 mentions</div>
       </div>
       <div class="meth-card excluded" id="mc2">
-        <div><div class="mc-ar" style="color:var(--muted)">النار · سقر · لظى · سعير</div><div class="mc-en">Other Hell names — separate words, separate counts</div></div>
+        <div><div class="mc-ar" style="color:var(--muted)">النار · سقر · لظى · سعير</div><div class="mc-en">Other Hell names separate words, separate counts</div></div>
         <div class="mc-no">✗ Not included</div>
       </div>
       <div class="meth-card excluded" id="mc3">
@@ -462,7 +462,7 @@
 
     <div class="gold-box">
       <div class="gt">The gate structure is written into the word counts. The asymmetry is written into a principle older than the counting.</div>
-      <div class="gs">Hell has 7 gates (Quran 15:44). The word جهنم appears 77 times — both digits are 7. Paradise has 8 gates (Hadith Bukhari 3257). The word الجنة appears 78 times — the final digit is 8. Paradise is mentioned one more time than Hell, consistent with every Quranic and Hadith statement that divine mercy precedes divine wrath. The probability of both word counts landing on these exact values by chance: approximately 1 in 22,500.</div>
+      <div class="gs">Hell has 7 gates (Quran 15:44). The word جهنم appears 77 times both digits are 7. Paradise has 8 gates (Hadith Bukhari 3257). The word الجنة appears 78 times the final digit is 8. Paradise is mentioned one more time than Hell, consistent with every Quranic and Hadith statement that divine mercy precedes divine wrath. The probability of both word counts landing on these exact values by chance: approximately 1 in 22,500.</div>
     </div>
 
     <div id="qv-hell-paradise"></div>
@@ -543,7 +543,7 @@ function animFrom(el, from, to, ms, cb) {
   })(performance.now());
 }
 
-/* Stage 0 — gate arches */
+/* Stage 0 gate arches */
 function animateGates() {
   var hellArches = document.querySelectorAll('#hell-arches .arch');
   var paraArches = document.querySelectorAll('#para-arches .arch');
@@ -557,14 +557,14 @@ function pickEx1(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
-    showOk('77 — and the word for Paradise appears 78 times. Now watch the digit pattern those two numbers contain.', function() { go(2); });
+    showOk('77 and the word for Paradise appears 78 times. Now watch the digit pattern those two numbers contain.', function() { go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
   }
 }
 
-/* Exercise 2 — dual counter */
+/* Exercise 2 dual counter */
 function runDual() {
   if (dualDone) return;
   dualDone = true;
@@ -576,7 +576,7 @@ function runDual() {
     done++;
     if (done === 2) {
       setTimeout(function() {
-        showOk('Hell: 77 — both digits are 7, Hell\'s gate count. Paradise: 78 — the final digit is 8, Paradise\'s gate count. The gates are encoded in the word frequencies.', function() { go(3); });
+        showOk('Hell: 77 both digits are 7, Hell\'s gate count. Paradise: 78 the final digit is 8, Paradise\'s gate count. The gates are encoded in the word frequencies.', function() { go(3); });
       }, 600);
     }
   }
@@ -592,7 +592,7 @@ function pickEx3(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
-    showOk('Hadith Qudsi (Bukhari 7553): "My mercy precedes my wrath." The word for Paradise appears one more time than the word for Hell — mercy leads by exactly one.', function() { go(4); });
+    showOk('Hadith Qudsi (Bukhari 7553): "My mercy precedes my wrath." The word for Paradise appears one more time than the word for Hell mercy leads by exactly one.', function() { go(4); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
