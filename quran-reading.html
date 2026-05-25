@@ -162,7 +162,7 @@
       <div class="ac-body">
         <div class="ac-ar">اقْرَأْ</div>
         <div class="ac-ref">96:1 · Surah Al-Alaq · First Revelation</div>
-        <div class="ac-tr">"Read" the first word revealed to Muhammad (ﷺ) in the Cave of Hira. Not "believe," not "worship" but "Read."</div>
+        <div class="ac-tr">"Read" the first word revealed to Muhammad (peace be upon him) in the Cave of Hira. Not "believe," not "worship" but "Read."</div>
       </div>
     </div>
 
@@ -651,7 +651,7 @@ function pickEx1(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
-    showOk('اقْرَأْ "Read" was the first word revealed to Muhammad (ﷺ) in the Cave of Hira. Not a command to pray or worship, but to read. This opening was not a coincidence the Quran had something to say about the human capacity for reading.', function() { go(2); });
+    showOk('اقْرَأْ "Read" was the first word revealed to Muhammad (peace be upon him) in the Cave of Hira. Not a command to pray or worship, but to read. This opening was not a coincidence the Quran had something to say about the human capacity for reading.', function() { go(2); });
   } else {
     el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
   }

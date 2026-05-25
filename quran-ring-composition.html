@@ -72,10 +72,10 @@
     .rng-arrow{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);}
     .rng-center{background:rgba(252,211,77,0.08);border:2px solid rgba(252,211,77,0.35);border-radius:10px;padding:14px 18px;text-align:center;margin-top:6px;opacity:0;transition:opacity .5s ease .1s;}
     .rng-center.vis{opacity:1;}
-    .rng-center-lbl{font-size:11px;font-weight:700;color:#fcd34d;letter-spacing:.08em;margin-bottom:4px;}
+    .rng-center-lbl{font-size:11px;font-weight:700;color:#e47d00;letter-spacing:.08em;margin-bottom:4px;}
     .rng-center-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);margin-bottom:4px;}
-    .rng-center-ref{font-size:11px;color:#fcd34d;font-weight:600;}
-    .rng-center-ar{font-family:'Amiri',serif;direction:rtl;font-size:18px;color:#fcd34d;margin-top:8px;line-height:2;}
+    .rng-center-ref{font-size:11px;color:#e47d00;font-weight:600;}
+    .rng-center-ar{font-family:'Amiri',serif;direction:rtl;font-size:18px;color:#e47d00;margin-top:8px;line-height:2;}
     .rng-note{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 20px;line-height:1.7;opacity:0;transition:opacity .5s ease;}
     .rng-note.vis{opacity:1;}
 
@@ -84,6 +84,44 @@
     .ng-step span{color:var(--accent);}
     .ng-step .ng-result{color:#fcd34d;}
     .ng-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px;}
+
+    /* Qibla Canvas Container */
+.qibla-canvas-wrap {
+  position: relative;
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .6s ease;
+  margin: 24px 0;
+}
+#qiblaCanvas {
+  vertical-align: top;
+  font-size: 0;
+}
+.qibla-canvas-wrap.visible {
+  opacity: 1 !important;
+}
+
+.qibla-canvas-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(252,211,77,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+#qiblaCanvas {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive sizing */
+@media (max-width: 480px) {
+  #qiblaCanvas {
+    height: 240px;
+  }
+}
 
     .kursi-mirror-container{margin:22px 0;position:relative;}
     .kursi-mirror-canvas{width:100%;height:480px;border-radius:14px;display:block;background:var(--surface);}
@@ -137,7 +175,7 @@
     <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:26px;display:block;"></canvas>
     <p class="body-text">Imagine a story that goes <strong style="color:var(--text)">A &rarr; B &rarr; C &rarr; B' &rarr; A'</strong> &mdash; where the end perfectly mirrors the beginning and the center holds the most important message. This is called <strong style="color:var(--text)">ring composition</strong>.</p>
     <div class="insight-box">
-      <strong>Surah Al-Baqarah (The Cow)</strong> is the longest chapter in the Quran &mdash; 286 verses, revealed to Prophet Muhammad over 9 years, out of sequential order, with no editorial process. Modern scholars discovered it forms a perfect mathematical mirror, detectable only with 20th-century literary analysis tools &mdash; invisible for 1,400 years.
+      <strong>Surah Al-Baqarah (The Cow)</strong> is the longest chapter in the Quran &mdash; 286 verses, revealed to Prophet Muhammad PBUH over 9 years, out of sequential order, with no editorial process. Modern scholars discovered it forms a perfect mathematical mirror, detectable only with 20th-century literary analysis tools &mdash; invisible for 1,400 years.
     </div>
     <p class="body-text">In this lesson you will see <em>two</em> examples of this structure: the whole chapter of Al-Baqarah, and then a single verse inside it &mdash; Ayat al-Kursi &mdash; which has its own perfect ring nested within the larger one.</p>
     <button class="btn btn-accent" onclick="go(1)">Start Lesson &rarr;</button>
@@ -166,7 +204,7 @@
         <div class="rng-sect lft" style="background:rgba(167,139,250,0.07)">
           <span class="rng-lbl">B &middot; Verses 21&ndash;39</span>
           <span class="rng-title">Creation &amp; Knowledge</span>
-          <span class="rng-ref">Allah creates Adam, sends him to earth</span>
+          <span class="rng-ref">Allah creates Adam, and thought him all the names</span>
         </div>
         <div class="rng-arrow">&harr;</div>
         <div class="rng-sect rgt" style="background:rgba(167,139,250,0.07)">
@@ -203,9 +241,9 @@
       </div>
       <div class="rng-center" id="rngCenter">
         <div class="rng-center-lbl">E &middot; VERSE 143 &middot; THE CENTER</div>
-        <div class="rng-center-title">The Ka'ba &mdash; New Direction of Prayer</div>
-        <div class="rng-center-ar">وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً وَسَطًا</div>
-        <div class="rng-center-ref">"And thus We have made you a middle nation"</div>
+        <div class="rng-center-title">The Ka'ba &mdash; Switch to New Direction of Prayer</div>
+        <div class="rng-center-ar">وَكَذَٰلِكَ جَعَلْنَـٰكُمْ أُمَّةًۭ وَسَطًۭا لِّتَكُونُوا۟ شُهَدَآءَ عَلَى ٱلنَّاسِ وَيَكُونَ ٱلرَّسُولُ عَلَيْكُمْ شَهِيدًۭا ۗ وَمَا جَعَلْنَا ٱلْقِبْلَةَ ٱلَّتِى كُنتَ عَلَيْهَآ إِلَّا لِنَعْلَمَ مَن يَتَّبِعُ ٱلرَّسُولَ مِمَّن يَنقَلِبُ عَلَىٰ عَقِبَيْهِ ۚ</div>
+        <div class="rng-center-ref">"And thus We have made you a <strong> middle <strong> nation, so that you might be witnesses to all mankind and the Messenger might be a witness to you.1 We appointed the direction which you formerly observed so that We might distinguish those who follow the Messenger from those <strong> who turn on their heels </strong>"</div>
       </div>
     </div>
     <p class="rng-note" id="rngNote">Every outer section mirrors its partner. The first half of the chapter matches the second half &mdash; revealed years apart.</p>
@@ -226,10 +264,22 @@
       <div class="ng-step" id="ngStep2" style="opacity:0">&divide; 2 = <span class="ng-result">143</span></div>
       <div class="ng-sub" id="ngSub" style="opacity:0">Verse 143 is the exact center of the longest chapter in the Quran.</div>
     </div>
-    <div class="verse-box" id="v143" style="opacity:0;transition:opacity .5s ease .3s">
+    <!-- Insert this RIGHT AFTER the closing </div> of .num-game -->
+<div class="qibla-canvas-wrap" style="margin:32px 0; opacity:0; transition:opacity .6s ease;">
+<canvas id="qiblaCanvas" style="width:100%; height:220px; max-height:280px; border-radius:14px; display:block; background:var(--surface); border:1px solid var(--border);"></canvas>   <p class="rng-note vis" style="text-align:center; margin-top:12px; font-size:13px; opacity:1;">
+  
+    The direction of prayer shifted from Jerusalem to Mecca at the exact center of the chapter.
+  </p>
+</div>
+<div class="verse-box" id="v143-part1" style="opacity:0;transition:opacity .5s ease .3s">
       <div class="vb-ref">Surah Al-Baqarah &middot; Verse 143</div>
       <div class="vb-ar">وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً <span class="vb-hl">وَسَطًا</span></div>
       <div class="vb-tr">"And thus We have made you a <span class="vb-hl-en">middle</span> nation"</div>
+    </div>
+<div class="verse-box" id="v143-part2" style="opacity:0;transition:opacity .5s ease .3s">
+      <div class="vb-ref">Surah Al-Baqarah &middot; Verse 143</div>
+      <div class="vb-ar">  مَن يَتَّبِعُ ٱلرَّسُولَ مِمَّن <span class="vb-hl-en"> يَنقَلِبُ  </span> عَلَىٰ عَقِبَيْهِ ۚ </div>
+      <div class="vb-tr">"who follow the Messenger from those <span class="vb-hl-en"> who turn</span> on their heels"</div>
     </div>
     <div class="insight-box" id="v143insight" style="opacity:0;transition:opacity .5s ease .5s">
       <strong>وَسَطًا (Wasatan)</strong> means <strong>MIDDLE</strong> in Arabic. The center verse of the longest chapter in the Quran literally contains the word "middle." This verse also describes the changing of the Qibla &mdash; the direction of prayer &mdash; from Jerusalem to Mecca. It is the <em>turning point</em> of the chapter, placed at the exact turning point of the structure.
@@ -316,6 +366,13 @@ function animFrom(el, from, to, ms, cb) {
 }
 
 function go(n) {
+  /* STOP QIBLA ANIMATION IF LEAVING STAGE 2 */
+  if (stage === 2 && n !== 2 && qiblaAnimator) {
+    qiblaAnimator.stop();
+    qiblaAnimator = null;
+    var wrap = document.querySelector('.qibla-canvas-wrap');
+    if (wrap) wrap.classList.remove('visible');
+  }
   document.getElementById('s' + stage).classList.remove('active');
   stage = n;
   document.getElementById('s' + stage).classList.add('active');
@@ -349,20 +406,42 @@ function revealRing() {
 }
 
 function revealNumbers() {
+  console.log('revealNumbers started');
   var step1 = document.getElementById('ngStep1');
   step1.style.color = 'var(--accent)';
   setTimeout(function() {
     document.getElementById('ngStep2').style.opacity = '1';
     setTimeout(function() {
       document.getElementById('ngSub').style.opacity = '1';
-      document.getElementById('v143').style.opacity = '1';
+      document.getElementById('v143-part1').style.opacity = '1';
+      document.getElementById('v143-part2').style.opacity = '1';
       document.getElementById('v143insight').style.opacity = '1';
       document.getElementById('s2prompt').style.opacity = '1';
       document.getElementById('s2mc').style.opacity = '1';
+      
+      /* START QIBLA CANVAS */
+      setTimeout(function() {
+        console.log('Trying to show canvas...');
+        var wrap = document.querySelector('.qibla-canvas-wrap');
+        var cv = document.getElementById('qiblaCanvas');
+        console.log('Wrap found:', !!wrap);
+        console.log('Canvas found:', !!cv);
+        if (wrap) {
+          wrap.classList.add('visible');
+          wrap.style.opacity = '1';
+          console.log('Wrap opacity set to 1');
+        }
+        if (cv && !qiblaAnimator) {
+          console.log('Canvas offsetWidth:', cv.offsetWidth);
+          console.log('Canvas offsetHeight:', cv.offsetHeight);
+          qiblaAnimator = initQiblaCanvas(cv);
+          console.log('Animator started:', !!qiblaAnimator);
+        }
+      }, 400);
+      
     }, 800);
   }, 700);
 }
-
 function saveProgress(id) {
   var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
   if (!d.has(id)) {
@@ -404,50 +483,910 @@ function pickEx(el, stageN, correct) {
   }
 }
 
+
+
 /* ── HERO CANVAS ── */
-(function() {
+
+
+
+/* ── HERO CANVAS ── */
+(function(){
   var c = document.getElementById('heroCanvas');
   if (!c) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = c.offsetWidth || c.width;
+  var H = c.offsetHeight || c.height;
+  c.width = Math.round(W * dpr);
+  c.height = Math.round(H * dpr);
   var ctx = c.getContext('2d');
-  var W = c.width, H = c.height, t = 0;
+  ctx.scale(dpr, dpr);
+  var t = 0;
+
   var COLS = [
     {r:232,g:121,b:249},{r:167,g:139,b:250},{r:96,g:165,b:250},{r:74,g:222,b:128},
     {r:252,g:211,b:77},{r:74,g:222,b:128},{r:96,g:165,b:250},{r:167,g:139,b:250},{r:232,g:121,b:249}
   ];
+  /* Light mode: deeper, richer node colors that read on light bg */
+  var LCOLS = [
+    {r:110,g:55,b:150},{r:80,g:60,b:150},{r:35,g:80,b:140},{r:20,g:100,b:65},
+    {r:165,g:115,b:10},{r:20,g:100,b:65},{r:35,g:80,b:140},{r:80,g:60,b:150},{r:110,g:55,b:150}
+  ];
   var LABELS = ['A','B','C','D','E',"D'","C'","B'","A'"];
-  var margin = 38, baseY = H * 0.78, topY = H * 0.16;
+
+  var mirrorX = W * 0.5;
+  var archCY  = H * 0.36;
+  var archR   = Math.min(W * 0.40, H * 0.27);
+  var baseY   = archCY;
+  var nodeFs  = Math.max(8, Math.min(11, W * 0.017));
+  var labelFs = Math.max(7.5, Math.min(10, W * 0.015));
+
   function rgba(c, a) { return 'rgba('+c.r+','+c.g+','+c.b+','+a+')'; }
-  function nodePos(i) {
-    return { x: margin + i * (W - 2 * margin) / 8, y: baseY - (baseY - topY) * Math.sin(Math.PI * i / 8) };
-  }
   function bez(p0,p1,p2,p3,t){var m=1-t;return m*m*m*p0+3*m*m*t*p1+3*m*t*t*p2+t*t*t*p3;}
-  (function frame() {
-    ctx.fillStyle = '#040810'; ctx.fillRect(0, 0, W, H);
+
+  function nodePos(i) {
+    var angle = Math.PI * i / 8;
+    return {
+      x: mirrorX + Math.cos(Math.PI - angle) * archR,
+      y: archCY - Math.sin(angle) * archR
+    };
+  }
+
+  /* Pick node color set based on theme */
+  function nc(i) { return document.documentElement.getAttribute('data-theme') === 'light' ? LCOLS[i] : COLS[i]; }
+
+  var mirrorParts = [];
+  for (var i = 0; i < 22; i++) {
+    mirrorParts.push({
+      y: Math.random() * H, sp: 0.25 + Math.random() * 0.6,
+      r: 0.4 + Math.random() * 1.1, al: 0.12 + Math.random() * 0.30,
+      ph: Math.random() * 6.283
+    });
+  }
+
+  var arcDots = [];
+  for (var i = 0; i < 4; i++) arcDots.push({ pair: i, phase: i * 0.25 });
+
+  function frame() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    ctx.clearRect(0, 0, W, H);
+
+    /* ── BACKGROUND ── */
+    if (isLight) {
+      var bg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, Math.max(W, H) * 0.65);
+      bg.addColorStop(0, '#f0e8d8');
+      bg.addColorStop(0.6, '#e8dece');
+      bg.addColorStop(1, '#ddd4c4');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    } else {
+      var bg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, Math.max(W, H) * 0.65);
+      bg.addColorStop(0, '#080e1e');
+      bg.addColorStop(0.6, '#050a16');
+      bg.addColorStop(1, '#030710');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    }
+
+    /* ── CENTER RADIAL WARMTH ── */
+    var cg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, archR * 1.6);
+    if (isLight) {
+      cg.addColorStop(0, 'rgba(180,140,60,0.10)');
+      cg.addColorStop(0.5, 'rgba(160,120,50,0.04)');
+      cg.addColorStop(1, 'transparent');
+    } else {
+      cg.addColorStop(0, 'rgba(252,211,77,0.045)');
+      cg.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = cg; ctx.fillRect(0, 0, W, H);
+
+    /* ── MIRROR LINE ── */
+    var mGlow = ctx.createLinearGradient(mirrorX - 28, 0, mirrorX + 28, 0);
+    if (isLight) {
+      mGlow.addColorStop(0, 'transparent');
+      mGlow.addColorStop(0.5, 'rgba(120,80,30,0.06)');
+      mGlow.addColorStop(1, 'transparent');
+    } else {
+      mGlow.addColorStop(0, 'transparent');
+      mGlow.addColorStop(0.5, 'rgba(252,211,77,0.065)');
+      mGlow.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = mGlow; ctx.fillRect(mirrorX - 28, 0, 56, H);
+
+    /* Dashed line */
+    ctx.beginPath(); ctx.moveTo(mirrorX, H * 0.03); ctx.lineTo(mirrorX, H * 0.97);
+    if (isLight) {
+      ctx.strokeStyle = 'rgba(120,80,30,0.38)';
+      ctx.lineWidth = 1.4;
+    } else {
+      ctx.strokeStyle = 'rgba(252,211,77,0.18)';
+      ctx.lineWidth = 1.2;
+    }
+    ctx.setLineDash([5, 9]); ctx.lineDashOffset = -t * 0.35;
+    ctx.stroke(); ctx.setLineDash([]);
+
+    /* Solid thin line */
+    ctx.beginPath(); ctx.moveTo(mirrorX, H * 0.03); ctx.lineTo(mirrorX, H * 0.97);
+    ctx.strokeStyle = isLight ? 'rgba(100,65,20,0.15)' : 'rgba(252,211,77,0.06)';
+    ctx.lineWidth = 0.4; ctx.stroke();
+
+    /* ── MIRROR PARTICLES ── */
+    mirrorParts.forEach(function(p) {
+      p.y += p.sp;
+      if (p.y > H + 5) p.y = -5;
+      var a = p.al * (0.35 + 0.65 * Math.sin(t * 0.04 + p.ph));
+      var xOff = Math.sin(t * 0.025 + p.ph) * 1.8;
+      if (isLight) {
+        ctx.beginPath(); ctx.arc(mirrorX + xOff, p.y, p.r * 1.1, 0, 6.283);
+        ctx.fillStyle = 'rgba(140,95,30,' + (a * 1.6) + ')'; ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(mirrorX + xOff, p.y, p.r, 0, 6.283);
+        ctx.fillStyle = 'rgba(252,211,77,' + a + ')'; ctx.fill();
+      }
+    });
+
+    /* ── HORIZONTAL MIRROR SURFACE LINE ── */
+    var a0 = nodePos(0), a8 = nodePos(8);
+    var surfY = baseY + 4;
+    var surfGrad = ctx.createLinearGradient(a0.x - 10, 0, a8.x + 10, 0);
+    if (isLight) {
+      surfGrad.addColorStop(0, 'transparent');
+      surfGrad.addColorStop(0.15, 'rgba(120,80,30,0.22)');
+      surfGrad.addColorStop(0.5, 'rgba(140,95,35,0.32)');
+      surfGrad.addColorStop(0.85, 'rgba(120,80,30,0.22)');
+      surfGrad.addColorStop(1, 'transparent');
+    } else {
+      surfGrad.addColorStop(0, 'transparent');
+      surfGrad.addColorStop(0.15, 'rgba(252,211,77,0.08)');
+      surfGrad.addColorStop(0.5, 'rgba(252,211,77,0.12)');
+      surfGrad.addColorStop(0.85, 'rgba(252,211,77,0.08)');
+      surfGrad.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = surfGrad; ctx.fillRect(a0.x - 10, surfY - 1.5, a8.x - a0.x + 20, 3);
+
+    /* ── REFLECTION ── */
+    ctx.save();
+    ctx.globalAlpha = isLight ? 0.10 : 0.045;
+    var reflScale = isLight ? 0.50 : 0.55;
+
+    for (var i = 0; i < 9; i++) {
+      var nd = nodePos(i), c = nc(i);
+      var ry = surfY + (surfY - nd.y) * reflScale;
+      var rr = (i === 4 ? 5 : 3.2) * (W / 660);
+      ctx.beginPath(); ctx.arc(nd.x, ry, rr, 0, 6.283);
+      ctx.fillStyle = rgba(c, 0.65); ctx.fill();
+    }
     for (var i = 0; i < 4; i++) {
-      var n1 = nodePos(i), n2 = nodePos(8 - i);
-      var my = Math.max(n1.y, n2.y) + (n2.x - n1.x) * 0.34;
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var r1Y = surfY + (surfY - n1.y) * reflScale;
+      var r2Y = surfY + (surfY - n2.y) * reflScale;
+      var rDepth = (n2.x - n1.x) * 0.12;
+      var rMy = Math.max(r1Y, r2Y) + rDepth;
+      ctx.beginPath(); ctx.moveTo(n1.x, r1Y);
+      ctx.bezierCurveTo(n1.x, rMy, n2.x, rMy, n2.x, r2Y);
+      ctx.strokeStyle = rgba(c, 0.55); ctx.lineWidth = 0.7; ctx.stroke();
+    }
+    ctx.restore();
+
+    /* fade-out gradient */
+    var fadeGrad = ctx.createLinearGradient(0, surfY, 0, surfY + H * 0.28);
+    if (isLight) {
+      fadeGrad.addColorStop(0, 'rgba(240,232,216,0)');
+      fadeGrad.addColorStop(1, 'rgba(240,232,216,1)');
+    } else {
+      fadeGrad.addColorStop(0, 'rgba(4,8,16,0)');
+      fadeGrad.addColorStop(1, 'rgba(4,8,16,1)');
+    }
+    ctx.fillStyle = fadeGrad; ctx.fillRect(0, surfY, W, H * 0.28);
+
+    /* ── CONNECTING LINES through mirror ── */
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var pulse = isLight
+        ? (0.10 + Math.sin(t * 0.028 + i * 1.3) * 0.06)
+        : (0.05 + Math.sin(t * 0.028 + i * 1.3) * 0.025);
+      ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+      ctx.strokeStyle = rgba(c, pulse); ctx.lineWidth = isLight ? 0.7 : 0.5; ctx.stroke();
+
+      var midY = (n1.y + n2.y) * 0.5;
+      var ds = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(mirrorX, midY - ds); ctx.lineTo(mirrorX + ds * 0.6, midY);
+      ctx.lineTo(mirrorX, midY + ds); ctx.lineTo(mirrorX - ds * 0.6, midY);
+      ctx.closePath();
+      ctx.fillStyle = rgba(c, isLight ? (0.28 + Math.sin(t * 0.04 + i) * 0.12) : (0.15 + Math.sin(t * 0.04 + i) * 0.08));
+      ctx.fill();
+    }
+
+    /* ── MIRROR ARCS ── */
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var depth = (n2.x - n1.x) * 0.28;
+      var my = Math.max(n1.y, n2.y) + depth;
+      var pulse = isLight
+        ? (0.40 + Math.sin(t * 0.04 + i * 0.9) * 0.14)
+        : (0.20 + Math.sin(t * 0.04 + i * 0.9) * 0.10);
+
       ctx.beginPath(); ctx.moveTo(n1.x, n1.y);
       ctx.bezierCurveTo(n1.x, my, n2.x, my, n2.x, n2.y);
-      ctx.strokeStyle = rgba(COLS[i], 0.28 + Math.sin(t * 0.04 + i * 0.9) * 0.10);
-      ctx.lineWidth = 1.1; ctx.stroke();
+      ctx.strokeStyle = rgba(c, pulse);
+      ctx.lineWidth = isLight ? 1.6 : 1.1; ctx.stroke();
+
+      /* traveling dot */
+      var dot = arcDots[i];
+      dot.phase = (dot.phase + 0.003) % 1;
+      var dx = bez(n1.x, n1.x, n2.x, n2.x, dot.phase);
+      var dy = bez(n1.y, my, my, n2.y, dot.phase);
+      ctx.beginPath(); ctx.arc(dx, dy, isLight ? 2.2 : 1.8, 0, 6.283);
+      ctx.fillStyle = rgba(c, isLight ? 0.95 : 0.85); ctx.fill();
+      /* trail */
+      for (var tr = 1; tr <= 3; tr++) {
+        var tp = (dot.phase - tr * 0.012 + 1) % 1;
+        var tx = bez(n1.x, n1.x, n2.x, n2.x, tp);
+        var ty = bez(n1.y, my, my, n2.y, tp);
+        ctx.beginPath(); ctx.arc(tx, ty, (isLight ? 1.6 : 1.2) - tr * 0.35, 0, 6.283);
+        ctx.fillStyle = rgba(c, isLight ? (0.50 - tr * 0.12) : (0.35 - tr * 0.09)); ctx.fill();
+      }
     }
+
+    /* ── ARCH OUTLINE ── */
+    ctx.beginPath();
+    for (var i = 0; i <= 64; i++) {
+      var angle = Math.PI * i / 64;
+      var ax = mirrorX + Math.cos(Math.PI - angle) * archR;
+      var ay = archCY - Math.sin(angle) * archR;
+      i === 0 ? ctx.moveTo(ax, ay) : ctx.lineTo(ax, ay);
+    }
+    ctx.strokeStyle = isLight ? 'rgba(120,90,50,0.22)' : 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = isLight ? 0.8 : 0.5; ctx.stroke();
+
+    /* ── NODES ── */
     for (var i = 0; i < 9; i++) {
-      var nd = nodePos(i), r = i === 4 ? 6.5 : 4.5;
-      ctx.beginPath(); ctx.arc(nd.x, nd.y, r * 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = rgba(COLS[i], (0.35 + Math.sin(t * 0.05 + i * 0.7) * 0.15) * 0.10); ctx.fill();
-      ctx.beginPath(); ctx.arc(nd.x, nd.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = rgba(COLS[i], 0.88); ctx.fill();
-      ctx.fillStyle = rgba(COLS[i], 0.75);
-      ctx.font = (i === 4 ? 'bold 9px' : '8px') + ' sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(LABELS[i], nd.x, nd.y + r + 11);
+      var nd = nodePos(i);
+      var isCenter = (i === 4);
+      var c = nc(i);
+      var baseR = isCenter ? Math.max(5.5, W * 0.0095) : Math.max(3.5, W * 0.006);
+      var glowPulse = 0.22 + Math.sin(t * 0.05 + i * 0.7) * 0.10;
+
+      /* outer glow - bigger in light mode for visibility */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR * (isCenter ? 5 : 3.2), 0, Math.PI * 2);
+      ctx.fillStyle = rgba(c, glowPulse * (isCenter ? 0.14 : 0.09)); ctx.fill();
+
+      /* node fill */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(c, isCenter ? 0.95 : 0.85);
+      ctx.fill();
+
+      /* subtle edge ring for definition */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR + 0.6, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(c, isCenter ? 0.30 : 0.15);
+      ctx.lineWidth = 0.4; ctx.stroke();
+
+      /* center node extras */
+      if (isCenter) {
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR * 1.9, 0, Math.PI * 2);
+        ctx.strokeStyle = rgba(c, 0.30 + Math.sin(t * 0.06) * 0.12);
+        ctx.lineWidth = 0.8; ctx.stroke();
+
+        var pulseR = baseR * (2.2 + Math.sin(t * 0.08) * 0.5);
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, pulseR, 0, Math.PI * 2);
+        ctx.strokeStyle = rgba(c, 0.10 + Math.sin(t * 0.08) * 0.04);
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+
+      /* label */
+      ctx.fillStyle = rgba(c, isCenter ? 0.82 : 0.70);
+      ctx.font = (isCenter ? 'bold ' : '500 ') + nodeFs + 'px "DM Sans",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(LABELS[i], nd.x, nd.y + baseR + 5);
     }
-    var ph = (t * 0.006) % 1, a = nodePos(0), b = nodePos(8);
-    var d0 = (b.x - a.x) * 0.34, m0 = Math.max(a.y, b.y) + d0;
-    ctx.beginPath(); ctx.arc(bez(a.x,a.x,b.x,b.x,ph), bez(a.y,m0,m0,b.y,ph), 2.5, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fill();
-    t++; requestAnimationFrame(frame);
-  })();
+
+    /* ── "RING COMPOSITION" label ── */
+    ctx.save();
+    ctx.globalAlpha = 0.35 + Math.sin(t * 0.025) * 0.06;
+    if (isLight) {
+      ctx.fillStyle = 'rgba(90,60,15,0.72)';
+    } else {
+      ctx.fillStyle = 'rgba(252,211,77,0.85)';
+    }
+    ctx.font = '600 ' + labelFs + 'px "DM Sans",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.letterSpacing = '0.12em';
+    ctx.fillText('RING COMPOSITION', mirrorX, H * 0.97);
+    ctx.restore();
+
+    /* ── EDGE VIGNETTES ── */
+    if (isLight) {
+      var vT = ctx.createLinearGradient(0, 0, 0, H * 0.065);
+      vT.addColorStop(0, 'rgba(221,208,198,0.85)');
+      vT.addColorStop(1, 'transparent');
+      ctx.fillStyle = vT; ctx.fillRect(0, 0, W, H * 0.065);
+
+      var vB = ctx.createLinearGradient(0, H * 0.935, 0, H);
+      vB.addColorStop(0, 'transparent');
+      vB.addColorStop(1, 'rgba(221,208,198,0.85)');
+      ctx.fillStyle = vB; ctx.fillRect(0, H * 0.935, W, H * 0.065);
+
+      var vL = ctx.createLinearGradient(0, 0, W * 0.035, 0);
+      vL.addColorStop(0, 'rgba(221,208,198,0.75)');
+      vL.addColorStop(1, 'transparent');
+      ctx.fillStyle = vL; ctx.fillRect(0, 0, W * 0.035, H);
+
+      var vR = ctx.createLinearGradient(W, 0, W * 0.965, 0);
+      vR.addColorStop(0, 'rgba(221,208,198,0.75)');
+      vR.addColorStop(1, 'transparent');
+      ctx.fillStyle = vR; ctx.fillRect(W * 0.965, 0, W * 0.035, H);
+    } else {
+      var vT = ctx.createLinearGradient(0, 0, 0, H * 0.06);
+      vT.addColorStop(0, 'rgba(4,8,16,0.90)');
+      vT.addColorStop(1, 'transparent');
+      ctx.fillStyle = vT; ctx.fillRect(0, 0, W, H * 0.06);
+
+      var vL = ctx.createLinearGradient(0, 0, W * 0.03, 0);
+      vL.addColorStop(0, 'rgba(4,8,16,0.80)');
+      vL.addColorStop(1, 'transparent');
+      ctx.fillStyle = vL; ctx.fillRect(0, 0, W * 0.03, H);
+
+      var vR = ctx.createLinearGradient(W, 0, W * 0.97, 0);
+      vR.addColorStop(0, 'rgba(4,8,16,0.80)');
+      vR.addColorStop(1, 'transparent');
+      ctx.fillStyle = vR; ctx.fillRect(W * 0.97, 0, W * 0.03, H);
+    }
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+
+  frame();
 })();
+
+
+/* ── QIBLA CANVAS ANIMATION ── */
+
+
+function initQiblaCanvas(cv) {
+  var rafId = null;
+  if (!cv) return { stop: function(){} };
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 3);
+  var W = cv.offsetWidth;
+  var H = cv.offsetHeight;
+  cv.width = Math.round(W * dpr);
+  cv.height = Math.round(H * dpr);
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var t = 0;
+  var cx = W * 0.5;
+  var aqsaX = W * 0.17, kaabaX = W * 0.83;
+  var lmY = H * 0.34;
+  var sc = Math.min(W / 340, H / 195, 1.5);
+  var arcCPy = H * 0.78;
+  var isMob = W < 420;
+
+  var arcParts = [];
+  for (var i = 0; i < 70; i++) {
+    arcParts.push({
+      pos: i / 70, sp: 0.001 + Math.random() * 0.0035,
+      sz: 0.3 + Math.random() * 1.8, al: 0.15 + Math.random() * 0.55,
+      off: (Math.random() - 0.5) * 8, trail: 0.3 + Math.random() * 0.5
+    });
+  }
+
+  var stars = [];
+  if (W > 300) {
+    for (var i = 0; i < 55; i++) {
+      stars.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: 0.12 + Math.random() * 0.5, sp: 0.3 + Math.random() * 0.8,
+        ph: Math.random() * 6.283
+      });
+    }
+  }
+
+  function isL() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function bez(tt, a, b, c) { var m = 1 - tt; return m*m*a + 2*m*tt*b + tt*tt*c; }
+
+  /* ── AL-AQSA ── */
+  function drawAqsa(alpha) {
+    if (alpha < 0.01) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(aqsaX, lmY);
+    ctx.scale(sc, sc);
+
+    // Multi-layer atmospheric glow
+    var g1 = ctx.createRadialGradient(0, -18, 2, 0, -18, 90 * sc);
+    g1.addColorStop(0, isL() ? 'rgba(245,190,60,0.30)' : 'rgba(255,210,70,0.22)');
+    g1.addColorStop(0.4, isL() ? 'rgba(230,170,40,0.12)' : 'rgba(240,190,50,0.08)');
+    g1.addColorStop(1, 'transparent');
+    ctx.fillStyle = g1;
+    ctx.fillRect(-95, -95, 190, 160);
+
+    // Ground shadow
+    ctx.fillStyle = isL() ? 'rgba(100,75,30,0.08)' : 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(0, 52, 65, 8, 0, 0, 6.283);
+    ctx.fill();
+
+    // Main body
+    ctx.fillStyle = isL() ? 'rgba(125,90,35,0.55)' : 'rgba(160,115,40,0.50)';
+    ctx.beginPath();
+    ctx.moveTo(-50, 48); ctx.lineTo(-54, -2); ctx.lineTo(54, -2); ctx.lineTo(50, 48);
+    ctx.closePath(); ctx.fill();
+
+    // Subtle wall texture lines
+    ctx.strokeStyle = isL() ? 'rgba(160,120,50,0.12)' : 'rgba(200,160,60,0.08)';
+    ctx.lineWidth = 0.4;
+    for (var wy = 0; wy < 44; wy += 6) {
+      ctx.beginPath(); ctx.moveTo(-52, wy); ctx.lineTo(52, wy); ctx.stroke();
+    }
+
+    // Central dome - multi-layer for richness
+    ctx.fillStyle = isL() ? 'rgba(240,195,60,0.78)' : 'rgba(255,220,75,0.65)';
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.fill();
+
+    // Dome highlight
+    var dh = ctx.createRadialGradient(-6, -28, 2, 0, -2, 32);
+    dh.addColorStop(0, isL() ? 'rgba(255,245,180,0.40)' : 'rgba(255,250,200,0.30)');
+    dh.addColorStop(0.5, 'transparent');
+    dh.addColorStop(1, 'transparent');
+    ctx.fillStyle = dh;
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.fill();
+
+    // Dome outline for crispness
+    ctx.strokeStyle = isL() ? 'rgba(200,155,40,0.50)' : 'rgba(255,230,100,0.35)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.stroke();
+
+    // Smaller dome behind
+    ctx.fillStyle = isL() ? 'rgba(220,170,45,0.55)' : 'rgba(240,195,55,0.40)';
+    ctx.beginPath(); ctx.arc(-5, -16, 22, Math.PI * 1.08, Math.PI * 1.92); ctx.fill();
+    ctx.strokeStyle = isL() ? 'rgba(200,155,40,0.35)' : 'rgba(255,230,100,0.22)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.arc(-5, -16, 22, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
+
+    // Windows
+    var wc = isL() ? 'rgba(255,235,150,0.45)' : 'rgba(255,240,160,0.30)';
+    ctx.fillStyle = wc;
+    for (var wi = -36; wi <= 36; wi += 18) {
+      ctx.beginPath();
+      ctx.moveTo(wi - 3, -8); ctx.lineTo(wi + 3, -8);
+      ctx.lineTo(wi + 2.5, 38); ctx.lineTo(wi - 2.5, 38);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // Minarets - detailed
+    var mf = isL() ? 'rgba(210,160,45,0.60)' : 'rgba(230,180,55,0.48)';
+    var ms = isL() ? 'rgba(255,230,120,0.55)' : 'rgba(255,235,130,0.38)';
+    [[-62, 0], [62, 0], [-72, 3], [72, 3]].forEach(function(m, idx) {
+      var w = idx < 2 ? 8 : 5;
+      ctx.fillStyle = mf;
+      ctx.fillRect(m[0] - w/2, m[1] - 65, w, 113);
+      ctx.strokeStyle = ms; ctx.lineWidth = 0.5;
+      ctx.strokeRect(m[0] - w/2, m[1] - 65, w, 113);
+
+      // Minaret top
+      ctx.fillStyle = ms;
+      ctx.beginPath(); ctx.arc(m[0], m[1] - 65, w/2 + 1.5, Math.PI, 0); ctx.fill();
+
+      // Balconies
+      ctx.fillStyle = mf;
+      var bs = idx < 2 ? 2.5 : 1.5;
+      ctx.fillRect(m[0] - w/2 - bs, m[1] - 42, w + bs*2, 2);
+      ctx.fillRect(m[0] - w/2 - bs, m[1] - 20, w + bs*2, 2);
+
+      // Pointed cap
+      ctx.fillStyle = ms;
+      ctx.beginPath();
+      ctx.moveTo(m[0] - w/2 - 1, m[1] - 65);
+      ctx.lineTo(m[0], m[1] - 74);
+      ctx.lineTo(m[0] + w/2 + 1, m[1] - 65);
+      ctx.closePath(); ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  /* ── KAABA ── */
+  function drawKaaba(alpha) {
+    if (alpha < 0.01) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(kaabaX, lmY);
+    ctx.scale(sc, sc);
+
+    // Rich green glow layers
+    var g1 = ctx.createRadialGradient(0, -10, 2, 0, -10, 80 * sc);
+    g1.addColorStop(0, isL() ? 'rgba(34,197,94,0.28)' : 'rgba(34,197,94,0.22)');
+    g1.addColorStop(0.35, isL() ? 'rgba(16,163,74,0.10)' : 'rgba(16,163,74,0.06)');
+    g1.addColorStop(1, 'transparent');
+    ctx.fillStyle = g1;
+    ctx.fillRect(-80, -85, 160, 140);
+
+    // Mataaf (circumambulation) glow
+    var mg = ctx.createRadialGradient(0, 18, 15, 0, 18, 55);
+    mg.addColorStop(0, isL() ? 'rgba(34,197,94,0.06)' : 'rgba(34,197,94,0.04)');
+    mg.addColorStop(1, 'transparent');
+    ctx.fillStyle = mg;
+    ctx.fillRect(-55, -10, 110, 56);
+
+    // Ground shadow
+    ctx.fillStyle = isL() ? 'rgba(15,60,35,0.08)' : 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 55, 7, 0, 0, 6.283);
+    ctx.fill();
+
+    // Cube body with subtle gradient
+    var cf = ctx.createLinearGradient(-24, 0, 24, 0);
+    cf.addColorStop(0, isL() ? 'rgba(28,18,8,0.75)' : 'rgba(18,12,6,0.82)');
+    cf.addColorStop(0.5, isL() ? 'rgba(38,26,12,0.70)' : 'rgba(25,17,8,0.78)');
+    cf.addColorStop(1, isL() ? 'rgba(28,18,8,0.75)' : 'rgba(18,12,6,0.82)');
+    ctx.fillStyle = cf;
+    ctx.fillRect(-24, -32, 48, 52);
+
+    // Left face (slightly lighter for 3D)
+    ctx.fillStyle = isL() ? 'rgba(48,34,16,0.45)' : 'rgba(35,24,12,0.50)';
+    ctx.fillRect(-24, -32, 6, 52);
+
+    // Right face (slightly darker for 3D)
+    ctx.fillStyle = isL() ? 'rgba(15,10,4,0.45)' : 'rgba(10,6,2,0.50)';
+    ctx.fillRect(18, -32, 6, 52);
+
+    // Top face
+    ctx.fillStyle = isL() ? 'rgba(50,36,18,0.55)' : 'rgba(35,25,12,0.60)';
+    ctx.beginPath();
+    ctx.moveTo(-24, -32); ctx.lineTo(-17, -44);
+    ctx.lineTo(31, -44); ctx.lineTo(24, -32);
+    ctx.closePath(); ctx.fill();
+
+    // Right face of top
+    ctx.fillStyle = isL() ? 'rgba(25,16,6,0.50)' : 'rgba(18,10,4,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(24, -32); ctx.lineTo(31, -44);
+    ctx.lineTo(31, -44 + 12); ctx.lineTo(24, -32 + 12);
+    ctx.closePath(); ctx.fill();
+
+    // Kiswa (gold band) - rich gradient
+    var kg = ctx.createLinearGradient(-24, -8, 24, -8);
+    kg.addColorStop(0, isL() ? 'rgba(180,140,30,0.75)' : 'rgba(220,175,40,0.68)');
+    kg.addColorStop(0.3, isL() ? 'rgba(240,200,55,0.90)' : 'rgba(255,215,65,0.82)');
+    kg.addColorStop(0.7, isL() ? 'rgba(240,200,55,0.90)' : 'rgba(255,215,65,0.82)');
+    kg.addColorStop(1, isL() ? 'rgba(180,140,30,0.75)' : 'rgba(220,175,40,0.68)');
+    ctx.fillStyle = kg;
+    ctx.fillRect(-24, -8, 48, 6);
+
+    // Kiswa on top face
+    ctx.fillStyle = isL() ? 'rgba(230,185,45,0.65)' : 'rgba(250,205,55,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-24, -32); ctx.lineTo(-17, -38.5);
+    ctx.lineTo(31, -38.5); ctx.lineTo(24, -32);
+    ctx.closePath(); ctx.fill();
+
+    // Kiswa calligraphy hint lines
+    ctx.strokeStyle = isL() ? 'rgba(255,240,160,0.20)' : 'rgba(255,245,180,0.15)';
+    ctx.lineWidth = 0.4;
+    for (var ky = -5; ky <= -2; ky += 1.2) {
+      ctx.beginPath(); ctx.moveTo(-22, ky); ctx.lineTo(22, ky); ctx.stroke();
+    }
+
+    // Black stone area (Hajr Aswad) - bright spot
+    var hs = ctx.createRadialGradient(-24, -12, 0, -24, -12, 8);
+    hs.addColorStop(0, isL() ? 'rgba(200,200,200,0.35)' : 'rgba(220,220,220,0.28)');
+    hs.addColorStop(1, 'transparent');
+    ctx.fillStyle = hs;
+    ctx.fillRect(-32, -20, 16, 16);
+
+    // Door area
+    ctx.fillStyle = isL() ? 'rgba(230,190,50,0.60)' : 'rgba(250,210,60,0.50)';
+    ctx.beginPath(); ctx.arc(0, 8, 5.5, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = isL() ? 'rgba(255,240,160,0.40)' : 'rgba(255,245,180,0.30)';
+    ctx.beginPath(); ctx.arc(0, 8, 5.5, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = isL() ? 'rgba(30,18,6,0.75)' : 'rgba(20,12,4,0.82)';
+    ctx.fillRect(-5, 8, 10, 12);
+
+    // Subtle edge highlight
+    ctx.strokeStyle = isL() ? 'rgba(255,230,140,0.18)' : 'rgba(255,240,160,0.12)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(-24, -44, 48, 64);
+
+    // Mizab (water spout)
+    ctx.fillStyle = isL() ? 'rgba(200,170,50,0.55)' : 'rgba(230,200,60,0.45)';
+    ctx.beginPath();
+    ctx.moveTo(4, -44); ctx.lineTo(8, -52); ctx.lineTo(12, -44);
+    ctx.closePath(); ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* ── TURNING ARC ── */
+  function drawArc(p) {
+    if (p <= 0.005) return;
+    var n = Math.max(4, Math.floor(p * 100));
+
+    // Outer glow trail
+    if (p > 0.1) {
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var tt = i / 100;
+        var px = bez(tt, aqsaX, cx, kaabaX);
+        var py = bez(tt, lmY, arcCPy, lmY);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = isL() ? 'rgba(252,211,77,0.12)' : 'rgba(252,211,77,0.08)';
+      ctx.lineWidth = 8; ctx.stroke();
+    }
+
+    // Main arc line
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var tt = i / 100;
+      var px = bez(tt, aqsaX, cx, kaabaX);
+      var py = bez(tt, lmY, arcCPy, lmY);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    var gr = ctx.createLinearGradient(aqsaX, 0, kaabaX, 0);
+    gr.addColorStop(0, isL() ? 'rgba(217,155,30,0.22)' : 'rgba(245,190,50,0.18)');
+    gr.addColorStop(0.35, isL() ? 'rgba(252,211,77,0.55)' : 'rgba(252,211,77,0.42)');
+    gr.addColorStop(0.65, isL() ? 'rgba(52,211,153,0.55)' : 'rgba(52,211,153,0.42)');
+    gr.addColorStop(1, isL() ? 'rgba(22,163,74,0.55)' : 'rgba(22,163,74,0.42)');
+    ctx.strokeStyle = gr; ctx.lineWidth = 2.8; ctx.stroke();
+
+    // Inner bright core line
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var tt = i / 100;
+      var px = bez(tt, aqsaX, cx, kaabaX);
+      var py = bez(tt, lmY, arcCPy, lmY);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = isL() ? 'rgba(255,245,200,0.30)' : 'rgba(255,250,220,0.22)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    // Arrow at end
+    if (p > 0.85) {
+      var ea = Math.min(1, (p - 0.85) / 0.15);
+      var ex = bez(1, aqsaX, cx, kaabaX), ey = bez(1, lmY, arcCPy, lmY);
+      var px2 = bez(0.88, aqsaX, cx, kaabaX), py2 = bez(0.88, lmY, arcCPy, lmY);
+      var ang = Math.atan2(ey - py2, ex - px2);
+      ctx.save();
+      ctx.globalAlpha = ea;
+      ctx.translate(ex, ey);
+      ctx.rotate(ang);
+
+      // Arrow glow
+      var ag = ctx.createRadialGradient(-6, 0, 0, -6, 0, 18);
+      ag.addColorStop(0, isL() ? 'rgba(34,197,94,0.30)' : 'rgba(34,197,94,0.25)');
+      ag.addColorStop(1, 'transparent');
+      ctx.fillStyle = ag;
+      ctx.fillRect(-24, -18, 36, 36);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.lineTo(-13, -6.5); ctx.lineTo(-13, 6.5);
+      ctx.closePath();
+      ctx.fillStyle = isL() ? 'rgba(34,197,94,0.80)' : 'rgba(34,197,94,0.70)';
+      ctx.fill();
+
+      // Arrow outline
+      ctx.strokeStyle = isL() ? 'rgba(52,211,153,0.50)' : 'rgba(52,211,153,0.40)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Traveling light with rich glow
+    var dx = bez(p, aqsaX, cx, kaabaX);
+    var dy = bez(p, lmY, arcCPy, lmY);
+
+    // Color interpolation
+    var cr = Math.round(245 + (34 - 245) * p);
+    var cg2 = Math.round(195 + (197 - 195) * p);
+    var cb = Math.round(50 + (94 - 50) * p);
+
+    // Outer glow
+    var dg = ctx.createRadialGradient(dx, dy, 0, dx, dy, 22);
+    dg.addColorStop(0, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0.50)');
+    dg.addColorStop(0.3, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0.15)');
+    dg.addColorStop(1, 'transparent');
+    ctx.fillStyle = dg;
+    ctx.beginPath(); ctx.arc(dx, dy, 22, 0, 6.283); ctx.fill();
+
+    // Mid glow
+    var dg2 = ctx.createRadialGradient(dx, dy, 0, dx, dy, 8);
+    dg2.addColorStop(0, isL() ? 'rgba(255,255,255,0.70)' : 'rgba(255,255,255,0.60)');
+    dg2.addColorStop(1, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0)');
+    ctx.fillStyle = dg2;
+    ctx.beginPath(); ctx.arc(dx, dy, 8, 0, 6.283); ctx.fill();
+
+    // Core dot
+    ctx.beginPath(); ctx.arc(dx, dy, 2.8, 0, 6.283);
+    ctx.fillStyle = isL() ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.90)';
+    ctx.fill();
+
+    // Sparkle cross
+    var sp = 0.6 + Math.sin(t * 0.12) * 0.4;
+    if (sp > 0.3) {
+      var ss = 6 * sp;
+      ctx.strokeStyle = isL() ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath(); ctx.moveTo(dx - ss, dy); ctx.lineTo(dx + ss, dy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(dx, dy - ss); ctx.lineTo(dx, dy + ss); ctx.stroke();
+    }
+  }
+
+  /* ── ARC PARTICLES ── */
+  function drawParts(p) {
+    arcParts.forEach(function(pt) {
+      pt.pos = (pt.pos + pt.sp) % 1;
+      if (pt.pos > p) return;
+      var px = bez(pt.pos, aqsaX, cx, kaabaX);
+      var py = bez(pt.pos, lmY, arcCPy, lmY) + pt.off;
+      var a = pt.al * (0.3 + 0.7 * Math.sin(t * 0.055 + pt.pos * 14));
+
+      var r = Math.round(250 + (34 - 250) * pt.pos);
+      var g = Math.round(200 + (197 - 200) * pt.pos);
+      var b = Math.round(60 + (94 - 60) * pt.pos);
+
+      // Particle glow
+      ctx.beginPath(); ctx.arc(px, py, pt.sz * 2.5, 0, 6.283);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (a * 0.15) + ')';
+      ctx.fill();
+
+      // Particle core
+      ctx.beginPath(); ctx.arc(px, py, pt.sz, 0, 6.283);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+      ctx.fill();
+    });
+  }
+
+  /* ── PRAYING FIGURE ── */
+  function drawFigure(p) {
+    if (p < 0.08) return;
+    ctx.save();
+    var fa = Math.min(1, (p - 0.08) / 0.3);
+    ctx.globalAlpha = fa * (isL() ? 0.35 : 0.25);
+    ctx.translate(cx, H * 0.58);
+    var fs = Math.min(W / 360, 1.3);
+    ctx.scale(fs, fs);
+    ctx.rotate(-0.3 + p * 0.55);
+    var fc = isL() ? 'rgba(90,70,40,0.35)' : 'rgba(160,140,100,0.22)';
+    ctx.fillStyle = fc;
+    ctx.beginPath(); ctx.ellipse(0, -12, 5.2, 13, 0, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -31, 4.5, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = fc; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-4.2, -19); ctx.quadraticCurveTo(-15, -7, -12, 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4.2, -19); ctx.quadraticCurveTo(15, -7, 12, 6); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ── MAIN LOOP ── */
+  function frame() {
+    var sp;
+    if (t < 90) sp = 0;
+    else if (t < 220) sp = (t - 90) / 130;
+    else sp = 1;
+
+    var aqA, kbA;
+    if (t < 55) { aqA = Math.min(1, t / 40); kbA = 0; }
+    else if (t < 250) {
+      aqA = 0.40 + 0.60 * Math.max(0, 1 - (t - 150) / 100);
+      kbA = Math.min(1, Math.max(0, (t - 150) / 100));
+    } else {
+      aqA = 0.40 + 0.07 * Math.sin(t * 0.018);
+      kbA = 0.90 + 0.10 * Math.sin(t * 0.022 + 1);
+    }
+
+    // Background
+    ctx.fillStyle = isL() ? '#f3ede0' : '#040c18';
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars (dark mode)
+    if (!isL()) {
+      stars.forEach(function(s) {
+        var a = 0.20 + Math.sin(t * s.sp * 0.012 + s.ph) * 0.22;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283);
+        ctx.fillStyle = 'rgba(255,255,255,' + a + ')'; ctx.fill();
+      });
+    }
+
+    // Subtle warm radial
+    var cg = ctx.createRadialGradient(cx, H * 0.44, 0, cx, H * 0.44, W * 0.45);
+    cg.addColorStop(0, isL() ? 'rgba(252,211,77,0.045)' : 'rgba(252,211,77,0.028)');
+    cg.addColorStop(1, 'transparent');
+    ctx.fillStyle = cg; ctx.fillRect(0, 0, W, H);
+
+    // Left warm glow
+    var lg = ctx.createRadialGradient(aqsaX, lmY, 0, aqsaX, lmY, W * 0.24);
+    lg.addColorStop(0, isL() ? 'rgba(230,180,50,0.07)' : 'rgba(245,195,55,0.05)');
+    lg.addColorStop(1, 'transparent');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+
+    // Right green glow
+    var rg = ctx.createRadialGradient(kaabaX, lmY, 0, kaabaX, lmY, W * 0.24);
+    rg.addColorStop(0, isL() ? 'rgba(34,197,94,0.07)' : 'rgba(34,197,94,0.05)');
+    rg.addColorStop(1, 'transparent');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+
+    drawArc(sp);
+    drawParts(sp);
+    drawAqsa(aqA);
+    drawKaaba(kbA);
+    drawFigure(sp);
+
+    // ── LABELS ──
+    var lfs = Math.max(7, Math.min(10.5, W * 0.017));
+    var sfs = Math.max(6.5, Math.min(9, W * 0.015));
+    var afs = Math.max(isMob ? 14 : 17, Math.min(22, W * 0.032));
+    var baseY = lmY + 62 * sc;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+
+    // BEFORE label
+    if (aqA > 0.12) {
+      ctx.globalAlpha = Math.min(1, aqA * 1.4);
+      ctx.fillStyle = isL() ? 'rgba(165,120,30,0.78)' : 'rgba(255,200,50,0.72)';
+      ctx.font = '700 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText('BEFORE', aqsaX, baseY);
+      ctx.fillStyle = isL() ? 'rgba(135,95,25,0.60)' : 'rgba(200,160,50,0.55)';
+      ctx.font = '500 ' + sfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'AL-AQSA' : 'BAYT AL-MAQDIS', aqsaX, baseY + lfs + 3);
+      ctx.font = '700 ' + afs + 'px "Amiri",serif';
+      ctx.fillStyle = isL() ? 'rgba(165,120,30,0.48)' : 'rgba(255,210,60,0.42)';
+      ctx.fillText('المسجد الأقصى', aqsaX, baseY + lfs + sfs + 4);
+    }
+
+    // AFTER label
+    if (kbA > 0.12) {
+      ctx.globalAlpha = Math.min(1, kbA * 1.4);
+      ctx.fillStyle = isL() ? 'rgba(22,120,70,0.78)' : 'rgba(34,197,94,0.72)';
+      ctx.font = '700 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText('AFTER', kaabaX, baseY);
+      ctx.fillStyle = isL() ? 'rgba(16,100,55,0.60)' : 'rgba(22,163,74,0.55)';
+      ctx.font = '500 ' + sfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'MAKKAH' : 'MAKKAH AL-MUKARRAMAH', kaabaX, baseY + lfs + 3);
+      ctx.font = '700 ' + afs + 'px "Amiri",serif';
+      ctx.fillStyle = isL() ? 'rgba(22,120,70,0.48)' : 'rgba(34,197,94,0.42)';
+      ctx.fillText('الكعبة المشرفة', kaabaX, baseY + lfs + sfs + 4);
+    }
+
+    // Bottom label
+    if (sp > 0.2) {
+      ctx.globalAlpha = Math.min(1, (sp - 0.2) / 0.3) * (0.50 + 0.15 * Math.sin(t * 0.025));
+      ctx.fillStyle = isL() ? 'rgba(130,85,15,0.75)' : 'rgba(252,211,77,0.60)';
+      ctx.font = '600 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'THE TURNING POINT' : 'THE TURNING POINT · VERSE 143', cx, H * 0.86);
+    }
+
+    ctx.globalAlpha = 1;
+
+    // ── VIGNETTES ──
+    var vt = ctx.createLinearGradient(0, 0, 0, H * 0.055);
+    vt.addColorStop(0, isL() ? 'rgba(243,237,224,0.90)' : 'rgba(4,12,24,0.90)');
+    vt.addColorStop(1, 'transparent');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, H * 0.055);
+    var vb = ctx.createLinearGradient(0, H * 0.945, 0, H);
+    vb.addColorStop(0, 'transparent');
+    vb.addColorStop(1, isL() ? 'rgba(243,237,224,0.90)' : 'rgba(4,12,24,0.90)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H * 0.945, W, H * 0.055);
+
+    t++;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  rafId = requestAnimationFrame(frame);
+
+  return {
+    stop: function() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+  };
+}
+
+var qiblaAnimator = null;
+
+
+
+
+
+
+
 
 /* ══════════════════════════════════════════════
    AYAT AL-KURSI MIRROR DPR-aware canvas
