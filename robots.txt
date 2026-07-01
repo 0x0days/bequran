@@ -39,5 +39,5 @@ Disallow: /scientists/
 Disallow: /book/
 
 # 4. POINT TO YOUR SITEMAP
-# IMPORTANT: Change 'https://www.yourdomain.com' to your actual Netlify URL!
-Sitemap: https://www.yourdomain.com/sitemap.xml
+# IMPORTANT: Change 'https://bequran.netlify.app' to your actual Netlify URL!
+Sitemap: https://bequran.netlify.app/sitemap.xml
