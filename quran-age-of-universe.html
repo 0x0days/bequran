@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Age of Universe · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #c4b5fd;
+      --accent-light: #ddd6fe;
+      --accent-dim:   rgba(196,181,253,0.12);
+      --accent-ring:  rgba(196,181,253,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(20px, 4.5vw, 28px); line-height: 2.2; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 15px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Ratio display ── */
+         /* ── Fraction Visual ── */
+    .fv{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;margin:24px 0}
+    .fv-row{margin-bottom:28px}.fv-row:last-of-type{margin-bottom:0}
+    .fv-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .fv-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:6px;background:var(--accent-dim);color:var(--accent-light);border:1px solid var(--accent-ring)}
+    .fv-tag-cosmic{background:rgba(124,58,237,.1);color:#a78bfa;border-color:rgba(124,58,237,.25)}
+    .fv-dim{font-size:13px;color:var(--muted)}
+
+    /* segmented bar */
+    .fv-track-seg{display:flex;gap:4px;height:52px;background:var(--surface2);border-radius:12px;padding:6px}
+    .fv-seg{flex:1;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.8);transition:opacity .35s ease var(--d,0s),transform .4s cubic-bezier(.175,.885,.32,1.275) var(--d,0s),background .3s ease var(--d,0s),box-shadow .3s ease var(--d,0s)}
+    .fv-seg span{font-size:12px;font-weight:700;color:var(--muted);opacity:.35;transition:color .3s ease var(--d,0s),opacity .3s ease var(--d,0s)}
+    .fv.animate .fv-seg{opacity:1;transform:scale(1)}
+    .fv.animate .fv-seg:nth-child(1){--d:.15s}
+    .fv.animate .fv-seg:nth-child(2){--d:.25s}
+    .fv.animate .fv-seg:nth-child(3){--d:.35s}
+    .fv.animate .fv-seg:nth-child(4){--d:.45s}
+    .fv.animate .fv-seg:nth-child(5){--d:.6s}
+    .fv.animate .fv-seg:nth-child(6){--d:.75s}
+
+    /* cosmic segments (first 4) */
+    .fv.animate .fv-seg-cosmic{background:#7C3AED;box-shadow:0 0 15px rgba(124,58,237,.3)}
+    .fv.animate .fv-seg-cosmic span{color:#fff;opacity:.9}
+
+    /* earth segments (last 2) */
+    .fv.animate .fv-seg-earth{background:#B08050;box-shadow:0 0 18px rgba(176,128,80,.4)}
+    .fv.animate .fv-seg-earth span{color:#fff;opacity:1}
+
+    /* continuous bar */
+    .fv-track-cont{height:52px;background:var(--surface2);border-radius:12px;padding:6px;position:relative;overflow:hidden}
+    .fv-cont-cosmic{height:100%;width:0%;background:linear-gradient(90deg,#4B0082,#7C3AED,#818CF8);border-radius:8px;transition:width 1.1s cubic-bezier(.4,0,.2,1) .3s}
+    .fv.animate .fv-cont-cosmic{width:100%}
+    .fv-cont-earth{position:absolute;top:6px;bottom:6px;right:6px;width:0%;background:#B08050;border-radius:0 8px 8px 0;transition:width 1.1s cubic-bezier(.4,0,.2,1) 1.5s;box-shadow:0 0 18px rgba(176,128,80,.4);z-index:1}
+    .fv.animate .fv-cont-earth{width:calc(33.33% - 4px)}
+    .fv-cont-edge{position:absolute;top:6px;bottom:6px;left:calc(66.66% - 2px);width:2px;background:rgba(255,255,255,.7);border-radius:1px;opacity:0;transition:opacity .4s ease 2.5s;z-index:2}
+    .fv.animate .fv-cont-edge{opacity:.65}
+
+    /* captions */
+    .fv-cap{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;gap:8px}
+    .fv-cap-hl-earth{color:#D4A373;font-weight:600}
+    .fv-cap-hl-cosmic{color:#818CF8;font-weight:600}
+    .fv-cap-m{color:var(--muted)}
+
+    /* conclusion */
+    .fv-concl{display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border);opacity:0;transform:translateY(10px) scale(.95);transition:all .6s cubic-bezier(.175,.885,.32,1.275) 2.8s}
+    .fv.animate .fv-concl{opacity:1;transform:translateY(0) scale(1)}
+    .fv-cl-line{flex:1;height:1px;background:var(--border)}
+    .fv-cl-badge{display:flex;align-items:center;gap:10px;background:var(--accent-dim);border:1px solid var(--accent-ring);border-radius:100px;padding:10px 22px;position:relative}
+    .fv-cl-badge svg{color:var(--ok);flex-shrink:0}
+    .fv-cl-label{font-size:13px;color:var(--muted);white-space:nowrap}
+    .fv-cl-frac{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold-light);white-space:nowrap;text-shadow:0 0 20px rgba(245,158,11,.3)}
+    .fv.animate .fv-cl-frac{animation:fracPop .5s cubic-bezier(.175,.885,.32,1.275) 3.2s backwards}
+    @keyframes fracPop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+    .fv.animate .fv-cl-badge{animation:badgeGlow .8s ease 3.4s}
+    @keyframes badgeGlow{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── S2: Two-reveal timeline ── */
+    .reveal-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .reveal-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .reveal-btn.used { opacity: .45; pointer-events: none; }
+    .rb-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--accent-dim); border: 1px solid var(--accent-ring); font-size: 20px; }
+    .reveal-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: none; animation: rise .35s ease; }
+    .reveal-result.show { display: block; }
+    .rr-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .rr-stat { font-size: 22px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--accent-light); margin-bottom: 4px; }
+    .rr-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .conv-panel { background: linear-gradient(135deg, rgba(196,181,253,0.08) 0%, rgba(196,181,253,0.02) 100%); border: 1px solid rgba(196,181,253,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 10px; font-weight: 600; }
+    .conv-big { font-family: 'Playfair Display', serif; font-size: clamp(36px, 8vw, 56px); font-weight: 700; color: var(--accent-light); text-shadow: 0 0 40px rgba(196,181,253,0.45); line-height: 1; margin: 8px 0; }
+    .conv-sub { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(36px, 8vw, 54px); font-weight: 700; line-height: 1; }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(196,181,253,0.05); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-pulsars-blackholes.html" class="nav-back">&larr; Pulsars &amp; Black Holes</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Age of Universe</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Cosmology</p>
+    <h1 class="hero-title">The Quran says Earth existed for 2 out of 6 creation days. Science measures Earth at exactly one third the age of the universe.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 7:54 + 41:9 Creation timeline</div>
+      <div class="iv-ar">
+        خَلَقَ السَّمَاوَاتِ وَالْأَرْضَ فِي <span class="hl">سِتَّةِ أَيَّامٍ</span><br>
+        خَلَقَ الْأَرْضَ فِي <span class="hl">يَوْمَيْنِ</span>
+      </div>
+      <div class="iv-tr">"He created the heavens and the Earth in <span class="hl">six days</span>" (7:54) "He created the Earth in <span class="hl">two days</span>" (41:9)</div>
+    </div>
+
+       <div class="fv" id="fractionViz">
+      <!-- Quran bar -->
+      <div class="fv-row">
+        <div class="fv-head">
+          <span class="fv-tag">Quran</span>
+          <span class="fv-dim">6 creation days total</span>
+        </div>
+        <div class="fv-track-seg">
+          <div class="fv-seg fv-seg-cosmic"><span>1</span></div>
+          <div class="fv-seg fv-seg-cosmic"><span>2</span></div>
+          <div class="fv-seg fv-seg-cosmic"><span>3</span></div>
+          <div class="fv-seg fv-seg-cosmic"><span>4</span></div>
+          <div class="fv-seg fv-seg-earth"><span>5</span></div>
+          <div class="fv-seg fv-seg-earth"><span>6</span></div>
+        </div>
+        <div class="fv-cap">
+          <span class="fv-cap-m">4 days (Universe only)</span>
+          <span class="fv-cap-hl-earth" id="fvQNum">0 Earth days</span>
+        </div>
+      </div>
+
+      <!-- Science bar -->
+      <div class="fv-row">
+        <div class="fv-head">
+          <span class="fv-tag fv-tag-cosmic">Science</span>
+          <span class="fv-dim">13.8 billion years total</span>
+        </div>
+        <div class="fv-track-cont">
+          <div class="fv-cont-cosmic"></div>
+          <div class="fv-cont-earth"></div>
+          <div class="fv-cont-edge"></div>
+        </div>
+        <div class="fv-cap">
+          <span class="fv-cap-m">9.2 billion yr (Universe only)</span>
+          <span class="fv-cap-hl-cosmic" id="fvSNum">0.0 billion yr (Earth)</span>
+        </div>
+      </div>
+
+      <!-- Conclusion -->
+      <div class="fv-concl">
+        <div class="fv-cl-line"></div>
+        <div class="fv-cl-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="fv-cl-label">Same fraction</span>
+          <span class="fv-cl-frac">1⁄3</span>
+        </div>
+        <div class="fv-cl-line"></div>
+      </div>
+    </div>
+
+    <p class="body-text">The universe is 13.8 billion years old. Earth formed 4.6 billion years ago. That places Earth at exactly one third of the universe's age 4.6 ÷ 13.8 = 0.333. The Quran states this in a different way: the whole of creation (heavens, Earth, everything between) took 6 days measured at God's Throne, while Earth itself existed for only the last 2 of those days. Two sixths equals one third the same ratio, in a different frame of reference.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#040810">Begin the lesson &rarr;</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">How old is Earth compared to the age of the entire universe?</p>
+
+    <!-- Option A: same age (equal bars) -->
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">The same age Earth and the universe formed together in the Big Bang</div>
+        <div style="margin:8px 0 4px">
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px">
+            <div style="background:rgba(196,181,253,0.55);flex:1;border-radius:3px 0 0 3px"></div>
+            <div style="background:rgba(252,211,77,0.55);flex:1;border-radius:0 3px 3px 0"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px">
+            <span style="font-size:10px;color:var(--muted)">Universe: 13.8 bln yrs</span>
+            <span style="font-size:10px;color:var(--muted)">Earth: 13.8 bln yrs</span>
+          </div>
+        </div>
+        <div class="ac-sub">Earth has existed for all of cosmic history</div>
+      </div>
+    </div>
+
+    <!-- Option B: one third (correct) -->
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Earth formed 9.2 billion years after the universe began</div>
+        <div style="margin:8px 0 4px">
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden">
+            <div style="background:rgba(196,181,253,0.55);flex:2;border-radius:3px 0 0 3px"></div>
+            <div style="background:rgba(252,211,77,0.75);flex:1;border-radius:0 3px 3px 0"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px">
+            <span style="font-size:10px;color:var(--muted)">← 9.2 bln yrs before Earth existed</span>
+            <span style="font-size:10px;color:var(--gold-light);font-weight:600">Earth ⅓ →</span>
+          </div>
+        </div>
+        <div class="ac-sub">Universe: 13.8 billion years &nbsp;·&nbsp; Earth: 4.6 billion years &nbsp;·&nbsp; 4.6 ÷ 13.8 = ⅓</div>
+      </div>
+    </div>
+
+    <!-- Option C: half -->
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Half the age Earth formed when the universe was about 7 billion years old</div>
+        <div style="margin:8px 0 4px">
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px">
+            <div style="background:rgba(196,181,253,0.55);flex:1;border-radius:3px 0 0 3px"></div>
+            <div style="background:rgba(252,211,77,0.55);flex:1;border-radius:0 3px 3px 0"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px">
+            <span style="font-size:10px;color:var(--muted)">Before Earth (½)</span>
+            <span style="font-size:10px;color:var(--muted)">Earth (½)</span>
+          </div>
+        </div>
+        <div class="ac-sub">Roughly in the middle of cosmic history</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 Two-reveal timeline ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">Reveal both sides of the timeline then see the ratio emerge.</p>
+
+    <button class="reveal-btn" id="btnA" onclick="revealA()">
+      <div class="rb-icon">🌌</div>
+      <div>
+        <div style="font-weight:600">The universe Quran: 6 Throne-days</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">How old is the universe, and what does the Quran say?</div>
+      </div>
+    </button>
+    <div class="reveal-result" id="resA">
+      <div class="rr-label">Universe full creation timeline</div>
+      <div class="rr-stat">13,800,000,000 years</div>
+      <div class="rr-note">Cosmologists measure the universe at 13.8 billion years old, confirmed by cosmic microwave background radiation and the expansion rate of space. The Quran says everything heavens, Earth, and all that is between was created in 6 days measured at God's Throne (7:54, 50:38).</div>
+    </div>
+
+    <button class="reveal-btn" id="btnB" onclick="revealB()">
+      <div class="rb-icon">🌍</div>
+      <div>
+        <div style="font-weight:600">The Earth Quran: 2 Throne-days</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">How old is Earth, and what does the Quran say?</div>
+      </div>
+    </button>
+    <div class="reveal-result" id="resB">
+      <div class="rr-label">Earth its share of creation</div>
+      <div class="rr-stat">4,600,000,000 years</div>
+      <div class="rr-note">Earth formed 4.6 billion years ago when our solar system coalesced from gas and dust. The Quran says Earth was created in 2 days (41:9). The universe had been in existence for 4 days before Earth appeared. That makes Earth's share 2 out of 6 exactly one third.</div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-lbl">Same fraction different clocks</div>
+      <div class="conv-big">⅓</div>
+      <div class="conv-sub">In Throne-days: 2 ÷ 6 = ⅓ &nbsp;·&nbsp; In Earth years: 4.6 ÷ 13.8 = ⅓<br>The Quran expressed it as a ratio correct in any frame of reference.</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">The Quran says the entire creation took 6 Throne-days. Earth was created in 2 of those days. What fraction of the universe's existence has Earth been present for?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">All 6 days Earth was present from the very beginning of creation</div>
+        <div class="ac-sub">Earth existed before the heavens were formed</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">The last 2 days out of 6, in which the Earth has existed</div>
+        <div class="ac-sub">2 ÷ 6 = ⅓ · The same fraction as 4.6 billion ÷ 13.8 billion</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Half Earth appeared at the midpoint of creation on day 3</div>
+        <div class="ac-sub">Equal time before and after Earth's formation</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The Quran's 2-out-of-6 ratio matches the measured ages of Earth and the universe to exact precision.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num" id="mv0" style="color:var(--accent-light);text-shadow:0 0 40px rgba(196,181,253,0.4)">0</div>
+        <div class="match-lbl">million years age of universe</div>
+      </div>
+      <div class="match-sep">÷</div>
+      <div class="match-block">
+        <div class="match-num" id="mv1" style="color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.4)">0</div>
+        <div class="match-lbl">million years age of Earth</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Reference</th><th>Quran (Throne-days)</th><th>Science (billion years)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td>Full creation heavens + Earth</td>
+          <td class="td-v">6 days</td>
+          <td class="td-v">13.8 bln yrs</td>
+        </tr>
+        <tr>
+          <td>Earth's existence within creation</td>
+          <td class="td-v">2 days</td>
+          <td class="td-v">4.6 bln yrs</td>
+        </tr>
+        <tr class="hl">
+          <td>Earth as a fraction of creation</td>
+          <td class="td-v">2 ÷ 6 = ⅓</td>
+          <td class="td-v">4.6 ÷ 13.8 = ⅓</td>
+        </tr>
+        <tr>
+          <td>Period before Earth existed</td>
+          <td class="td-v">4 days</td>
+          <td class="td-v">9.2 bln yrs</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why expressing it as a ratio matters:</strong> The universe's age is measured differently depending on the observer's speed and gravitational field (Einstein's relativity). An observer measuring the universe as 3 billion years old also measures Earth as 1 billion years old still one third. By expressing it as a ratio rather than absolute numbers, the Quran's statement is correct for every possible observer in every frame of reference.
+    </div>
+
+    <div class="insight-box">
+      <strong>The Christian Bible comparison:</strong> Genesis places the creation of Earth on day one making Earth the same age as the universe. Modern cosmology refutes this. The Quran places Earth's formation as beginning on the fourth day after four days of prior cosmic history which matches what cosmologists measure.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">Summary and recap.</div>
+      <div class="gs">Cosmologists confirmed the 13.8-billion-year age of the universe in the 20th century. No human in 7th-century Arabia could have measured, calculated, or guessed that the correct ratio of Earth's age to the universe's age is precisely one third.</div>
+    </div>
+
+    <div id="qv-age"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+          <div id="curiositySeed"></div>
+
+      <a href="quran-pulsars-blackholes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Pulsars &amp; Black Holes</a>
+      <a href="quran-big-bang.html" class="btn" style="background:var(--accent);color:#040810">Next &middot; Big Bang &rarr;</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Age of Universe',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('age-of-universe');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 13800, 2000, null);
+        animFrom(document.getElementById('mv1'), 0, 4600, 2000, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Universe: 13.8 billion years. Earth: 4.6 billion years. The ratio 4.6 ÷ 13.8 = exactly one third.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+var doneA = false, doneB = false;
+
+function revealA() {
+  if (doneA) return;
+  doneA = true;
+  document.getElementById('btnA').classList.add('used');
+  document.getElementById('resA').classList.add('show');
+  checkBoth();
+}
+
+function revealB() {
+  if (doneB) return;
+  doneB = true;
+  document.getElementById('btnB').classList.add('used');
+  document.getElementById('resB').classList.add('show');
+  checkBoth();
+}
+
+function checkBoth() {
+  if (doneA && doneB) {
+    document.getElementById('convPanel').classList.add('show');
+    setTimeout(function() {
+      showOk('2 ÷ 6 = ⅓ in Throne-days. 4.6 ÷ 13.8 = ⅓ in Earth years. The ratio holds in any frame of reference.', function() { go(3); });
+    }, 1200);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Exactly. Two out of six days is one third matching the measured ratio of 4.6 billion to 13.8 billion years precisely.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero Canvas: Dual timeline showing universe vs Earth proportion ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  const W = cv.width, H = cv.height;
+
+  /* Star field */
+  var seed = 91;
+  function rng() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; }
+  var stars = [];
+  for (var i = 0; i < 50; i++) stars.push({ x: rng() * W, y: rng() * H, r: rng() * 0.9 + 0.2, a: rng() * 0.35 + 0.08 });
+
+  var frame = 0;
+  const TOTAL = 240; /* loop period */
+
+  /* Layout */
+  const PAD = 28;
+  const BAR_W = W - PAD * 2;       /* 584 */
+  const UNIV_Y = H * 0.38;
+  const EARTH_Y = H * 0.66;
+  const BAR_H = 9;
+  const EARTH_FRAC = 1 / 3;        /* Earth = 1/3 of universe */
+  const EARTH_X = PAD + BAR_W * (1 - EARTH_FRAC); /* Earth bar starts at 2/3 mark */
+
+  function draw() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Stars */
+    stars.forEach(function(s) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + s.a + ')';
+      ctx.fill();
+    });
+
+    /* Animation progress 0–1 with ease */
+    var t = Math.min(frame / 160, 1);
+    var progress = 1 - Math.pow(1 - t, 3); /* ease-out */
+
+    /* Universe bar fills fully */
+    var univFill = progress * BAR_W;
+    /* Background track */
+    ctx.beginPath();
+    ctx.roundRect(PAD, UNIV_Y - BAR_H / 2, BAR_W, BAR_H, 4);
+    ctx.fillStyle = 'rgba(196,181,253,0.10)';
+    ctx.fill();
+    /* Fill */
+    if (univFill > 0) {
+      ctx.beginPath();
+      ctx.roundRect(PAD, UNIV_Y - BAR_H / 2, univFill, BAR_H, 4);
+      var gU = ctx.createLinearGradient(PAD, 0, PAD + BAR_W, 0);
+      gU.addColorStop(0, 'rgba(196,181,253,0.55)');
+      gU.addColorStop(1, 'rgba(196,181,253,0.95)');
+      ctx.fillStyle = gU;
+      ctx.fill();
+    }
+
+    /* Earth bar starts at 2/3 mark, fills right third */
+    var earthProgress = Math.max(0, Math.min((progress - 2/3) / (1/3), 1));
+    var earthFill = earthProgress * (BAR_W * EARTH_FRAC);
+    /* Background track */
+    ctx.beginPath();
+    ctx.roundRect(EARTH_X, EARTH_Y - BAR_H / 2, BAR_W * EARTH_FRAC, BAR_H, 4);
+    ctx.fillStyle = 'rgba(252,211,77,0.10)';
+    ctx.fill();
+    /* Fill */
+    if (earthFill > 0) {
+      ctx.beginPath();
+      ctx.roundRect(EARTH_X, EARTH_Y - BAR_H / 2, earthFill, BAR_H, 4);
+      var gE = ctx.createLinearGradient(EARTH_X, 0, EARTH_X + BAR_W * EARTH_FRAC, 0);
+      gE.addColorStop(0, 'rgba(252,211,77,0.6)');
+      gE.addColorStop(1, 'rgba(252,211,77,1.0)');
+      ctx.fillStyle = gE;
+      ctx.fill();
+    }
+
+    /* Labels */
+    ctx.font = '500 11px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(196,181,253,0.75)';
+    ctx.fillText('UNIVERSE  13.8 billion years', PAD, UNIV_Y - BAR_H / 2 - 7);
+    ctx.fillStyle = 'rgba(252,211,77,0.75)';
+    ctx.fillText('EARTH  4.6 billion years', EARTH_X, EARTH_Y - BAR_H / 2 - 7);
+
+    /* Vertical divider at 2/3 mark "Earth began here" */
+    if (progress > 0.5) {
+      var divAlpha = Math.min((progress - 0.5) / 0.2, 1) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(EARTH_X, UNIV_Y + BAR_H / 2 + 2);
+      ctx.lineTo(EARTH_X, EARTH_Y - BAR_H / 2 - 2);
+      ctx.strokeStyle = 'rgba(255,255,255,' + divAlpha.toFixed(2) + ')';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    /* "= ⅓" label at right edge when both bars visible */
+    if (earthProgress > 0.9) {
+      var lblAlpha = Math.min((earthProgress - 0.9) / 0.1, 1);
+      ctx.font = 'bold 18px "Playfair Display", serif';
+      ctx.fillStyle = 'rgba(196,181,253,' + (lblAlpha * 0.9).toFixed(2) + ')';
+      ctx.fillText('= ⅓', W - PAD - 2, (UNIV_Y + EARTH_Y) / 2 + 6);
+    }
+
+    /* Loop */
+    frame++;
+    if (frame > TOTAL) frame = 0;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"age-of-universe");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"age-of-universe","question":"How old is the universe in billions of years?","inputType":"expand","unit":"Byr","min":0,"max":20,"step":0.1, "correct":13.8,"correctLabel":"13.8 billion years","curiositySeed":{"question":"Three modern discoveries in one 7th-century sentence: the singularity, Dark Energy, and water-based life. Ready to see them?","nextUrl":"quran-big-bang.html","nextTitle":"Big Bang"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 7:54 (six days) and 41:9 (two days for Earth).
+   2 out of 6 = Earth's 4.6 billion years out of universe's 13.8 billion = 1/3. */
+QuranValidator.attach('qv-age',{
+  mode:'locate',
+  title:'Read the two verses yourself',
+  subtitle:'7:54 says creation took 6 days · 41:9 says Earth took 2 of those days · ratio 2/6 = Earth\'s age / universe age',
+  groups:[
+    {id:'sixdays', label:'Six days (full creation)', arabic:'سِتَّةِ أَيَّامٍ', color:'#c084fc', occurrences:[[7,54]]},
+    {id:'twodays', label:'Two days (Earth only)',   arabic:'يَوْمَيْنِ',       color:'#4ade80', occurrences:[[41,9]]}
+  ]
+});
+</script>
+<script>
+/* ── Fraction Visual animation ── */
+(function(){
+  function animNum(el,from,to,dur,dec,suf){
+    if(!el)return;
+    var s=null;
+    function step(ts){
+      if(!s)s=ts;
+      var p=Math.min((ts-s)/dur,1);
+      var e=1-Math.pow(1-p,3);
+      el.textContent=(from+(to-from)*e).toFixed(dec)+suf;
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function initFV(){
+    var fv=document.getElementById('fractionViz');
+    if(!fv||fv.classList.contains('animate'))return;
+    var r=fv.getBoundingClientRect();
+    if(r.width<1)return;
+    fv.classList.add('animate');
+    setTimeout(function(){
+      animNum(document.getElementById('fvQNum'),0,2,800,0,' Earth days');
+      animNum(document.getElementById('fvSNum'),0,4.6,800,1,' billion yr (Earth)');
+    },400);
+    return true;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(initFV,100)});
+  else setTimeout(initFV,100);
+  window.addEventListener('load',function(){setTimeout(initFV,300)});
+  var fv=document.getElementById('fractionViz');
+  if(fv){var st=fv.closest('.stage');if(st)new MutationObserver(function(){setTimeout(initFV,150)}).observe(st,{attributes:true,attributeFilter:['class']})}
+})();
+</script>
+</body>
+</html>

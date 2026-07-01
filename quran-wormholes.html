@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Wormholes · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #67e8f9;
+      --accent-light: #a5f3fc;
+      --accent-dim:   rgba(103,232,249,0.12);
+      --accent-ring:  rgba(103,232,249,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(22px, 5vw, 32px); line-height: 2.2; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 15px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Claim row ── */
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(32px, 7vw, 48px); font-weight: 700; line-height: 1; color: var(--accent-light); text-shadow: 0 0 40px rgba(103,232,249,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── S1: Two-clock time dilation ── */
+    .clock-arena { display: flex; gap: 16px; margin: 20px 0; }
+    .clock-panel { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
+    .cp-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .cp-counter { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 10px; line-height: 1; }
+    .cp-unit { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+    .td-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px 20px; margin: 16px 0; display: none; animation: rise .35s ease; }
+    .td-result.show { display: block; }
+    .td-eq { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; margin-bottom: 12px; }
+    .td-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--accent-light); }
+
+    /* ── S2: Space folding ── */
+    .fold-dist-wrap { display: flex; gap: 16px; align-items: center; margin: 14px 0; flex-wrap: wrap; }
+    .fold-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--accent-light); line-height: 1; }
+    .fold-unit { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+    .fold-verse { background: var(--surface); border-left: 3px solid var(--accent-light); border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 16px 0; display: none; animation: rise .35s ease; }
+    .fold-verse.show { display: block; }
+    .fold-mc { display: none; margin-top: 16px; }
+    .fold-mc.show { display: block; animation: rise .4s ease; }
+
+    /* ── S3: Camel/needle ── */
+    .camel-info { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .camel-info strong { color: var(--text); }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(103,232,249,0.05); }
+    .sci-table tr.hl .td-v { color: var(--accent); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-red-giant.html" class="nav-back">&larr; Sun Swallows Earth</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Wormholes</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Physics</p>
+    <h1 class="hero-title">The Quran names a mechanism for crossing cosmic distances in steps. Einstein discovered the same mechanism 1,300 years later.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 70:3–4 Surah Al-Ma'arij &middot; The Ascending Pathways</div>
+      <div class="iv-ar">
+        مِنَ اللَّهِ <span class="hl">ذِي الْمَعَارِجِ</span><br>
+        تَعْرُجُ الْمَلَائِكَةُ وَالرُّوحُ إِلَيْهِ فِي يَوْمٍ كَانَ مِقْدَارُهُ <span class="hl">خَمْسِينَ أَلْفَ سَنَةٍ</span>
+      </div>
+      <div class="iv-tr">"from Allah, <span class="hl">owner of the Ma'arej (pathways)</span> ˹through which˺ the angels and the ˹holy˺ spirit will ascend to Him on a Day <span class="hl">fifty thousand years in length</span>."</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">1 day</div>
+        <div class="cr-lbl">inside a Ma'arj</div>
+      </div>
+      <div class="cr-eq">=</div>
+      <div class="cr-block">
+        <div class="cr-num">50,000 yrs</div>
+        <div class="cr-lbl">outside time dilation</div>
+      </div>
+    </div>
+
+    <p class="body-text">A wormhole is a shortcut through spacetime it folds the universe so that two points separated by millions of light-years become reachable in a few steps. Einstein described this in 1935, calling them "bridges" in space-time. The Quran calls them <em>Ma'arej</em> (معارج ascending pathways) and describes how angels use them for long-distance travel including a precise time-dilation ratio matching what general relativity predicts.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#040810">Begin the lesson &rarr;</button>
+  </div>
+
+
+<!-- ── STAGE 1: Exercise 1 Time Dilation Demo ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">Imagine two clocks sitting side by side. If you put one near a black hole and keep the other on Earth, the clock near the black hole ticks slower — not broken, just slower. Time itself runs at a different speed. The Quran says exactly this about the Ma'arj: one day inside equals 50,000 years outside. Press <strong>Start</strong> to see it happen.</p>
+
+    <div class="clock-arena">
+      <div class="clock-panel">
+        <div class="cp-label">Outside &mdash; on Earth</div>
+        <canvas id="clockEarth" class="cp-canvas" width="120" height="120" style="width:120px;height:120px;border-radius:60px;border:1px solid rgba(252,211,77,0.22)"></canvas>
+        <div class="cp-counter" id="earthYears" style="color:var(--gold-light)">0</div>
+        <div class="cp-unit">years passed</div>
+      </div>
+      <div class="clock-panel" style="border-color:var(--accent-ring)">
+        <div class="cp-label" style="color:var(--accent-light)">Inside the Ma'arj</div>
+        <canvas id="clockMaarj" class="cp-canvas" width="120" height="120" style="width:120px;height:120px;border-radius:60px;border:1px solid rgba(103,232,249,0.3)"></canvas>
+        <div class="cp-counter" id="maarjDays" style="color:var(--accent-light)">0</div>
+        <div class="cp-unit">days passed</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:16px">
+      <button class="btn" id="startClockBtn" onclick="startTimeDilation()" style="background:var(--accent);color:#040810">&#9654; Start</button>
+    </div>
+
+    <div class="td-result" id="tdResult">
+      <div class="td-eq">
+        <span class="td-val">50,000 years</span>
+        <span>on Earth</span>
+        <span>=</span>
+        <span class="td-val" style="color:var(--gold-light)">1 day</span>
+        <span>in the Ma'arj</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65">This is called <strong style="color:var(--text)">time dilation</strong> — the discovery that time is not the same everywhere. Einstein proved this in 1915. In 1959, <strong style="color:var(--text)">Pound and Rebka</strong> measured it in a lab tower at Harvard using light beams. In 1971, <strong style="color:var(--text)">Hafele and Keating</strong> flew atomic clocks on airplanes and found the flying clocks ticked at a different rate than clocks on the ground. Your phone's GPS corrects for this every single day — without it, Google Maps would be off by 10 km, as physicist <strong style="color:var(--text)">Neil Ashby</strong> of NIST documented. The Quran said "a day whose measure is fifty thousand years" — time measured differently in two places — over 1,300 years before any human knew time could behave this way.</p>
+    </div>
+
+    <div id="tdMc" style="display:none">
+      <p class="prompt" style="margin-top:20px;font-size:clamp(16px,3.5vw,20px)">The verse says time has a different "measure" in two places. What did Einstein discover about time?</p>
+
+      <div onclick="pickEx1(this, false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Time is the same everywhere for everyone</div>
+          <div class="ac-sub">This is what everyone believed before Einstein — but he proved it wrong. Time actually changes depending on where you are.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx1(this, true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Time runs at different speeds in different places — exactly what the verse describes</div>
+          <div class="ac-sub">Einstein called this time dilation. The Quran described it with a precise number 1,300 years earlier.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx1(this, false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Time only changes if you move very fast in a straight line</div>
+          <div class="ac-sub">Speed affects time too, but the verse doesn't mention speed — it says time itself is measured differently in two locations, which is gravity's effect on time.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 Space Folding ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">Picture a piece of paper with two dots on opposite ends. The distance between them is long if you travel along the paper. But fold the paper so the dots touch — now the distance is zero. That's what a wormhole does to space: it folds it so two faraway points connect directly. Press <strong>Fold Space</strong> to watch 1,000 light-years collapse.</p>
+
+    <canvas id="foldCanvas" width="640" height="180" style="width:100%;height:180px;border-radius:14px;margin-bottom:14px;display:block;background:#040810"></canvas>
+
+    <div class="fold-dist-wrap">
+      <div>
+        <div class="fold-num" id="foldDist">1,000</div>
+        <div class="fold-unit" id="foldUnit">light-years apart</div>
+      </div>
+      <button class="btn" id="foldBtn" onclick="foldSpace()" style="background:var(--accent);color:#040810">Fold Space</button>
+    </div>
+
+    <div class="fold-verse" id="foldVerse">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-light);margin-bottom:8px;font-weight:600">Quran 15:14&ndash;15</div>
+      <div style="font-family:'Amiri',serif;direction:rtl;font-size:22px;color:var(--text);line-height:2;margin-bottom:8px">وَلَوْ فَتَحْنَا عَلَيْهِم بَابًا مِّنَ السَّمَاءِ فَظَلُّوا فِيهِ يَعْرُجُونَ لَقَالُوا إِنَّمَا سُكِّرَتْ أَبْصَارُنَا</div>
+      <div style="font-size:13px;color:var(--muted);font-style:italic;line-height:1.7">"And even if We opened for them a gate to heaven, through which they continued to ascend," (15:14–15) still they would say, "Our eyes have truly been dazzled! In fact, we must have been bewitched."</div>
+      <div style="font-size:12px;color:var(--accent-light);line-height:1.7;margin-top:8px">Now look at what the verse describes step by step, and how each step matches a wormhole:<br><strong>Step 1:</strong> "A gate of heaven that opens" (<em>بابًا من السماء</em>) — a wormhole has a mouth, an opening.<br><strong>Step 2:</strong> "They remained inside it" (<em>فظلوا فيه</em>) — the word <em>فيه</em> means "inside it." A wormhole is a tunnel you enter — it has an inside, unlike a black hole which has no "other side."<br><strong>Step 3:</strong> "They ascended through it" (<em>يعرجون</em>) — you travel through the tunnel and come out somewhere else. This is the same root word as <em>Ma'arej</em> in 70:4.<br><strong>The connection:</strong> Einstein and Rosen proved in 1935 that spacetime can have exactly this — an opening, a tunnel interior, and a path through to another point. Wheeler named them "wormholes" in 1957. Thorne proved stable ones can exist (Nobel 2017). The verse describes the three features of a wormhole — mouth, tunnel, traversal — 1,300 years before the math existed.</div>
+    </div>
+
+    <div class="fold-mc" id="foldMc">
+      <p class="prompt" style="font-size:clamp(16px,3.5vw,20px);margin-top:4px">The verse describes: an opening, an inside you enter, and a path through to somewhere else. What in physics has these three things?</p>
+
+      <div onclick="pickEx2(this, false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">A black hole</div>
+          <div class="ac-sub">A black hole has an opening but nothing comes out the other side — there's no "through." The verse describes traveling through and reaching somewhere.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx2(this, true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">A wormhole — an opening, a tunnel you travel inside, and an exit on the other side</div>
+          <div class="ac-sub">Einstein and Rosen proved this structure is possible in 1935. The verse described its three features 1,300 years earlier.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx2(this, false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">A telescope looking into space</div>
+          <div class="ac-sub">A telescope lets you see far away — you don't enter inside it or travel through it. The verse describes physical traversal.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 Lorentz Contraction ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">Here's a strange fact: when something moves extremely fast — close to the speed of light — it actually shrinks in the direction it's moving. Not compressed, not squished — its physical length becomes shorter. <strong>Hendrik Lorentz</strong> proved this in 1904 (Nobel Prize 1902). At CERN, particles moving at nearly light speed shrink to a tiny fraction of their normal size. Press <strong>Enter Wormhole</strong> to see what this means inside a tunnel where things move that fast.</p>
+
+    <canvas id="camelCanvas" width="640" height="160" style="width:100%;height:160px;border-radius:14px;margin-bottom:14px;display:block;background:#040810"></canvas>
+
+    <div style="text-align:center;margin-bottom:14px">
+      <button class="btn" id="camelBtn" onclick="enterWormhole()" style="background:var(--accent);color:#040810">Enter Wormhole</button>
+    </div>
+
+    <div class="camel-info">
+      <strong>Quran 7:40:</strong> "Those who deny Our signs — the doors of heaven will not be opened for them, and they will not enter Paradise until a camel passes through the eye of a needle." Now connect this to what you just learned: the verse places this scenario at the <em>doors of heaven</em> (<em>أبواب السماء</em>) — the same openable gates with tunnel interiors described in 15:14, the same ascending pathways described in 70:4. Inside a wormhole, objects travel at speeds close to light. Lorentz proved that at those speeds, objects physically shrink. A camel-sized object, moving at relativistic speed inside a wormhole tunnel, would contract — its length would genuinely shrink — making it possible to fit through an opening as small as a needle's eye. The verse places a scenario that seems impossible under normal physics exactly at the structure where the physics that makes it possible actually applies.
+    </div>
+
+    <div id="camelMc" style="display:none">
+      <p class="prompt" style="font-size:clamp(16px,3.5vw,20px);margin-top:4px">Fast-moving objects physically shrink. The Quran places the "camel through a needle" scene at the doors of heaven — the wormhole structures. What does this mean?</p>
+
+      <div onclick="pickEx3(this, false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">The camel gets crushed and destroyed to fit through</div>
+          <div class="ac-sub">Crushing destroys the object — it wouldn't pass through in one piece. Lorentz contraction shrinks length without destroying the object.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx3(this, true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Inside a wormhole, extreme speed shrinks objects — so the "impossible" fit becomes physically possible</div>
+          <div class="ac-sub">Lorentz (Nobel 1902) proved objects shrink at high speed. The Quran placed this scene exactly where that physics applies.</div>
+        </div>
+      </div>
+
+      <div onclick="pickEx3(this, false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">The needle's eye magically expands to fit the camel</div>
+          <div class="ac-sub">The verse doesn't say anything changes about the needle — it's the object that changes size under Lorentz contraction.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The Quran described wormholes with the word Ma'arej, gave their time-dilation ratio, described their structure as an opening with a tunnel inside, and placed a length-contraction scenario at their entrance — over 1,300 years before any physicist discovered these concepts.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num" id="mv0" style="color:var(--accent-light);text-shadow:0 0 40px rgba(103,232,249,0.4)">0</div>
+        <div class="match-lbl">&times; time dilation ratio — confirmed by real experiments</div>
+      </div>
+      <div class="match-sep">&middot;</div>
+      <div class="match-block">
+        <div class="match-num" id="mv1" style="color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.4);font-size:clamp(28px,6vw,40px)">0</div>
+        <div class="match-lbl">years before Lorentz, Einstein, Wheeler &amp; Thorne</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>What the Quran says</th><th>Verse</th><th>What physics discovered</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td>Ascending stairways you travel through to cross great distances</td>
+          <td class="td-v" style="font-family:'Amiri',serif;direction:rtl;font-size:18px">معارج — 70:4</td>
+          <td class="td-v">Wormhole tunnels — Einstein &amp; Rosen (1935), named by Wheeler (1957)</td>
+        </tr>
+        <tr>
+          <td>One day here equals 50,000 years there — time measured differently</td>
+          <td class="td-v">70:4</td>
+          <td class="td-v">Time dilation — Einstein (1915), proven by Pound &amp; Rebka (1959), Hafele &amp; Keating (1971), GPS daily</td>
+        </tr>
+        <tr>
+          <td>A gate that opens, with an inside you enter and travel through</td>
+          <td class="td-v">15:14–15</td>
+          <td class="td-v">Wormhole with mouth + tunnel interior — Einstein-Rosen (1935), Thorne (Nobel 2017)</td>
+        </tr>
+        <tr class="hl">
+          <td>Doors of heaven + a big object fitting through a tiny opening</td>
+          <td class="td-v">7:40</td>
+          <td class="td-v">Wormhole mouths + Lorentz contraction — objects shrink at high speed (Nobel 1902)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why "Ma'arej" is the right word:</strong> <em>Ma'arej</em> (معارج) means "stairways" — a physical structure with steps you climb to go up. It doesn't mean "a miracle" or "something mysterious." It means a path you walk on, step by step, to cross a distance. When Kip Thorne (Nobel 2017) describes a wormhole, he describes exactly this: a tunnel you travel through, step by step, that connects two points separated by a huge distance. The Quran picked a word for a physical path — not a spiritual metaphor — and physics turned out to have exactly such a path.
+    </div>
+
+    <div class="insight-box">
+      <strong>How Quran 15:14 describes a wormhole in three steps:</strong> <strong>First,</strong> "a gate of heaven that opens" — a wormhole has a mouth, an opening in spacetime. <strong>Second,</strong> "they remained inside it" — the Arabic word <em>فيه</em> means "inside it," confirming this is a tunnel with an interior, not just a surface or boundary. A black hole has no interior you travel through; a wormhole does. <strong>Third,</strong> "they ascended through it" — you move through the tunnel and reach somewhere. These three features — opening, interior, traversal — are exactly what Einstein and Rosen's 1935 paper proved spacetime can have.
+    </div>
+
+    <div class="insight-box">
+      <strong>Why the camel verse belongs at the "doors of heaven":</strong> Quran 7:40 doesn't just mention a camel and a needle randomly — it places this scene at the <em>doors of heaven</em> (<em>أبواب السماء</em>). Verses 15:14 and 70:4 already identified these doors as wormhole structures. Lorentz (Nobel 1902) proved that at the extreme speeds inside a wormhole, objects physically shrink — their length contracts toward zero. So a scenario that seems impossible under normal physics — a large object through a tiny opening — becomes possible precisely inside the structure the Quran placed it at. The verse connects the right "impossible" task to the right structure where physics actually resolves it.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"Owner of the Ma'arej." The Quran used one word for a physical tunnel path, gave a precise time-dilation number, described a gate with an interior you enter and travel through, and placed a length-contraction scenario at the doors where it applies. Each piece maps to a discovery made over 1,300 years later by Lorentz (1904), Einstein (1915), Einstein-Rosen (1935), Wheeler (1957), Pound-Rebka (1959), Hafele-Keating (1971), and Thorne (Nobel 2017).</div>
+      <div class="gs">One verse matching one discovery could be coincidence. But the Quran produced a connected description across multiple verses — using shared words like Ma'arej, ya'rujoon, baab, abwaab — that maps to a single physics concept nobody had the tools to discover until the 20th century. The time ratio, the tunnel structure, the openable gate, the interior path, the length contraction at the entrance — all described with consistent vocabulary, all confirmed by real experiments and real Nobel laureates.</div>
+    </div>
+
+    <div id="qv-wormholes"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+          <div id="curiositySeed"></div>
+
+      <a href="quran-red-giant.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Sun Swallows Earth</a>
+      <a href="quran-pulsars-blackholes.html" class="btn" style="background:var(--accent);color:#040810">Next &middot; Pulsars &amp; Black Holes &rarr;</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Wormholes',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initClockDisplay, 60);
+  if (n === 2) setTimeout(initFoldCanvas, 60);
+  if (n === 3) setTimeout(initCamelCanvas, 60);
+  if (n === 4) {
+    saveProgress('wormholes');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 50000, 1800, null);
+        animFrom(document.getElementById('mv1'), 0, 1300, 2200, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#tdMc .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#tdMc .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Time dilation: extreme spacetime curvature slows time exactly as the Quran describes for the Ma\'arj. GPS satellites must correct for this effect every day.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx2(el, correct) {
+  if (document.querySelector('#foldMc .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#foldMc .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('A wormhole folds spacetime so two distant points connect directly. The Quran calls these Ma\'arej ascending pathways 1,300 years before Einstein described them in 1935.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#camelMc .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#camelMc .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Length contraction: at relativistic speeds, objects shorten in their direction of travel. Inside a wormhole, a camel-sized object could genuinely fit through a needle-sized gap.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   S1 Two-clock time dilation animation
+═══════════════════════════════════════════════════════ */
+var clockStarted = false;
+
+function drawClockFace(ctx, W, H, angle, color) {
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+  var cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.44;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.3;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  for (var i = 0; i < 12; i++) {
+    var a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+    var inner = R * (i % 3 === 0 ? 0.76 : 0.85);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
+    ctx.lineTo(cx + Math.cos(a) * (R * 0.94), cy + Math.sin(a) * (R * 0.94));
+    ctx.strokeStyle = 'rgba(255,255,255,' + (i % 3 === 0 ? '0.38' : '0.15') + ')';
+    ctx.lineWidth = i % 3 === 0 ? 2 : 1;
+    ctx.stroke();
+  }
+  var ha = angle - Math.PI / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - Math.cos(ha) * R * 0.14, cy - Math.sin(ha) * R * 0.14);
+  ctx.lineTo(cx + Math.cos(ha) * R * 0.70, cy + Math.sin(ha) * R * 0.70);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function initClockDisplay() {
+  var ec = document.getElementById('clockEarth');
+  var mc = document.getElementById('clockMaarj');
+  if (!ec || !mc) return;
+  drawClockFace(ec.getContext('2d'), 120, 120, 0, '#fcd34d');
+  drawClockFace(mc.getContext('2d'), 120, 120, 0, '#67e8f9');
+}
+
+function startTimeDilation() {
+  if (clockStarted) return;
+  clockStarted = true;
+  var btn = document.getElementById('startClockBtn');
+  btn.style.opacity = '0.4';
+  btn.style.pointerEvents = 'none';
+  var ec = document.getElementById('clockEarth').getContext('2d');
+  var mc = document.getElementById('clockMaarj').getContext('2d');
+  var DURATION = 6000;
+  var startTs = null;
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / DURATION, 1);
+    var earthAngle = p * 4 * Math.PI * 2;
+    drawClockFace(ec, 120, 120, earthAngle, '#fcd34d');
+    drawClockFace(mc, 120, 120, earthAngle / 50000, '#67e8f9');
+    document.getElementById('earthYears').textContent = Math.round(p * 50000);
+    document.getElementById('maarjDays').textContent = p >= 0.98 ? 1 : 0;
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('tdResult').classList.add('show');
+      setTimeout(function() {
+        document.getElementById('tdMc').style.display = 'block';
+      }, 1100);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ═══════════════════════════════════════════════════════
+   S2 Space folding interactive
+═══════════════════════════════════════════════════════ */
+var foldStarted = false;
+
+function makeFoldRng() {
+  var s = 133;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function drawFoldFrame(ctx, W, H, progress) {
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+  var rng = makeFoldRng();
+  for (var i = 0; i < 50; i++) {
+    ctx.beginPath();
+    ctx.arc(rng() * W, rng() * H, rng() * 0.9 + 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,' + (rng() * 0.22 + 0.04) + ')';
+    ctx.fill();
+  }
+  var ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+  var leftX  = 80  + ease * 190;
+  var rightX = W - 80 - ease * 190;
+  var midY   = H / 2;
+  var cpY    = midY - ease * H * 0.50;
+  ctx.beginPath();
+  ctx.moveTo(leftX, midY);
+  ctx.quadraticCurveTo(W / 2, cpY, rightX, midY);
+  ctx.strokeStyle = 'rgba(103,232,249,0.5)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 7]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  for (var g = 0; g <= 8; g++) {
+    var t = g / 8;
+    var bx = (1 - t) * (1 - t) * leftX + 2 * (1 - t) * t * (W / 2) + t * t * rightX;
+    var by = (1 - t) * (1 - t) * midY  + 2 * (1 - t) * t * cpY     + t * t * midY;
+    ctx.beginPath();
+    ctx.moveTo(bx, by - 10); ctx.lineTo(bx, by + 10);
+    ctx.strokeStyle = 'rgba(103,232,249,0.13)';
+    ctx.lineWidth = 1; ctx.stroke();
+  }
+  var glL = ctx.createRadialGradient(leftX, midY, 0, leftX, midY, 14);
+  glL.addColorStop(0, 'rgba(252,211,77,1)'); glL.addColorStop(1, 'transparent');
+  ctx.beginPath(); ctx.arc(leftX, midY, 7, 0, Math.PI * 2); ctx.fillStyle = glL; ctx.fill();
+  var glR = ctx.createRadialGradient(rightX, midY, 0, rightX, midY, 14);
+  glR.addColorStop(0, 'rgba(167,243,252,1)'); glR.addColorStop(1, 'transparent');
+  ctx.beginPath(); ctx.arc(rightX, midY, 7, 0, Math.PI * 2); ctx.fillStyle = glR; ctx.fill();
+  ctx.font = '10px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  if (progress < 0.45) {
+    ctx.fillStyle = 'rgba(252,211,77,0.65)';
+    ctx.fillText('Earth', leftX, midY + 22);
+    ctx.fillStyle = 'rgba(103,232,249,0.65)';
+    ctx.fillText('Distant Star', rightX, midY + 22);
+  }
+  if (progress > 0.72) {
+    var ga = Math.min((progress - 0.72) / 0.28, 1);
+    var mx = (leftX + rightX) / 2;
+    var glM = ctx.createRadialGradient(mx, cpY, 0, mx, cpY, 32);
+    glM.addColorStop(0, 'rgba(167,243,252,' + (ga * 0.88) + ')'); glM.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(mx, cpY, 32, 0, Math.PI * 2); ctx.fillStyle = glM; ctx.fill();
+    ctx.fillStyle = 'rgba(167,243,252,' + ga + ')';
+    ctx.font = '11px DM Sans, sans-serif';
+    ctx.fillText('Connected', mx, cpY - 18);
+  }
+}
+
+function initFoldCanvas() {
+  var cv = document.getElementById('foldCanvas');
+  if (!cv) return;
+  drawFoldFrame(cv.getContext('2d'), cv.width, cv.height, 0);
+}
+
+function foldSpace() {
+  if (foldStarted) return;
+  foldStarted = true;
+  var btn = document.getElementById('foldBtn');
+  btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+  var cv = document.getElementById('foldCanvas');
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = cv.width, H = cv.height;
+  var startTs = null, DURATION = 2800;
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / DURATION, 1);
+    drawFoldFrame(ctx, W, H, p);
+    if (p > 0.96) {
+      document.getElementById('foldDist').textContent = '0';
+      document.getElementById('foldUnit').textContent = 'light-years connected';
+    } else {
+      document.getElementById('foldDist').textContent = Math.round(1000 * (1 - p));
+    }
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      setTimeout(function() {
+        document.getElementById('foldVerse').classList.add('show');
+        setTimeout(function() { document.getElementById('foldMc').classList.add('show'); }, 900);
+      }, 400);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ═══════════════════════════════════════════════════════
+   S3 Camel / needle length contraction
+═══════════════════════════════════════════════════════ */
+var CS = { phase: 'idle', x: 60, w: 120, frame: 0, mcShown: false };
+
+function makeCamelRng() {
+  var s = 77;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function drawCamelScene(ctx, W, H) {
+  var s = CS;
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+  var rng = makeCamelRng();
+  for (var i = 0; i < 35; i++) {
+    ctx.beginPath();
+    ctx.arc(rng() * W, rng() * H, rng() * 0.8 + 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,' + (rng() * 0.2 + 0.04) + ')';
+    ctx.fill();
+  }
+  var wallX  = Math.floor(W * 0.68);
+  var gapTop = Math.floor(H * 0.30);
+  var gapBot = Math.floor(H * 0.70);
+  var ch = 36;
+  var bob = (s.phase === 'idle' || s.phase === 'bounced') ? Math.sin(s.frame * 0.055) * 2.5 : 0;
+  var cy = Math.floor(H / 2 - ch / 2 + bob);
+  ctx.fillStyle = 'rgba(103,232,249,0.06)';
+  ctx.fillRect(wallX, 0, W - wallX, H);
+  ctx.fillStyle = 'rgba(103,232,249,0.3)';
+  ctx.fillRect(wallX - 2, 0, 4, gapTop);
+  ctx.fillRect(wallX - 2, gapBot, 4, H - gapBot);
+  ctx.strokeStyle = 'rgba(103,232,249,0.4)';
+  ctx.lineWidth = 1; ctx.setLineDash([3, 5]);
+  ctx.beginPath(); ctx.moveTo(wallX, gapTop); ctx.lineTo(wallX, gapBot); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = '10px DM Sans, sans-serif';
+  ctx.fillStyle = 'rgba(103,232,249,0.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText("needle's eye", wallX + (W - wallX) / 2, H - 10);
+  var cx2 = s.x, cw = s.w, phase = s.phase;
+  var camelColor = (phase === 'contracting' || phase === 'threading') ? '#f97316' : '#fdba74';
+  var r = Math.min(8, cw / 4, ch / 4);
+  ctx.shadowColor = 'rgba(253,186,116,0.45)'; ctx.shadowBlur = 10;
+  ctx.fillStyle = camelColor;
+  ctx.beginPath();
+  ctx.moveTo(cx2 + r, cy);
+  ctx.lineTo(cx2 + cw - r, cy);
+  ctx.quadraticCurveTo(cx2 + cw, cy, cx2 + cw, cy + r);
+  ctx.lineTo(cx2 + cw, cy + ch - r);
+  ctx.quadraticCurveTo(cx2 + cw, cy + ch, cx2 + cw - r, cy + ch);
+  ctx.lineTo(cx2 + r, cy + ch);
+  ctx.quadraticCurveTo(cx2, cy + ch, cx2, cy + ch - r);
+  ctx.lineTo(cx2, cy + r);
+  ctx.quadraticCurveTo(cx2, cy, cx2 + r, cy);
+  ctx.closePath(); ctx.fill();
+  ctx.shadowBlur = 0;
+  if (cw > 42) {
+    ctx.font = '11px DM Sans, sans-serif';
+    ctx.fillStyle = '#040810';
+    ctx.textAlign = 'center';
+    ctx.fillText('camel', cx2 + cw / 2, cy + ch / 2 + 4);
+  }
+  ctx.font = '11px DM Sans, sans-serif'; ctx.textAlign = 'center';
+  if (phase === 'bouncing') {
+    ctx.fillStyle = 'rgba(248,113,113,0.85)';
+    ctx.fillText("too wide…", cx2 + cw / 2, cy - 10);
+  } else if (phase === 'bounced') {
+    ctx.fillStyle = 'rgba(103,232,249,0.7)';
+    ctx.fillText("press ‘Compress & Enter’", cx2 + cw / 2, cy - 10);
+  } else if (phase === 'contracting' || phase === 'threading') {
+    ctx.fillStyle = 'rgba(249,115,22,0.9)';
+    ctx.fillText('length contracting…', cx2 + cw / 2, cy - 10);
+  } else if (phase === 'expanding' || phase === 'done') {
+    ctx.fillStyle = 'rgba(34,197,94,0.88)';
+    ctx.fillText('passed through!', cx2 + cw / 2, cy - 10);
+  }
+}
+
+function camelTick() {
+  var cv = document.getElementById('camelCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var s = CS;
+  s.frame++;
+  var wallX = Math.floor(W * 0.68);
+  if (s.phase === 'approaching') {
+    s.x += 2.8;
+    if (s.x + s.w >= wallX - 4) {
+      s.x = wallX - s.w - 4;
+      s.phase = 'bouncing';
+    }
+  } else if (s.phase === 'bouncing') {
+    s.x -= 3.2;
+    if (s.x <= 60) {
+      s.x = 60;
+      s.phase = 'bounced';
+      var btn = document.getElementById('camelBtn');
+      btn.textContent = 'Compress & Enter';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    }
+  } else if (s.phase === 'contracting') {
+    s.w -= 4.5;
+    if (s.w <= 22) { s.w = 22; s.phase = 'threading'; }
+  } else if (s.phase === 'threading') {
+    s.x += 4;
+    if (s.x > wallX + 38) { s.phase = 'expanding'; }
+  } else if (s.phase === 'expanding') {
+    s.w += 4.5; s.x += 1.5;
+    if (s.w >= 120) {
+      s.w = 120;
+      s.phase = 'done';
+      if (!s.mcShown) {
+        s.mcShown = true;
+        document.getElementById('camelBtn').style.opacity = '0.4';
+        document.getElementById('camelBtn').style.pointerEvents = 'none';
+        setTimeout(function() { document.getElementById('camelMc').style.display = 'block'; }, 700);
+      }
+    }
+  }
+  drawCamelScene(ctx, W, H);
+  if (s.phase !== 'done') requestAnimationFrame(camelTick);
+}
+
+function initCamelCanvas() {
+  CS = { phase: 'idle', x: 60, w: 120, frame: 0, mcShown: false };
+  var cv = document.getElementById('camelCanvas');
+  if (!cv) return;
+  drawCamelScene(cv.getContext('2d'), cv.width, cv.height);
+  requestAnimationFrame(camelTick);
+}
+
+function enterWormhole() {
+  var btn = document.getElementById('camelBtn');
+  if (CS.phase === 'idle') {
+    CS.phase = 'approaching';
+    btn.textContent = 'Approaching…';
+    btn.style.opacity = '0.5';
+    btn.style.pointerEvents = 'none';
+  } else if (CS.phase === 'bounced') {
+    CS.phase = 'contracting';
+    btn.textContent = 'Contracting…';
+    btn.style.opacity = '0.5';
+    btn.style.pointerEvents = 'none';
+    /* loop is already running no new RAF needed */
+  }
+}
+
+/* ── Hero Canvas: Wormhole tunnel rings approaching viewer ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W / 2, cy = H / 2;
+
+  /* Static star field */
+  const stars = [];
+  const rng = (function() { let s = 42; return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; }; })();
+  for (let i = 0; i < 55; i++) {
+    stars.push({ x: rng() * W, y: rng() * H, r: rng() * 1.0 + 0.2, a: rng() * 0.4 + 0.1 });
+  }
+
+  /* Particle streams along tunnel arms */
+  const NUM_ARMS = 10;
+  const NUM_PER_ARM = 5;
+  const armAngles = [];
+  for (let a = 0; a < NUM_ARMS; a++) armAngles.push((a / NUM_ARMS) * Math.PI * 2);
+
+  let frame = 0;
+  const NUM_RINGS = 18;
+  const SPEED = 0.55; /* rings advance per frame (fraction of ring spacing) */
+
+  function draw() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Stars */
+    stars.forEach(function(s) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + s.a + ')';
+      ctx.fill();
+    });
+
+    /* Tunnel rings: ellipses expanding outward from center */
+    for (let i = 0; i < NUM_RINGS; i++) {
+      /* rawPhase 0 = at center, 1 = at canvas edge */
+      const rawPhase = ((frame * SPEED / NUM_RINGS + i / NUM_RINGS) % 1);
+      /* Quadratic ease-in so rings accelerate as they approach */
+      const t = rawPhase * rawPhase;
+
+      const rx = t * W * 0.52;
+      const ry = t * H * 0.50;
+      if (rx < 1.5) continue;
+
+      /* Fade in, then fade out as ring reaches edge */
+      const alpha = rawPhase < 0.8
+        ? rawPhase * 0.75
+        : (1 - rawPhase) / 0.2 * 0.6;
+
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(103,232,249,' + alpha.toFixed(2) + ')';
+      ctx.lineWidth = 0.6 + t * 1.8;
+      ctx.stroke();
+    }
+
+    /* Particle streams radiating from center outward */
+    armAngles.forEach(function(angle) {
+      for (let p = 0; p < NUM_PER_ARM; p++) {
+        const phase = ((frame * 0.018 + p / NUM_PER_ARM) % 1);
+        const t2 = phase * phase;
+        /* clamp to canvas bounds */
+        const maxDist = Math.min(W, H) * 0.48;
+        const dist = t2 * maxDist;
+        const px = cx + Math.cos(angle) * dist;
+        const py = cy + Math.sin(angle) * dist;
+        const a2 = (1 - phase) * 0.55;
+        const r2 = 0.8 + phase * 1.2;
+        ctx.beginPath();
+        ctx.arc(px, py, r2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(103,232,249,' + a2.toFixed(2) + ')';
+        ctx.fill();
+      }
+    });
+
+    /* Central glow */
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 48);
+    grd.addColorStop(0,   'rgba(167,243,252,0.75)');
+    grd.addColorStop(0.25,'rgba(103,232,249,0.30)');
+    grd.addColorStop(0.7, 'rgba(103,232,249,0.08)');
+    grd.addColorStop(1,   'transparent');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 48, 40, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"wormholes");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"wormholes","question":"According to general relativity, 1 day at a black hole's edge equals how many years elsewhere?","unit":"years","inputType":"warp","min":100,"max":200000,"step":100,"correct":50000,"correctLabel":"50,000 years","curiositySeed":{"question":"Pulsars spin up to 700 times per second. The Quran calls a star 'the Knocker' and 'the Piercer.' When were pulsars discovered?","nextUrl":"quran-pulsars-blackholes.html","nextTitle":"Pulsars & Black Holes"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 70:3–4 the Ma'arej verses. Read ذِي الْمَعَارِجِ and the 50,000-year time ratio yourself. */
+QuranValidator.attach('qv-wormholes',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 70:3–4 "Owner of the Ma\'arej… a day of fifty thousand years." Written 1,300 years before Einstein.',
+  groups:[
+    {id:'maarij', label:"Ma'arej (ascending pathways)", arabic:'الْمَعَارِجِ', color:'#67e8f9', occurrences:[[70,3],[70,4]]}
+  ]
+});
+</script>
+</body>
+</html>

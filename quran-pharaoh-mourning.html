@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Mourning of Pharaoh · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #a5f3fc;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(165,243,252,0.04) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#0891b2); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    .hero-verse { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin-bottom:24px; border-left:3px solid var(--accent); }
+    .verse-ar { font-family:'Amiri',serif; font-size:20px; color:var(--accent); direction:rtl; text-align:right; line-height:2.1; margin-bottom:10px; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.7; font-style:italic; }
+    .verse-highlight { color:var(--accent); font-style:normal; font-weight:600; }
+    .claim-box { background:linear-gradient(135deg,rgba(165,243,252,0.07),rgba(8,145,178,0.03)); border:1px solid rgba(165,243,252,0.17); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:600; }
+    .claim-text { font-size:15px; line-height:1.7; }
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(165,243,252,0.3); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-ref { font-size:10px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; color:var(--accent); line-height:1.8; }
+    .ac-tr { font-size:12px; color:var(--muted); margin-top:2px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:13px; font-weight:600; color:var(--ok); }
+    .verdict-hero { text-align:center; padding:12px 0 28px; }
+    .verdict-number { font-family:'Playfair Display',serif; font-size:clamp(52px,10vw,80px); font-weight:700; color:var(--accent); line-height:1; }
+    .verdict-label { font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:.06em; text-transform:uppercase; }
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(165,243,252,0.06),rgba(8,145,178,0.02)); border:1px solid rgba(165,243,252,0.17); border-radius:14px; padding:20px 24px; margin-bottom:16px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#0c1a24; box-shadow:0 4px 20px rgba(165,243,252,0.22); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(165,243,252,0.4); color:var(--text); }
+       .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+        .verdict-text .gt { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3vw, 20px); font-weight: 700; color: var(--accent); margin-bottom: 12px; display: block; }
+
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+
+<div class="container">
+  <a href="quran-paper-money.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    ← Paper Money
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Mourning of Pharaoh</div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <div class="hero-verse">
+      <div class="verse-ref">Quran 44:29 · Surah Ad-Dukhan</div>
+      <div class="verse-ar">فَمَا بَكَتْ عَلَيْهِمُ <span style="color:#bae6fd">السَّمَاءُ وَالْأَرْضُ</span> وَمَا كَانُوا مُنْظَرِينَ</div>
+      <div class="verse-en">"<span class="verse-highlight">Neither heaven nor earth wept over them</span>, nor were they reprieved."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Impossible Reference</div>
+      <div class="claim-text">
+        The Quran says the sky did <em>not</em> weep for Pharaoh. Skeptics objected: nobody in history ever claimed the sky wept for pharaohs so the Quran was responding to a belief that didn't exist.
+        <br><br>
+        Then hieroglyphs were deciphered. Egyptian pyramid texts sealed for over a thousand years described the mourning of dead pharaohs: <strong style="color:var(--accent)">"The sky weeps, the stars shake, the keepers of the gods tremble."</strong> The Quran was negating a very specific claim, written in a script nobody could read for 1,400 years.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="go(1)">
+      Begin Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- ══ STAGE 1 ══ -->
+  <div id="s1" class="stage">
+    <p class="prompt">Egyptian hieroglyphic writing fell out of use in the 5th century CE. When were hieroglyphs finally deciphered?</p>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">During the Islamic Golden Age (8th–13th century) Arab scholars translated the ancient scripts</div></div>
+    </div>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">During the Crusades (11th–13th century) European knights brought back knowledge of Egyptian writing</div></div>
+    </div>
+
+    <div onclick="pickEx1(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">In 1822 by Jean-François Champollion, using the Rosetta Stone more than 1,200 years after the Quran</div>
+        <div class="ac-ref">Wikipedia · Egyptian Hieroglyphs · 2020</div>
+        <div class="ac-tr">"Although attempts were made, the script remained undeciphered throughout the Middle Ages and the early modern period. The decipherment was finally accomplished in the 1820s."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 2 dual-panel canvas ══ -->
+  <div id="s2" class="stage">
+    <p class="prompt">What did pyramid texts say about the mourning of a dead Pharaoh?</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">That the Nile flooded in mourning and the sun god Ra darkened the sky with sand</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">"The sky weeps, the stars shake, the keepers of the gods tremble" a specific belief that the heavens mourned for the dead Pharaoh as a god</div>
+        <div class="ac-ref">C.G. Jung · Symbols of Transformation · Vol. 5 · p. 1757</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">That the earth cracked open to receive the Pharaoh's body, but the sky remained silent</div></div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 3 ══ -->
+  <div id="s3" class="stage">
+    <p class="prompt">The Quran says "Neither heaven nor earth wept over them." Why is this specific negation remarkable?</p>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Because it is a common poetic expression many cultures said the sky wept for great rulers, so this was a general denial</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">Because the verse is about rain the Quran is denying that rain fell in Egypt after Pharaoh drowned</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Because it directly negates a belief found only in Egyptian pyramid texts that "the sky weeps" for dead pharaohs texts sealed in undecipherable hieroglyphs until 1822. Nobody in 7th-century Arabia could have known about this specific Egyptian religious claim.</div>
+        <div class="ac-ar">فَمَا بَكَتْ عَلَيْهِمُ السَّمَاءُ وَالْأَرْضُ</div>
+        <div class="ac-ref">44:29 · Surah Ad-Dukhan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 4 VERDICT ══ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <div class="verdict-hero">
+      <div class="verdict-number" id="mv0">0</div>
+      <div class="verdict-label">Years the Quran referenced sealed hieroglyphic texts</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n" id="mv1">0</div>
+        <div class="lbl">Year Champollion deciphered hieroglyphs</div>
+      </div>
+      <div class="stat-card">
+        <div class="n">610</div>
+        <div class="lbl">CE Quran 44:29 revealed</div>
+      </div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">C.G. Jung · Symbols of Transformation · Volume 5, p. 1757</div>
+      <div class="source-quote">"A pyramid text describing the dead Pharaoh's fight for supremacy in heaven, says: The sky weeps, the stars shake, the keepers of the gods tremble and their servants flee when they behold the King rising up as spirit, as a god who lives on his fathers and possesses his mothers."</div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Wikipedia · Egyptian Hieroglyphs · 2020</div>
+      <div class="source-quote">"With the final closing of pagan temples in the 5th century, knowledge of hieroglyphic writing was lost. Although attempts were made, the script remained undeciphered throughout the Middle Ages and the early modern period. The decipherment of hieroglyphic writing was finally accomplished in the 1820s by Jean-François Champollion, with the help of the Rosetta Stone."</div>
+    </div>
+
+    <div class="verdict-text">
+      <span class="gt">Summary and recap.</span>
+      Egyptian pyramid texts declared that when a Pharaoh died, <em style="color:var(--accent)">"the sky weeps, the stars shake."</em> This was a core religious belief about the divine status of pharaohs their death caused the heavens themselves to mourn.
+      <br><br>
+      The Quran 44:29 states: <strong>"Neither heaven nor earth wept over them."</strong> This is a direct negation of a very specific Egyptian religious claim. But here is the problem: hieroglyphs were completely undecipherable from the 5th century until <strong>1822</strong>. No one in 7th-century Arabia could read pyramid texts. The claim that "the sky weeps for pharaohs" was sealed inside stone walls in an unreadable script.
+      <br><br>
+      The Quran not only knew about this Egyptian belief it specifically addressed and negated it. 1,200 years before any human could verify the belief existed.
+    </div>
+
+    <div id="qv-mourning"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-reading.html" class="btn btn-primary">
+        Next: Reading
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ══ HERO CANVAS weeping sky over Egyptian pyramids ══ */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = 640, H = 130; cv.width = W; cv.height = H;
+  var t = 0;
+
+  var rng = (function(){ var s=53; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
+
+  /* Stars fixed positions */
+  var stars = [];
+  for (var i = 0; i < 38; i++) {
+    stars.push({ x:rng()*W, y:rng()*H*0.60, r:0.4+rng()*1.0, phase:rng()*Math.PI*2, shaking:i<10 });
+  }
+
+  /* Tear drops falling from sky */
+  var tears = [];
+  for (var j = 0; j < 14; j++) {
+    tears.push({
+      x: 20 + rng()*(W-40),
+      y: rng()*H*0.55,
+      vy: 0.4 + rng()*0.6,
+      len: 4 + rng()*8,
+      a: 0.25 + rng()*0.4,
+      phase: rng()*Math.PI*2
+    });
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* Deep mourning sky dark blue-violet gradient */
+    var sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#020610');
+    sky.addColorStop(0.45, '#03091a');
+    sky.addColorStop(0.75, '#060a14');
+    sky.addColorStop(1, '#0a0808');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+
+    /* Horizon glow faint afterglow of sunset/mourning */
+    var hglow = ctx.createRadialGradient(W/2, H-18, 0, W/2, H-18, W*0.55);
+    hglow.addColorStop(0, 'rgba(165,243,252,0.06)');
+    hglow.addColorStop(0.5, 'rgba(165,243,252,0.02)');
+    hglow.addColorStop(1, 'rgba(165,243,252,0)');
+    ctx.fillStyle = hglow; ctx.fillRect(0, 0, W, H);
+
+    /* Stars shaking ones get tremor offset */
+    stars.forEach(function(s) {
+      var ox = s.shaking ? Math.sin(t * 0.12 + s.phase) * 1.4 : 0;
+      var oy = s.shaking ? Math.cos(t * 0.09 + s.phase) * 1.0 : 0;
+      var a = 0.35 + Math.sin(t * 0.025 + s.phase) * 0.25;
+      ctx.save();
+      if (s.shaking) {
+        ctx.shadowColor = 'rgba(165,243,252,0.6)'; ctx.shadowBlur = 5;
+      }
+      ctx.beginPath(); ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI*2);
+      ctx.fillStyle = s.shaking
+        ? 'rgba(165,243,252,' + (a + 0.2) + ')'
+        : 'rgba(200,220,255,' + a + ')';
+      ctx.fill();
+      ctx.restore();
+    });
+
+    /* Tear drops falling streaks from the sky */
+    tears.forEach(function(d) {
+      d.y += d.vy;
+      if (d.y > H * 0.72) { d.y = rng() * H * 0.25; d.x = 20 + rng() * (W - 40); }
+      var da = d.a * (0.7 + 0.3 * Math.sin(t * 0.04 + d.phase));
+      ctx.save();
+      ctx.shadowColor = 'rgba(165,243,252,0.5)'; ctx.shadowBlur = 3;
+      var grad = ctx.createLinearGradient(d.x, d.y - d.len, d.x, d.y + 4);
+      grad.addColorStop(0, 'rgba(165,243,252,0)');
+      grad.addColorStop(0.6, 'rgba(165,243,252,' + da + ')');
+      grad.addColorStop(1, 'rgba(220,245,255,' + (da * 0.8) + ')');
+      ctx.strokeStyle = grad; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(d.x, d.y - d.len); ctx.lineTo(d.x, d.y + 3); ctx.stroke();
+      /* Teardrop tip */
+      ctx.beginPath(); ctx.arc(d.x, d.y + 3, 1.5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(165,243,252,' + da + ')'; ctx.fill();
+      ctx.restore();
+    });
+
+    /* Ground line */
+    var gnd = ctx.createLinearGradient(0, H-24, 0, H);
+    gnd.addColorStop(0, 'rgba(60,35,20,0.75)'); gnd.addColorStop(1, 'rgba(30,15,8,0.85)');
+    ctx.fillStyle = gnd; ctx.fillRect(0, H-24, W, 24);
+
+    /* Pyramids silhouette two, slightly different sizes */
+    function pyramid(px, py, pw, ph, alpha) {
+      ctx.beginPath(); ctx.moveTo(px - pw/2, py); ctx.lineTo(px, py - ph); ctx.lineTo(px + pw/2, py); ctx.closePath();
+      ctx.fillStyle = 'rgba(55,32,18,' + alpha + ')'; ctx.fill();
+      ctx.strokeStyle = 'rgba(165,243,252,' + (alpha * 0.22) + ')'; ctx.lineWidth = 0.5; ctx.stroke();
+    }
+    pyramid(W*0.32, H-24, 130, 65, 0.88);
+    pyramid(W*0.56, H-24, 90, 46, 0.70);
+    pyramid(W*0.75, H-24, 60, 32, 0.50);
+
+    /* Hieroglyphic marks on a stone tablet left side */
+    var tx = 28, ty = 12;
+    ctx.strokeStyle = 'rgba(165,243,252,0.18)'; ctx.lineWidth = 0.5;
+    ctx.strokeRect(tx - 4, ty - 2, 60, H - 28);
+    var marks = [[0.12,8],[0.22,5],[0.32,9],[0.42,6],[0.52,11],[0.62,7],[0.72,8],[0.82,5]];
+    marks.forEach(function(m) {
+      var ma = 0.22 + Math.sin(t*0.015 + m[0]*10) * 0.07;
+      ctx.fillStyle = 'rgba(165,243,252,' + ma + ')';
+      ctx.fillRect(tx, ty + m[0]*(H-28), m[1], 2.5);
+      ctx.fillRect(tx + m[1] + 3, ty + m[0]*(H-28) + 1, m[1] * 0.6, 2);
+    });
+
+    /* Arabic verse */
+    ctx.font = 'bold 13px Amiri,serif';
+    ctx.fillStyle = 'rgba(165,243,252,0.72)';
+    ctx.textAlign = 'right';
+    ctx.fillText('فَمَا بَكَتْ عَلَيْهِمُ السَّمَاءُ وَالْأَرْضُ', W - 14, H - 8);
+
+    t += 0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ══ S2 CANVAS Egyptian pyramid text vs Quran denial ══ */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width || 640, H = cv.height || 220;
+  var startTs = null, TOTAL = 1600;
+
+  /* Tears for left panel pre-computed */
+  var lTears = [];
+  var rng2 = (function(){ var s=17; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
+  for (var i = 0; i < 12; i++) lTears.push({ x:rng2(), y:rng2()*0.5, vy:0.003+rng2()*0.003, len:0.06+rng2()*0.08, phase:rng2()*6.28 });
+  var animT = 0;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / TOTAL, 1);
+    animT += 0.6;
+    var lA = Math.min(p * 2.2, 1);
+    var rA = Math.max(0, Math.min((p - 0.4) * 2.0, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#03060e'; ctx.fillRect(0, 0, W, H);
+
+    var gap = 10, pW = (W - gap * 3) / 2;
+
+    /* ── LEFT PANEL Egyptian pyramid text: SKY WEEPS ── */
+    ctx.globalAlpha = lA;
+    var lx = gap, ly = 8, lh = H - 16;
+
+    /* Panel background deep mourning blue */
+    var lbg = ctx.createLinearGradient(lx, ly, lx, ly + lh);
+    lbg.addColorStop(0, '#02050f'); lbg.addColorStop(1, '#05091a');
+    ctx.fillStyle = lbg;
+    ctx.beginPath(); ctx.roundRect(lx, ly, pW, lh, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(165,243,252,0.20)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(lx, ly, pW, lh, 10); ctx.stroke();
+
+    /* Header */
+    ctx.fillStyle = 'rgba(165,243,252,0.82)'; ctx.font = '700 10px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('PYRAMID TEXTS', lx + pW/2, ly + 20);
+    ctx.fillStyle = 'rgba(165,243,252,0.45)'; ctx.font = '500 9px DM Sans,sans-serif';
+    ctx.fillText('Egyptian mourning ritual', lx + pW/2, ly + 34);
+
+    /* Falling tears in panel */
+    lTears.forEach(function(d) {
+      d.y += d.vy;
+      if (d.y > 0.82) d.y = 0.05 + rng2() * 0.08;
+      var tx2 = lx + 10 + d.x * (pW - 20);
+      var ty2 = ly + 42 + d.y * (lh - 58);
+      var tlen = d.len * lh;
+      var da = 0.35 + 0.2 * Math.sin(animT * 0.08 + d.phase);
+      var tg = ctx.createLinearGradient(tx2, ty2 - tlen, tx2, ty2 + 4);
+      tg.addColorStop(0, 'rgba(165,243,252,0)');
+      tg.addColorStop(0.7, 'rgba(165,243,252,' + da + ')');
+      tg.addColorStop(1, 'rgba(210,240,255,' + (da * 0.8) + ')');
+      ctx.strokeStyle = tg; ctx.lineWidth = 1; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(tx2, ty2 - tlen); ctx.lineTo(tx2, ty2 + 3); ctx.stroke();
+      ctx.beginPath(); ctx.arc(tx2, ty2 + 3, 1.3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(165,243,252,' + da + ')'; ctx.fill();
+    });
+
+    /* Stars shaking in left panel */
+    var starPts = [[0.18,0.22],[0.42,0.16],[0.65,0.24],[0.28,0.36],[0.55,0.30],[0.75,0.18]];
+    starPts.forEach(function(s) {
+      var ox = Math.sin(animT * 0.18 + s[0]*7) * 1.8;
+      var oy = Math.cos(animT * 0.14 + s[1]*5) * 1.2;
+      var sa = 0.5 + Math.sin(animT * 0.1 + s[0]*4) * 0.3;
+      ctx.save(); ctx.shadowColor='rgba(165,243,252,0.7)'; ctx.shadowBlur=4;
+      ctx.beginPath(); ctx.arc(lx + 8 + s[0]*(pW-16) + ox, ly + 42 + s[1]*(lh-80)*0.55 + oy, 1.5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(165,243,252,' + sa + ')'; ctx.fill();
+      ctx.restore();
+    });
+
+    /* Quote text */
+    ctx.fillStyle = 'rgba(165,243,252,0.70)'; ctx.font = 'italic 500 9px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('"The sky weeps,', lx + pW/2, ly + lh - 38);
+    ctx.fillText('the stars shake"', lx + pW/2, ly + lh - 26);
+    ctx.fillStyle = 'rgba(165,243,252,0.35)'; ctx.font = '500 8px DM Sans,sans-serif';
+    ctx.fillText('Egyptian Pyramid Texts', lx + pW/2, ly + lh - 12);
+    ctx.globalAlpha = 1;
+
+    /* ── RIGHT PANEL Quran: NEITHER WEPT ── */
+    var rx = gap * 2 + pW;
+    ctx.globalAlpha = rA;
+
+    var rbg = ctx.createLinearGradient(rx, ly, rx, ly + lh);
+    rbg.addColorStop(0, '#02080a'); rbg.addColorStop(1, '#030d0f');
+    ctx.fillStyle = rbg;
+    ctx.beginPath(); ctx.roundRect(rx, ly, pW, lh, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(165,243,252,0.28)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(rx, ly, pW, lh, 10); ctx.stroke();
+
+    /* Header */
+    ctx.save();
+    ctx.shadowColor = 'rgba(165,243,252,0.5)'; ctx.shadowBlur = 8;
+    ctx.fillStyle = 'rgba(165,243,252,0.90)'; ctx.font = '700 10px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('QURAN 44:29', rx + pW/2, ly + 20);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(165,243,252,0.45)'; ctx.font = '500 9px DM Sans,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Revealed 610 CE', rx + pW/2, ly + 34);
+
+    /* Still sky calm stars (not shaking) */
+    var calmStars = [[0.15,0.20],[0.38,0.14],[0.60,0.22],[0.25,0.34],[0.50,0.28],[0.72,0.17],[0.85,0.30]];
+    calmStars.forEach(function(s) {
+      var sa = 0.25 + Math.sin(animT * 0.02 + s[0]*3) * 0.08;
+      ctx.beginPath(); ctx.arc(rx + 8 + s[0]*(pW-16), ly + 42 + s[1]*(lh-80)*0.55, 1.2, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(165,243,252,' + sa + ')'; ctx.fill();
+    });
+
+    /* Big denial فَمَا (NOT) mark */
+    var cx2 = rx + pW/2, cy2 = ly + lh*0.48;
+    ctx.save();
+    ctx.shadowColor = 'rgba(165,243,252,0.6)'; ctx.shadowBlur = 12;
+    /* Circle with line through negation symbol */
+    ctx.strokeStyle = 'rgba(165,243,252,0.75)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx2, cy2, 20, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx2 - 14, cy2 + 14); ctx.lineTo(cx2 + 14, cy2 - 14); ctx.stroke();
+    ctx.restore();
+
+    /* Arabic text */
+    ctx.font = 'bold 11px Amiri,serif'; ctx.fillStyle = 'rgba(165,243,252,0.80)'; ctx.textAlign = 'center';
+    ctx.fillText('فَمَا بَكَتْ', rx + pW/2, ly + lh - 40);
+    ctx.font = '500 9px DM Sans,sans-serif'; ctx.fillStyle = 'rgba(165,243,252,0.60)';
+    ctx.fillText('"Neither heaven nor earth wept"', rx + pW/2, ly + lh - 26);
+    ctx.fillStyle = 'rgba(165,243,252,0.35)'; ctx.font = '500 8px DM Sans,sans-serif';
+    ctx.fillText('1,200 years before decipherment', rx + pW/2, ly + lh - 12);
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ══ ENGINE ══ */
+var stage = 0;
+function ease(t) { return 1 - Math.pow(1-t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  (function run(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts-t0)/ms, 1);
+    el.textContent = Math.round(from + ease(p)*(to-from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  })(performance.now());
+}
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Mourning of Pharaoh', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('pharaoh-mourning');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1200, 1800);
+        animFrom(document.getElementById('mv1'), 0, 1822, 1800);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id); localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Hieroglyphs fell out of use in the 5th century CE and remained undeciphered for over 1,200 years. Jean-François Champollion cracked the code in 1822 using the Rosetta Stone more than 1,200 years after the Quran was revealed.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Pyramid texts describe Pharaoh\'s death causing the sky to weep and the stars to shake. This belief was locked in undecipherable hieroglyphs until 1822. Quran 44:29 specifically negates this belief "Neither heaven nor earth wept" 1,200 years before anyone could read it.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('The Quran negates exactly the belief described in Egyptian pyramid texts: that the sky weeps for dead pharaohs. This specific Egyptian religious claim was sealed in undecipherable hieroglyphs for 1,200 years. No one in 7th-century Arabia could have accessed it.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"pharaoh-mourning");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: 'pharaoh-mourning',
+  question: 'Ancient Egyptian pyramid texts claim the sky weeps at a pharaoh\'s death. When were these texts first decoded?',
+  unit: "CE",
+  inputType: "excavate",
+  min: 1790, max: 1900, step: 1,
+  correct: 1882,
+  correctLabel: '1880s',
+  curiositySeed: {
+    question: 'The brain\'s reading circuit is wired at birth — before the baby sees a single word. When was this confirmed by MRI?',
+    nextUrl: 'quran-reading.html',
+    nextTitle: 'Reading'
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 44:29 "Neither heaven nor earth wept over them."
+   This negates a specific Egyptian belief sealed in unreadable hieroglyphs
+   until 1822 1,200 years after the Quran. */
+QuranValidator.attach('qv-mourning',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 44:29 "Neither heaven nor earth wept over them." This negates Egyptian pyramid texts that were unreadable until 1822.',
+  groups:[
+    {id:'sky', label:'Sky did not weep negating Egyptian belief', arabic:'السَّمَاءُ', color:'#bae6fd', occurrences:[[44,29]]}
+  ]
+});
+</script>
+</body>
+</html>

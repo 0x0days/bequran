@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Ring Composition · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0b1622;--surface:#111e2e;--surface2:#182840;
+      --border:rgba(255,255,255,0.08);--text:#e2ddd4;--muted:#7a8fa3;
+      --gold:#f59e0b;--gold-light:#fcd34d;
+      --ok:#22c55e;--ok-bg:#052e16;--ok-border:#166534;
+      --err-light:#f87171;--err-bg:#2d0707;--err-border:#991b1b;
+      --accent:#4ade80;--accent-light:#86efac;
+      --accent-dim:rgba(74,222,128,0.12);--accent-ring:rgba(74,222,128,0.28);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:44px 20px 160px;}
+    .container{max-width:660px;margin:0 auto;}
+    .dot-field{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:28px 28px;}
+    .container{position:relative;z-index:1;}
+    .nav-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;transition:color .2s;}
+    .nav-back:hover{color:var(--text);}
+    .stage{display:none;}
+    .stage.active{display:block;animation:rise .4s ease;}
+    @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .lesson-bar-wrap{background:var(--surface2);border-radius:100px;height:10px;margin-bottom:6px;overflow:hidden;}
+    .lesson-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .65s cubic-bezier(.4,0,.2,1);width:0%;}
+    .lesson-meta{font-size:11px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:36px;}
+    .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:14px;color:var(--accent);}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);line-height:1.22;margin-bottom:16px;}
+    .body-text{font-size:15px;line-height:1.85;color:var(--muted);margin-bottom:22px;}
+    .prompt{font-family:'Playfair Display',serif;font-size:clamp(18px,4vw,22px);line-height:1.4;margin-bottom:22px;}
+    .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-accent{background:var(--accent);color:#052e16;}
+    .btn-accent:hover{filter:brightness(1.1);}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+    .insight-box{background:var(--surface);border-radius:10px;border-left:3px solid var(--accent);padding:16px 20px;font-size:14px;color:var(--muted);line-height:1.8;margin:20px 0;}
+    .insight-box strong{color:var(--text);}
+
+    .answer-card{background:var(--surface);border:2px solid rgba(255,255,255,0.1);border-bottom:4px solid rgba(0,0,0,0.28);border-radius:14px;padding:15px 18px;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;margin-bottom:11px;display:flex;align-items:flex-start;gap:14px;user-select:none;}
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong){border-color:var(--accent-light);transform:translateY(-2px);}
+    .answer-card.ac-correct{border-color:var(--ok);background:rgba(34,197,94,0.08);pointer-events:none;}
+    .answer-card.ac-wrong{animation:shake .4s ease;border-color:var(--err-light)!important;}
+    .answer-card.ac-disabled{opacity:.38;pointer-events:none;}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+    .ac-letter{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;color:var(--muted);}
+    .answer-card.ac-correct .ac-letter{background:rgba(34,197,94,0.2);border-color:var(--ok);color:var(--ok);}
+    .ac-body{flex:1;}
+    .ac-big{font-size:15px;font-weight:600;color:var(--text);line-height:1.45;}
+    .ac-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+    .verse-box{background:var(--surface);border:1px solid var(--accent-ring);border-radius:14px;padding:24px;text-align:center;margin:22px 0;}
+    .vb-ref{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .vb-ar{font-family:'Amiri',serif;direction:rtl;font-size:clamp(20px,5vw,28px);line-height:2.1;color:var(--text);}
+    .vb-hl{color:#fcd34d;font-weight:700;}
+    .vb-tr{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;border-top:1px solid var(--border);padding-top:12px;font-style:italic;}
+    .vb-hl-en{color:#fcd34d;font-style:normal;font-weight:600;}
+
+    .rng-wrap{margin:22px 0;}
+    .rng-pair{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:0;margin-bottom:6px;opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease;}
+    .rng-pair.vis{opacity:1;transform:translateY(0);}
+    .rng-sect{padding:10px 14px;border-radius:8px;display:flex;flex-direction:column;gap:2px;}
+    .rng-sect.lft{border-left:3px solid var(--pc);align-items:flex-start;}
+    .rng-sect.rgt{border-right:3px solid var(--pc);align-items:flex-end;text-align:right;}
+    .rng-lbl{font-size:11px;font-weight:700;color:var(--pc);letter-spacing:.06em;}
+    .rng-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+    .rng-ref{font-size:10px;color:var(--muted);}
+    .rng-arrow{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);}
+    .rng-center{background:rgba(252,211,77,0.08);border:2px solid rgba(252,211,77,0.35);border-radius:10px;padding:14px 18px;text-align:center;margin-top:6px;opacity:0;transition:opacity .5s ease .1s;}
+    .rng-center.vis{opacity:1;}
+    .rng-center-lbl{font-size:11px;font-weight:700;color:#e47d00;letter-spacing:.08em;margin-bottom:4px;}
+    .rng-center-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);margin-bottom:4px;}
+    .rng-center-ref{font-size:11px;color:#e47d00;font-weight:600;}
+    .rng-center-ar{font-family:'Amiri',serif;direction:rtl;font-size:18px;color:#e47d00;margin-top:8px;line-height:2;}
+    .rng-note{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 20px;line-height:1.7;opacity:0;transition:opacity .5s ease;}
+    .rng-note.vis{opacity:1;}
+
+    .num-game{background:var(--surface);border-radius:14px;padding:24px;text-align:center;margin:22px 0;}
+    .ng-step{font-size:28px;font-family:'Playfair Display',serif;font-weight:700;color:var(--muted);margin-bottom:10px;min-height:40px;}
+    .ng-step span{color:var(--accent);}
+    .ng-step .ng-result{color:#fcd34d;}
+    .ng-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px;}
+
+    /* Qibla Canvas Container */
+.qibla-canvas-wrap {
+  position: relative;
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .6s ease;
+  margin: 24px 0;
+}
+#qiblaCanvas {
+  vertical-align: top;
+  font-size: 0;
+}
+.qibla-canvas-wrap.visible {
+  opacity: 1 !important;
+}
+
+.qibla-canvas-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(252,211,77,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+#qiblaCanvas {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive sizing */
+@media (max-width: 480px) {
+  #qiblaCanvas {
+    height: 240px;
+  }
+}
+
+    .kursi-mirror-container{margin:22px 0;position:relative;}
+    .kursi-mirror-canvas{width:100%;height:480px;border-radius:14px;display:block;background:var(--surface);}
+    @media(max-width:480px){.kursi-mirror-canvas{height:440px;}}
+    .kursi-clause-text{display:none;}
+
+    .xp-badge{display:none;align-items:center;gap:10px;background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:12px;padding:12px 18px;margin-bottom:24px;font-size:14px;font-weight:600;color:var(--ok);}
+    .xp-badge.show{display:flex;animation:rise .4s ease;}
+
+    .v-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0;}
+    .v-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+    .v-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--accent);line-height:1;}
+    .v-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:6px;}
+    .verdict-quote{font-family:'Playfair Display',serif;font-size:clamp(18px,4vw,22px);line-height:1.5;color:var(--text);margin:24px 0 18px;border-left:3px solid var(--accent);padding-left:18px;}
+
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);padding:14px 24px;display:none;justify-content:space-between;align-items:center;gap:16px;z-index:100;}
+    .fb-panel.show{display:flex;animation:slideup .3s ease;}
+    @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .fb-panel.fb-ok{border-top-color:var(--ok-border);background:var(--ok-bg);}
+    .fb-left{display:flex;align-items:center;gap:14px;}
+    .fb-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+    .fb-panel.fb-ok .fb-icon{background:rgba(34,197,94,0.2);color:var(--ok);}
+    .fb-title{font-weight:700;font-size:16px;}
+    .fb-sub{font-size:13px;color:var(--muted);line-height:1.5;max-width:380px;}
+    .fb-btn{padding:12px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;background:var(--ok);color:#fff;}
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="container">
+  <a href="quran-atmosphere.html" class="nav-back">&larr; Atmospheric Pressure</a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <p class="lesson-meta" id="lmeta">Lesson &middot; Ring Composition</p>
+
+  <!-- S0 INTRO -->
+  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+    <p class="eyebrow">Lesson 50 &middot; Literary Structure</p>
+    <h1 class="hero-title">The Hidden Mirror Inside the Quran</h1>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:26px;display:block;"></canvas>
+    <p class="body-text">Imagine a story that goes <strong style="color:var(--text)">A &rarr; B &rarr; C &rarr; B' &rarr; A'</strong> &mdash; where the end perfectly mirrors the beginning and the center holds the most important message. This is called <strong style="color:var(--text)">ring composition</strong>.</p>
+    <div class="insight-box">
+      <strong>Surah Al-Baqarah (The Cow)</strong> is the longest chapter in the Quran &mdash; 286 verses, revealed to Prophet Muhammad PBUH over 9 years, out of sequential order, with no editorial process. Modern scholars discovered it forms a perfect mathematical mirror, detectable only with 20th-century literary analysis tools &mdash; invisible for 1,400 years.
+    </div>
+    <p class="body-text">In this lesson you will see <em>two</em> examples of this structure: the whole chapter of Al-Baqarah, and then a single verse inside it &mdash; Ayat al-Kursi &mdash; which has its own perfect ring nested within the larger one.</p>
+    <button class="btn btn-accent" onclick="go(1)">Start Lesson &rarr;</button>
+  </div>
+
+  <!-- S1 BAQARAH RING VISUAL -->
+  <div id="s1" class="stage">
+    <p class="eyebrow">Example 1 &middot; Surah Al-Baqarah</p>
+    <h2 class="hero-title">The Mirror of 286 Verses</h2>
+    <p class="body-text">Al-Baqarah's 286 verses can be divided into 9 sections by theme. Look at how the sections pair up &mdash; revealed years apart, yet matching perfectly:</p>
+    <div class="rng-wrap" id="rngWrap">
+      <div class="rng-pair" id="rp0" style="--pc:#e879f9">
+        <div class="rng-sect lft" style="background:rgba(232,121,249,0.07)">
+          <span class="rng-lbl">A &middot; Verses 1&ndash;20</span>
+          <span class="rng-title">Faith &amp; Unbelief</span>
+          <span class="rng-ref">Who believes and who rejects</span>
+        </div>
+        <div class="rng-arrow">&harr;</div>
+        <div class="rng-sect rgt" style="background:rgba(232,121,249,0.07)">
+          <span class="rng-lbl">A' &middot; Verses 285&ndash;286</span>
+          <span class="rng-title">Faith &amp; Unbelief</span>
+          <span class="rng-ref">Same theme, mirroring section A</span>
+        </div>
+      </div>
+      <div class="rng-pair" id="rp1" style="--pc:#a78bfa">
+        <div class="rng-sect lft" style="background:rgba(167,139,250,0.07)">
+          <span class="rng-lbl">B &middot; Verses 21&ndash;39</span>
+          <span class="rng-title">Creation &amp; Knowledge</span>
+          <span class="rng-ref">Allah creates Adam, and thought him all the names</span>
+        </div>
+        <div class="rng-arrow">&harr;</div>
+        <div class="rng-sect rgt" style="background:rgba(167,139,250,0.07)">
+          <span class="rng-lbl">B' &middot; Verses 254&ndash;284</span>
+          <span class="rng-title">Creation &amp; Knowledge</span>
+          <span class="rng-ref">Ayat al-Kursi &mdash; Allah's throne &amp; knowledge</span>
+        </div>
+      </div>
+      <div class="rng-pair" id="rp2" style="--pc:#60a5fa">
+        <div class="rng-sect lft" style="background:rgba(96,165,250,0.07)">
+          <span class="rng-lbl">C &middot; Verses 40&ndash;103</span>
+          <span class="rng-title">Laws Given to the Jews</span>
+          <span class="rng-ref">Commands and covenant with Israel</span>
+        </div>
+        <div class="rng-arrow">&harr;</div>
+        <div class="rng-sect rgt" style="background:rgba(96,165,250,0.07)">
+          <span class="rng-lbl">C' &middot; Verses 178&ndash;253</span>
+          <span class="rng-title">Laws Given to Muslims</span>
+          <span class="rng-ref">The same framework &mdash; now for the new community</span>
+        </div>
+      </div>
+      <div class="rng-pair" id="rp3" style="--pc:#4ade80">
+        <div class="rng-sect lft" style="background:rgba(74,222,128,0.07)">
+          <span class="rng-lbl">D &middot; Verses 104&ndash;141</span>
+          <span class="rng-title">Ibrahim Was Tested</span>
+          <span class="rng-ref">The patriarch faces God's trials</span>
+        </div>
+        <div class="rng-arrow">&harr;</div>
+        <div class="rng-sect rgt" style="background:rgba(74,222,128,0.07)">
+          <span class="rng-lbl">D' &middot; Verses 153&ndash;177</span>
+          <span class="rng-title">Muslims Will Be Tested</span>
+          <span class="rng-ref">The new community faces the same pattern</span>
+        </div>
+      </div>
+      <div class="rng-center" id="rngCenter">
+        <div class="rng-center-lbl">E &middot; VERSE 143 &middot; THE CENTER</div>
+        <div class="rng-center-title">Middle Nation ... Turn to New Direction of Prayer</div>
+        <div class="rng-center-ar">وَكَذَٰلِكَ جَعَلْنَـٰكُمْ أُمَّةًۭ وَسَطًۭا لِّتَكُونُوا۟ شُهَدَآءَ عَلَى ٱلنَّاسِ وَيَكُونَ ٱلرَّسُولُ عَلَيْكُمْ شَهِيدًۭا وَمَا جَعَلْنَا ٱلْقِبْلَةَ ٱلَّتِى كُنتَ عَلَيْهَآ إِلَّا لِنَعْلَمَ مَن يَتَّبِعُ ٱلرَّسُولَ مِمَّن يَنقَلِبُ عَلَىٰ عَقِبَيْهِ ۚ</div>
+        <div class="rng-center-ref">And thus We have made you a middle nation, that you may be witnesses over the people and that the Messenger may be a witness over you. And We did not appoint the Qiblah to which you formerly faced except that We might distinguish who follows the Messenger from who turns back on his heels.</div>
+      </div>
+    </div>
+    <p class="rng-note" id="rngNote">Every outer section mirrors its partner. The first half of the chapter matches the second half &mdash; revealed years apart.</p>
+    <div style="height:20px"></div>
+    <p class="prompt">Section A (verses 1&ndash;20) covers Faith &amp; Unbelief. What does section A' (verses 285&ndash;286) address?</p>
+    <div onclick="pickEx(this,1,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">Laws given to Muslims about prayer and fasting</div></div></div>
+    <div onclick="pickEx(this,1,true)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">Faith &amp; Unbelief &mdash; the exact same theme as section A</div><div class="ac-sub">The end mirrors the beginning &mdash; that is ring composition</div></div></div>
+    <div onclick="pickEx(this,1,false)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">Stories of the prophets Ibrahim and Musa</div></div></div>
+  </div>
+
+  <!-- S2 THE CENTER VERSE -->
+  <div id="s2" class="stage">
+    <p class="eyebrow">The Numbers Game</p>
+    <h2 class="hero-title">The Center of 286 Verses</h2>
+    <p class="body-text">Ring composition says the most important message sits at the <strong style="color:var(--text)">exact center</strong> of the structure. Al-Baqarah has 286 verses. Let's do the math:</p>
+    <div class="num-game">
+      <div class="ng-step" id="ngStep1">286 verses</div>
+      <div class="ng-step" id="ngStep2" style="opacity:0">&divide; 2 = <span class="ng-result">143</span></div>
+      <div class="ng-sub" id="ngSub" style="opacity:0">Verse 143 is the exact center of the longest chapter in the Quran.</div>
+    </div>
+    <!-- Insert this RIGHT AFTER the closing </div> of .num-game -->
+<div class="qibla-canvas-wrap" style="margin:32px 0; opacity:0; transition:opacity .6s ease;">
+<canvas id="qiblaCanvas" style="width:100%; height:220px; max-height:280px; border-radius:14px; display:block; background:var(--surface); border:1px solid var(--border);"></canvas>   <p class="rng-note vis" style="text-align:center; margin-top:12px; font-size:13px; opacity:1;">
+  
+    The direction of prayer shifted from Jerusalem to Mecca at the exact center of the chapter.
+  </p>
+</div>
+<div class="verse-box" id="v143-part1" style="opacity:0;transition:opacity .5s ease .3s">
+      <div class="vb-ref">Surah Al-Baqarah &middot; Verse 143</div>
+      <div class="vb-ar">وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً <span class="vb-hl">وَسَطًا</span></div>
+      <div class="vb-tr">"And thus We have made you a <span class="vb-hl-en">middle</span> nation"</div>
+    </div>
+<div class="verse-box" id="v143-part2" style="opacity:0;transition:opacity .5s ease .3s">
+      <div class="vb-ref">Surah Al-Baqarah &middot; Verse 143</div>
+      <div class="vb-ar">  مَن يَتَّبِعُ ٱلرَّسُولَ مِمَّن <span class="vb-hl-en"> يَنقَلِبُ  </span> عَلَىٰ عَقِبَيْهِ ۚ </div>
+      <div class="vb-tr">"who follow the Messenger from those <span class="vb-hl-en"> who turn</span> on their heels"</div>
+    </div>
+    <div class="insight-box" id="v143insight" style="opacity:0;transition:opacity .5s ease .5s">
+      <strong>وَسَطًا (Wasatan)</strong> means <strong>MIDDLE</strong> in Arabic. The center verse of the longest chapter in the Quran literally contains the word "middle." This verse also describes the changing of the Qibla &mdash; the direction of prayer &mdash; from Jerusalem to Mecca. It is the <em>turning point</em> of the chapter, placed at the exact turning point of the structure.
+    </div>
+    <p class="prompt" id="s2prompt" style="opacity:0;transition:opacity .4s ease .7s">The Arabic word وَسَطًا (Wasatan) in verse 143 means:</p>
+    <div id="s2mc" style="opacity:0;transition:opacity .4s ease .8s">
+      <div onclick="pickEx(this,2,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">Prophet</div></div></div>
+      <div onclick="pickEx(this,2,true)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">Middle</div><div class="ac-sub">The center word of the center verse of the longest chapter</div></div></div>
+      <div onclick="pickEx(this,2,false)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">Prayer</div></div></div>
+    </div>
+  </div>
+
+  <!-- S3 AYAT AL-KURSI -->
+  <div id="s3" class="stage">
+    <p class="eyebrow">Example 2 &middot; A Ring Within a Ring</p>
+    <h2 class="hero-title">Ayat al-Kursi &mdash; 9 Clauses, Perfect Mirror</h2>
+    <p class="body-text">Verse 2:255 &mdash; <strong style="color:var(--text)">Ayat al-Kursi</strong> (The Throne Verse) &mdash; is considered the most excellent verse in the Quran. It has 9 clauses. Scholars discovered it too forms a perfect ring, nested inside the larger ring of Al-Baqarah itself. Watch the mirror unfold:</p>
+    <div class="kursi-mirror-container">
+      <canvas id="kursiMirrorCanvas" class="kursi-mirror-canvas"></canvas>
+    </div>
+    <p class="prompt">What appears at the exact center of Ayat al-Kursi (clause E)?</p>
+    <div onclick="pickEx(this,3,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">His throne encompasses the heavens and the earth</div></div></div>
+    <div onclick="pickEx(this,3,true)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">"He knows what is BEFORE them and what is AFTER them"</div><div class="ac-sub">The center clause literally mentions "before" and "after" &mdash; the mirror concept itself</div></div></div>
+    <div onclick="pickEx(this,3,false)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">Who could intercede with Him?</div></div></div>
+  </div>
+
+  <!-- S4 VERDICT -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>Lesson complete &middot; +30 XP</span>
+    </div>
+    <p class="eyebrow">The Impossible</p>
+    <h2 class="hero-title">An Illiterate Man. No Editing. Out of Order.</h2>
+    <div class="v-grid">
+      <div class="v-card"><div class="v-num" id="vn1">0</div><div class="v-lbl">Verses in Al-Baqarah</div></div>
+      <div class="v-card"><div class="v-num" id="vn2">0</div><div class="v-lbl">Years of revelation</div></div>
+    </div>
+    <blockquote class="verdict-quote">The center verse of the longest chapter contains the Arabic word for "middle." The center clause of the most excellent verse talks about "before and after." These are not coincidences &mdash; they are a signature.</blockquote>
+    <div class="insight-box">
+      <strong>What makes this impossible to plan as a human:</strong> Muhammad (peace be upon him) could not read or write. Verses were revealed out of sequential order, responding to unexpected events &mdash; not written in advance. Each verse was immediately fixed in its final position with no review or editing allowed. Other texts with ring composition (Homer, the Bible) were written sequentially by literate authors with full editorial freedom. The Quran had neither.
+    </div>
+    <div class="insight-box" style="border-left-color:#fcd34d">
+      <strong>Hidden for 1,400 years:</strong> The ring structure was discovered by 20th-century scholars using modern literary analysis tools. The Quran had been memorized and recited perfectly for 14 centuries before anyone realized the mathematical mirror was there.
+    </div>
+    <div id="qv-ring"></div>
+    <div id="curiositySeed"></div>
+    <div style="margin-top:28px;">
+      <a href="index.html" class="btn btn-ghost">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Return to All Lessons
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">&#10003;</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Ring Composition', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+function go(n) {
+  /* STOP QIBLA ANIMATION IF LEAVING STAGE 2 */
+  if (stage === 2 && n !== 2 && qiblaAnimator) {
+    qiblaAnimator.stop();
+    qiblaAnimator = null;
+    var wrap = document.querySelector('.qibla-canvas-wrap');
+    if (wrap) wrap.classList.remove('visible');
+  }
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(revealRing, 100);
+  if (n === 2) setTimeout(revealNumbers, 300);
+  if (n === 3) setTimeout(initKursiMirror, 250);
+  if (n === 4) {
+    saveProgress('ring-composition');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('vn1'), 0, 286, 1200);
+        animFrom(document.getElementById('vn2'), 0, 9, 900);
+      }, 400);
+    }, 300);
+  }
+}
+
+function revealRing() {
+  var pairs = ['rp0','rp1','rp2','rp3'];
+  pairs.forEach(function(id, i) {
+    setTimeout(function() { document.getElementById(id).classList.add('vis'); }, i * 380);
+  });
+  setTimeout(function() {
+    document.getElementById('rngCenter').classList.add('vis');
+    document.getElementById('rngNote').classList.add('vis');
+  }, pairs.length * 380 + 200);
+}
+
+function revealNumbers() {
+  console.log('revealNumbers started');
+  var step1 = document.getElementById('ngStep1');
+  step1.style.color = 'var(--accent)';
+  setTimeout(function() {
+    document.getElementById('ngStep2').style.opacity = '1';
+    setTimeout(function() {
+      document.getElementById('ngSub').style.opacity = '1';
+      document.getElementById('v143-part1').style.opacity = '1';
+      document.getElementById('v143-part2').style.opacity = '1';
+      document.getElementById('v143insight').style.opacity = '1';
+      document.getElementById('s2prompt').style.opacity = '1';
+      document.getElementById('s2mc').style.opacity = '1';
+      
+      /* START QIBLA CANVAS */
+      setTimeout(function() {
+        console.log('Trying to show canvas...');
+        var wrap = document.querySelector('.qibla-canvas-wrap');
+        var cv = document.getElementById('qiblaCanvas');
+        console.log('Wrap found:', !!wrap);
+        console.log('Canvas found:', !!cv);
+        if (wrap) {
+          wrap.classList.add('visible');
+          wrap.style.opacity = '1';
+          console.log('Wrap opacity set to 1');
+        }
+        if (cv && !qiblaAnimator) {
+          console.log('Canvas offsetWidth:', cv.offsetWidth);
+          console.log('Canvas offsetHeight:', cv.offsetHeight);
+          qiblaAnimator = initQiblaCanvas(cv);
+          console.log('Animator started:', !!qiblaAnimator);
+        }
+      }, 400);
+      
+    }, 800);
+  }, 700);
+}
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '\u2713';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  document.getElementById('fbPanel').className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+var SUBS = {
+  1: 'Section A\' mirrors section A exactly \u2014 both cover Faith & Unbelief. The end of the chapter matches the beginning. This is ring composition.',
+  2: 'Verse 143 sits at the exact center of Al-Baqarah. It contains the word \u0648\u064E\u0633\u064E\u0637\u064B\u0627 \u2014 meaning MIDDLE \u2014 while being the middle verse. The chapter literally labels its own center.',
+  3: 'The center clause of Ayat al-Kursi says "He knows what is BEFORE and AFTER" \u2014 it speaks of the very concept of ring composition from the inside of the ring itself.'
+};
+var NEXT = { 1: 2, 2: 3, 3: 4 };
+
+function pickEx(el, stageN, correct) {
+  var selector = '#s' + stageN + ' .answer-card';
+  if (document.querySelector('#s' + stageN + ' .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll(selector).forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk(SUBS[stageN], function() { go(NEXT[stageN]); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+
+
+/* ── HERO CANVAS ── */
+
+
+
+/* ── HERO CANVAS ── */
+(function(){
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = c.offsetWidth || c.width;
+  var H = c.offsetHeight || c.height;
+  c.width = Math.round(W * dpr);
+  c.height = Math.round(H * dpr);
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  var t = 0;
+
+  var COLS = [
+    {r:232,g:121,b:249},{r:167,g:139,b:250},{r:96,g:165,b:250},{r:74,g:222,b:128},
+    {r:252,g:211,b:77},{r:74,g:222,b:128},{r:96,g:165,b:250},{r:167,g:139,b:250},{r:232,g:121,b:249}
+  ];
+  /* Light mode: deeper, richer node colors that read on light bg */
+  var LCOLS = [
+    {r:110,g:55,b:150},{r:80,g:60,b:150},{r:35,g:80,b:140},{r:20,g:100,b:65},
+    {r:165,g:115,b:10},{r:20,g:100,b:65},{r:35,g:80,b:140},{r:80,g:60,b:150},{r:110,g:55,b:150}
+  ];
+  var LABELS = ['A','B','C','D','E',"D'","C'","B'","A'"];
+
+  var mirrorX = W * 0.5;
+  var archCY  = H * 0.36;
+  var archR   = Math.min(W * 0.40, H * 0.27);
+  var baseY   = archCY;
+  var nodeFs  = Math.max(8, Math.min(11, W * 0.017));
+  var labelFs = Math.max(7.5, Math.min(10, W * 0.015));
+
+  function rgba(c, a) { return 'rgba('+c.r+','+c.g+','+c.b+','+a+')'; }
+  function bez(p0,p1,p2,p3,t){var m=1-t;return m*m*m*p0+3*m*m*t*p1+3*m*t*t*p2+t*t*t*p3;}
+
+  function nodePos(i) {
+    var angle = Math.PI * i / 8;
+    return {
+      x: mirrorX + Math.cos(Math.PI - angle) * archR,
+      y: archCY - Math.sin(angle) * archR
+    };
+  }
+
+  /* Pick node color set based on theme */
+  function nc(i) { return document.documentElement.getAttribute('data-theme') === 'light' ? LCOLS[i] : COLS[i]; }
+
+  var mirrorParts = [];
+  for (var i = 0; i < 22; i++) {
+    mirrorParts.push({
+      y: Math.random() * H, sp: 0.25 + Math.random() * 0.6,
+      r: 0.4 + Math.random() * 1.1, al: 0.12 + Math.random() * 0.30,
+      ph: Math.random() * 6.283
+    });
+  }
+
+  var arcDots = [];
+  for (var i = 0; i < 4; i++) arcDots.push({ pair: i, phase: i * 0.25 });
+
+  function frame() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    ctx.clearRect(0, 0, W, H);
+
+    /* ── BACKGROUND ── */
+    if (isLight) {
+      var bg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, Math.max(W, H) * 0.65);
+      bg.addColorStop(0, '#f0e8d8');
+      bg.addColorStop(0.6, '#e8dece');
+      bg.addColorStop(1, '#ddd4c4');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    } else {
+      var bg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, Math.max(W, H) * 0.65);
+      bg.addColorStop(0, '#080e1e');
+      bg.addColorStop(0.6, '#050a16');
+      bg.addColorStop(1, '#030710');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    }
+
+    /* ── CENTER RADIAL WARMTH ── */
+    var cg = ctx.createRadialGradient(mirrorX, archCY, 0, mirrorX, archCY, archR * 1.6);
+    if (isLight) {
+      cg.addColorStop(0, 'rgba(180,140,60,0.10)');
+      cg.addColorStop(0.5, 'rgba(160,120,50,0.04)');
+      cg.addColorStop(1, 'transparent');
+    } else {
+      cg.addColorStop(0, 'rgba(252,211,77,0.045)');
+      cg.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = cg; ctx.fillRect(0, 0, W, H);
+
+    /* ── MIRROR LINE ── */
+    var mGlow = ctx.createLinearGradient(mirrorX - 28, 0, mirrorX + 28, 0);
+    if (isLight) {
+      mGlow.addColorStop(0, 'transparent');
+      mGlow.addColorStop(0.5, 'rgba(120,80,30,0.06)');
+      mGlow.addColorStop(1, 'transparent');
+    } else {
+      mGlow.addColorStop(0, 'transparent');
+      mGlow.addColorStop(0.5, 'rgba(252,211,77,0.065)');
+      mGlow.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = mGlow; ctx.fillRect(mirrorX - 28, 0, 56, H);
+
+    /* Dashed line */
+    ctx.beginPath(); ctx.moveTo(mirrorX, H * 0.03); ctx.lineTo(mirrorX, H * 0.97);
+    if (isLight) {
+      ctx.strokeStyle = 'rgba(120,80,30,0.38)';
+      ctx.lineWidth = 1.4;
+    } else {
+      ctx.strokeStyle = 'rgba(252,211,77,0.18)';
+      ctx.lineWidth = 1.2;
+    }
+    ctx.setLineDash([5, 9]); ctx.lineDashOffset = -t * 0.35;
+    ctx.stroke(); ctx.setLineDash([]);
+
+    /* Solid thin line */
+    ctx.beginPath(); ctx.moveTo(mirrorX, H * 0.03); ctx.lineTo(mirrorX, H * 0.97);
+    ctx.strokeStyle = isLight ? 'rgba(100,65,20,0.15)' : 'rgba(252,211,77,0.06)';
+    ctx.lineWidth = 0.4; ctx.stroke();
+
+    /* ── MIRROR PARTICLES ── */
+    mirrorParts.forEach(function(p) {
+      p.y += p.sp;
+      if (p.y > H + 5) p.y = -5;
+      var a = p.al * (0.35 + 0.65 * Math.sin(t * 0.04 + p.ph));
+      var xOff = Math.sin(t * 0.025 + p.ph) * 1.8;
+      if (isLight) {
+        ctx.beginPath(); ctx.arc(mirrorX + xOff, p.y, p.r * 1.1, 0, 6.283);
+        ctx.fillStyle = 'rgba(140,95,30,' + (a * 1.6) + ')'; ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(mirrorX + xOff, p.y, p.r, 0, 6.283);
+        ctx.fillStyle = 'rgba(252,211,77,' + a + ')'; ctx.fill();
+      }
+    });
+
+    /* ── HORIZONTAL MIRROR SURFACE LINE ── */
+    var a0 = nodePos(0), a8 = nodePos(8);
+    var surfY = baseY + 4;
+    var surfGrad = ctx.createLinearGradient(a0.x - 10, 0, a8.x + 10, 0);
+    if (isLight) {
+      surfGrad.addColorStop(0, 'transparent');
+      surfGrad.addColorStop(0.15, 'rgba(120,80,30,0.22)');
+      surfGrad.addColorStop(0.5, 'rgba(140,95,35,0.32)');
+      surfGrad.addColorStop(0.85, 'rgba(120,80,30,0.22)');
+      surfGrad.addColorStop(1, 'transparent');
+    } else {
+      surfGrad.addColorStop(0, 'transparent');
+      surfGrad.addColorStop(0.15, 'rgba(252,211,77,0.08)');
+      surfGrad.addColorStop(0.5, 'rgba(252,211,77,0.12)');
+      surfGrad.addColorStop(0.85, 'rgba(252,211,77,0.08)');
+      surfGrad.addColorStop(1, 'transparent');
+    }
+    ctx.fillStyle = surfGrad; ctx.fillRect(a0.x - 10, surfY - 1.5, a8.x - a0.x + 20, 3);
+
+    /* ── REFLECTION ── */
+    ctx.save();
+    ctx.globalAlpha = isLight ? 0.10 : 0.045;
+    var reflScale = isLight ? 0.50 : 0.55;
+
+    for (var i = 0; i < 9; i++) {
+      var nd = nodePos(i), c = nc(i);
+      var ry = surfY + (surfY - nd.y) * reflScale;
+      var rr = (i === 4 ? 5 : 3.2) * (W / 660);
+      ctx.beginPath(); ctx.arc(nd.x, ry, rr, 0, 6.283);
+      ctx.fillStyle = rgba(c, 0.65); ctx.fill();
+    }
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var r1Y = surfY + (surfY - n1.y) * reflScale;
+      var r2Y = surfY + (surfY - n2.y) * reflScale;
+      var rDepth = (n2.x - n1.x) * 0.12;
+      var rMy = Math.max(r1Y, r2Y) + rDepth;
+      ctx.beginPath(); ctx.moveTo(n1.x, r1Y);
+      ctx.bezierCurveTo(n1.x, rMy, n2.x, rMy, n2.x, r2Y);
+      ctx.strokeStyle = rgba(c, 0.55); ctx.lineWidth = 0.7; ctx.stroke();
+    }
+    ctx.restore();
+
+    /* fade-out gradient */
+    var fadeGrad = ctx.createLinearGradient(0, surfY, 0, surfY + H * 0.28);
+    if (isLight) {
+      fadeGrad.addColorStop(0, 'rgba(240,232,216,0)');
+      fadeGrad.addColorStop(1, 'rgba(240,232,216,1)');
+    } else {
+      fadeGrad.addColorStop(0, 'rgba(4,8,16,0)');
+      fadeGrad.addColorStop(1, 'rgba(4,8,16,1)');
+    }
+    ctx.fillStyle = fadeGrad; ctx.fillRect(0, surfY, W, H * 0.28);
+
+    /* ── CONNECTING LINES through mirror ── */
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var pulse = isLight
+        ? (0.10 + Math.sin(t * 0.028 + i * 1.3) * 0.06)
+        : (0.05 + Math.sin(t * 0.028 + i * 1.3) * 0.025);
+      ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+      ctx.strokeStyle = rgba(c, pulse); ctx.lineWidth = isLight ? 0.7 : 0.5; ctx.stroke();
+
+      var midY = (n1.y + n2.y) * 0.5;
+      var ds = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(mirrorX, midY - ds); ctx.lineTo(mirrorX + ds * 0.6, midY);
+      ctx.lineTo(mirrorX, midY + ds); ctx.lineTo(mirrorX - ds * 0.6, midY);
+      ctx.closePath();
+      ctx.fillStyle = rgba(c, isLight ? (0.28 + Math.sin(t * 0.04 + i) * 0.12) : (0.15 + Math.sin(t * 0.04 + i) * 0.08));
+      ctx.fill();
+    }
+
+    /* ── MIRROR ARCS ── */
+    for (var i = 0; i < 4; i++) {
+      var n1 = nodePos(i), n2 = nodePos(8 - i), c = nc(i);
+      var depth = (n2.x - n1.x) * 0.28;
+      var my = Math.max(n1.y, n2.y) + depth;
+      var pulse = isLight
+        ? (0.40 + Math.sin(t * 0.04 + i * 0.9) * 0.14)
+        : (0.20 + Math.sin(t * 0.04 + i * 0.9) * 0.10);
+
+      ctx.beginPath(); ctx.moveTo(n1.x, n1.y);
+      ctx.bezierCurveTo(n1.x, my, n2.x, my, n2.x, n2.y);
+      ctx.strokeStyle = rgba(c, pulse);
+      ctx.lineWidth = isLight ? 1.6 : 1.1; ctx.stroke();
+
+      /* traveling dot */
+      var dot = arcDots[i];
+      dot.phase = (dot.phase + 0.003) % 1;
+      var dx = bez(n1.x, n1.x, n2.x, n2.x, dot.phase);
+      var dy = bez(n1.y, my, my, n2.y, dot.phase);
+      ctx.beginPath(); ctx.arc(dx, dy, isLight ? 2.2 : 1.8, 0, 6.283);
+      ctx.fillStyle = rgba(c, isLight ? 0.95 : 0.85); ctx.fill();
+      /* trail */
+      for (var tr = 1; tr <= 3; tr++) {
+        var tp = (dot.phase - tr * 0.012 + 1) % 1;
+        var tx = bez(n1.x, n1.x, n2.x, n2.x, tp);
+        var ty = bez(n1.y, my, my, n2.y, tp);
+        ctx.beginPath(); ctx.arc(tx, ty, (isLight ? 1.6 : 1.2) - tr * 0.35, 0, 6.283);
+        ctx.fillStyle = rgba(c, isLight ? (0.50 - tr * 0.12) : (0.35 - tr * 0.09)); ctx.fill();
+      }
+    }
+
+    /* ── ARCH OUTLINE ── */
+    ctx.beginPath();
+    for (var i = 0; i <= 64; i++) {
+      var angle = Math.PI * i / 64;
+      var ax = mirrorX + Math.cos(Math.PI - angle) * archR;
+      var ay = archCY - Math.sin(angle) * archR;
+      i === 0 ? ctx.moveTo(ax, ay) : ctx.lineTo(ax, ay);
+    }
+    ctx.strokeStyle = isLight ? 'rgba(120,90,50,0.22)' : 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = isLight ? 0.8 : 0.5; ctx.stroke();
+
+    /* ── NODES ── */
+    for (var i = 0; i < 9; i++) {
+      var nd = nodePos(i);
+      var isCenter = (i === 4);
+      var c = nc(i);
+      var baseR = isCenter ? Math.max(5.5, W * 0.0095) : Math.max(3.5, W * 0.006);
+      var glowPulse = 0.22 + Math.sin(t * 0.05 + i * 0.7) * 0.10;
+
+      /* outer glow - bigger in light mode for visibility */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR * (isCenter ? 5 : 3.2), 0, Math.PI * 2);
+      ctx.fillStyle = rgba(c, glowPulse * (isCenter ? 0.14 : 0.09)); ctx.fill();
+
+      /* node fill */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(c, isCenter ? 0.95 : 0.85);
+      ctx.fill();
+
+      /* subtle edge ring for definition */
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR + 0.6, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(c, isCenter ? 0.30 : 0.15);
+      ctx.lineWidth = 0.4; ctx.stroke();
+
+      /* center node extras */
+      if (isCenter) {
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, baseR * 1.9, 0, Math.PI * 2);
+        ctx.strokeStyle = rgba(c, 0.30 + Math.sin(t * 0.06) * 0.12);
+        ctx.lineWidth = 0.8; ctx.stroke();
+
+        var pulseR = baseR * (2.2 + Math.sin(t * 0.08) * 0.5);
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, pulseR, 0, Math.PI * 2);
+        ctx.strokeStyle = rgba(c, 0.10 + Math.sin(t * 0.08) * 0.04);
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+
+      /* label */
+      ctx.fillStyle = rgba(c, isCenter ? 0.82 : 0.70);
+      ctx.font = (isCenter ? 'bold ' : '500 ') + nodeFs + 'px "DM Sans",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(LABELS[i], nd.x, nd.y + baseR + 5);
+    }
+
+    /* ── "RING COMPOSITION" label ── */
+    ctx.save();
+    ctx.globalAlpha = 0.35 + Math.sin(t * 0.025) * 0.06;
+    if (isLight) {
+      ctx.fillStyle = 'rgba(90,60,15,0.72)';
+    } else {
+      ctx.fillStyle = 'rgba(252,211,77,0.85)';
+    }
+    ctx.font = '600 ' + labelFs + 'px "DM Sans",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.letterSpacing = '0.12em';
+    ctx.fillText('RING COMPOSITION', mirrorX, H * 0.97);
+    ctx.restore();
+
+    /* ── EDGE VIGNETTES ── */
+    if (isLight) {
+      var vT = ctx.createLinearGradient(0, 0, 0, H * 0.065);
+      vT.addColorStop(0, 'rgba(221,208,198,0.85)');
+      vT.addColorStop(1, 'transparent');
+      ctx.fillStyle = vT; ctx.fillRect(0, 0, W, H * 0.065);
+
+      var vB = ctx.createLinearGradient(0, H * 0.935, 0, H);
+      vB.addColorStop(0, 'transparent');
+      vB.addColorStop(1, 'rgba(221,208,198,0.85)');
+      ctx.fillStyle = vB; ctx.fillRect(0, H * 0.935, W, H * 0.065);
+
+      var vL = ctx.createLinearGradient(0, 0, W * 0.035, 0);
+      vL.addColorStop(0, 'rgba(221,208,198,0.75)');
+      vL.addColorStop(1, 'transparent');
+      ctx.fillStyle = vL; ctx.fillRect(0, 0, W * 0.035, H);
+
+      var vR = ctx.createLinearGradient(W, 0, W * 0.965, 0);
+      vR.addColorStop(0, 'rgba(221,208,198,0.75)');
+      vR.addColorStop(1, 'transparent');
+      ctx.fillStyle = vR; ctx.fillRect(W * 0.965, 0, W * 0.035, H);
+    } else {
+      var vT = ctx.createLinearGradient(0, 0, 0, H * 0.06);
+      vT.addColorStop(0, 'rgba(4,8,16,0.90)');
+      vT.addColorStop(1, 'transparent');
+      ctx.fillStyle = vT; ctx.fillRect(0, 0, W, H * 0.06);
+
+      var vL = ctx.createLinearGradient(0, 0, W * 0.03, 0);
+      vL.addColorStop(0, 'rgba(4,8,16,0.80)');
+      vL.addColorStop(1, 'transparent');
+      ctx.fillStyle = vL; ctx.fillRect(0, 0, W * 0.03, H);
+
+      var vR = ctx.createLinearGradient(W, 0, W * 0.97, 0);
+      vR.addColorStop(0, 'rgba(4,8,16,0.80)');
+      vR.addColorStop(1, 'transparent');
+      ctx.fillStyle = vR; ctx.fillRect(W * 0.97, 0, W * 0.03, H);
+    }
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+})();
+
+
+/* ── QIBLA CANVAS ANIMATION ── */
+
+
+function initQiblaCanvas(cv) {
+  var rafId = null;
+  if (!cv) return { stop: function(){} };
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 3);
+  var W = cv.offsetWidth;
+  var H = cv.offsetHeight;
+  cv.width = Math.round(W * dpr);
+  cv.height = Math.round(H * dpr);
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var t = 0;
+  var cx = W * 0.5;
+  var aqsaX = W * 0.17, kaabaX = W * 0.83;
+  var lmY = H * 0.34;
+  var sc = Math.min(W / 340, H / 195, 1.5);
+  var arcCPy = H * 0.78;
+  var isMob = W < 420;
+
+  var arcParts = [];
+  for (var i = 0; i < 70; i++) {
+    arcParts.push({
+      pos: i / 70, sp: 0.001 + Math.random() * 0.0035,
+      sz: 0.3 + Math.random() * 1.8, al: 0.15 + Math.random() * 0.55,
+      off: (Math.random() - 0.5) * 8, trail: 0.3 + Math.random() * 0.5
+    });
+  }
+
+  var stars = [];
+  if (W > 300) {
+    for (var i = 0; i < 55; i++) {
+      stars.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: 0.12 + Math.random() * 0.5, sp: 0.3 + Math.random() * 0.8,
+        ph: Math.random() * 6.283
+      });
+    }
+  }
+
+  function isL() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function bez(tt, a, b, c) { var m = 1 - tt; return m*m*a + 2*m*tt*b + tt*tt*c; }
+
+  /* ── AL-AQSA ── */
+  function drawAqsa(alpha) {
+    if (alpha < 0.01) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(aqsaX, lmY);
+    ctx.scale(sc, sc);
+
+    // Multi-layer atmospheric glow
+    var g1 = ctx.createRadialGradient(0, -18, 2, 0, -18, 90 * sc);
+    g1.addColorStop(0, isL() ? 'rgba(245,190,60,0.30)' : 'rgba(255,210,70,0.22)');
+    g1.addColorStop(0.4, isL() ? 'rgba(230,170,40,0.12)' : 'rgba(240,190,50,0.08)');
+    g1.addColorStop(1, 'transparent');
+    ctx.fillStyle = g1;
+    ctx.fillRect(-95, -95, 190, 160);
+
+    // Ground shadow
+    ctx.fillStyle = isL() ? 'rgba(100,75,30,0.08)' : 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(0, 52, 65, 8, 0, 0, 6.283);
+    ctx.fill();
+
+    // Main body
+    ctx.fillStyle = isL() ? 'rgba(125,90,35,0.55)' : 'rgba(160,115,40,0.50)';
+    ctx.beginPath();
+    ctx.moveTo(-50, 48); ctx.lineTo(-54, -2); ctx.lineTo(54, -2); ctx.lineTo(50, 48);
+    ctx.closePath(); ctx.fill();
+
+    // Subtle wall texture lines
+    ctx.strokeStyle = isL() ? 'rgba(160,120,50,0.12)' : 'rgba(200,160,60,0.08)';
+    ctx.lineWidth = 0.4;
+    for (var wy = 0; wy < 44; wy += 6) {
+      ctx.beginPath(); ctx.moveTo(-52, wy); ctx.lineTo(52, wy); ctx.stroke();
+    }
+
+    // Central dome - multi-layer for richness
+    ctx.fillStyle = isL() ? 'rgba(240,195,60,0.78)' : 'rgba(255,220,75,0.65)';
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.fill();
+
+    // Dome highlight
+    var dh = ctx.createRadialGradient(-6, -28, 2, 0, -2, 32);
+    dh.addColorStop(0, isL() ? 'rgba(255,245,180,0.40)' : 'rgba(255,250,200,0.30)');
+    dh.addColorStop(0.5, 'transparent');
+    dh.addColorStop(1, 'transparent');
+    ctx.fillStyle = dh;
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.fill();
+
+    // Dome outline for crispness
+    ctx.strokeStyle = isL() ? 'rgba(200,155,40,0.50)' : 'rgba(255,230,100,0.35)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(0, -2, 32, Math.PI, 0); ctx.stroke();
+
+    // Smaller dome behind
+    ctx.fillStyle = isL() ? 'rgba(220,170,45,0.55)' : 'rgba(240,195,55,0.40)';
+    ctx.beginPath(); ctx.arc(-5, -16, 22, Math.PI * 1.08, Math.PI * 1.92); ctx.fill();
+    ctx.strokeStyle = isL() ? 'rgba(200,155,40,0.35)' : 'rgba(255,230,100,0.22)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.arc(-5, -16, 22, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
+
+    // Windows
+    var wc = isL() ? 'rgba(255,235,150,0.45)' : 'rgba(255,240,160,0.30)';
+    ctx.fillStyle = wc;
+    for (var wi = -36; wi <= 36; wi += 18) {
+      ctx.beginPath();
+      ctx.moveTo(wi - 3, -8); ctx.lineTo(wi + 3, -8);
+      ctx.lineTo(wi + 2.5, 38); ctx.lineTo(wi - 2.5, 38);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // Minarets - detailed
+    var mf = isL() ? 'rgba(210,160,45,0.60)' : 'rgba(230,180,55,0.48)';
+    var ms = isL() ? 'rgba(255,230,120,0.55)' : 'rgba(255,235,130,0.38)';
+    [[-62, 0], [62, 0], [-72, 3], [72, 3]].forEach(function(m, idx) {
+      var w = idx < 2 ? 8 : 5;
+      ctx.fillStyle = mf;
+      ctx.fillRect(m[0] - w/2, m[1] - 65, w, 113);
+      ctx.strokeStyle = ms; ctx.lineWidth = 0.5;
+      ctx.strokeRect(m[0] - w/2, m[1] - 65, w, 113);
+
+      // Minaret top
+      ctx.fillStyle = ms;
+      ctx.beginPath(); ctx.arc(m[0], m[1] - 65, w/2 + 1.5, Math.PI, 0); ctx.fill();
+
+      // Balconies
+      ctx.fillStyle = mf;
+      var bs = idx < 2 ? 2.5 : 1.5;
+      ctx.fillRect(m[0] - w/2 - bs, m[1] - 42, w + bs*2, 2);
+      ctx.fillRect(m[0] - w/2 - bs, m[1] - 20, w + bs*2, 2);
+
+      // Pointed cap
+      ctx.fillStyle = ms;
+      ctx.beginPath();
+      ctx.moveTo(m[0] - w/2 - 1, m[1] - 65);
+      ctx.lineTo(m[0], m[1] - 74);
+      ctx.lineTo(m[0] + w/2 + 1, m[1] - 65);
+      ctx.closePath(); ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  /* ── KAABA ── */
+  function drawKaaba(alpha) {
+    if (alpha < 0.01) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(kaabaX, lmY);
+    ctx.scale(sc, sc);
+
+    // Rich green glow layers
+    var g1 = ctx.createRadialGradient(0, -10, 2, 0, -10, 80 * sc);
+    g1.addColorStop(0, isL() ? 'rgba(34,197,94,0.28)' : 'rgba(34,197,94,0.22)');
+    g1.addColorStop(0.35, isL() ? 'rgba(16,163,74,0.10)' : 'rgba(16,163,74,0.06)');
+    g1.addColorStop(1, 'transparent');
+    ctx.fillStyle = g1;
+    ctx.fillRect(-80, -85, 160, 140);
+
+    // Mataaf (circumambulation) glow
+    var mg = ctx.createRadialGradient(0, 18, 15, 0, 18, 55);
+    mg.addColorStop(0, isL() ? 'rgba(34,197,94,0.06)' : 'rgba(34,197,94,0.04)');
+    mg.addColorStop(1, 'transparent');
+    ctx.fillStyle = mg;
+    ctx.fillRect(-55, -10, 110, 56);
+
+    // Ground shadow
+    ctx.fillStyle = isL() ? 'rgba(15,60,35,0.08)' : 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 55, 7, 0, 0, 6.283);
+    ctx.fill();
+
+    // Cube body with subtle gradient
+    var cf = ctx.createLinearGradient(-24, 0, 24, 0);
+    cf.addColorStop(0, isL() ? 'rgba(28,18,8,0.75)' : 'rgba(18,12,6,0.82)');
+    cf.addColorStop(0.5, isL() ? 'rgba(38,26,12,0.70)' : 'rgba(25,17,8,0.78)');
+    cf.addColorStop(1, isL() ? 'rgba(28,18,8,0.75)' : 'rgba(18,12,6,0.82)');
+    ctx.fillStyle = cf;
+    ctx.fillRect(-24, -32, 48, 52);
+
+    // Left face (slightly lighter for 3D)
+    ctx.fillStyle = isL() ? 'rgba(48,34,16,0.45)' : 'rgba(35,24,12,0.50)';
+    ctx.fillRect(-24, -32, 6, 52);
+
+    // Right face (slightly darker for 3D)
+    ctx.fillStyle = isL() ? 'rgba(15,10,4,0.45)' : 'rgba(10,6,2,0.50)';
+    ctx.fillRect(18, -32, 6, 52);
+
+    // Top face
+    ctx.fillStyle = isL() ? 'rgba(50,36,18,0.55)' : 'rgba(35,25,12,0.60)';
+    ctx.beginPath();
+    ctx.moveTo(-24, -32); ctx.lineTo(-17, -44);
+    ctx.lineTo(31, -44); ctx.lineTo(24, -32);
+    ctx.closePath(); ctx.fill();
+
+    // Right face of top
+    ctx.fillStyle = isL() ? 'rgba(25,16,6,0.50)' : 'rgba(18,10,4,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(24, -32); ctx.lineTo(31, -44);
+    ctx.lineTo(31, -44 + 12); ctx.lineTo(24, -32 + 12);
+    ctx.closePath(); ctx.fill();
+
+    // Kiswa (gold band) - rich gradient
+    var kg = ctx.createLinearGradient(-24, -8, 24, -8);
+    kg.addColorStop(0, isL() ? 'rgba(180,140,30,0.75)' : 'rgba(220,175,40,0.68)');
+    kg.addColorStop(0.3, isL() ? 'rgba(240,200,55,0.90)' : 'rgba(255,215,65,0.82)');
+    kg.addColorStop(0.7, isL() ? 'rgba(240,200,55,0.90)' : 'rgba(255,215,65,0.82)');
+    kg.addColorStop(1, isL() ? 'rgba(180,140,30,0.75)' : 'rgba(220,175,40,0.68)');
+    ctx.fillStyle = kg;
+    ctx.fillRect(-24, -8, 48, 6);
+
+    // Kiswa on top face
+    ctx.fillStyle = isL() ? 'rgba(230,185,45,0.65)' : 'rgba(250,205,55,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-24, -32); ctx.lineTo(-17, -38.5);
+    ctx.lineTo(31, -38.5); ctx.lineTo(24, -32);
+    ctx.closePath(); ctx.fill();
+
+    // Kiswa calligraphy hint lines
+    ctx.strokeStyle = isL() ? 'rgba(255,240,160,0.20)' : 'rgba(255,245,180,0.15)';
+    ctx.lineWidth = 0.4;
+    for (var ky = -5; ky <= -2; ky += 1.2) {
+      ctx.beginPath(); ctx.moveTo(-22, ky); ctx.lineTo(22, ky); ctx.stroke();
+    }
+
+    // Black stone area (Hajr Aswad) - bright spot
+    var hs = ctx.createRadialGradient(-24, -12, 0, -24, -12, 8);
+    hs.addColorStop(0, isL() ? 'rgba(200,200,200,0.35)' : 'rgba(220,220,220,0.28)');
+    hs.addColorStop(1, 'transparent');
+    ctx.fillStyle = hs;
+    ctx.fillRect(-32, -20, 16, 16);
+
+    // Door area
+    ctx.fillStyle = isL() ? 'rgba(230,190,50,0.60)' : 'rgba(250,210,60,0.50)';
+    ctx.beginPath(); ctx.arc(0, 8, 5.5, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = isL() ? 'rgba(255,240,160,0.40)' : 'rgba(255,245,180,0.30)';
+    ctx.beginPath(); ctx.arc(0, 8, 5.5, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = isL() ? 'rgba(30,18,6,0.75)' : 'rgba(20,12,4,0.82)';
+    ctx.fillRect(-5, 8, 10, 12);
+
+    // Subtle edge highlight
+    ctx.strokeStyle = isL() ? 'rgba(255,230,140,0.18)' : 'rgba(255,240,160,0.12)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(-24, -44, 48, 64);
+
+    // Mizab (water spout)
+    ctx.fillStyle = isL() ? 'rgba(200,170,50,0.55)' : 'rgba(230,200,60,0.45)';
+    ctx.beginPath();
+    ctx.moveTo(4, -44); ctx.lineTo(8, -52); ctx.lineTo(12, -44);
+    ctx.closePath(); ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* ── TURNING ARC ── */
+  function drawArc(p) {
+    if (p <= 0.005) return;
+    var n = Math.max(4, Math.floor(p * 100));
+
+    // Outer glow trail
+    if (p > 0.1) {
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var tt = i / 100;
+        var px = bez(tt, aqsaX, cx, kaabaX);
+        var py = bez(tt, lmY, arcCPy, lmY);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = isL() ? 'rgba(252,211,77,0.12)' : 'rgba(252,211,77,0.08)';
+      ctx.lineWidth = 8; ctx.stroke();
+    }
+
+    // Main arc line
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var tt = i / 100;
+      var px = bez(tt, aqsaX, cx, kaabaX);
+      var py = bez(tt, lmY, arcCPy, lmY);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    var gr = ctx.createLinearGradient(aqsaX, 0, kaabaX, 0);
+    gr.addColorStop(0, isL() ? 'rgba(217,155,30,0.22)' : 'rgba(245,190,50,0.18)');
+    gr.addColorStop(0.35, isL() ? 'rgba(252,211,77,0.55)' : 'rgba(252,211,77,0.42)');
+    gr.addColorStop(0.65, isL() ? 'rgba(52,211,153,0.55)' : 'rgba(52,211,153,0.42)');
+    gr.addColorStop(1, isL() ? 'rgba(22,163,74,0.55)' : 'rgba(22,163,74,0.42)');
+    ctx.strokeStyle = gr; ctx.lineWidth = 2.8; ctx.stroke();
+
+    // Inner bright core line
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var tt = i / 100;
+      var px = bez(tt, aqsaX, cx, kaabaX);
+      var py = bez(tt, lmY, arcCPy, lmY);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = isL() ? 'rgba(255,245,200,0.30)' : 'rgba(255,250,220,0.22)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    // Arrow at end
+    if (p > 0.85) {
+      var ea = Math.min(1, (p - 0.85) / 0.15);
+      var ex = bez(1, aqsaX, cx, kaabaX), ey = bez(1, lmY, arcCPy, lmY);
+      var px2 = bez(0.88, aqsaX, cx, kaabaX), py2 = bez(0.88, lmY, arcCPy, lmY);
+      var ang = Math.atan2(ey - py2, ex - px2);
+      ctx.save();
+      ctx.globalAlpha = ea;
+      ctx.translate(ex, ey);
+      ctx.rotate(ang);
+
+      // Arrow glow
+      var ag = ctx.createRadialGradient(-6, 0, 0, -6, 0, 18);
+      ag.addColorStop(0, isL() ? 'rgba(34,197,94,0.30)' : 'rgba(34,197,94,0.25)');
+      ag.addColorStop(1, 'transparent');
+      ctx.fillStyle = ag;
+      ctx.fillRect(-24, -18, 36, 36);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.lineTo(-13, -6.5); ctx.lineTo(-13, 6.5);
+      ctx.closePath();
+      ctx.fillStyle = isL() ? 'rgba(34,197,94,0.80)' : 'rgba(34,197,94,0.70)';
+      ctx.fill();
+
+      // Arrow outline
+      ctx.strokeStyle = isL() ? 'rgba(52,211,153,0.50)' : 'rgba(52,211,153,0.40)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Traveling light with rich glow
+    var dx = bez(p, aqsaX, cx, kaabaX);
+    var dy = bez(p, lmY, arcCPy, lmY);
+
+    // Color interpolation
+    var cr = Math.round(245 + (34 - 245) * p);
+    var cg2 = Math.round(195 + (197 - 195) * p);
+    var cb = Math.round(50 + (94 - 50) * p);
+
+    // Outer glow
+    var dg = ctx.createRadialGradient(dx, dy, 0, dx, dy, 22);
+    dg.addColorStop(0, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0.50)');
+    dg.addColorStop(0.3, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0.15)');
+    dg.addColorStop(1, 'transparent');
+    ctx.fillStyle = dg;
+    ctx.beginPath(); ctx.arc(dx, dy, 22, 0, 6.283); ctx.fill();
+
+    // Mid glow
+    var dg2 = ctx.createRadialGradient(dx, dy, 0, dx, dy, 8);
+    dg2.addColorStop(0, isL() ? 'rgba(255,255,255,0.70)' : 'rgba(255,255,255,0.60)');
+    dg2.addColorStop(1, 'rgba(' + cr + ',' + cg2 + ',' + cb + ',0)');
+    ctx.fillStyle = dg2;
+    ctx.beginPath(); ctx.arc(dx, dy, 8, 0, 6.283); ctx.fill();
+
+    // Core dot
+    ctx.beginPath(); ctx.arc(dx, dy, 2.8, 0, 6.283);
+    ctx.fillStyle = isL() ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.90)';
+    ctx.fill();
+
+    // Sparkle cross
+    var sp = 0.6 + Math.sin(t * 0.12) * 0.4;
+    if (sp > 0.3) {
+      var ss = 6 * sp;
+      ctx.strokeStyle = isL() ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath(); ctx.moveTo(dx - ss, dy); ctx.lineTo(dx + ss, dy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(dx, dy - ss); ctx.lineTo(dx, dy + ss); ctx.stroke();
+    }
+  }
+
+  /* ── ARC PARTICLES ── */
+  function drawParts(p) {
+    arcParts.forEach(function(pt) {
+      pt.pos = (pt.pos + pt.sp) % 1;
+      if (pt.pos > p) return;
+      var px = bez(pt.pos, aqsaX, cx, kaabaX);
+      var py = bez(pt.pos, lmY, arcCPy, lmY) + pt.off;
+      var a = pt.al * (0.3 + 0.7 * Math.sin(t * 0.055 + pt.pos * 14));
+
+      var r = Math.round(250 + (34 - 250) * pt.pos);
+      var g = Math.round(200 + (197 - 200) * pt.pos);
+      var b = Math.round(60 + (94 - 60) * pt.pos);
+
+      // Particle glow
+      ctx.beginPath(); ctx.arc(px, py, pt.sz * 2.5, 0, 6.283);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (a * 0.15) + ')';
+      ctx.fill();
+
+      // Particle core
+      ctx.beginPath(); ctx.arc(px, py, pt.sz, 0, 6.283);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+      ctx.fill();
+    });
+  }
+
+  /* ── PRAYING FIGURE ── */
+  function drawFigure(p) {
+    if (p < 0.08) return;
+    ctx.save();
+    var fa = Math.min(1, (p - 0.08) / 0.3);
+    ctx.globalAlpha = fa * (isL() ? 0.35 : 0.25);
+    ctx.translate(cx, H * 0.58);
+    var fs = Math.min(W / 360, 1.3);
+    ctx.scale(fs, fs);
+    ctx.rotate(-0.3 + p * 0.55);
+    var fc = isL() ? 'rgba(90,70,40,0.35)' : 'rgba(160,140,100,0.22)';
+    ctx.fillStyle = fc;
+    ctx.beginPath(); ctx.ellipse(0, -12, 5.2, 13, 0, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -31, 4.5, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = fc; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-4.2, -19); ctx.quadraticCurveTo(-15, -7, -12, 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4.2, -19); ctx.quadraticCurveTo(15, -7, 12, 6); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ── MAIN LOOP ── */
+  function frame() {
+    var sp;
+    if (t < 90) sp = 0;
+    else if (t < 220) sp = (t - 90) / 130;
+    else sp = 1;
+
+    var aqA, kbA;
+    if (t < 55) { aqA = Math.min(1, t / 40); kbA = 0; }
+    else if (t < 250) {
+      aqA = 0.40 + 0.60 * Math.max(0, 1 - (t - 150) / 100);
+      kbA = Math.min(1, Math.max(0, (t - 150) / 100));
+    } else {
+      aqA = 0.40 + 0.07 * Math.sin(t * 0.018);
+      kbA = 0.90 + 0.10 * Math.sin(t * 0.022 + 1);
+    }
+
+    // Background
+    ctx.fillStyle = isL() ? '#f3ede0' : '#040c18';
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars (dark mode)
+    if (!isL()) {
+      stars.forEach(function(s) {
+        var a = 0.20 + Math.sin(t * s.sp * 0.012 + s.ph) * 0.22;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283);
+        ctx.fillStyle = 'rgba(255,255,255,' + a + ')'; ctx.fill();
+      });
+    }
+
+    // Subtle warm radial
+    var cg = ctx.createRadialGradient(cx, H * 0.44, 0, cx, H * 0.44, W * 0.45);
+    cg.addColorStop(0, isL() ? 'rgba(252,211,77,0.045)' : 'rgba(252,211,77,0.028)');
+    cg.addColorStop(1, 'transparent');
+    ctx.fillStyle = cg; ctx.fillRect(0, 0, W, H);
+
+    // Left warm glow
+    var lg = ctx.createRadialGradient(aqsaX, lmY, 0, aqsaX, lmY, W * 0.24);
+    lg.addColorStop(0, isL() ? 'rgba(230,180,50,0.07)' : 'rgba(245,195,55,0.05)');
+    lg.addColorStop(1, 'transparent');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+
+    // Right green glow
+    var rg = ctx.createRadialGradient(kaabaX, lmY, 0, kaabaX, lmY, W * 0.24);
+    rg.addColorStop(0, isL() ? 'rgba(34,197,94,0.07)' : 'rgba(34,197,94,0.05)');
+    rg.addColorStop(1, 'transparent');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+
+    drawArc(sp);
+    drawParts(sp);
+    drawAqsa(aqA);
+    drawKaaba(kbA);
+    drawFigure(sp);
+
+    // ── LABELS ──
+    var lfs = Math.max(7, Math.min(10.5, W * 0.017));
+    var sfs = Math.max(6.5, Math.min(9, W * 0.015));
+    var afs = Math.max(isMob ? 14 : 17, Math.min(22, W * 0.032));
+    var baseY = lmY + 62 * sc;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+
+    // BEFORE label
+    if (aqA > 0.12) {
+      ctx.globalAlpha = Math.min(1, aqA * 1.4);
+      ctx.fillStyle = isL() ? 'rgba(165,120,30,0.78)' : 'rgba(255,200,50,0.72)';
+      ctx.font = '700 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText('BEFORE', aqsaX, baseY);
+      ctx.fillStyle = isL() ? 'rgba(135,95,25,0.60)' : 'rgba(200,160,50,0.55)';
+      ctx.font = '500 ' + sfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'AL-AQSA' : 'BAYT AL-MAQDIS', aqsaX, baseY + lfs + 3);
+      ctx.font = '700 ' + afs + 'px "Amiri",serif';
+      ctx.fillStyle = isL() ? 'rgba(165,120,30,0.48)' : 'rgba(255,210,60,0.42)';
+      ctx.fillText('المسجد الأقصى', aqsaX, baseY + lfs + sfs + 4);
+    }
+
+    // AFTER label
+    if (kbA > 0.12) {
+      ctx.globalAlpha = Math.min(1, kbA * 1.4);
+      ctx.fillStyle = isL() ? 'rgba(22,120,70,0.78)' : 'rgba(34,197,94,0.72)';
+      ctx.font = '700 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText('AFTER', kaabaX, baseY);
+      ctx.fillStyle = isL() ? 'rgba(16,100,55,0.60)' : 'rgba(22,163,74,0.55)';
+      ctx.font = '500 ' + sfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'MAKKAH' : 'MAKKAH AL-MUKARRAMAH', kaabaX, baseY + lfs + 3);
+      ctx.font = '700 ' + afs + 'px "Amiri",serif';
+      ctx.fillStyle = isL() ? 'rgba(22,120,70,0.48)' : 'rgba(34,197,94,0.42)';
+      ctx.fillText('الكعبة المشرفة', kaabaX, baseY + lfs + sfs + 4);
+    }
+
+    // Bottom label
+    if (sp > 0.2) {
+      ctx.globalAlpha = Math.min(1, (sp - 0.2) / 0.3) * (0.50 + 0.15 * Math.sin(t * 0.025));
+      ctx.fillStyle = isL() ? 'rgba(130,85,15,0.75)' : 'rgba(252,211,77,0.60)';
+      ctx.font = '600 ' + lfs + 'px "DM Sans",sans-serif';
+      ctx.fillText(isMob ? 'THE TURNING POINT' : 'THE TURNING POINT · VERSE 143', cx, H * 0.86);
+    }
+
+    ctx.globalAlpha = 1;
+
+    // ── VIGNETTES ──
+    var vt = ctx.createLinearGradient(0, 0, 0, H * 0.055);
+    vt.addColorStop(0, isL() ? 'rgba(243,237,224,0.90)' : 'rgba(4,12,24,0.90)');
+    vt.addColorStop(1, 'transparent');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, H * 0.055);
+    var vb = ctx.createLinearGradient(0, H * 0.945, 0, H);
+    vb.addColorStop(0, 'transparent');
+    vb.addColorStop(1, isL() ? 'rgba(243,237,224,0.90)' : 'rgba(4,12,24,0.90)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H * 0.945, W, H * 0.055);
+
+    t++;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  rafId = requestAnimationFrame(frame);
+
+  return {
+    stop: function() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+  };
+}
+
+var qiblaAnimator = null;
+
+
+
+
+
+
+
+
+/* ══════════════════════════════════════════════
+   AYAT AL-KURSI MIRROR DPR-aware canvas
+   ══════════════════════════════════════════════ */
+function initKursiMirror() {
+  var canvas = document.getElementById('kursiMirrorCanvas');
+  if (!canvas || canvas._kmInit) return;
+  canvas._kmInit = true;
+
+  /* ── HiDPI setup ── */
+  var dpr  = window.devicePixelRatio || 1;
+  var rect = canvas.getBoundingClientRect();
+  var W    = rect.width;
+  var H    = rect.height;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  /* ── Clause data ── */
+  var clauses = [
+    { label:'A',  color:[232,121,249], text:'Allah \u2014 there is no God but Him, the Living, the Sustaining' },
+    { label:'B',  color:[167,139,250], text:'Neither tiredness nor sleep overtakes Him' },
+    { label:'C',  color:[96,165,250],  text:'He owns what is in the heavens and the earth' },
+    { label:'D',  color:[74,222,128],  text:'Who could intercede with Him except by His permission?' },
+    { label:'E',  color:[252,211,77],  text:'He knows what is BEFORE them and what is AFTER them' },
+    { label:"D'", color:[74,222,128],  text:'They do not encompass any of His knowledge except what He wills' },
+    { label:"C'", color:[96,165,250],  text:'His throne encompasses the heavens and the earth' },
+    { label:"B'", color:[167,139,250], text:'Their preservation does not exhaust Him' },
+    { label:"A'", color:[232,121,249], text:'He is the Most High, the Most Supreme' }
+  ];
+
+  /* ── State ── */
+  var animPhase = 0, animStart = null, animDur = 2800;
+  var hlPair = -1, hlTime = 0, tick = 0;
+
+  /* ── Particles ── */
+  var parts = [];
+  for (var i = 0; i < 45; i++) {
+    parts.push({
+      x: W/2 + (Math.random()-0.5)*28,
+      y: Math.random()*H,
+      vy: 0.25 + Math.random()*0.65,
+      sz: 0.7 + Math.random()*1.4,
+      a: 0.12 + Math.random()*0.3,
+      ph: Math.random()*Math.PI*2
+    });
+  }
+
+  /* ── Responsive sizing helpers ── */
+  function sBW() { return Math.min(270, W * 0.39); }   // side box width
+  function cBW() { return Math.min(340, W * 0.50); }   // center box width
+  function sBH() { return Math.min(56, H * 0.115); }   // side box height
+  function cBH() { return Math.min(62, H * 0.125); }   // center box height
+  function pad() { return Math.max(8, W * 0.016); }
+  function lFS() { return Math.max(10, Math.min(12, W*0.019)); }
+  function tFS() { return Math.max(9.5, Math.min(11.5, W*0.017)); }
+  function stFS(){ return Math.max(8, Math.min(10, W*0.015)); }
+  function tiFS(){ return Math.max(11, Math.min(14, W*0.021)); }
+  function lh()  { return Math.max(12, Math.min(14, W*0.02)); }
+
+  /* ── Positions: linear → mirror layout ── */
+  // Layout: 4 pairs in upper area, E centered at bottom
+  function clausePos(idx, ph) {
+    var linY = H * 0.035 + idx * (H * 0.91 / 8);
+    var linX = W / 2;
+
+    var pStartY = H * 0.07;
+    var pSpace  = (H * 0.58) / 3;   // room for 4 items (0..3)
+    var mx, my;
+
+    if (idx < 4) {
+      mx = W * 0.235;
+      my = pStartY + idx * pSpace;
+    } else if (idx === 4) {
+      mx = W * 0.5;
+      my = H * 0.84;
+    } else {
+      var ri = 8 - idx;              // 3,2,1,0 → mirrors left side
+      mx = W * 0.765;
+      my = pStartY + ri * pSpace;
+    }
+
+    var t = ease(ph);
+    return { x: linX + (mx - linX) * t, y: linY + (my - linY) * t };
+  }
+
+  /* ── Drawing helpers ── */
+  function rrect(x, y, w, h, r) {
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);   ctx.quadraticCurveTo(x+w, y,   x+w, y+r);
+    ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);   ctx.quadraticCurveTo(x,   y+h, x,   y+h-r);
+    ctx.lineTo(x, y+r);     ctx.quadraticCurveTo(x,   y,   x+r, y);
+    ctx.closePath();
+  }
+
+  function wrapTxt(text, x, y, maxW, lineH, maxLn) {
+    var words = text.split(' '), line = '', drawn = 0;
+    for (var w = 0; w < words.length; w++) {
+      var test = line + words[w] + ' ';
+      if (ctx.measureText(test).width > maxW && w > 0) {
+        ctx.fillText(line.trim(), x, y);
+        line = words[w] + ' '; y += lineH; drawn++;
+        if (drawn >= maxLn) { ctx.fillText(line.trim().replace(/.$/,'\u2026'), x, y); return; }
+      } else { line = test; }
+    }
+    ctx.fillText(line.trim(), x, y);
+  }
+
+  function rgba(c, a) { return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')'; }
+
+  /* ── Draw: mirror line ── */
+  function drawMirror(ph) {
+    if (ph < 0.2) return;
+    var a = Math.min(1, (ph - 0.2) / 0.35);
+    var cx = W / 2;
+    ctx.save(); ctx.globalAlpha = a * 0.5;
+    ctx.strokeStyle = 'rgba(252,211,77,0.65)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,6]);
+    ctx.lineDashOffset = -tick * 0.4;
+    ctx.beginPath(); ctx.moveTo(cx, H*0.02); ctx.lineTo(cx, H*0.74); ctx.stroke();
+    ctx.setLineDash([]);
+    var g = ctx.createLinearGradient(cx-30,0,cx+30,0);
+    g.addColorStop(0,'rgba(252,211,77,0)');
+    g.addColorStop(0.5,'rgba(252,211,77,'+(a*0.06)+')');
+    g.addColorStop(1,'rgba(252,211,77,0)');
+    ctx.fillStyle = g; ctx.fillRect(cx-30, H*0.02, 60, H*0.72);
+    ctx.restore();
+  }
+
+  /* ── Draw: particles ── */
+  function drawParts() {
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      p.y += p.vy;
+      if (p.y > H + 10) { p.y = -10; p.x = W/2 + (Math.random()-0.5)*28; }
+      var a = p.a * (0.5 + 0.5 * Math.sin(tick*0.025 + p.ph));
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.sz, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(252,211,77,'+a+')'; ctx.fill();
+    }
+  }
+
+  /* ── Draw: connection curves ── */
+  function drawConns(ph) {
+    if (ph < 0.7) return;
+    var a = Math.min(1, (ph - 0.7) / 0.3);
+    var bw = sBW();
+    for (var i = 0; i < 4; i++) {
+      var p1 = clausePos(i, ph);
+      var p2 = clausePos(8 - i, ph);
+      var hl = (hlPair === i);
+      ctx.save();
+      ctx.globalAlpha = a * (hl ? 0.75 : 0.22);
+      ctx.beginPath();
+      ctx.moveTo(p1.x + bw/2, p1.y);
+      ctx.quadraticCurveTo(W/2, (p1.y + p2.y)/2, p2.x - bw/2, p2.y);
+      ctx.strokeStyle = rgba(clauses[i].color, 1);
+      ctx.lineWidth = hl ? 2.2 : 1;
+      ctx.stroke();
+      if (hl) {
+        ctx.globalAlpha = a * 0.9;
+        [p1.x + bw/2, p2.x - bw/2].forEach(function(px, idx) {
+          ctx.beginPath();
+          ctx.arc(px, idx === 0 ? p1.y : p2.y, 3.5, 0, Math.PI*2);
+          ctx.fillStyle = rgba(clauses[i].color, 0.9);
+          ctx.fill();
+        });
+      }
+      ctx.restore();
+    }
+  }
+
+  /* ── Draw: single clause box ── */
+  function drawClause(idx, ph) {
+    var pos = clausePos(idx, ph);
+    var c   = clauses[idx];
+    var cen = (idx === 4);
+    var hl  = (hlPair >= 0 && (idx === hlPair || idx === 8 - hlPair));
+
+    var bw = cen ? cBW() : sBW();
+    var bh = cen ? cBH() : sBH();
+    var x  = pos.x - bw/2;
+    var y  = pos.y - bh/2;
+    var p  = pad();
+
+    ctx.save();
+
+    /* Glow */
+    if (cen) {
+      var ga = 0.12 + 0.04 * Math.sin(tick*0.03);
+      ctx.fillStyle = 'rgba(252,211,77,'+ga+')';
+      rrect(x-4, y-4, bw+8, bh+8, 12); ctx.fill();
+    } else if (hl) {
+      ctx.fillStyle = rgba(c.color, 0.14 + 0.07*Math.sin(tick*0.05));
+      rrect(x-3, y-3, bw+6, bh+6, 10); ctx.fill();
+    }
+
+    /* Fill */
+    ctx.fillStyle = cen ? 'rgba(18,32,52,0.97)' : 'rgba(17,30,46,0.94)';
+    rrect(x, y, bw, bh, 8); ctx.fill();
+
+    /* Stroke */
+    if (cen) { ctx.strokeStyle = 'rgba(252,211,77,0.55)'; ctx.lineWidth = 2; }
+    else if (hl) { ctx.strokeStyle = rgba(c.color, 0.75); ctx.lineWidth = 1.5; }
+    else { ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1; }
+    rrect(x, y, bw, bh, 8); ctx.stroke();
+
+    /* Label */
+    ctx.fillStyle = rgba(c.color, 1);
+    ctx.font = 'bold ' + lFS() + 'px "DM Sans",sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(c.label, x + p, y + p - 1);
+
+    /* Text */
+    ctx.fillStyle = cen ? '#fcd34d' : (hl ? '#fff' : 'rgba(226,221,212,0.82)');
+    ctx.font = (cen ? '600 ' : '400 ') + tFS() + 'px "DM Sans",sans-serif';
+    var textY = y + p + lFS() + 2;
+    wrapTxt(c.text, x + p, textY, bw - p*2, lh(), cen ? 3 : 3);
+
+    /* "Mirror point" label for E */
+    if (cen && ph > 0.85) {
+      ctx.globalAlpha = Math.min(1, (ph - 0.85)/0.15);
+      ctx.fillStyle = 'rgba(252,211,77,0.82)';
+      ctx.font = 'bold ' + stFS() + 'px "DM Sans",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('\u2605 THE MIRROR POINT \u2605', pos.x, y + bh + 7);
+    }
+
+    ctx.restore();
+  }
+
+  /* ── Main loop ── */
+  function frame(ts) {
+    if (!animStart) animStart = ts;
+    if (animPhase < 1) animPhase = Math.min(1, (ts - animStart) / animDur);
+
+    hlTime++;
+    if (animPhase >= 1) {
+      var cd = 110, total = cd * 5, cp = hlTime % total;
+      hlPair = cp < cd * 4 ? Math.floor(cp / cd) : -1;
+    }
+
+    /* Clear */
+    ctx.fillStyle = '#0b1622'; ctx.fillRect(0, 0, W, H);
+
+    drawMirror(animPhase);
+    drawParts();
+    drawConns(animPhase);
+
+    /* Draw left side, right side, then center on top */
+    for (var i = 0; i < 4; i++) drawClause(i, animPhase);
+    for (var i = 5; i < 9; i++) drawClause(i, animPhase);
+    drawClause(4, animPhase);
+
+    /* Title */
+    if (animPhase > 0.45) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, (animPhase - 0.45)/0.3);
+      ctx.fillStyle = 'rgba(252,211,77,0.82)';
+      ctx.font = 'bold ' + tiFS() + 'px "DM Sans",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('PERFECT RING COMPOSITION', W/2, 5);
+      ctx.restore();
+    }
+
+    tick++;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"ring-composition");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: 'ring-composition',
+  question: 'Al-Baqarah has 286 verses. The centre verse contains the word \'middle\' (وَسَطًا). What is the verse number of the exact centre?',
+  
+  inputType: "mirror","unit":"","min":0,"max":286,"step":1,
+  
+  correct: 143,
+  correctLabel: 'Verse 143',
+  curiositySeed: {
+    question: 'Galileo was sentenced to house arrest for saying Earth moves. The Quran uses the word كُلٌّ — \'all\' (plural 3+) — for orbiting bodies. Does this include Earth?',
+    nextUrl: 'quran-celestial-orbits.html',
+    nextTitle: 'Celestial Orbits'
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+QuranValidator.attach('qv-ring',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 2:143 \u2014 it contains \u0648\u064E\u0633\u064E\u0637\u064B\u0627 (middle). It IS the middle verse of Al-Baqarah (286 \u00f7 2 = verse 143).',
+  groups:[
+    {id:'middle', label:'Middle \u2014 center of Al-Baqarah', arabic:'\u0648\u064E\u0633\u064E\u0637\u064B\u0627', color:'#4ade80', occurrences:[[2,143]]}
+  ]
+});
+</script>
+</body>
+</html>

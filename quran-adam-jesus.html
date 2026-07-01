@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Adam &amp; Jesus · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent: #34d399;
+      --adam:         #f97316;
+      --adam-light:   #fb923c;
+      --adam-dim:     rgba(249,115,22,0.10);
+      --adam-ring:    rgba(251,146,60,0.22);
+      --jesus:        #3b82f6;
+      --jesus-light:  #93c5fd;
+      --jesus-dim:    rgba(59,130,246,0.10);
+      --jesus-ring:   rgba(147,197,253,0.22);
+      --match:        #10b981;
+      --match-light:  #34d399;
+      --match-dim:    rgba(16,185,129,0.10);
+      --match-ring:   rgba(52,211,153,0.22);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --gold-dim:     rgba(245,158,11,0.08);
+      --gold-ring:    rgba(245,158,11,0.22);
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    /* Verse card */
+    .verse-card { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--match-light); border-radius: 14px; padding: 26px 22px; margin-bottom: 22px; }
+    .verse-ref { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--match-light); margin-bottom: 14px; }
+    .verse-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(19px, 3.2vw, 24px); line-height: 2.2; color: var(--text); margin-bottom: 14px; }
+    .pv-jesus-hl { color: var(--jesus-light); font-weight: 700; }
+    .pv-adam-hl  { color: var(--adam-light);  font-weight: 700; }
+    .verse-tr { font-size: 14px; line-height: 1.8; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; font-style: italic; }
+    .verse-tr strong { color: var(--text); font-style: normal; }
+
+    /* Pair cards */
+    .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .pair-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 16px; text-align: center; position: relative; overflow: hidden; }
+    .pair-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .pc-adam::after  { background: linear-gradient(90deg, #c2410c, var(--adam-light)); }
+    .pc-jesus::after { background: linear-gradient(90deg, #1d4ed8, var(--jesus-light)); }
+    .pc-arabic { font-family: 'Amiri', serif; font-size: 42px; direction: rtl; margin-bottom: 6px; }
+    .pc-arabic.adam  { color: var(--adam-light); }
+    .pc-arabic.jesus { color: var(--jesus-light); }
+    .pc-name { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px; }
+    .pc-attr { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .pc-attr strong { color: var(--text); }
+
+    /* Answer cards */
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 18px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    /* Dual counter (stage 2) */
+    .dual-display { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin: 8px 0 26px; }
+    .dual-side { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 14px; text-align: center; }
+    .dual-side.adam-side  { border-top: 3px solid var(--adam-light); }
+    .dual-side.jesus-side { border-top: 3px solid var(--jesus-light); }
+    .dual-arabic { font-family: 'Amiri', serif; font-size: 40px; line-height: 1.2; margin-bottom: 4px; }
+    .dual-side.adam-side  .dual-arabic { color: var(--adam-light); }
+    .dual-side.jesus-side .dual-arabic { color: var(--jesus-light); }
+    .dual-roman { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+    .dual-num { font-family: 'Playfair Display', serif; font-size: clamp(60px, 11vw, 80px); font-weight: 700; line-height: 1; }
+    .dual-side.adam-side  .dual-num { color: var(--adam-light); }
+    .dual-side.jesus-side .dual-num { color: var(--jesus-light); }
+    .dual-lbl { font-size: 10px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: .05em; }
+    .dual-eq { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; color: var(--muted); transition: color .6s, text-shadow .6s; text-align: center; }
+    .dual-eq.lit { color: var(--match-light); text-shadow: 0 0 36px rgba(52,211,153,0.55); }
+
+    .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--match); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .calc-btn.used { opacity: 0.5; pointer-events: none; }
+
+    /* Prophet table */
+    .prophet-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px; }
+    .prophet-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 16px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .prophet-table td { padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .prophet-table .match-row td { background: var(--match-dim); }
+    .pt-num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+    .pt-num.muted   { color: var(--muted); }
+    .pt-num.adam-c  { color: var(--adam-light); }
+    .pt-num.jesus-c { color: var(--jesus-light); }
+    .pt-check { color: var(--match-light); font-weight: 500; font-size: 13px; }
+    .pt-no    { color: var(--surface2); font-size: 20px; }
+
+    /* Nav coordinate cards */
+    .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; opacity: 0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
+    .nav-card.show { opacity: 1; transform: none; }
+    .nav-head { display: flex; align-items: stretch; }
+    .nav-formula { padding: 16px 18px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-arabic { font-family: 'Amiri', serif; font-size: 30px; direction: rtl; }
+    .nav-arabic.adam  { color: var(--adam-light); }
+    .nav-arabic.jesus { color: var(--jesus-light); }
+    .nav-arabic.both  { color: var(--match-light); }
+    .nav-letters { font-size: 12px; margin-top: 2px; }
+    .nav-letters.adam-c  { color: var(--adam-light); }
+    .nav-letters.jesus-c { color: var(--jesus-light); }
+    .nav-letters.match-c { color: var(--match-light); }
+    .nav-arrow-cell { padding: 16px 6px; color: var(--muted); font-size: 16px; display: flex; align-items: center; }
+    .nav-surah { flex: 1; padding: 16px 18px; border-left: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; }
+    .nav-surah-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+    .nav-surah-num.adam-c  { color: var(--adam-light); }
+    .nav-surah-num.jesus-c { color: var(--jesus-light); }
+    .nav-surah-num.match-c { color: var(--match-light); }
+    .nav-surah-name { font-size: 13px; color: var(--muted); }
+    .nav-body { padding: 14px 18px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .nav-body strong { color: var(--text); }
+    .mini-verse { background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 2px solid var(--border); padding: 10px 14px; margin-top: 10px; font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: 17px; line-height: 2; color: var(--text); }
+    .mini-tr { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 6px; direction: ltr; text-align: left; line-height: 1.5; }
+    .s25-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .s25-card { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .s25-card strong { color: var(--text); font-size: 12px; }
+    .s25-tag { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+    .s25-tag.adam-c  { color: var(--adam-light); }
+    .s25-tag.jesus-c { color: var(--jesus-light); }
+
+    /* Gold box */
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    /* Insight box */
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--match-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+    .insight-box em { font-style: normal; color: var(--match-light); }
+
+    /* XP badge */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    /* Prob block */
+    .prob-block { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+    .prob-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+    .prob-row:last-of-type { border-bottom: none; }
+    .prob-row .pl { color: var(--muted); }
+    .prob-row .pr { color: var(--text); font-weight: 500; }
+    .prob-row .pr.hl { color: var(--match-light); }
+    .prob-footer { padding: 16px 18px; background: var(--match-dim); border-top: 1px solid var(--match-ring); }
+    .prob-footer .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .prob-footer .val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--match-light); }
+
+    /* Feedback panel */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-man-woman-chromosomes.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Pattern 4b · Chromosomes
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · Adam &amp; Jesus</div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 0 · THE QURAN PAIRS THEM
+  ══════════════════════════════════════ -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--match-light)">Pattern 5 · Adam &amp; Jesus</div>
+    <h1 class="hero-title">The Quran compares Jesus directly to Adam. In one verse. Then the text encodes that pairing in every layer of its structure.</h1>
+    <p class="body-text">This isn't a researcher's observation. The Quran states the comparison itself the only time any two figures are explicitly paired this way. Both share one defining characteristic no other prophet in Islamic theology shares.</p>
+
+    <div class="verse-card">
+      <div class="verse-ref">Quran 3:59 the only explicit pairing in the text</div>
+      <div class="verse-ar">
+        إِنَّ مَثَلَ <span class="pv-jesus-hl">عِيسَىٰ</span> عِندَ ٱللَّهِ كَمَثَلِ <span class="pv-adam-hl">ءَادَمَ</span> ۖ خَلَقَهُۥ مِن تُرَابٍ ثُمَّ قَالَ لَهُۥ كُن فَيَكُونُ
+      </div>
+      <div class="verse-tr">"Indeed, the example of <strong>Jesus</strong> to Allah is like that of <strong>Adam</strong>. He created him from dust; then He said to him, 'Be,' and he was."</div>
+    </div>
+
+    <div class="pair-grid">
+      <div class="pair-card pc-adam">
+        <div class="pc-arabic adam">آدم</div>
+        <div class="pc-name">Adam</div>
+        <div class="pc-attr"><strong>No human father.</strong><br>Created from dust by divine command.</div>
+      </div>
+      <div class="pair-card pc-jesus">
+        <div class="pc-arabic jesus">عيسى</div>
+        <div class="pc-name">Jesus</div>
+        <div class="pc-attr"><strong>No human father.</strong><br>Born of a virgin by divine command.</div>
+      </div>
+    </div>
+
+    <button class="btn" style="background:var(--match);color:#fff" onclick="go(1)">
+      Take the lesson
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 1 · EXERCISE 1
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <div class="prompt">How many times does the name عيسى (Jesus/Isa) appear in the entire Quran?</div>
+    <p class="body-text" style="margin-bottom:20px">Count every occurrence across all 114 chapters no filters, no categories. Just the proper name wherever it appears. Make your best guess.</p>
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">11</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">18</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,true)">25</div>
+      <div class="answer-card" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700" onclick="pickEx1(this,false)">36</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 2 · EXERCISE 2 DUAL COUNTER
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s2">
+    <div class="prompt">Now count both names together آدم and عيسى across the entire Quran.</div>
+    <p class="body-text" style="margin-bottom:20px">No adjustments, no semantic roles just the raw proper name count. Watch what happens when you run both.</p>
+
+    <div class="dual-display">
+      <div class="dual-side adam-side">
+        <div class="dual-arabic">آدم</div>
+        <div class="dual-roman">Adam</div>
+        <div class="dual-num" id="dAdam">0</div>
+        <div class="dual-lbl">mentions</div>
+      </div>
+      <div class="dual-eq" id="dualEq">=</div>
+      <div class="dual-side jesus-side">
+        <div class="dual-arabic">عيسى</div>
+        <div class="dual-roman">Jesus</div>
+        <div class="dual-num" id="dJesus">0</div>
+        <div class="dual-lbl">mentions</div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="countBothBtn" onclick="runDual()">Count both names</button>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 3 · EXERCISE 3
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <div class="prompt">Adam's name آدم has 3 letters in Arabic. Surah 3 is about…</div>
+    <p class="body-text" style="margin-bottom:20px">Adam is the first human the father of all humanity. His name's letter count points to Surah 3. What does that chapter focus on?</p>
+    <div class="answers-grid">
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">The laws of prayer and fasting</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Worship practices and ritual obligations</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,true)">
+        <strong style="color:var(--text)">Family, lineage, and divine selection</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Āl-ʿImrān "The Family of Imran"</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">The afterlife and resurrection</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Judgment day and what follows</div>
+      </div>
+      <div class="answer-card" style="font-size:15px;padding:20px 18px;text-align:left" onclick="pickEx3(this,false)">
+        <strong style="color:var(--text)">Stories of nations that were punished</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Lessons from destroyed civilisations</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       STAGE 4 · VERDICT
+  ══════════════════════════════════════ -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">Adam: 25. Jesus: 25. The only prophets in the Quran with an exact matching count and the only two with no human father.</h2>
+
+    <p class="body-text" style="margin-bottom:14px">Every major prophet checked. Only one pair matches:</p>
+
+    <table class="prophet-table" id="prophet-tbl">
+      <thead>
+        <tr>
+          <th>Prophet</th>
+          <th>Arabic</th>
+          <th>Mentions</th>
+          <th>Unique pair?</th>
+        </tr>
+      </thead>
+      <tbody id="prophet-body"></tbody>
+    </table>
+
+    <div class="insight-box" style="margin-bottom:28px">
+      Moses appears <em>136</em> times. Abraham <em>69</em>. Noah <em>43</em>. No two major prophets share an identical count <strong>except Adam and Jesus</strong>. And they are the only two prophets in Islamic theology with no human father. The text encodes the theology.
+    </div>
+
+    <p class="body-text" style="margin-bottom:14px">The names also act as coordinates inside the book each pointing to a chapter whose content mirrors the prophet's identity:</p>
+
+    <div id="navCards">
+
+      <div class="nav-card" id="nc0">
+        <div class="nav-head">
+          <div class="nav-formula">
+            <div>
+              <div class="nav-arabic adam">آدم</div>
+              <div class="nav-letters adam-c">3 letters</div>
+            </div>
+          </div>
+          <div class="nav-arrow-cell">→</div>
+          <div class="nav-surah">
+            <div class="nav-surah-num adam-c">Surah 3</div>
+            <div class="nav-surah-name">Āl-ʿImrān · "The Family of Imran"</div>
+          </div>
+        </div>
+        <div class="nav-body">
+          <strong>The connection:</strong> Adam is the father of all humanity. Surah 3 is about lineage, family, and divine selection. Its opening verse names Adam first among the chosen:
+          <div class="mini-verse" dir="rtl">إِنَّ ٱللَّهَ ٱصْطَفَىٰٓ ءَادَمَ وَنُوحًا وَءَالَ إِبْرَٰهِيمَ وَءَالَ عِمْرَٰنَ عَلَى ٱلْعَـٰلَمِينَ</div>
+          <div class="mini-tr">"Allah chose Adam, Noah, the family of Abraham, and the family of Imran over the worlds." 3:33</div>
+        </div>
+      </div>
+
+      <div class="nav-card" id="nc1">
+        <div class="nav-head">
+          <div class="nav-formula">
+            <div>
+              <div class="nav-arabic jesus">عيسى</div>
+              <div class="nav-letters jesus-c">4 letters</div>
+            </div>
+          </div>
+          <div class="nav-arrow-cell">→</div>
+          <div class="nav-surah">
+            <div class="nav-surah-num jesus-c">Surah 4</div>
+            <div class="nav-surah-name">An-Nisāʾ · "The Women"</div>
+          </div>
+        </div>
+        <div class="nav-body">
+          <strong>The connection:</strong> Jesus is the only prophet whose entire identity is defined by <strong> his mother </strong> always called "Jesus, son of Mary." His name's letter count points to the chapter named after women. Surah 4's defining verse on Jesus:
+          <div class="mini-verse" dir="rtl">إِنَّمَا ٱلْمَسِيحُ عِيسَى ٱبْنُ مَرْيَمَ رَسُولُ ٱللَّهِ وَكَلِمَتُهُۥٓ</div>
+          <div class="mini-tr">"The Messiah, Jesus son of Mary, was a messenger of Allah and His word which He directed to Mary." 4:171</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="prob-block">
+      <div class="prob-row"><span class="pl">Prophet name frequency range in the Quran</span><span class="pr">1 to 136 mentions</span></div>
+      <div class="prob-row"><span class="pl">Probability any two prophets share a count</span><span class="pr">~1 in 137</span></div>
+      <div class="prob-row"><span class="pl">These two are the text's only explicit theological pair</span><span class="pr hl">Quran 3:59 stated directly</span></div>
+      <div class="prob-row"><span class="pl">They are the only fatherless-creation pair in Islam</span><span class="pr hl">Unique in all of Islamic theology</span></div>
+      <div class="prob-row"><span class="pl">Any other prophet pair matches?</span><span class="pr hl">No only Adam &amp; Jesus</span></div>
+      <div class="prob-footer">
+        <div class="lbl">Probability of this exact match at specifically 25</div>
+        <div class="val">~1 in 18,800</div>
+      </div>
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">Three independent layers. All point to the same pairing.</div>
+      <div class="gs">Verse 3:59 states the comparison. The name counts confirm it 25:25, exact, no adjustments. Adam's 3 letters point to Surah 3 (family and lineage). Jesus's 4 letters point to Surah 4 (The Women for the prophet born of one). Both appear 25 times, and Surah 25 contains the verse about earthly origin (25:7) and celestial descent (25:25) one for each. The pairing the text announces is encoded in every layer of its structure.</div>
+    </div>
+
+    <div id="qv-adam-jesus"></div>
+
+    <div id="curiositySeed"></div>
+    <a href="quran-hell-paradise.html" class="btn" style="background:var(--match);color:#fff;margin-bottom:12px">
+      Next pattern · Hell &amp; Paradise
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div></div>
+    <a href="quran-man-woman-chromosomes.html" class="btn" style="background:transparent;color:var(--muted);border:1px solid var(--border);font-size:13px;padding:10px 20px;margin-top:8px">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back · Chromosomes
+    </a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon">✓</div>
+    <div>
+      <div class="fb-title">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" onclick="hideFb()">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var fbCb = null;
+var dualDone = false;
+
+var barMap  = { 0:'0%', 1:'25%', 2:'50%', 3:'75%', 4:'100%' };
+var metaMap = { 0:'Lesson · Adam & Jesus', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete · +30 XP' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('lbar').style.width = barMap[n] || '0%';
+  document.getElementById('lmeta').textContent = metaMap[n] || '';
+  if (n === 4) { saveProgress('adam-jesus'); initVerdict(); }
+}
+
+function showOk(sub, cb) {
+  fbCb = cb;
+  document.getElementById('fbSub').textContent = sub;
+  var panel = document.getElementById('fbPanel');
+  panel.className = 'fb-panel fb-ok show';
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').classList.remove('show');
+  if (fbCb) { var f = fbCb; fbCb = null; f(); }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(tick);
+    else if (cb) cb();
+  })(performance.now());
+}
+
+/* Exercise 1 */
+function pickEx1(el, correct) {
+  if (el.classList.contains('ac-correct') || el.classList.contains('ac-disabled')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
+    showOk('Jesus appears 25 times. Now watch what happens when you count Adam alongside him.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* Exercise 2 dual counter */
+function runDual() {
+  if (dualDone) return;
+  dualDone = true;
+  document.getElementById('countBothBtn').classList.add('used');
+  var adamEl  = document.getElementById('dAdam');
+  var jesusEl = document.getElementById('dJesus');
+  var eqEl    = document.getElementById('dualEq');
+  var done    = 0;
+  function onDone() {
+    done++;
+    if (done === 2) {
+      setTimeout(function() {
+        eqEl.classList.add('lit');
+        setTimeout(function() {
+          showOk('Adam: 25. Jesus: 25. Exact match no adjustments, no filtering. The Quran pairs them in verse 3:59 and encodes that pairing in the count of their names.', function() { go(3); });
+        }, 500);
+      }, 200);
+    }
+  }
+  setTimeout(function() {
+    animFrom(adamEl,  0, 25, 1100, onDone);
+    animFrom(jesusEl, 0, 25, 1100, onDone);
+  }, 300);
+}
+
+/* Exercise 3 */
+function pickEx3(el, correct) {
+  if (el.classList.contains('ac-correct') || el.classList.contains('ac-disabled')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (c !== el) c.classList.add('ac-disabled'); });
+    showOk('Adam\'s 3-letter name points to Surah 3 "The Family of Imran" which names Adam first among the chosen. Jesus\'s 4-letter name points to Surah 4 "The Women" for the prophet born of one.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 450);
+  }
+}
+
+/* Verdict */
+var prophets = [
+  { name:'Moses',    ar:'مُوسَى',    n:136, cls:'muted',   match:false },
+  { name:'Abraham',  ar:'إِبْرَٰهِيم', n:69,  cls:'muted',   match:false },
+  { name:'Noah',     ar:'نُوح',      n:43,  cls:'muted',   match:false },
+  { name:'Mariam',   ar:'مَرْيَمَ',    n:32,  cls:'muted',   match:false },
+  { name:'Muhammad', ar:'مُحَمَّد',  n:4,   cls:'muted',   match:false },
+  { name:'Adam',     ar:'آدَم',      n:25,  cls:'adam-c',  match:true  },
+  { name:'Jesus',    ar:'عِيسَى',    n:25,  cls:'jesus-c', match:true  },
+];
+
+function buildProphetTable() {
+  var tbody = document.getElementById('prophet-body');
+  tbody.innerHTML = '';
+  prophets.forEach(function(p, i) {
+    setTimeout(function() {
+      var tr = document.createElement('tr');
+      if (p.match) tr.className = 'match-row';
+      var arColor = p.match ? (p.cls === 'adam-c' ? 'var(--adam-light)' : 'var(--jesus-light)') : 'var(--muted)';
+      tr.innerHTML = '<td style="color:var(--text);font-weight:' + (p.match ? '500' : '400') + '">' + p.name + '</td>'
+        + '<td><span style="font-family:\'Amiri\',serif;font-size:20px;direction:rtl;color:' + arColor + '">' + p.ar + '</span></td>'
+        + '<td class="pt-num ' + p.cls + '">' + p.n + '</td>'
+        + '<td>' + (p.match ? '<span class="pt-check">✓ The pair</span>' : '<span class="pt-no">—</span>') + '</td>';
+      tbody.appendChild(tr);
+      tr.style.animation = 'rise .35s ease';
+    }, i * 270);
+  });
+}
+
+function showNavCards() {
+  var delay = prophets.length * 270 + 300;
+  ['nc0','nc1','nc2'].forEach(function(id, i) {
+    setTimeout(function() {
+      document.getElementById(id).classList.add('show');
+    }, delay + i * 520);
+  });
+}
+
+function initVerdict() {
+  setTimeout(function() { document.getElementById('xpBadge').classList.add('show'); }, 300);
+  setTimeout(function() {
+    buildProphetTable();
+    showNavCards();
+  }, 500);
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, t = 0;
+
+  var dust = [];
+  for (var i = 0; i < 60; i++) {
+    dust.push({
+      progress: Math.random(),
+      side: Math.random() < 0.5 ? -1 : 1,
+      spread: (Math.random() - 0.5) * 20,
+      speed: 0.002 + Math.random() * 0.003,
+      size: Math.random() * 2 + 0.5
+    });
+  }
+
+  function drawSky() {
+    var bg = ctx.createRadialGradient(W/2, H * 0.2, 10, W/2, H/2, W*0.8);
+    bg.addColorStop(0, '#0c0818');
+    bg.addColorStop(0.5, '#060410');
+    bg.addColorStop(1, '#020205');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle stars
+    ctx.fillStyle = '#ffffff';
+    var stars = [[80, 15], [220, 40], [420, 20], [560, 50], [140, 65], [500, 70], [350, 10]];
+    stars.forEach(function(s) {
+      ctx.globalAlpha = 0.3 + Math.sin(t * 2 + s[0]) * 0.3;
+      ctx.fillRect(s[0], s[1], 1.5, 1.5);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSourceBeam() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    // Source glow at the top
+    var g = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 80);
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    g.addColorStop(0.3, 'rgba(200, 180, 255, 0.2)');
+    g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(W/2 - 80, 0, 160, 100);
+
+    // Left sweeping beam to Adam
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 5, 0);
+    ctx.quadraticCurveTo(W/2 - 40, H * 0.4, W * 0.32, H * 0.85);
+    ctx.lineTo(W * 0.32 + 30, H * 0.85);
+    ctx.quadraticCurveTo(W/2 + 20, H * 0.4, W/2 + 5, 0);
+    ctx.closePath();
+    var b1 = ctx.createLinearGradient(W/2, 0, W * 0.32, H * 0.85);
+    b1.addColorStop(0, 'rgba(255, 200, 150, 0.12)');
+    b1.addColorStop(1, 'rgba(255, 100, 50, 0)');
+    ctx.fillStyle = b1;
+    ctx.fill();
+
+    // Right sweeping beam to Jesus
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 5, 0);
+    ctx.quadraticCurveTo(W/2 + 40, H * 0.4, W * 0.68, H * 0.85);
+    ctx.lineTo(W * 0.68 - 30, H * 0.85);
+    ctx.quadraticCurveTo(W/2 - 20, H * 0.4, W/2 + 5, 0);
+    ctx.closePath();
+    var b2 = ctx.createLinearGradient(W/2, 0, W * 0.68, H * 0.85);
+    b2.addColorStop(0, 'rgba(150, 200, 255, 0.12)');
+    b2.addColorStop(1, 'rgba(50, 100, 255, 0)');
+    ctx.fillStyle = b2;
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawDust() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    dust.forEach(function(d) {
+      d.progress += d.speed;
+      if (d.progress > 1) { d.progress = 0; d.spread = (Math.random() - 0.5) * 20; }
+
+      var targetX = d.side === -1 ? W * 0.32 : W * 0.68;
+      var targetY = H * 0.85;
+      var u = d.progress;
+      
+      // Bezier math for X and Y along the sweeping beam
+      var cpx = d.side === -1 ? W/2 - 40 : W/2 + 40;
+      var cpy = H * 0.4;
+      var x = (1-u)*(1-u)*W/2 + 2*(1-u)*u*cpx + u*u*targetX + d.spread * (1 - u);
+      var y = (1-u)*(1-u)*0 + 2*(1-u)*u*cpy + u*u*targetY;
+
+      var alpha = Math.sin(u * Math.PI) * 0.8;
+      var r = d.side === -1 ? 255 : 150;
+      var g2 = d.side === -1 ? 180 : 220;
+      var b = d.side === -1 ? 100 : 255;
+
+      ctx.beginPath();
+      ctx.arc(x, y, d.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',' + alpha + ')';
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  // Draws a sharp, towering geometric light presence
+  function drawPresence(cx, cy, colorInner, colorMid, colorOuter, phaseOffset) {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    var breathe = Math.sin(t * 1.2 + phaseOffset) * 0.1 + 1; // 0.9 to 1.1 scale
+
+    // Outer ethereal aura glow
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var outerGlow = ctx.createRadialGradient(0, -40 * breathe, 10, 0, -40 * breathe, 90);
+    outerGlow.addColorStop(0, colorOuter + '0.2)');
+    outerGlow.addColorStop(1, colorOuter + '0)');
+    ctx.fillStyle = outerGlow;
+    ctx.fillRect(-90, -130, 180, 180);
+    ctx.restore();
+
+    // Sharp Diamond/Rhombus shape (Vertical, like a standing aura)
+    var h = 110 * breathe;
+    var w = 35 * breathe;
+
+    ctx.beginPath();
+    ctx.moveTo(0, -h);         // Top point
+    ctx.lineTo(w, -h * 0.3);  // Right shoulder
+    ctx.lineTo(w * 0.6, 20);  // Right hip
+    ctx.lineTo(0, 40);        // Bottom point
+    ctx.lineTo(-w * 0.6, 20); // Left hip
+    ctx.lineTo(-w, -h * 0.3); // Left shoulder
+    ctx.closePath();
+
+    // Fill with mid-tone
+    var grad = ctx.createLinearGradient(0, -h, 0, 40);
+    grad.addColorStop(0, colorMid + '0.8)');
+    grad.addColorStop(0.5, colorInner + '0.4)');
+    grad.addColorStop(1, colorOuter + '0.1)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Crisp sharp edge outline
+    ctx.strokeStyle = colorInner + '0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Inner cross-hatch geometry for "edgy detailed" look
+    ctx.strokeStyle = colorInner + '0.4)';
+    ctx.lineWidth = 1;
+    
+    // Horizontal sharp lines
+    for (var i = 1; i < 4; i++) {
+      var ly = -h + (h + 40) * (i / 4);
+      var lw = w * (1 - Math.abs((ly + 40) / (h + 40))); // Taper towards top and bottom
+      ctx.beginPath();
+      ctx.moveTo(-lw, ly);
+      ctx.lineTo(lw, ly);
+      ctx.stroke();
+    }
+
+    // Inner vertical spine
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.8);
+    ctx.lineTo(0, 30);
+    ctx.strokeStyle = colorInner + '0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Blinding inner core (White hot center)
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var core = ctx.createRadialGradient(0, -50 * breathe, 0, 0, -50 * breathe, 25);
+    core.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+    core.addColorStop(0.5, colorInner + '0.4)');
+    core.addColorStop(1, colorInner + '0)');
+    ctx.fillStyle = core;
+    ctx.fillRect(-25, -75 * breathe, 50, 50);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function frame() {
+    t += 0.012;
+    ctx.clearRect(0, 0, W, H);
+
+    drawSky();
+    drawSourceBeam();
+    drawDust();
+
+    // Left Light: Adam (Warm Gold/Amber - Created from Earth/Clay)
+    drawPresence(W * 0.32, H * 0.85, 'rgba(255, 200, 100,', 'rgba(255, 140, 50,', 'rgba(180, 60, 20,', 0);
+    
+    // Right Light: Jesus (Cool Cyan/Blue - Created from a Word/Ruh)
+    drawPresence(W * 0.68, H * 0.85, 'rgba(150, 220, 255,', 'rgba(80, 160, 255,', 'rgba(30, 60, 180,', 3.14);
+
+    // Vignettes
+    var vt = ctx.createLinearGradient(0, 0, 0, 35);
+    vt.addColorStop(0, 'rgba(2,2,5,0.9)');
+    vt.addColorStop(1, 'rgba(2,2,5,0)');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, 35);
+
+    var vb = ctx.createLinearGradient(0, H - 35, 0, H);
+    vb.addColorStop(0, 'rgba(2,2,5,0)');
+    vb.addColorStop(1, 'rgba(2,2,5,0.9)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H - 35, W, 35);
+
+    var vl = ctx.createLinearGradient(0, 0, 35, 0);
+    vl.addColorStop(0, 'rgba(2,2,5,0.8)');
+    vl.addColorStop(1, 'rgba(2,2,5,0)');
+    ctx.fillStyle = vl; ctx.fillRect(0, 0, 35, H);
+
+    var vr = ctx.createLinearGradient(W - 35, 0, W, 0);
+    vr.addColorStop(0, 'rgba(2,2,5,0)');
+    vr.addColorStop(1, 'rgba(2,2,5,0.8)');
+    ctx.fillStyle = vr; ctx.fillRect(W - 35, 0, 35, H);
+
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+}
+
+// Call it when the page loads
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"adam-jesus");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: "adam-jesus",
+  question: "Adam (آدم) is named 25 times. How many times is Jesus (عيسى) named?",
+  unit: "",
+  inputType: "scale-balance",
+  leftLabel: "Adam", leftArabic: "آدم", leftCount: 25,
+  rightLabel: "Jesus", rightArabic: "عيسى",
+  min: 0, max: 50, step: 1,
+  correct: 25,
+  correctLabel: "25 times",
+  curiositySeed: {
+    question: "Hell is mentioned 77 times in the Quran. How many times is Paradise mentioned?",
+    nextUrl:  "quran-hell-paradise.html",
+    nextTitle:"Hell & Paradise"
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+var ADAM_LIST = [
+  [2,31],[2,33],[2,34],[2,35],[2,37],[3,33],[3,59],[5,27],[7,11],[7,19],
+  [7,26],[7,27],[7,31],[7,35],[7,172],[17,61],[17,70],[18,50],[19,58],
+  [20,115],[20,116],[20,117],[20,120],[20,121],[36,60]
+];
+var JESUS_LIST = [
+  [2,87],[2,136],[2,253],[3,45],[3,52],[3,55],[3,59],[3,84],[4,157],[4,163],
+  [4,171],[5,46],[5,78],[5,110],[5,112],[5,114],[5,116],[6,85],[19,34],
+  [33,7],[42,13],[43,63],[57,27],[61,6],[61,14]
+];
+QuranValidator.attach('qv-adam-jesus', {
+  mode: 'count',
+  title: 'Read it yourself in the Quran',
+  subtitle: 'Count every آدم (Adam) and عيسى (Jesus) in the Quran',
+  groups: [
+    {
+      id: 'adam',
+      label: 'Adam',
+      arabic: 'آدم',
+      color: '#34d399',
+      occurrences: ADAM_LIST
+    },
+    {
+      id: 'jesus',
+      label: 'Jesus',
+      arabic: 'عيسى',
+      color: '#818cf8',
+      occurrences: JESUS_LIST
+    }
+  ],
+  claimedRatio: '25 : 25 exact match'
+});
+</script>
+</body>
+</html>

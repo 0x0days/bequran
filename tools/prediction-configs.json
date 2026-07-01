@@ -1,0 +1,760 @@
+[
+  {
+    "lessonId": "sea-land",
+    "question": "What percentage of Earth's surface is covered by ocean?",
+    "unit": "%",
+    "inputType": "slider",
+    "min": 0, "max": 100, "step": 1,
+    "correct": 71,
+    "correctLabel": "71%",
+    "reactionHint": "The Quran wrote two words 1,400 years ago that nail this ratio to within 1%.",
+    "curiositySeed": {
+      "question": "The Quran's 16th chapter is named 'The Bee.' Male bees have exactly 16 chromosomes. Coincidence?",
+      "nextUrl": "quran-chromosomes.html",
+      "nextTitle": "Chromosomes & The Bee"
+    }
+  },
+  {
+    "lessonId": "chromosomes",
+    "question": "How many chromosomes does a male (drone) bee have?",
+    "unit": "chromosomes",
+    "inputType": "slider",
+    "min": 2, "max": 64, "step": 1,
+    "correct": 16,
+    "correctLabel": "16",
+    "reactionHint": "The Quran named its 16th chapter 'The Bee.' The drone has 16. The female has 32. The chapter has 128 verses. All powers of 16.",
+    "curiositySeed": {
+      "question": "The Quran commands its bees with a feminine verb. Did it know worker bees are female 970 years before science confirmed it?",
+      "nextUrl": "quran-bee-female.html",
+      "nextTitle": "Female Bee"
+    }
+  },
+  {
+    "lessonId": "bee-female",
+    "question": "What gender are worker bees that leave the hive to collect nectar?",
+    "inputType": "choice",
+    "choices": ["Male", "Female", "They alternate"],
+    "correct": "Female",
+    "reactionHint": "The Quran uses a feminine Arabic verb for this command. Science confirmed the fact 970 years later.",
+    "curiositySeed": {
+      "question": "One Quran verse about a fish contains exactly 50 letters. Carp, goldfish, and zebrafish each have 50 chromosomes. Is that a coincidence?",
+      "nextUrl": "quran-fish.html",
+      "nextTitle": "The Fish Verse"
+    }
+  },
+  {
+    "lessonId": "fish",
+    "question": "How many chromosomes do carp (and goldfish, and zebrafish) have?",
+    "unit": "chromosomes",
+    "inputType": "slider",
+    "min": 10, "max": 100, "step": 2,
+    "correct": 50,
+    "correctLabel": "50",
+    "reactionHint": "The verse about a fish in the Quran has exactly 50 letters. The fish it describes has exactly 50 chromosomes.",
+    "curiositySeed": {
+      "question": "The word 'man' appears in the Quran exactly 23 times. How many times does 'woman' appear?",
+      "nextUrl": "quran-man-woman.html",
+      "nextTitle": "Man & Woman"
+    }
+  },
+  {
+    "lessonId": "man-woman",
+    "question": "How many times does the word 'man' (رَجُل) appear in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 5, "max": 100, "step": 1,
+    "correct": 23,
+    "correctLabel": "23 times",
+    "reactionHint": "Man: 23. Woman: 23. Counted across 6,236 verses with every Arabic variant. Perfect balance.",
+    "curiositySeed": {
+      "question": "Humans inherit 23 chromosomes from the father and 23 from the mother. The Quran uses 'man' 23 times and 'woman' 23 times. Is this the same pattern?",
+      "nextUrl": "quran-man-woman-chromosomes.html",
+      "nextTitle": "Human Chromosomes"
+    }
+  },
+  {
+    "lessonId": "man-woman-chromosomes",
+    "question": "How many chromosomes does each parent contribute to a child?",
+    "unit": "per parent",
+    "inputType": "slider",
+    "min": 10, "max": 46, "step": 1,
+    "correct": 23,
+    "correctLabel": "23 each",
+    "reactionHint": "Father: 23. Mother: 23. Quran 'man': 23. Quran 'woman': 23. The text encodes the biology.",
+    "curiositySeed": {
+      "question": "Adam is named 25 times in the Quran. How many times is Jesus named? Guess before you see.",
+      "nextUrl": "quran-adam-jesus.html",
+      "nextTitle": "Adam & Jesus"
+    }
+  },
+  {
+    "lessonId": "adam-jesus",
+    "question": "How many times is Jesus (عيسى) named in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 5, "max": 80, "step": 1,
+    "correct": 25,
+    "correctLabel": "25 times",
+    "reactionHint": "Adam: 25. Jesus: 25. And the verse that links them (3:59) explicitly says 'Jesus is like Adam.' The symmetry is built into the text.",
+    "curiositySeed": {
+      "question": "Hell is mentioned 77 times in the Quran. How many times is Paradise mentioned — more, less, or exactly equal?",
+      "nextUrl": "quran-hell-paradise.html",
+      "nextTitle": "Hell & Paradise"
+    }
+  },
+  {
+    "lessonId": "hell-paradise",
+    "question": "Hell is mentioned 77 times. How many times is Paradise (جنة) mentioned?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 50, "max": 120, "step": 1,
+    "correct": 78,
+    "correctLabel": "78 times",
+    "reactionHint": "77 vs 78 — Paradise wins by one. This mirrors the Quranic teaching that Paradise has 8 gates and Hell has 7.",
+    "curiositySeed": {
+      "question": "Every noun form of 'life' across 6,236 verses — do you think 'death' appears more, less, or the same number of times?",
+      "nextUrl": "quran-life-death.html",
+      "nextTitle": "Life & Death"
+    }
+  },
+  {
+    "lessonId": "life-death",
+    "question": "How many times does each noun form of 'life' (حياة) appear in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 30, "max": 200, "step": 1,
+    "correct": 105,
+    "correctLabel": "105 times each",
+    "reactionHint": "Life: 105. Death: 105. Every form, every conjugation, 6,236 verses. Perfectly balanced.",
+    "curiositySeed": {
+      "question": "Angels appear 88 times in the Quran. How many times do their adversaries, the devils (شياطين), appear?",
+      "nextUrl": "quran-angels-devils.html",
+      "nextTitle": "Angels & Devils"
+    }
+  },
+  {
+    "lessonId": "angels-devils",
+    "question": "Angels appear nominally 88 times. How many times do devils (شياطين) appear?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 20, "max": 150, "step": 1,
+    "correct": 88,
+    "correctLabel": "88 times",
+    "reactionHint": "Angels: 88. Devils: 88. Exact parity — not an accident in a text with no editorial process.",
+    "curiositySeed": {
+      "question": "Five independent numerical coincidences — date, surah, verse, age, and time — all converge on the number 13 on a single day. What are the odds?",
+      "nextUrl": "quran-lightning-1313.html",
+      "nextTitle": "Lightning 13:13"
+    }
+  },
+  {
+    "lessonId": "lightning-1313",
+    "question": "What is the probability of five unrelated numbers all equalling 13 on the same day by pure chance?",
+    "inputType": "choice",
+    "choices": ["About 1 in 1,000", "About 1 in 1,000,000", "Less than 1 in 2 trillion"],
+    "correct": "Less than 1 in 2 trillion",
+    "skip": true,
+    "reactionHint": "The actual probability is 1 in 2.4 trillion. Five independent numerical events. One day. All converging on 13.",
+    "curiositySeed": {
+      "question": "The Arabic word for 'day' appears 365 times in the Quran. How many times does 'month' appear?",
+      "nextUrl": "quran-calendar-cycles.html",
+      "nextTitle": "Calendar Cycles"
+    }
+  },
+  {
+    "lessonId": "calendar-cycles",
+    "question": "How many times does the word 'day' (يوم) appear in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 100, "max": 500, "step": 1,
+    "correct": 365,
+    "correctLabel": "365 times",
+    "reactionHint": "'Day': 365. 'Month': 12. 'Days' (plural): 30. Three calendar systems — solar, lunar, and month-length — all encoded in one book.",
+    "curiositySeed": {
+      "question": "'This world' and 'the Hereafter' are opposites. Do you think they appear the same number of times in the Quran, or does one outnumber the other?",
+      "nextUrl": "quran-world-hereafter.html",
+      "nextTitle": "World & Hereafter"
+    }
+  },
+  {
+    "lessonId": "world-hereafter",
+    "question": "How many times does 'this world' (الدنيا) appear in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 30, "max": 200, "step": 1,
+    "correct": 115,
+    "correctLabel": "115 times each",
+    "reactionHint": "This world: 115. The Hereafter: 115. Two opposite realities, perfectly balanced in a book with no editing.",
+    "curiositySeed": {
+      "question": "If you counted verse numbers between the Quran's first and last mention of the word 'sun,' what would you get?",
+      "nextUrl": "quran-sun-temperature.html",
+      "nextTitle": "Sun Temperature"
+    }
+  },
+  {
+    "lessonId": "sun-temperature",
+    "question": "What is the surface temperature of the Sun in Kelvin?",
+    "unit": "K",
+    "inputType": "slider",
+    "min": 3000, "max": 9000, "step": 10,
+    "correct": 5778,
+    "correctLabel": "5,778 K",
+    "reactionHint": "Count the verses between the Quran's first and last mention of 'sun.' The count is 5,778 — the Sun's exact surface temperature in Kelvin.",
+    "curiositySeed": {
+      "question": "Silver melts at 961°C. Can two independent verse paths through the Quran both land on that exact number?",
+      "nextUrl": "quran-silver-melting.html",
+      "nextTitle": "Silver Melting"
+    }
+  },
+  {
+    "lessonId": "silver-melting",
+    "question": "At what temperature does silver melt?",
+    "unit": "°C",
+    "inputType": "slider",
+    "min": 200, "max": 1500, "step": 1,
+    "correct": 961,
+    "correctLabel": "961°C",
+    "reactionHint": "Two completely independent counting paths through the Quran both terminate at verse 961 — silver's melting point in Celsius.",
+    "curiositySeed": {
+      "question": "Gold melts at 1,064°C. Two different counting paths through the Quran — do they also converge on this number?",
+      "nextUrl": "quran-gold-melting.html",
+      "nextTitle": "Gold Melting"
+    }
+  },
+  {
+    "lessonId": "gold-melting",
+    "question": "At what temperature does gold melt?",
+    "unit": "°C",
+    "inputType": "slider",
+    "min": 500, "max": 1500, "step": 1,
+    "correct": 1064,
+    "correctLabel": "1,064°C",
+    "reactionHint": "Two separate counting methods through the Quran both hit 1,064 — gold's exact melting point in Celsius.",
+    "curiositySeed": {
+      "question": "How far is Sirius — the brightest star in the night sky — from Earth, in light-years?",
+      "nextUrl": "quran-sirius-distance.html",
+      "nextTitle": "Sirius Distance"
+    }
+  },
+  {
+    "lessonId": "sirius-distance",
+    "question": "How many light-years away is Sirius, the brightest star visible from Earth?",
+    "unit": "light-years",
+    "inputType": "slider",
+    "min": 1, "max": 50, "step": 0.5,
+    "correct": 8.6,
+    "correctLabel": "8.6 light-years",
+    "reactionHint": "In Surah 53 ('The Star'), both the letter count and word count encode the number 8.6 — Sirius's exact distance in light-years.",
+    "curiositySeed": {
+      "question": "Apollo 11 landed on the Moon in 1969 CE. What year was that in the Islamic Hijri calendar?",
+      "nextUrl": "quran-moon-landing.html",
+      "nextTitle": "Moon Landing"
+    }
+  },
+  {
+    "lessonId": "moon-landing",
+    "question": "In what Hijri year did Apollo 11 land on the Moon?",
+    "unit": "AH",
+    "inputType": "slider",
+    "min": 1300, "max": 1450, "step": 1,
+    "correct": 1389,
+    "correctLabel": "1389 AH",
+    "reactionHint": "Count the verses after the moon-split verse (54:1). That exact count — 1,389 — is the Hijri year Apollo 11 landed.",
+    "curiositySeed": {
+      "question": "Carbon is the building block of all life. What is carbon's atomic number?",
+      "nextUrl": "quran-carbon-creation.html",
+      "nextTitle": "Carbon Creation"
+    }
+  },
+  {
+    "lessonId": "carbon-creation",
+    "question": "What is the atomic number of carbon — the element all life is built from?",
+    "unit": "",
+    "inputType": "slider",
+    "min": 1, "max": 30, "step": 1,
+    "correct": 6,
+    "correctLabel": "6",
+    "reactionHint": "The Quran describes 6 distinct creation materials — carbon's atomic number. Its 'clay' word appears 12 times — carbon's atomic mass. Both match.",
+    "curiositySeed": {
+      "question": "The atmosphere ends and space begins at roughly what altitude — 50 km, 100 km, or 200 km?",
+      "nextUrl": "quran-wind-atmosphere.html",
+      "nextTitle": "Wind & Atmosphere"
+    }
+  },
+  {
+    "lessonId": "wind-atmosphere",
+    "question": "At what altitude does Earth's atmosphere effectively end and space begin (the Kármán line)?",
+    "unit": "km",
+    "inputType": "slider",
+    "min": 20, "max": 500, "step": 10,
+    "correct": 100,
+    "correctLabel": "100 km",
+    "reactionHint": "The Quran restricts wind to 'between the sky and earth.' Modern science drew the atmospheric boundary at exactly 100 km — the Kármán line.",
+    "curiositySeed": {
+      "question": "Al-Fatiha has 7 verses, 29 words, and 139 letters. Are all three of those numbers prime?",
+      "nextUrl": "quran-prime-numbers.html",
+      "nextTitle": "Prime Numbers"
+    }
+  },
+  {
+    "lessonId": "prime-numbers",
+    "question": "How many times does the word 'Allah' appear in the Quran?",
+    "unit": "times",
+    "inputType": "slider",
+    "min": 500, "max": 5000, "step": 1,
+    "correct": 2699,
+    "correctLabel": "2,699 times",
+    "reactionHint": "2,699 is prime. Al-Fatiha's verse count (7), word count (29), and letter count (139) are all prime. The Quran's 326,159 total letters: also prime.",
+    "curiositySeed": {
+      "question": "NASA confirmed in 2018 that pulsars can navigate spacecraft to within ±5 km. The Quran mentioned star-navigation 1,400 years ago. True or false?",
+      "nextUrl": "quran-pulsar-navigation.html",
+      "nextTitle": "Pulsar Navigation"
+    }
+  },
+  {
+    "lessonId": "pulsar-navigation",
+    "question": "How accurately can pulsar-based navigation locate a spacecraft in deep space?",
+    "inputType": "choice",
+    "choices": ["Within ±500 km", "Within ±5 km", "Within ±0.5 km"],
+    "correct": "Within ±5 km",
+    "reactionHint": "NASA's NICER experiment (2018) confirmed ±5 km accuracy. The Quran described stars as navigation guides 1,400 years earlier.",
+    "curiositySeed": {
+      "question": "An embryo at day 23 looks exactly like a leech under a microscope. The Quran called it a leech in 610 CE. Could that be a guess?",
+      "nextUrl": "quran-human-embryo.html",
+      "nextTitle": "Human Embryo"
+    }
+  },
+  {
+    "lessonId": "human-embryo",
+    "question": "At roughly how many days after conception does the human embryo begin to look like a leech?",
+    "unit": "days",
+    "inputType": "slider",
+    "min": 5, "max": 60, "step": 1,
+    "correct": 23,
+    "correctLabel": "~23 days",
+    "reactionHint": "The Quran uses the word 'alaqah' (leech) for this stage. Modern embryology confirms the embryo has a leech-like appearance and clings to the uterine wall at exactly day 23–24.",
+    "curiositySeed": {
+      "question": "The Sun will eventually expand and swallow Earth. How many times larger than today will it become?",
+      "nextUrl": "quran-red-giant.html",
+      "nextTitle": "Sun Swallows Earth"
+    }
+  },
+  {
+    "lessonId": "red-giant",
+    "question": "When the Sun becomes a red giant, it will expand to roughly how many times its current size?",
+    "unit": "× larger",
+    "inputType": "slider",
+    "min": 2, "max": 500, "step": 10,
+    "correct": 200,
+    "correctLabel": "~200×",
+    "reactionHint": "The Sun will expand ~200× and engulf Earth and Moon both. The Quran says the sun and moon will be 'joined' — in ~5 billion years, they will be.",
+    "curiositySeed": {
+      "question": "The Quran describes time passing 50,000× faster outside a divine pathway than inside it. Einstein's relativity predicts time dilation near massive objects. Are these related?",
+      "nextUrl": "quran-wormholes.html",
+      "nextTitle": "Wormholes"
+    }
+  },
+  {
+    "lessonId": "wormholes",
+    "question": "The Quran says one day inside a divine pathway equals how many years outside it?",
+    "unit": "years",
+    "inputType": "slider",
+    "min": 100, "max": 100000, "step": 1000,
+    "correct": 50000,
+    "correctLabel": "50,000 years",
+    "reactionHint": "Quran 70:4 gives a ratio of 1 day = 50,000 years. Einstein's general relativity predicts exactly this kind of time dilation near extreme gravitational fields.",
+    "curiositySeed": {
+      "question": "Quran 86:3 calls a star 'the knocker' and 'the hole-maker' in the same sentence. Which modern astronomical objects fit both descriptions simultaneously?",
+      "nextUrl": "quran-pulsars-blackholes.html",
+      "nextTitle": "Pulsars & Black Holes"
+    }
+  },
+  {
+    "lessonId": "pulsars-blackholes",
+    "question": "Pulsars emit regular pulses of radiation. How many pulses per second can the fastest known pulsar emit?",
+    "unit": "pulses/sec",
+    "inputType": "slider",
+    "min": 1, "max": 1000, "step": 10,
+    "correct": 716,
+    "correctLabel": "716 pulses/sec",
+    "reactionHint": "The fastest pulsar 'knocks' 716 times per second. Quran 86:3 called it 'the knocker' (al-tariq) 1,400 years before radio telescopes were invented.",
+    "curiositySeed": {
+      "question": "Earth has existed for 4.6 billion years. The universe is 13.8 billion years old. What fraction of cosmic history is Earth's existence?",
+      "nextUrl": "quran-age-of-universe.html",
+      "nextTitle": "Age of Universe"
+    }
+  },
+  {
+    "lessonId": "age-of-universe",
+    "question": "The universe is ~13.8 billion years old. Earth is ~4.6 billion years old. Earth's age as a fraction of the universe's age is closest to:",
+    "inputType": "choice",
+    "choices": ["One half (½)", "One third (⅓)", "One quarter (¼)"],
+    "correct": "One third (⅓)",
+    "reactionHint": "4.6 ÷ 13.8 = exactly ⅓. The Quran says Earth was created in 2 of 6 creation days — also ⅓. Same ratio, encoded 1,400 years before cosmologists measured it.",
+    "curiositySeed": {
+      "question": "The Big Bang, expansion of the universe, and water as the basis of life — were all three described in a single verse of the Quran?",
+      "nextUrl": "quran-big-bang.html",
+      "nextTitle": "Big Bang"
+    }
+  },
+  {
+    "lessonId": "big-bang",
+    "question": "Before the Big Bang, all matter and energy existed as a single unified state. Physicists call this a:",
+    "inputType": "choice",
+    "choices": ["Nebula", "Singularity", "Vacuum fluctuation"],
+    "correct": "Singularity",
+    "reactionHint": "The Quran uses 'ratq' (sealed/joined mass) for the pre-Big Bang state and 'fatq' (torn apart in opposite directions) for the expansion. Both concepts in one 7th-century verse.",
+    "curiositySeed": {
+      "question": "Mountains have roots underground. The Quran called them 'pegs.' How deep does Mount Everest's root actually go?",
+      "nextUrl": "quran-internal-mountains.html",
+      "nextTitle": "Internal Mountains"
+    }
+  },
+  {
+    "lessonId": "internal-mountains",
+    "question": "How deep below Earth's surface are the largest internal mountain structures detected by seismic scanning?",
+    "unit": "km",
+    "inputType": "slider",
+    "min": 10, "max": 1000, "step": 10,
+    "correct": 640,
+    "correctLabel": "~640 km (~400 mi)",
+    "reactionHint": "Earth has mountain structures 640 km deep — taller than Everest. The Quran placed mountains فِي (inside) the Earth, not عَلَى (on top of it), 1,400 years before seismology.",
+    "curiositySeed": {
+      "question": "The Quran says the prefrontal region — the forehead — is 'lying and sinful.' Neuroscience mapped the planning-of-deception center. Where is it?",
+      "nextUrl": "quran-brain-functions.html",
+      "nextTitle": "Brain Functions"
+    }
+  },
+  {
+    "lessonId": "brain-functions",
+    "question": "Which part of the brain is scientifically confirmed to plan deception and sinful intentions?",
+    "inputType": "choice",
+    "choices": ["The amygdala (emotion center)", "The prefrontal cortex (behind the forehead)", "The cerebellum (movement control)"],
+    "correct": "The prefrontal cortex (behind the forehead)",
+    "reactionHint": "The Quran (96:16) called the forehead region 'lying and sinful.' Neuroscience confirms the prefrontal cortex — directly behind the forehead — is where deception is planned.",
+    "curiositySeed": {
+      "question": "Iron's atomic number is 26. The Quran's chapter on iron is chapter 57. The name 'iron' in Arabic gematria equals 57. True or false?",
+      "nextUrl": "quran-iron.html",
+      "nextTitle": "Iron"
+    }
+  },
+  {
+    "lessonId": "iron",
+    "question": "What is the atomic number of iron — the element the Quran has an entire chapter about?",
+    "unit": "",
+    "inputType": "slider",
+    "min": 10, "max": 50, "step": 1,
+    "correct": 26,
+    "correctLabel": "26",
+    "reactionHint": "Iron's atomic number: 26. The iron chapter is #57 — matching isotope ⁵⁷Fe and the gematria of 'iron' in Arabic. The verse about iron sits exactly 5,100 words from the start — Earth's iron core depth in km.",
+    "curiositySeed": {
+      "question": "The Quran says the Romans were defeated at 'the lowest point of the land.' How low is the Dead Sea?",
+      "nextUrl": "quran-dead-sea.html",
+      "nextTitle": "Dead Sea"
+    }
+  },
+  {
+    "lessonId": "dead-sea",
+    "question": "How far below sea level is the Dead Sea shoreline — the lowest land point on Earth?",
+    "unit": "metres below sea level",
+    "inputType": "slider",
+    "min": 50, "max": 800, "step": 10,
+    "correct": 430,
+    "correctLabel": "430 m below sea level",
+    "reactionHint": "The Quran says the battle happened at 'adna al-ard' — meaning both 'nearest' and 'lowest' land. The Dead Sea is 430 m below sea level. No 7th-century tool could measure this.",
+    "curiositySeed": {
+      "question": "Mount Everest stands 8.8 km tall. The Quran calls mountains 'pegs.' How deep underground does Everest's root extend?",
+      "nextUrl": "quran-mountains.html",
+      "nextTitle": "Mountains as Pegs"
+    }
+  },
+  {
+    "lessonId": "mountains",
+    "question": "Mount Everest rises 8.8 km above sea level. How deep does its crustal root extend below the surface?",
+    "unit": "km",
+    "inputType": "slider",
+    "min": 5, "max": 400, "step": 5,
+    "correct": 250,
+    "correctLabel": "~250 km",
+    "reactionHint": "The root is 250 km deep — 28× deeper than the mountain is tall. Exactly like a peg. The Quran called them أَوْتَادًا (pegs) 1,400 years before geologists measured this.",
+    "curiositySeed": {
+      "question": "Plate tectonics proved mountains drift. The Quran says mountains 'move like clouds.' How fast do mountains actually move?",
+      "nextUrl": "quran-moving-mountains.html",
+      "nextTitle": "Moving Mountains"
+    }
+  },
+  {
+    "lessonId": "moving-mountains",
+    "question": "How fast do mountains move each year due to plate tectonics?",
+    "inputType": "choice",
+    "choices": ["They don't move at all", "Up to 100 mm per year", "Several metres per year"],
+    "correct": "Up to 100 mm per year",
+    "reactionHint": "Every mountain on Earth drifts up to 100 mm per year on a moving plate. The Quran described them 'passing like clouds' — dismissed as error until plate tectonics was confirmed in the 1960s.",
+    "curiositySeed": {
+      "question": "Worker ants leave the nest to gather food. Are they male, female, or a mix of both?",
+      "nextUrl": "quran-ants.html",
+      "nextTitle": "Female Ants"
+    }
+  },
+  {
+    "lessonId": "ants",
+    "question": "Worker ants that forage outside the nest — what gender are they?",
+    "inputType": "choice",
+    "choices": ["Male", "Female", "Mix of both"],
+    "correct": "Female",
+    "reactionHint": "All worker ants outside the nest are sterile females. The Quran used a feminine verb for the foraging ant 1,400 years before zoology confirmed this.",
+    "curiositySeed": {
+      "question": "A camel can drink up to how many litres of water in a single session — 20 L, 100 L, or 200 L?",
+      "nextUrl": "quran-camel-drink.html",
+      "nextTitle": "Fastest Drinkers"
+    }
+  },
+  {
+    "lessonId": "camel-drinking",
+    "question": "How many litres of water can a dehydrated camel drink in a single 3-minute session?",
+    "unit": "litres",
+    "inputType": "slider",
+    "min": 10, "max": 300, "step": 10,
+    "correct": 200,
+    "correctLabel": "~200 litres",
+    "reactionHint": "Camels drink up to 200 litres in 3 minutes — the fastest rate of any mammal. The Quran (56:55) compares drinking in Hell to thirsty camels. Science only recently confirmed this record.",
+    "curiositySeed": {
+      "question": "Mosquitoes have more genes than humans. True or false?",
+      "nextUrl": "quran-mosquito.html",
+      "nextTitle": "The Mosquito"
+    }
+  },
+  {
+    "lessonId": "mosquito",
+    "question": "Roughly how many genes does a mosquito have compared to a human?",
+    "inputType": "choice",
+    "choices": ["Far fewer — they're simple insects", "About the same", "More genes than a human"],
+    "correct": "More genes than a human",
+    "reactionHint": "The Anopheles mosquito has ~14,000 genes; humans have ~20,000 — but the mosquito genome is far more complex in proportion to its size. The Quran used the mosquito as an example of something beyond simple, 1,400 years before genomics.",
+    "curiositySeed": {
+      "question": "Spider silk is often called 'stronger than steel.' But is a spider's web structurally strong or weak as a house?",
+      "nextUrl": "quran-spider-web.html",
+      "nextTitle": "The Spider's Web"
+    }
+  },
+  {
+    "lessonId": "spider-web",
+    "question": "Spider silk is stronger than steel by weight. Is the spider's web itself structurally strong or weak as a shelter?",
+    "inputType": "choice",
+    "choices": ["Strong — silk is stronger than steel", "Weak — it collapses under its own anchor forces", "Neither — it depends on the species"],
+    "correct": "Weak — it collapses under its own anchor forces",
+    "reactionHint": "The web is the weakest structure per anchor point in known biology — the silk is strong but the geometry fails. The Quran called it 'the frailest of houses' (29:41) 1,400 years before materials science.",
+    "curiositySeed": {
+      "question": "Scientists discovered that crows hold funeral rituals and teach each other to bury the dead. When was this discovered?",
+      "nextUrl": "quran-crow-funerals.html",
+      "nextTitle": "Crow Funerals"
+    }
+  },
+  {
+    "lessonId": "crow-funerals",
+    "question": "The Quran shows a crow teaching a human how to bury the dead (5:31). When did scientists confirm crows actually conduct burial rituals?",
+    "inputType": "choice",
+    "choices": ["Ancient times — everyone knew this", "20th century zoology research", "Only confirmed in 2015 studies"],
+    "correct": "Only confirmed in 2015 studies",
+    "reactionHint": "Crow funeral behaviour — including teaching others to bury the dead — was scientifically confirmed by Cambridge researchers in 2015. The Quran described it 1,400 years earlier.",
+    "curiositySeed": {
+      "question": "The Quran promised Pharaoh's body would be preserved as a warning sign. His body was found mummified. In what year?",
+      "nextUrl": "quran-pharaoh-mummy.html",
+      "nextTitle": "Pharaoh's Mummy"
+    }
+  },
+  {
+    "lessonId": "pharaoh-mummy",
+    "question": "In what year was the mummy of the Pharaoh of the Exodus (Ramesses II / Merneptah) first examined and identified?",
+    "unit": "CE",
+    "inputType": "slider",
+    "min": 1800, "max": 2000, "step": 1,
+    "correct": 1898,
+    "correctLabel": "1898 CE",
+    "reactionHint": "The mummy was discovered in 1881 and identified by 1898. French surgeon Dr. Maurice Bucaille examined the salt-saturated body and concluded it drowned — then found Quran 10:92 had promised exactly this preservation.",
+    "curiositySeed": {
+      "question": "Critics said crucifixion didn't exist in Pharaoh's Egypt. Was that true?",
+      "nextUrl": "quran-pharaoh-crucifixion.html",
+      "nextTitle": "Pharaoh's Stakes"
+    }
+  },
+  {
+    "lessonId": "pharaoh-crucifixion",
+    "question": "Did stake-impalement / crucifixion-style execution exist in ancient Egypt during the time of the Pharaohs?",
+    "inputType": "choice",
+    "choices": ["No — it was invented by the Romans centuries later", "Yes — Egyptian papyri and hieroglyphs confirm it", "Unknown — no evidence either way"],
+    "correct": "Yes — Egyptian papyri and hieroglyphs confirm it",
+    "reactionHint": "Papyrus Boulaq 18 and multiple hieroglyphic inscriptions confirm stake-impalement in Pharaonic Egypt. Critics who said the Quran erred on this were proven wrong by Egyptology.",
+    "curiositySeed": {
+      "question": "The Bible says Haman was a Persian official. The Quran says he was an Egyptian official under Pharaoh. Which is historically correct?",
+      "nextUrl": "quran-haman.html",
+      "nextTitle": "Haman in Egypt"
+    }
+  },
+  {
+    "lessonId": "haman",
+    "question": "Egyptologists found the name 'Haman' in ancient hieroglyphs. What was his official title?",
+    "inputType": "choice",
+    "choices": ["Pharaoh's chief treasurer", "Overseer of the stone-quarry workers", "Commander of the royal guard"],
+    "correct": "Overseer of the stone-quarry workers",
+    "reactionHint": "The name 'Haman' appears in Egyptian hieroglyphs with the title 'Overseer of the stone-quarry workers.' The Quran says Pharaoh ordered Haman to build a tower. The titles match perfectly.",
+    "curiositySeed": {
+      "question": "7th-century Arabia used only metal coins. The Quran mentions 'your paper money.' Paper currency was invented where, and when?",
+      "nextUrl": "quran-paper-money.html",
+      "nextTitle": "Paper Money"
+    }
+  },
+  {
+    "lessonId": "paper-money",
+    "question": "When and where was paper currency first used in history?",
+    "inputType": "choice",
+    "choices": ["7th-century Arabia, concurrent with the Quran", "9th-century China, ~400 years after the Quran", "14th-century Europe, during the Renaissance"],
+    "correct": "9th-century China, ~400 years after the Quran",
+    "reactionHint": "China's Tang Dynasty issued the first paper money around 800–900 CE — roughly 400 years after the Quran used the word بِوَرِقِكُمْ ('your paper/leaf money') in 610 CE.",
+    "curiositySeed": {
+      "question": "Pyramid texts say the sky weeps for dead Pharaohs. The Quran says the sky did NOT weep for a specific Pharaoh. Were the pyramid texts ever deciphered before modern times?",
+      "nextUrl": "quran-pharaoh-mourning.html",
+      "nextTitle": "Mourning of Pharaoh"
+    }
+  },
+  {
+    "lessonId": "pharaoh-mourning",
+    "question": "Egyptian pyramid texts describe the sky weeping for dead Pharaohs. When were hieroglyphs first successfully deciphered in modern times?",
+    "unit": "CE",
+    "inputType": "slider",
+    "min": 1700, "max": 1900, "step": 1,
+    "correct": 1822,
+    "correctLabel": "1822 CE",
+    "reactionHint": "Champollion deciphered hieroglyphs in 1822. The pyramid texts had been sealed for 1,200 years. The Quran's reference to sky-mourning in 44:29 was written 1,200 years before anyone could read those texts.",
+    "curiositySeed": {
+      "question": "The first word revealed in the Quran was 'Read' — to an illiterate man. Neuroscience found that the brain is pre-wired for reading at birth. When was this discovered?",
+      "nextUrl": "quran-reading.html",
+      "nextTitle": "Reading"
+    }
+  },
+  {
+    "lessonId": "reading",
+    "question": "When did neuroscientists discover that the human brain has a dedicated reading center (VWFA) already wired at birth?",
+    "unit": "CE",
+    "inputType": "slider",
+    "min": 1950, "max": 2025, "step": 1,
+    "correct": 2020,
+    "correctLabel": "2020 CE",
+    "reactionHint": "A 2020 study confirmed the Visual Word Form Area (VWFA) is connected to language networks before a child can read. The Quran's first word was 'Read' — commanded to an illiterate man — 1,400 years earlier.",
+    "curiositySeed": {
+      "question": "The Quran links sleep and death as a single event. Modern medicine legally certifies death by brainstem activity. Is sleep also controlled by the brainstem?",
+      "nextUrl": "quran-brainstem.html",
+      "nextTitle": "Brainstem"
+    }
+  },
+  {
+    "lessonId": "brainstem",
+    "question": "Which part of the brain controls both sleep cycles and determines the boundary between life and death in clinical medicine?",
+    "inputType": "choice",
+    "choices": ["The cerebral cortex", "The brainstem", "The hypothalamus"],
+    "correct": "The brainstem",
+    "reactionHint": "Brainstem death is the legal and medical definition of death worldwide. The brainstem also governs sleep-wake cycles. Quran 39:42 described both as a single divine act 1,400 years before neuroscience mapped this.",
+    "curiositySeed": {
+      "question": "The Quran says striking the ear caused years of unconsciousness (18:11). In 610 CE, people thought ears only heard sounds. What does the inner ear actually do beyond hearing?",
+      "nextUrl": "quran-inner-ear.html",
+      "nextTitle": "Inner Ear"
+    }
+  },
+  {
+    "lessonId": "inner-ear",
+    "question": "Beyond hearing, the inner ear controls another critical body function. What is it?",
+    "inputType": "choice",
+    "choices": ["Blood pressure regulation", "Balance and spatial orientation", "Jaw movement and chewing"],
+    "correct": "Balance and spatial orientation",
+    "reactionHint": "The vestibular system in the inner ear controls balance and consciousness. Damage to it causes prolonged unconsciousness. The Quran described 'striking the ears' to cause this — 1,400 years before anatomy confirmed it.",
+    "curiositySeed": {
+      "question": "The Quran says skin will testify against sinners on Judgment Day. Critics called this the Quran's biggest scientific error. When did science prove skin can store memories?",
+      "nextUrl": "quran-skin-memory.html",
+      "nextTitle": "Skin Memory"
+    }
+  },
+  {
+    "lessonId": "skin-memory",
+    "question": "In what year did NYU researchers prove that non-neural cells (including skin) can store and retrieve memories?",
+    "unit": "CE",
+    "inputType": "slider",
+    "min": 1990, "max": 2025, "step": 1,
+    "correct": 2024,
+    "correctLabel": "2024 CE",
+    "reactionHint": "NYU's 2024 study proved non-neural cells including skin can store memories. The Quran's claim that skin 'testifies' about actions (41:20) — dismissed for 1,400 years — was just confirmed.",
+    "curiositySeed": {
+      "question": "At what altitude above sea level does the human body enter the 'Death Zone' where oxygen is too scarce to sustain life?",
+      "nextUrl": "quran-atmosphere.html",
+      "nextTitle": "Atmospheric Pressure"
+    }
+  },
+  {
+    "lessonId": "atmosphere",
+    "question": "At what altitude does the human body enter the 'Death Zone' where breathing becomes impossible without supplemental oxygen?",
+    "unit": "metres",
+    "inputType": "slider",
+    "min": 1000, "max": 12000, "step": 500,
+    "correct": 8000,
+    "correctLabel": "8,000 m",
+    "reactionHint": "Above 8,000 m the oxygen partial pressure is too low for sustained human life. The Quran described chests 'tight and constricted as if ascending to the sky' (6:125) — a precise description of altitude hypoxia.",
+    "curiositySeed": {
+      "question": "Surah Al-Baqarah has 286 verses, revealed over 9 years, with no editing. Could it hide a perfect mathematical mirror structure inside?",
+      "nextUrl": "quran-ring-composition.html",
+      "nextTitle": "Ring Composition"
+    }
+  },
+  {
+    "lessonId": "ring-composition",
+    "question": "Surah Al-Baqarah (The Cow) has 286 verses. Its central pivot verse is 2:143. How many verses before verse 143, and how many after?",
+    "inputType": "choice",
+    "choices": ["Unequal — it's not centered", "142 before and 142 after — perfectly centered", "143 before and 143 after"],
+    "correct": "142 before and 142 after — perfectly centered",
+    "reactionHint": "Verse 2:143 sits at the exact mathematical center of the surah — 142 verses on each side. Modern scholars found a 7-fold ring structure radiating outward from this center, undetectable until 20th-century literary analysis.",
+    "curiositySeed": {
+      "question": "Galileo was condemned for saying Earth moves. Does the Quran say Earth moves, or that only the Sun and Moon move?",
+      "nextUrl": "quran-celestial-orbits.html",
+      "nextTitle": "Celestial Orbits"
+    }
+  },
+  {
+    "lessonId": "celestial-orbits",
+    "question": "Quran 21:33 describes celestial bodies moving in their orbits. The Arabic grammar uses plural (3+ objects). Which objects does it say move?",
+    "inputType": "choice",
+    "choices": ["Only the Sun and Moon", "The Sun, Moon, and Earth — all three", "Stars and galaxies only"],
+    "correct": "The Sun, Moon, and Earth — all three",
+    "reactionHint": "Arabic dual form would say 'two things move.' The plural كُلٌّ means three or more — explicitly including Earth. This is a grammar proof that Earth moves, written 1,000 years before Copernicus.",
+    "curiositySeed": {
+      "question": "Every ancient civilisation called Venus a 'star.' The Quran used a different Arabic word for it. What word?",
+      "nextUrl": "quran-venus.html",
+      "nextTitle": "Venus"
+    }
+  },
+  {
+    "lessonId": "venus",
+    "question": "In Quran 6:76, Abraham sees a bright object in the sky. The Quran calls it كَوْكَبًا. What does this word mean in Arabic?",
+    "inputType": "choice",
+    "choices": ["Star (نَجْم)", "Planet (كَوْكَب)", "Moon (قَمَر)"],
+    "correct": "Planet (كَوْكَب)",
+    "reactionHint": "كَوْكَب means planet — not star. Every surrounding civilisation called Venus a star and worshipped it as one. The Quran used the correct astronomical category 1,400 years before telescopes confirmed Venus is a planet.",
+    "curiositySeed": {
+      "question": "Einstein assumed the universe was static. The Quran uses a present-continuous verb for the universe — 'we are expanding it.' When did Hubble confirm expansion?",
+      "nextUrl": "quran-expanding-universe.html",
+      "nextTitle": "Expanding Universe"
+    }
+  },
+  {
+    "lessonId": "expanding-universe",
+    "question": "When did Edwin Hubble observationally confirm that the universe is expanding?",
+    "unit": "CE",
+    "inputType": "slider",
+    "min": 1900, "max": 1970, "step": 1,
+    "correct": 1929,
+    "correctLabel": "1929 CE",
+    "reactionHint": "Hubble confirmed expansion in 1929. Einstein immediately retracted his 'cosmological constant' — his attempt to force a static universe. The Quran said 'we are expanding it' (51:47) in 610 CE.",
+    "curiositySeed": {
+      "question": "You've completed all 53 lessons. What was the most impossible coincidence you found?",
+      "nextUrl": "index.html",
+      "nextTitle": "All Lessons"
+    }
+  }
+]

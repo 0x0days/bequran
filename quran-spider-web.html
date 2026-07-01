@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Spider Web · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #5ea88f;
+      --accent-light: #96d4be;
+      --accent-dim:   rgba(94,168,143,0.10);
+      --accent-ring:  rgba(94,168,143,0.22);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; padding:44px 20px 160px;
+    }
+    .dot-field {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:radial-gradient(rgba(255,255,255,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    .container { max-width:720px; margin:0 auto; position:relative; z-index:1; }
+
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent-light)); width:0%; transition:width .7s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:28px; }
+
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:22px 0; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:22px; line-height:2.1; direction:rtl; text-align:right; color:var(--text); margin-bottom:10px; }
+    .verse-ar .hl { color:var(--accent-light); }
+    .verse-en { font-size:14px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .verse-en .hl { color:var(--accent-light); font-style:normal; font-weight:600; }
+
+    .lesson-eyebrow { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .lesson-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+    .lesson-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+    .claim-box { background:var(--accent-dim); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:22px 0; }
+    .claim-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .claim-text { font-size:15px; line-height:1.65; color:var(--text); }
+
+    .prompt { font-family:'Playfair Display',serif; font-size:18px; line-height:1.5; margin:24px 0 16px; }
+
+    .answers { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .answer-card {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+      cursor:pointer; transition:border-color .18s, background .18s;
+    }
+    .answer-card:hover { border-color:rgba(255,255,255,0.2); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); pointer-events:none; }
+    .answer-card.ac-wrong   { border-color:var(--err-border); background:var(--err-bg); animation:shake .35s ease; }
+    .answer-card.ac-disabled{ opacity:.45; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .ac-letter { width:26px; height:26px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:2px; }
+    .ac-big { font-size:16px; font-weight:600; line-height:1.3; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:transform .18s, box-shadow .18s; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-accent { background:var(--accent); color:#0b1622; box-shadow:0 4px 20px rgba(94,168,143,0.22); }
+    .btn-accent:hover { box-shadow:0 8px 30px rgba(94,168,143,0.32); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    .ex-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--accent-light); line-height:1; }
+    .ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+    .ex-result.show { display:block; }
+    .ex-arena { display:flex; gap:14px; margin:20px 0; }
+    .ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 14px; text-align:center; transition:border-color .3s, background .3s; }
+    .ex-panel.lit { border-color:var(--accent-ring); background:var(--accent-dim); }
+
+    .verdict-title { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,28px); font-weight:700; line-height:1.3; margin-bottom:10px; }
+    .verdict-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:28px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:14px 18px; margin-bottom:22px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .stat-row { display:flex; gap:14px; margin:22px 0; flex-wrap:wrap; }
+    .stat-box { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:16px 14px; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--accent-light); }
+    .stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:4px; }
+    .verdict-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .verdict-table th { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+    .verdict-table td { font-size:13px; padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .verdict-table tr:last-child td { border-bottom:none; }
+    .td-check { color:var(--ok); font-weight:700; }
+
+    .gold-box { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.18); border-radius:12px; padding:18px 20px; margin:24px 0; }
+    .gt { font-family:'Playfair Display',serif; font-size:16px; line-height:1.55; color:var(--gold-light); margin-bottom:8px; }
+    .gs { font-size:13px; color:var(--muted); line-height:1.7; }
+
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:28px; transition:color .18s; }
+    .nav-back:hover { color:var(--text); }
+    .nav-next-wrap { margin-top:36px; padding-top:24px; border-top:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; }
+
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:18px 20px 32px;transform:translateY(110%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .fb-panel.show{transform:translateY(0)}
+    .fb-panel.fb-ok{background:var(--ok-bg);border-top:3px solid var(--ok)}
+    .fb-panel.fb-err{background:var(--err-bg);border-top:3px solid var(--err-light)}
+    .fb-left{display:flex;align-items:center;gap:12px}
+    .fb-icon{font-size:24px;line-height:1}
+    .fb-title{font-size:17px;font-weight:700}
+    .fb-panel.fb-ok .fb-title{color:var(--ok)}
+    .fb-panel.fb-err .fb-title{color:var(--err-light)}
+    .fb-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:3px;line-height:1.55;max-width:340px}
+    .fb-btn{flex-shrink:0;padding:14px 30px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+    .fb-btn:active{transform:scale(0.96)}
+    .fb-panel.fb-ok .fb-btn{background:var(--ok);color:var(--ok-bg)}
+    .fb-panel.fb-err .fb-btn{background:var(--err-light);color:var(--err-bg)}
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to all lessons
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Spider Web</div>
+
+  <!-- ── SP PREDICTION ── -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ── S0 INTRO ── -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="lesson-eyebrow">Zoology · Arachnology</p>
+    <h1 class="lesson-title">Spider Web</h1>
+    <p class="lesson-sub">The Quran uses the female verb form for who builds the spider's web and calls it the most fragile of houses. Science confirmed both facts 1,400 years later.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">29:41 · Surah Al-Ankabut</div>
+      <div class="verse-ar">مَثَلُ الَّذِينَ اتَّخَذُوا مِنْ دُونِ اللَّهِ أَوْلِيَاءَ كَمَثَلِ الْعَنْكَبُوتِ <span class="hl">اتَّخَذَتْ</span> بَيْتًا ۖ وَإِنَّ أَوْهَنَ الْبُيُوتِ لَبَيْتُ الْعَنْكَبُوتِ ۖ لَوْ كَانُوا يَعْلَمُونَ</div>
+      <div class="verse-en">"The likeness of those who take protectors other than Allah is that of the spider. <span class="hl">She builds a house.</span> But the most fragile of houses is the spider's house. If they only knew."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovery</div>
+      <div class="claim-text">The verb <strong style="color:var(--accent-light)">اتَّخَذَتْ</strong> (ittakhathat) is the female form the male would be اتَّخَذَ (ittakhadha). Arachnology confirms: <strong style="color:var(--accent-light)">adult female spiders build typical webs; adult males do not.</strong> Males reserve their silk for mating alone. Furthermore, the web is damaged by wind, rain, dust, and every captured prey requiring up to <strong style="color:var(--accent-light)">20 meters of silk to rebuild each night.</strong></div>
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 Verb form comparison + MC ── -->
+  <div id="s1" class="stage">
+
+    <p class="prompt">What does the verb form in 29:41 specifically reveal?</p>
+
+    <canvas id="s1Canvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div id="s1Mc" style="display:none">
+      <div class="answers">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">The verb has no gender it could be either male or female</div>
+            <div class="ac-sub">Arabic verbs do carry gender markers</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">It uses the female form, indicating the female spider builds the web</div>
+            <div class="ac-sub">اتَّخَذَتْ carries the female تْ marker</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">It uses the male form, meaning male spiders build webs</div>
+            <div class="ac-sub">The male form would be اتَّخَذَ without the تْ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 Web fragility animation ── -->
+  <div id="s2" class="stage">
+
+    <p class="prompt">Watch how easily a spider's web is destroyed and how much work rebuilding takes.</p>
+    <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">Wind, rain, dust, and every caught insect damage the structure. The spider rebuilds it regularly.</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="ex-arena">
+      <div class="ex-panel" id="s2PanelA">
+        <div class="ex-unit">Silk per rebuild</div>
+        <div class="ex-num" id="driftCount">0</div>
+        <div class="ex-unit">meters</div>
+      </div>
+      <div class="ex-panel" id="s2PanelB">
+        <div class="ex-unit">Rebuild frequency</div>
+        <div class="ex-num">Nightly</div>
+        <div class="ex-unit">often every night</div>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="s2Btn" onclick="startFragility()">
+      Simulate web damage
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="ex-result" id="s2Result">
+      <div style="font-size:13px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">20 meters of silk, rebuilt every night</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">It is the only structure on Earth that gets destroyed every time it fulfills its purpose catching food. The Quran: <em style="color:var(--text)">"the most fragile of houses."</em></div>
+    </div>
+  </div>
+
+  <!-- ── S3 MC ── -->
+  <div id="s3" class="stage">
+
+    <p class="prompt">Why is the spider's web described as "the most fragile of houses" in 29:41?</p>
+
+    <div class="answers">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Because spiders are small, weak creatures</div>
+          <div class="ac-sub">Size of the builder is not the same as fragility of the structure</div>
+          </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">It is destroyed each time it catches prey and must be rebuilt nightly with 20 m of silk</div>
+          <div class="ac-sub">No other creature's home is destroyed by doing its job</div>
+          </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Because spiders build their webs only once and never return</div>
+          <div class="ac-sub">They actually rebuild them frequently</div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ── -->
+  <div id="s4" class="stage">
+
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">The Quran used the female verb and called the web the most fragile house.</h2>
+    <p class="verdict-sub">The verse could have used the male verb form اتَّخَذَ it would still be understood as "the spider built." Instead it used اتَّخَذَتْ, the female form, precisely matching the biological fact that only female spiders build typical webs. Combined with the description of the web as "the most fragile of houses" a structure destroyed by wind, rain, dust, and every single catch, requiring 20 meters of fresh silk each night this is not a guess. It is knowledge.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="mv0">0</div>
+        <div class="stat-lbl">meters of silk per rebuild</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="mv1">0</div>
+        <div class="stat-lbl">years before science confirmed it</div>
+      </div>
+    </div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr><th>Statement in Quran 29:41</th><th>Modern science confirms</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Uses female verb اتَّخَذَتْ for the builder</td><td>Adult female spiders build typical webs; males do not</td><td class="td-check">✓</td></tr>
+        <tr><td>Describes the web as "the most fragile of houses"</td><td>Destroyed by wind, rain, dust, and every prey capture</td><td class="td-check">✓</td></tr>
+        <tr><td>Implies constant rebuilding</td><td>Webs are rebuilt every night 20 meters of silk each time</td><td class="td-check">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">"The most fragile of houses" a biological fact hidden in a verb ending.</div>
+      <div class="gs">A single letter تْ carries the entire scientific claim. Without it, the verse would say "the spider built" with no gender specified, and the precision would be lost. With it, the verse states that the female builds the web a fact no one in the 7th century had any method to verify. No ancient text mentions this distinction. Only the Quran does.</div>
+    </div>
+
+    <div id="qv-spider"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ── CORE ENGINE ────────────────────────────────── */
+var stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · Spider Web',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initS1Canvas, 80);
+  if (n === 2) setTimeout(initS2Canvas, 80);
+  if (n === 4) {
+    saveProgress('spider-web');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 20, 1600);
+        animFrom(document.getElementById('mv1'), 0, 1400, 2100);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The تْ at the end of اتَّخَذَتْ is the female marker. The Quran specifically identified the female as the builder matching what arachnology only confirmed recently.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('No other creature\'s home is destroyed every time it works. The spider must produce 20 meters of silk and rebuild nightly the most fragile of houses.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HELPERS ────────────────────────────────────── */
+function makeRng(seed) {
+  var s = seed;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+/* ── HERO CANVAS ────────────────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = 640, H = 130;
+  cv.width = W; cv.height = H;
+
+  var cx = W * 0.48, cy = H * 0.50;
+  var maxRx = W * 0.38, maxRy = H * 0.42;
+  var NR = 16, NRing = 7;
+  var t = 0;
+
+  var angles = [];
+  for (var i = 0; i < NR; i++) angles.push(i / NR * Math.PI * 2 - Math.PI / 2);
+
+  var rng = makeRng(42);
+  var dews = [];
+  for (var r = 2; r <= NRing; r++) {
+    for (var a = 0; a < NR; a++) {
+      if (rng() > 0.62) {
+        dews.push({ r: r, a: a, ph: rng() * 6.283, sz: 0.6 + rng() * 1.0 });
+      }
+    }
+  }
+
+  /* drifting broken thread fragments */
+  var frags = [];
+  for (var f = 0; f < 4; f++) {
+    frags.push({
+      x: cx + (rng() - 0.5) * maxRx * 1.8,
+      y: cy + (rng() - 0.5) * maxRy * 1.4,
+      vx: 0.025 + rng() * 0.04,
+      vy: -0.008 + rng() * 0.016,
+      len: 8 + rng() * 14,
+      cv: (rng() - 0.5) * 0.35,
+      al: 0.04 + rng() * 0.05
+    });
+  }
+
+  function pt(a, rF) {
+    return [cx + Math.cos(a) * maxRx * rF, cy + Math.sin(a) * maxRy * rF];
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* background */
+    var bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(maxRx, maxRy) * 1.5);
+    bg.addColorStop(0, '#060e14');
+    bg.addColorStop(1, '#040810');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    /* soft center glow */
+    var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRx * 0.85);
+    cg.addColorStop(0, 'rgba(94,168,143,0.18)');
+    cg.addColorStop(1, 'rgba(94,168,143,0)');
+    ctx.fillStyle = cg;
+    ctx.fillRect(0, 0, W, H);
+
+    /* radial threads with traveling shimmer */
+    for (var i = 0; i < NR; i++) {
+      var a = angles[i];
+      var end = pt(a, 1);
+      var shimT = ((t * 0.011 + i * 0.24) % 1.5);
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(end[0], end[1]);
+
+      if (shimT < 1) {
+        var sg = ctx.createLinearGradient(cx, cy, end[0], end[1]);
+        sg.addColorStop(0, 'rgba(150,212,190,0.38)');
+        sg.addColorStop(Math.max(0.01, shimT - 0.12), 'rgba(150,212,190,0.30)');
+        sg.addColorStop(shimT, 'rgba(210,248,232,0.95)');
+        sg.addColorStop(Math.min(0.99, shimT + 0.12), 'rgba(150,212,190,0.30)');
+        sg.addColorStop(1, 'rgba(150,212,190,0.20)');
+        ctx.strokeStyle = sg;
+      } else {
+        ctx.strokeStyle = 'rgba(150,212,190,0.38)';
+      }
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    /* spiral rings */
+    for (var ring = 1; ring <= NRing; ring++) {
+      var rF = ring / NRing;
+      var wob = Math.sin(t * 0.013 + ring * 0.75) * 1.1 * rF;
+      var perpOff = Math.PI * 0.5;
+
+      ctx.beginPath();
+      for (var i = 0; i <= NR; i++) {
+        var a = angles[i % NR];
+        var p = pt(a, rF);
+        p[0] += Math.cos(a + perpOff) * wob;
+        p[1] += Math.sin(a + perpOff) * wob;
+        if (i === 0) ctx.moveTo(p[0], p[1]);
+        else ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(150,212,190,' + (0.20 + rF * 0.32) + ')';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    }
+
+    /* dew drops at intersections */
+    dews.forEach(function(d) {
+      var rF = d.r / NRing;
+      var wob = Math.sin(t * 0.013 + d.r * 0.75) * 1.1 * rF;
+      var a = angles[d.a % NR];
+      var p = pt(a, rF);
+      p[0] += Math.cos(a + Math.PI * 0.5) * wob;
+      p[1] += Math.sin(a + Math.PI * 0.5) * wob;
+      var da = 0.14 + Math.sin(t * 0.04 + d.ph) * 0.11;
+
+      /* soft halo */
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], d.sz * 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(150,212,190,' + (da * 0.55) + ')';
+      ctx.fill();
+
+      /* core */
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], d.sz, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(215,248,235,' + Math.min(0.95, da * 4.5) + ')';
+      ctx.fill();
+    });
+
+    /* broken fragments drifting (fragility) */
+    frags.forEach(function(f) {
+      f.x += f.vx;
+      f.y += f.vy;
+      if (f.x > W + 20) { f.x = -20; f.y = cy + (Math.random() - 0.5) * maxRy * 2; }
+      ctx.beginPath();
+      ctx.moveTo(f.x, f.y);
+      ctx.quadraticCurveTo(f.x + f.len * 0.5, f.y + f.cv * f.len, f.x + f.len, f.y);
+      ctx.strokeStyle = 'rgba(150,212,190,' + f.al + ')';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    });
+
+    /* spider silhouette at center */
+    ctx.save();
+    ctx.shadowColor = 'rgba(94,200,160,0.9)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = 'rgba(94,168,143,0.95)';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 3.5, 2.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    for (var leg = 0; leg < 4; leg++) {
+      var la = leg * 0.48 - 0.75 + Math.sin(t * 0.022 + leg) * 0.06;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(la) * 7, cy + Math.sin(la) * 5.5);
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(-la + 0.12) * 7, cy + Math.sin(-la + 0.12) * 5.5);
+      ctx.strokeStyle = 'rgba(150,212,190,0.72)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+    }
+
+    /* Arabic label */
+    ctx.font = 'bold 13px Amiri, serif';
+    ctx.fillStyle = 'rgba(150,212,190,0.82)';
+    ctx.textAlign = 'right';
+    ctx.fillText('وَإِنَّ أَوْهَنَ الْبُيُوتِ لَبَيْتُ الْعَنْكَبُوتِ', W - 14, H - 10);
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ── S1 CANVAS Male vs Female verb ────────────── */
+function initS1Canvas() {
+  var cv = document.getElementById('s1Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var startTs = null;
+  var LEFT_DUR = 680, RIGHT_START = 520, RIGHT_DUR = 680;
+  var TOTAL = RIGHT_START + RIGHT_DUR + 250;
+
+  function drawFrame(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+    var lA = Math.min(elapsed / LEFT_DUR, 1);
+    var rA = Math.max(0, Math.min((elapsed - RIGHT_START) / RIGHT_DUR, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#060c14';
+    ctx.fillRect(0, 0, W, H);
+
+    var gap = 12, pW = (W - gap * 3) / 2, pH = H - 16;
+
+    /* ── LEFT: Male form (not used) ── */
+    var lx = gap;
+    ctx.globalAlpha = lA;
+    ctx.fillStyle = '#0d1a28';
+    roundRect(ctx, lx, 8, pW, pH, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(248,113,113,0.22)'; ctx.lineWidth = 1;
+    roundRect(ctx, lx, 8, pW, pH, 10); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (lA > 0.05) {
+      var lCx = lx + pW / 2;
+
+      ctx.globalAlpha = lA * 0.85;
+      ctx.fillStyle = '#f87171';
+      ctx.font = '700 9px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('MALE FORM \u2014 NOT USED', lCx, 28);
+
+      /* Arabic word */
+      ctx.globalAlpha = lA * 0.30;
+      ctx.font = '700 34px Amiri, serif';
+      ctx.fillStyle = 'rgba(226,221,212,0.30)';
+      ctx.fillText('\u0627\u062A\u0651\u064E\u062E\u064E\u0630\u064E', lCx, H * 0.46);
+
+      /* strikethrough */
+      ctx.globalAlpha = lA * 0.45;
+      ctx.strokeStyle = '#f87171';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(lCx - 38, H * 0.43);
+      ctx.lineTo(lCx + 38, H * 0.43);
+      ctx.stroke();
+
+      /* transliteration */
+      ctx.globalAlpha = lA * 0.28;
+      ctx.fillStyle = 'rgba(248,113,113,0.50)';
+      ctx.font = '400 12px DM Sans, sans-serif';
+      ctx.fillText('ittakhadha', lCx, H * 0.60);
+
+      /* bottom label */
+      ctx.globalAlpha = lA * 0.45;
+      ctx.fillStyle = 'rgba(248,113,113,0.55)';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.fillText('MALE VERB', lCx, H - 18);
+
+      ctx.globalAlpha = 1;
+    }
+
+    /* ── RIGHT: Female form (used) ── */
+    var rx = gap * 2 + pW;
+    ctx.globalAlpha = rA;
+    ctx.fillStyle = '#0d1a28';
+    roundRect(ctx, rx, 8, pW, pH, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(94,168,143,0.30)'; ctx.lineWidth = 1;
+    roundRect(ctx, rx, 8, pW, pH, 10); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (rA > 0.05) {
+      var rCx = rx + pW / 2;
+
+      ctx.globalAlpha = rA * 0.88;
+      ctx.fillStyle = 'rgba(150,212,190,0.85)';
+      ctx.font = '700 9px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FEMALE FORM \u2014 USED IN QURAN', rCx, 28);
+
+      /* Arabic word bright */
+      ctx.globalAlpha = rA * 0.92;
+      ctx.font = '700 34px Amiri, serif';
+      ctx.fillStyle = 'rgba(150,212,190,0.92)';
+      ctx.fillText('\u0627\u062A\u0651\u064E\u062E\u064E\u0630\u064E\u062A\u0652', rCx, H * 0.46);
+
+      /* glowing badge for تْ below the word */
+      var badgeX = rCx + 28;
+      var badgeY = H * 0.60;
+      var glowR = 16 + Math.sin(ts * 0.004) * 2.5;
+      var tg = ctx.createRadialGradient(badgeX, badgeY, 0, badgeX, badgeY, glowR);
+      tg.addColorStop(0, 'rgba(150,212,190,' + (0.22 * rA) + ')');
+      tg.addColorStop(1, 'rgba(150,212,190,0)');
+      ctx.fillStyle = tg;
+      ctx.fillRect(badgeX - glowR, badgeY - glowR, glowR * 2, glowR * 2);
+
+      ctx.globalAlpha = rA * 0.9;
+      ctx.fillStyle = '#0d1a28';
+      ctx.beginPath();
+      ctx.arc(badgeX, badgeY, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(150,212,190,' + (0.6 * rA) + ')';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.globalAlpha = rA;
+      ctx.fillStyle = 'rgba(150,212,190,0.95)';
+      ctx.font = '700 16px Amiri, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('\u062A\u0652', badgeX, badgeY + 5.5);
+
+      /* connector line from badge to word */
+      ctx.globalAlpha = rA * 0.35;
+      ctx.beginPath();
+      ctx.moveTo(badgeX, badgeY - 14);
+      ctx.lineTo(badgeX, H * 0.46 + 6);
+      ctx.strokeStyle = 'rgba(150,212,190,0.40)';
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([2, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      /* label under badge */
+      ctx.globalAlpha = rA * 0.65;
+      ctx.fillStyle = 'rgba(150,212,190,0.75)';
+      ctx.font = '600 9px DM Sans, sans-serif';
+      ctx.fillText('female marker', badgeX, badgeY + 22);
+
+      /* transliteration */
+      ctx.globalAlpha = rA * 0.60;
+      ctx.fillStyle = 'rgba(150,212,190,0.60)';
+      ctx.font = '400 12px DM Sans, sans-serif';
+      ctx.fillText('ittakhathat', rCx - 20, H * 0.60);
+
+      /* bottom label */
+      ctx.globalAlpha = rA * 0.75;
+      ctx.fillStyle = 'rgba(150,212,190,0.75)';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.fillText('FEMALE BUILDS  \u2713', rCx, H - 18);
+
+      ctx.globalAlpha = 1;
+    }
+
+    if (elapsed < TOTAL) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      document.getElementById('s1Mc').style.display = 'block';
+    }
+  }
+  requestAnimationFrame(drawFrame);
+}
+
+/* ── S2 CANVAS Web fragility ──────────────────── */
+var s2Running = false;
+
+function drawS2Frame(ctx, W, H, webFrac, windOn, windProg, lblA) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#040810';
+  ctx.fillRect(0, 0, W, H);
+
+  var cx = W * 0.5, cy = H * 0.46;
+  var maxRx = W * 0.30, maxRy = H * 0.37;
+  var NR = 12, NRing = 6;
+  var angles = [];
+  for (var i = 0; i < NR; i++) angles.push(i / NR * Math.PI * 2 - Math.PI / 2);
+
+  function pt(a, rF) {
+    return [cx + Math.cos(a) * maxRx * rF, cy + Math.sin(a) * maxRy * rF];
+  }
+
+  /* center glow */
+  var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRx * 0.5);
+  cg.addColorStop(0, 'rgba(94,168,143,0.028)');
+  cg.addColorStop(1, 'rgba(94,168,143,0)');
+  ctx.fillStyle = cg;
+  ctx.fillRect(0, 0, W, H);
+
+  /* radial threads shrink with damage */
+  var radFrac = 0.35 + 0.65 * webFrac;
+  for (var i = 0; i < NR; i++) {
+    var a = angles[i];
+    var end = pt(a, radFrac);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(end[0], end[1]);
+    ctx.strokeStyle = 'rgba(150,212,190,0.16)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  /* spiral rings disappear from outside in */
+  var visRings = Math.max(0, Math.round(NRing * webFrac));
+  for (var ring = 1; ring <= visRings; ring++) {
+    var rF = ring / NRing;
+    if (rF > webFrac + 0.01) break;
+    ctx.beginPath();
+    for (var i = 0; i <= NR; i++) {
+      var a = angles[i % NR];
+      var p = pt(a, rF);
+      if (i === 0) ctx.moveTo(p[0], p[1]);
+      else ctx.lineTo(p[0], p[1]);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(150,212,190,' + (0.05 + rF * 0.09) + ')';
+    ctx.lineWidth = 0.4;
+    ctx.stroke();
+  }
+
+  /* broken thread fragments during damage */
+  if (windOn && webFrac < 0.85) {
+    var fragAlpha = Math.min(1, (0.85 - webFrac) / 0.4) * 0.18;
+    for (var fi = 0; fi < 8; fi++) {
+      var fa = angles[fi * 1.5 % NR | 0];
+      var fBase = pt(fa, 0.55 + fi * 0.06);
+      var fOff = windProg * (15 + fi * 4);
+      ctx.beginPath();
+      ctx.moveTo(fBase[0] + fOff, fBase[1] - fi * 2);
+      ctx.quadraticCurveTo(
+        fBase[0] + fOff + 8, fBase[1] - fi * 2 - 3,
+        fBase[0] + fOff + 14, fBase[1] - fi * 2 + 1
+      );
+      ctx.strokeStyle = 'rgba(150,212,190,' + fragAlpha + ')';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    }
+  }
+
+  /* wind streaks */
+  if (windOn) {
+    for (var wi = 0; wi < 20; wi++) {
+      var wx = windProg * W * 1.5 - wi * 22;
+      var wy = H * 0.06 + (wi / 20) * H * 0.88;
+      var wLen = 10 + (wi % 5) * 5;
+      var wa = 0.13 * Math.max(0, 1 - Math.abs(wx / W - 0.5) * 1.8);
+      if (wa > 0.01) {
+        ctx.beginPath();
+        ctx.moveTo(wx, wy);
+        ctx.lineTo(wx - wLen, wy + (wi % 2 === 0 ? -1.5 : 1.5));
+        ctx.strokeStyle = 'rgba(200,228,218,' + wa + ')';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+
+  /* spider */
+  ctx.fillStyle = 'rgba(94,168,143,0.28)';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, 2, 1.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  for (var leg = 0; leg < 4; leg++) {
+    var la = leg * 0.5 - 0.8;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(la) * 5, cy + Math.sin(la) * 4);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(-la + 0.1) * 5, cy + Math.sin(-la + 0.1) * 4);
+    ctx.strokeStyle = 'rgba(150,212,190,0.16)';
+    ctx.lineWidth = 0.4;
+    ctx.stroke();
+  }
+
+  /* labels */
+  if (lblA > 0) {
+    ctx.globalAlpha = lblA;
+    ctx.font = '600 9px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(150,212,190,0.50)';
+    ctx.fillText('20 METERS OF SILK \u00B7 REBUILT EVERY NIGHT', cx, H - 10);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  drawS2Frame(ctx, cv.width, cv.height, 1, false, 0, 0);
+}
+
+function startFragility() {
+  if (s2Running) return;
+  s2Running = true;
+  document.getElementById('s2Btn').disabled = true;
+
+  var cv = document.getElementById('s2Canvas');
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var INTACT = 600, DAMAGE = 1200, REBUILD = 1500, LABEL = 500;
+  var TOTAL = INTACT + DAMAGE + REBUILD + LABEL;
+  var startTs = null;
+  var countEl = document.getElementById('driftCount');
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var e = ts - startTs;
+    var webFrac = 1, windOn = false, windProg = 0, lblA = 0;
+
+    if (e < INTACT) {
+      webFrac = 1;
+    } else if (e < INTACT + DAMAGE) {
+      var dp = (e - INTACT) / DAMAGE;
+      webFrac = 1 - ease(dp) * 0.72;
+      windOn = true;
+      windProg = ease(dp);
+    } else if (e < INTACT + DAMAGE + REBUILD) {
+      var rp = (e - INTACT - DAMAGE) / REBUILD;
+      webFrac = 0.28 + ease(rp) * 0.72;
+      countEl.textContent = Math.round(ease(rp) * 20);
+    } else {
+      webFrac = 1;
+      lblA = Math.min((e - INTACT - DAMAGE - REBUILD) / LABEL, 1);
+    }
+
+    drawS2Frame(ctx, W, H, webFrac, windOn, windProg, lblA);
+
+    if (e < TOTAL) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('s2PanelA').classList.add('lit');
+      document.getElementById('s2PanelB').classList.add('lit');
+      document.getElementById('s2Result').classList.add('show');
+      setTimeout(function() {
+        showOk('20 meters of silk, rebuilt every night \u2014 the most fragile of houses, just as the Quran states.', function() { go(3); });
+      }, 900);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"spider-web");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"spider-web","question":"Which spiders spin webs?","inputType":"choice","choices":["Only males","Only females","Both males and females"],"correct":"Only females","curiositySeed":{"question":"Crows hold 'funerals' for their dead — gathering around the corpse to learn about dangers. When was this scientifically confirmed?","nextUrl":"quran-crow-funerals.html","nextTitle":"Crow Funerals"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 29:41 اتَّخَذَتْ (she built feminine verb). Only female spiders spin webs. */
+QuranValidator.attach('qv-spider',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 29:41 اتَّخَذَتْ "SHE built a house." The feminine تْ ending means the web-builder is female confirmed by zoology.',
+  groups:[
+    {id:'spider', label:'She builds (female verb)', arabic:'الْعَنْكَبُوتِ', color:'#a8a29e', occurrences:[[29,41]]}
+  ]
+});
+</script>
+</body>
+</html>

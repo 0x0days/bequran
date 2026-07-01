@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Wind &amp; Atmosphere · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #2dd4bf;
+      --accent-light: #5eead4;
+      --accent-dim:   rgba(45,212,191,0.12);
+      --accent-ring:  rgba(45,212,191,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Duolingo progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Typography ── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.used { opacity: .4; pointer-events: none; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Intro verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(20px, 4.5vw, 28px); line-height: 2.2; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 500; }
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(32px, 7vw, 48px); font-weight: 700; line-height: 1; color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(17px, 4vw, 24px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .ac-ar { font-family: 'Amiri', serif; font-size: 17px; direction: rtl; text-align: right; color: var(--text); line-height: 1.9; }
+    .ac-tr { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+
+    /* ── S2: Two-path explorer ── */
+    .path-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .path-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .path-btn.used { opacity: .5; pointer-events: none; }
+    .path-btn .pb-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .path-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; display: none; animation: rise .35s ease; }
+    .path-result.show { display: block; }
+    .pr-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 10px; font-weight: 600; }
+    .pr-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 20px; line-height: 2.1; color: var(--text); margin-bottom: 10px; }
+    .pr-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .pr-en { font-size: 14px; color: var(--muted); line-height: 1.75; font-style: italic; }
+    .pr-en .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+    .pr-sci { font-size: 14px; color: var(--muted); line-height: 1.8; }
+    .pr-sci strong { color: var(--text); }
+    .conv-panel { background: linear-gradient(135deg, rgba(45,212,191,0.08) 0%, rgba(45,212,191,0.03) 100%); border: 1px solid rgba(45,212,191,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-eq { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 20px); color: var(--text); line-height: 1.7; }
+    .conv-eq span { color: var(--accent-light); }
+    .conv-num { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 40px); font-weight: 700; color: var(--accent-light); margin-top: 8px; display: block; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-num.mc1 { color: var(--accent-light); text-shadow: 0 0 40px var(--accent-ring); }
+    .match-num.mc2 { color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.4); }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-carbon-creation.html" class="nav-back">← Carbon Creation</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · Wind &amp; Atmosphere</div>
+
+
+<!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · Wind &amp; Atmosphere</p>
+    <h1 class="hero-title">A 7th-century text says wind exists in a bounded zone — modern science placed that boundary at exactly 100 km.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 2:164 Surah Al-Baqarah · The Cow (excerpt)</div>
+      <div class="iv-ar">
+        وَتَصْرِيفِ الرِّيَاحِ وَالسَّحَابِ الْمُسَخَّرِ <span class="hl">بَيْنَ السَّمَاءِ وَالْأَرْضِ</span>
+      </div>
+      <div class="iv-tr">
+        "...and the directing of the winds and the clouds controlled <span class="hl">between the sky and the earth</span>..."
+      </div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num" style="font-size:clamp(20px,4vw,28px);font-family:'Amiri',serif;direction:rtl;">بَيْنَ السَّمَاءِ وَالْأَرْضِ</div>
+        <div class="cr-lbl">Quran 2:164 · "between the sky and earth"</div>
+      </div>
+      <div class="cr-eq">=</div>
+      <div class="cr-block">
+        <div class="cr-num">100 km</div>
+        <div class="cr-lbl">Kármán Line · where atmosphere ends</div>
+      </div>
+    </div>
+
+    <p class="body-text">Wind is simply air moving. No air means no wind. Earth's air — the atmosphere — stretches from the ground up to about 100 km. Above that is space: no air, no wind, silence. The Quran says wind operates "between the sky and the earth." The word <em>between</em> (بين) means bounded — with a bottom and a top. It didn't say wind is "in the sky" or "everywhere." It said "between" — meaning wind has a ceiling. Modern science confirmed this ceiling at 100 km, the Kármán Line, named after aerodynamicist Theodore von Kármán.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#0d2626">Begin the lesson →</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">In Surah Al-Baqarah 2:164, where does the Quran say winds and clouds operate?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Everywhere in space with no limit</div>
+        <div class="ac-sub">Wind extends infinitely beyond Earth — no boundary</div>
+        </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">بَيْنَ السَّمَاءِ وَالْأَرْضِ</div>
+        <div class="ac-tr">Between the sky and the earth</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Only at ground level, never above it</div>
+        <div class="ac-sub">Wind stays on the surface and never rises into the sky</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 Two-source explorer ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">Reveal both sources then see what they agree on.</p>
+
+    <button class="path-btn" id="btnA" onclick="revealPath('a')">
+      <div class="pb-icon" style="background:var(--accent-dim);color:var(--accent-light)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">Read the Quran's description</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Surah Al-Baqarah 2:164</div>
+      </div>
+      <svg style="margin-left:auto;color:var(--muted)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="path-result" id="resultA">
+      <div class="pr-label">Quran 2:164 · 7th century CE</div>
+      <div class="pr-ar">وَتَصْرِيفِ الرِّيَاحِ وَالسَّحَابِ الْمُسَخَّرِ <span class="hl">بَيْنَ السَّمَاءِ وَالْأَرْضِ</span></div>
+      <div class="pr-en">"...the directing of the winds and clouds controlled <span class="hl">between the sky and the earth</span>..."</div>
+    </div>
+
+    <button class="path-btn" id="btnB" onclick="revealPath('b')">
+      <div class="pb-icon" style="background:rgba(99,179,237,0.12);color:#63b3ed">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">Check modern atmospheric science</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Kármán Line &amp; wind mechanics</div>
+      </div>
+      <svg style="margin-left:auto;color:var(--muted)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="path-result" id="resultB">
+      <div class="pr-label">Modern Atmospheric Science</div>
+      <div class="pr-sci">
+        Wind is air moving. Air exists only inside Earth's atmosphere — from the ground up to about <strong>100 km altitude</strong>. This boundary is called the <strong>Kármán Line</strong>, named after aerodynamicist <strong>Theodore von Kármán</strong>. He chose 100 km because above it, the air is too thin for aircraft to fly — the atmosphere effectively ends.<br><br>
+        Above 100 km is space. Almost no air molecules exist there — nothing to move, no wind. The International Space Station orbits at ~400 km in total silence. Wind, as we know it, stops at the Kármán Line.
+      </div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-eq">
+        The Quran restricts wind to <span>"between the sky and earth"</span><br>Modern science defines that exact boundary at
+      </div>
+      <span class="conv-num" id="convKarman">0</span>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px">km altitude — the Kármán Line</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">You may have heard of "solar wind." Does it prove wind exists in outer space?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Yes — solar wind is regular wind in space</div>
+        <div class="ac-sub">Wind blows through empty space just like it does on Earth</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Solar wind is just atmospheric wind that faded</div>
+        <div class="ac-sub">Earth's wind gradually weakens as it leaves the atmosphere</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">No — solar wind is plasma, not air moving</div>
+        <div class="ac-sub">It is charged particles from the Sun — a different phenomenon entirely, not atmospheric wind</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">"Between the sky and earth" — the Quran's 7th-century boundary for wind matches exactly where modern science drew the Kármán Line at 100 km.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num mc1" id="mv0">0</div>
+        <div class="match-lbl">km — where Earth's atmosphere ends</div>
+      </div>
+      <div class="match-eq" style="font-family:'Playfair Display',serif;font-size:clamp(18px,4vw,28px);color:var(--muted)">Kármán Line</div>
+    </div>
+
+    <table class="sci-table" style="margin-top:28px">
+      <thead>
+        <tr><th>What happened</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Quran revealed</td>
+          <td class="td-v">~610 CE</td>
+        </tr>
+        <tr>
+          <td>Quran places wind</td>
+          <td class="td-v">"Between" sky and earth — bounded, with a ceiling</td>
+        </tr>
+        <tr>
+          <td>Science draws atmosphere boundary</td>
+          <td class="td-v">100 km — Kármán Line (Theodore von Kármán)</td>
+        </tr>
+        <tr>
+          <td>Wind above 100 km</td>
+          <td class="td-v">None — no air exists there to move</td>
+        </tr>
+        <tr class="hl">
+          <td>Years before humans could verify this</td>
+          <td class="td-v"><strong>~1,350 years</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why the word "between" (بين) is the key:</strong> The Arabic word <em>bayna</em> means "between" — something with two sides, a lower limit and an upper limit. The Quran didn't say wind is "in the sky" or "everywhere." It said "between" the sky and earth — meaning wind has a floor and a ceiling. Modern science confirmed this: wind's floor is the ground, and wind's ceiling is the Kármán Line at 100 km, identified by Theodore von Kármán. The connection: the Quran's word "between" gives wind a ceiling, and science measured that ceiling at 100 km.
+    </div>
+
+    <div class="insight-box">
+      <strong>The verse groups three things — and all three share the same boundary:</strong> <strong>Step 1:</strong> "Winds" — air moving, which needs air to exist. <strong>Step 2:</strong> "Clouds" — water vapor, which only forms inside the atmosphere. <strong>Step 3:</strong> "Between sky and earth" — a bounded zone with a top and bottom. <strong>The connection:</strong> all three things the Quran groups together exist in exactly one place — Earth's atmosphere, which ends at 100 km. The verse doesn't just describe wind correctly in isolation — it places wind next to clouds in the same bounded zone, and science confirms both stop at the same line.
+    </div>
+
+    <div class="insight-box">
+      <strong>Why "solar wind" doesn't change anything:</strong> "Solar wind" is a name for charged particles (plasma) streaming from the Sun. It is not air moving — it has no air molecules, no gas, no connection to atmospheric wind. Science gives it a different name because it is a different phenomenon. The Quran describes atmospheric wind — the movement of air within a planet's atmosphere. That wind, as the verse states, exists "between the sky and the earth" — bounded, with a ceiling at 100 km.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">The Quran says winds and clouds are controlled "between the sky and the earth." Modern science confirms that atmospheric wind — air moving — exists only within Earth's atmosphere, ending at the Kármán Line 100 km up. The word "between" places wind in a bounded zone, and science drew that exact boundary at 100 km.</div>
+      <div class="gs">In the 7th century, no human had left the atmosphere to observe that wind stops at a specific altitude. The only way to know this was to go there — which didn't happen until the 1960s — or to receive the knowledge from elsewhere. The Quran's statement was verified for the first time over 1,300 years after it was revealed.</div>
+    </div>
+
+    <div id="qv-wind"></div>
+
+        <div id="curiositySeed"></div>
+
+
+    <a href="quran-carbon-creation.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Carbon Creation</a>
+    <a href="quran-prime-numbers.html" class="btn" style="background:var(--accent);color:#0d2626;margin-left:12px">Next · Prime Numbers →</a>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Wind & Atmosphere',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('wind-atmosphere');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 100, 1600, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* Stage 1 */
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('2:164 explicitly places winds and clouds "between the sky and the earth" not throughout the heavens.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* Stage 2 two-path explorer */
+var doneA = false, doneB = false;
+
+function revealPath(which) {
+  if (which === 'a' && !doneA) {
+    doneA = true;
+    document.getElementById('resultA').classList.add('show');
+    document.getElementById('btnA').classList.add('used');
+    checkBothPaths();
+  }
+  if (which === 'b' && !doneB) {
+    doneB = true;
+    document.getElementById('resultB').classList.add('show');
+    document.getElementById('btnB').classList.add('used');
+    checkBothPaths();
+  }
+}
+
+function checkBothPaths() {
+  if (!doneA || !doneB) return;
+  var panel = document.getElementById('convPanel');
+  panel.classList.add('show');
+  animFrom(document.getElementById('convKarman'), 0, 100, 1400, function() {
+    setTimeout(function() {
+      showOk('Both agree: wind is confined to the atmosphere "between the sky and earth." Beyond 100 km, no wind exists.', function() { go(3); });
+    }, 500);
+  });
+}
+
+/* Stage 3 */
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Solar wind is charged plasma from the Sun electrons and protons, not gas molecules. It is not atmospheric wind and does not exist between sky and earth.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero canvas atmosphere cross-section ── */
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, t = 0;
+
+  /* Wind particles (in atmosphere zone only) */
+  var particles = [];
+  for (var i = 0; i < 42; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: H * 0.42 + Math.random() * H * 0.50,
+      vx: 0.5 + Math.random() * 0.9,
+      vy: (Math.random() - 0.5) * 0.25,
+      sz: 0.6 + Math.random() * 1.1,
+      a:  0.25 + Math.random() * 0.45
+    });
+  }
+
+  /* Stars (space zone only) */
+  var stars = [];
+  for (var j = 0; j < 32; j++) {
+    stars.push({
+      x: (j * 137.5) % W,
+      y: (j * 63.2)  % (H * 0.36),
+      ph: j * 0.38
+    });
+  }
+
+  /* Cloud wisps */
+  var wisps = [
+    { x: W * 0.12, y: H * 0.63, vx: 0.22, r: 11 },
+    { x: W * 0.52, y: H * 0.72, vx: 0.18, r: 14 },
+    { x: W * 0.78, y: H * 0.58, vx: 0.28, r: 9  }
+  ];
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* Deep space background */
+    ctx.fillStyle = '#02040a';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Atmosphere glow zone */
+    var atmoGrad = ctx.createLinearGradient(0, H * 0.32, 0, H);
+    atmoGrad.addColorStop(0, 'rgba(13,30,50,0)');
+    atmoGrad.addColorStop(0.35, 'rgba(8,22,38,0.7)');
+    atmoGrad.addColorStop(1, 'rgba(6,18,30,0.95)');
+    ctx.fillStyle = atmoGrad;
+    ctx.fillRect(0, H * 0.28, W, H * 0.72);
+
+    /* Stars */
+    stars.forEach(function(s) {
+      var a = 0.2 + Math.sin(t * 0.7 + s.ph) * 0.18;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(200,215,255,' + a + ')';
+      ctx.fill();
+    });
+
+    /* Atmosphere boundary dashed teal line */
+    var bY = H * 0.36;
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, bY); ctx.lineTo(W, bY);
+    ctx.strokeStyle = 'rgba(45,212,191,0.2)';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+    ctx.restore();
+
+    /* Wind horizontal streaks */
+    for (var i = 0; i < 6; i++) {
+      var ly  = H * 0.46 + i * H * 0.075;
+      var spd = 0.7 + i * 0.12;
+      var lx  = ((t * spd + i * 130) % (W + 60)) - 30;
+      var len = 18 + i * 6;
+      var la  = 0.06 + Math.sin(t * 0.4 + i) * 0.03;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.lineTo(lx - len, ly);
+      ctx.strokeStyle = 'rgba(45,212,191,' + la + ')';
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+
+    /* Wind particles */
+    particles.forEach(function(p) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x > W + 4) p.x = -4;
+      if (p.y < H * 0.40) p.y += 0.5;
+      if (p.y > H * 0.94) p.y = H * 0.41 + Math.random() * H * 0.10;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(45,212,191,' + p.a + ')';
+      ctx.fill();
+    });
+
+    /* Cloud wisps */
+    wisps.forEach(function(cl) {
+      cl.x += cl.vx;
+      if (cl.x > W + cl.r * 4) cl.x = -cl.r * 4;
+      ctx.beginPath();
+      ctx.arc(cl.x, cl.y, cl.r, 0, Math.PI * 2);
+      ctx.arc(cl.x + cl.r * 0.9, cl.y - cl.r * 0.3, cl.r * 0.7, 0, Math.PI * 2);
+      ctx.arc(cl.x - cl.r * 0.7, cl.y - cl.r * 0.2, cl.r * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(90,120,155,0.1)';
+      ctx.fill();
+    });
+
+    /* Earth curve at bottom */
+    ctx.beginPath();
+    ctx.arc(W * 0.5, H + W * 0.85, W * 0.98, Math.PI * 1.07, Math.PI * 1.93);
+    ctx.strokeStyle = 'rgba(45,212,191,0.16)';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    /* Vignette */
+    var vig = ctx.createRadialGradient(W*0.5, H*0.5, H*0.1, W*0.5, H*0.5, W*0.7);
+    vig.addColorStop(0, 'rgba(2,4,10,0)');
+    vig.addColorStop(1, 'rgba(2,4,10,0.55)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"wind-atmosphere");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"wind-atmosphere","question":"At what altitude does Earth's atmosphere effectively end (the Kármán line)?","unit":"km","inputType":"dprobe","min":50,"max":500,"step":10,"correct":100,"correctLabel":"100 km","curiositySeed":{"question":"Surah Al-Fatiha has 7 verses. Is 7 a prime number — and do you think its word count and letter count are also prime?","nextUrl":"quran-prime-numbers.html","nextTitle":"Prime Numbers"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 2:164 wind "between the sky and earth." Also 30:48 wind carries clouds.
+   Confirmed: wind exists only within Earth's atmosphere (below the Kármán Line). */
+QuranValidator.attach('qv-wind',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 2:164 winds "between the sky and earth." Confirmed by space travel: wind stops at the Kármán Line, 100 km up.',
+  groups:[
+    {id:'wind', label:'Wind between sky and earth', arabic:'الرِّيَاحِ', color:'#2dd4bf', occurrences:[[2,164],[30,48]]}
+  ]
+});
+</script>
+</body>
+</html>

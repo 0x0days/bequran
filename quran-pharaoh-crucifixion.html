@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Pharaoh's Stakes · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #e879f9;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(232,121,249,0.06) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#c026d3); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    .hero-verse { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin-bottom:24px; border-left:3px solid var(--accent); }
+    .verse-ar { font-family:'Amiri',serif; font-size:20px; color:var(--accent); direction:rtl; text-align:right; line-height:2; margin-bottom:10px; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.7; font-style:italic; }
+    .claim-box { background:linear-gradient(135deg,rgba(232,121,249,0.08),rgba(192,38,211,0.03)); border:1px solid rgba(232,121,249,0.18); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:600; }
+    .claim-text { font-size:15px; line-height:1.7; }
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(232,121,249,0.3); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-ref { font-size:10px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; color:var(--accent); line-height:1.8; }
+    .ac-tr { font-size:12px; color:var(--muted); margin-top:2px; }
+    /* evidence images */
+    .evidence-section { margin:20px 0 24px; }
+    .evidence-label { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; font-weight:600; }
+    .evidence-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .evidence-grid.single { grid-template-columns:1fr; }
+    .evidence-item { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .evidence-item img { width:100%; display:block; filter:brightness(0.92) contrast(1.05); }
+    [data-theme="light"] .evidence-item img { filter:none; }
+    .evidence-caption { padding:8px 12px; font-size:11px; color:var(--muted); line-height:1.5; }
+    .evidence-caption strong { color:var(--text); }
+    /* xp */
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:13px; font-weight:600; color:var(--ok); }
+    .verdict-hero { text-align:center; padding:12px 0 28px; }
+    .verdict-number { font-family:'Playfair Display',serif; font-size:clamp(52px,10vw,80px); font-weight:700; color:var(--accent); line-height:1; }
+    .verdict-label { font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:.06em; text-transform:uppercase; }
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(232,121,249,0.06),rgba(192,38,211,0.02)); border:1px solid rgba(232,121,249,0.18); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#1a0011; box-shadow:0 4px 20px rgba(232,121,249,0.25); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(232,121,249,0.4); color:var(--text); }
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-pharaoh-mummy.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    ← Pharaoh's Mummy
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Pharaoh's Stakes</div>
+
+  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <div class="hero-verse">
+      <div class="verse-ref">Quran 89:10–12 · Surah Al-Fajr</div>
+      <div class="verse-ar">وَفِرْعَوْنَ ذِي الْأَوْتَادِ · الَّذِينَ طَغَوْا فِي الْبِلَادِ</div>
+      <div class="verse-en">"And Pharaoh of the Stakes who transgressed in the lands."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovered Mistake</div>
+      <div class="claim-text">
+        Skeptics insisted the Quran made an error: crucifixion was a Roman invention of the 4th century BC it couldn't exist in Pharaoh's Egypt. But Egyptologists discovered papyrus and hieroglyphs depicting <strong style="color:var(--accent)">impalement on stakes</strong> in ancient Egypt millennia before Rome existed. The Quran described this precisely. The skeptics were wrong. The Quran was right.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="go(1)">
+      Begin Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- ══ STAGE 1 ══ -->
+  <div id="s1" class="stage">
+    <p class="prompt">Quran 20:71 says Pharaoh threatened to crucify on "trunks of palm trees." What does this tell us about Egyptian crucifixion?</p>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">It was identical to Roman T-shaped crucifixion hands nailed to a crossbeam</div></div>
+    </div>
+
+    <div onclick="pickEx1(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">فَلَأُصَلِّبَنَّكُمْ فِي جُذُوعِ النَّخْلِ</div>
+        <div class="ac-ref">20:71 · Surah Ta-Ha</div>
+        <div class="ac-tr">Impalement on an upright trunk not a T-cross. The same verse says hands were cut off first, so no nailing was possible.</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Egyptians used crucifixion exactly like Assyrians tying to a post without impalement</div></div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 2 canvas + evidence images ══ -->
+  <div id="s2" class="stage">
+    <p class="prompt">What is the difference between the cross everyone imagines and what the Quran and archaeology actually describe?</p>
+
+    <canvas id="s2Canvas" width="640" height="190"
+      style="width:100%;height:190px;border-radius:12px;margin-bottom:16px;display:block;"></canvas>
+
+    <div class="evidence-section">
+      <div class="evidence-label">Archaeological Evidence</div>
+      <div class="evidence-grid">
+        <div class="evidence-item">
+          <img src="pics/1.HIEROGLYPH-FOR-IMPALEMENT-ON-A-STAKE.webp" alt="Hieroglyph for impalement on a stake" loading="lazy">
+          <div class="evidence-caption"><strong>Hieroglyph determinative</strong> the bent figure on an upright stake. Egyptian word "tp-ht": "to put on the stake as punishment." The body is bent forward impaled, not hanging by hands.</div>
+        </div>
+        <div class="evidence-item">
+          <img src="pics/2.Hieroglyph-writing-for-Pfahl.webp" alt="Egyptian dictionary entry for Pfahl (Stake)" loading="lazy">
+          <div class="evidence-caption"><strong>Egyptian lexicon entry</strong> for "Pfahl" (stake). Entry 3: "auf den Pfahl legen als Strafe" to put on the stake as punishment. Multiple hieroglyphic forms of impalement recorded.</div>
+        </div>
+      </div>
+    </div>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Roman cross (T-shape) victim hung from outstretched arms nailed to a crossbeam</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">Egyptian stake the victim was impaled on an upright post. The Quran says "palm trunks," the hieroglyph shows a body bent over a stake. Same method the Assyrians and Babylonians used confirmed by papyrus evidence.</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">No difference crucifixion always meant a cross-shaped structure in all ancient cultures</div></div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 3 ══ -->
+  <div id="s3" class="stage">
+    <p class="prompt">What is Papyrus Boulaq 18 and why does it matter to this discovery?</p>
+
+    <div class="evidence-section" style="margin-bottom:16px;">
+      <div class="evidence-grid single">
+        <div class="evidence-item">
+          <img src="pics/3.Mentioning-of-impalement-in-the-Theban-account-papyrus.webp" alt="Papyrus Boulaq 18 with highlighted impalement reference" loading="lazy">
+          <div class="evidence-caption"><strong>Papyrus Boulaq 18</strong> dated to the 13th Dynasty (Second Intermediate Period). The red-highlighted line reads: "…the comrade was put on the stake…" This predates Rome by over a thousand years.</div>
+        </div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">A Roman document proving they taught crucifixion to the Egyptians</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">An account claiming Moses himself ordered crucifixion on stakes</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">An Egyptian papyrus from the 13th Dynasty that explicitly mentions "the comrade was put on the stake" proving stake-impalement existed in Egypt long before Rome, exactly as the Quran described</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 4 VERDICT ══ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <div class="verdict-hero">
+      <div class="verdict-number" id="mv0">0</div>
+      <div class="verdict-label">Years ago the Quran described Egyptian crucifixion</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n">13th (~1800 BC)</div>
+        <div class="lbl">Dynasty Papyrus Boulaq 18</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="mv1">0</div>
+        <div class="lbl">Years Rome had not yet invented the cross</div>
+      </div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">National Library of Medicine "The History and Pathology of Crucifixion"</div>
+      <div class="source-quote">"Probably originating with the Assyrians and Babylonians, crucifixion was first used systematically by the Persians. In its earliest form in Persia the victim was tied to a tree or post, or even impaled on an upright post, with feet clear of the ground. Only later was a cross used. In the 4th century BC Alexander the Great adopted crucifixion and brought it to the Mediterranean shores…"</div>
+    </div>
+
+    <div class="verdict-text">
+      When scholars read "Pharaoh of the Stakes" (Quran 89:10) and Joseph predicting crucifixion in Egypt (Quran 12:41), skeptics said the Quran made a historical error Rome invented crucifixion centuries after Joseph.
+      <br><br>
+      But Egyptologists found <strong>Papyrus Boulaq 18</strong> (13th Dynasty, ~1800 BC): "the comrade was put on the stake." They found <strong>hieroglyphic dictionary entries</strong> for stake-impalement as punishment. And Quran 20:71 says "crucify on the trunks of palm trees" not a T-cross, but an upright trunk, exactly matching the hieroglyphic determinative of a body impaled and bent over a post.
+      <br><br>
+      The Quran used the word <em style="color:var(--accent)">الأوتاد</em> (autad = stakes) for Pharaoh not cross, not wood, specifically <strong>stakes</strong>. This archaeological precision, written by an illiterate man in 7th-century Arabia, could not have been guessed.
+    </div>
+
+    <div id="qv-crucifixion"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-haman.html" class="btn btn-primary">
+        Next: Haman in Egypt
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ══ HERO CANVAS Egyptian night + stake silhouette ══ */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = 640, H = 130; cv.width = W; cv.height = H;
+  var t = 0;
+  var rng = (function(){ var s=57; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
+  var stars = [];
+  for (var i = 0; i < 24; i++) stars.push({ x:rng()*W, y:rng()*H*0.58, r:0.4+rng()*0.8, ph:rng()*6.28 });
+
+  function frame() {
+    ctx.clearRect(0,0,W,H);
+    // Night desert
+    var sky = ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#03030b'); sky.addColorStop(0.55,'#06071a');
+    sky.addColorStop(0.82,'#180a1a'); sky.addColorStop(1,'#0e0612');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // Stars
+    stars.forEach(function(s) {
+      var a=0.3+Math.sin(t*0.018+s.ph)*0.22;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(232,121,249,'+a+')'; ctx.fill();
+    });
+    // Moon (crescent)
+    ctx.save();
+    ctx.beginPath(); ctx.arc(W-55,16,7,0,Math.PI*2);
+    ctx.fillStyle='rgba(245,230,255,0.82)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(W-52,14,6,0,Math.PI*2);
+    ctx.fillStyle='#03030b'; ctx.fill();
+    ctx.restore();
+    // Ground
+    var gnd = ctx.createLinearGradient(0,H-22,0,H);
+    gnd.addColorStop(0,'rgba(100,60,120,0.35)'); gnd.addColorStop(1,'rgba(50,25,60,0.20)');
+    ctx.fillStyle=gnd; ctx.fillRect(0,H-22,W,22);
+    // Pyramid left
+    ctx.beginPath(); ctx.moveTo(30,H-22); ctx.lineTo(110,H-62); ctx.lineTo(190,H-22);
+    ctx.fillStyle='rgba(80,45,95,0.55)'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(200,H-22); ctx.lineTo(250,H-43); ctx.lineTo(300,H-22);
+    ctx.fillStyle='rgba(65,35,78,0.40)'; ctx.fill();
+
+    // === STAKE with impaled figure (from hieroglyph) ===
+    var sX = W*0.65, sBot = H-22, sTop = H*0.12;
+    var pulse = Math.sin(t*0.04)*0.08;
+
+    // Glow around stake
+    var glow = ctx.createRadialGradient(sX,sBot+(sTop-sBot)*0.4,0,sX,sBot+(sTop-sBot)*0.4,40);
+    glow.addColorStop(0,'rgba(232,121,249,'+(0.14+pulse)+')'); glow.addColorStop(1,'rgba(232,121,249,0)');
+    ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+
+    // Upright stake/post
+    ctx.fillStyle='rgba(160,90,180,0.85)';
+    ctx.strokeStyle='rgba(232,121,249,0.55)'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.roundRect(sX-2,sTop,4,sBot-sTop,1); ctx.fill(); ctx.stroke();
+    // Pointed top of stake
+    ctx.beginPath(); ctx.moveTo(sX-3,sTop+4); ctx.lineTo(sX,sTop-4); ctx.lineTo(sX+3,sTop+4); ctx.closePath();
+    ctx.fillStyle='rgba(200,120,220,0.85)'; ctx.fill();
+
+    // Impaled figure body bent forward over stake (matches hieroglyph)
+    // The body is draped over/bent at the stake near the top third
+    var fY = sTop + (sBot-sTop)*0.28; // impalement point (upper body)
+    ctx.save();
+    ctx.strokeStyle='rgba(220,140,235,0.80)'; ctx.lineWidth=1.4; ctx.lineCap='round';
+    // Torso bent forward over stake
+    ctx.beginPath(); ctx.moveTo(sX,fY-6); ctx.quadraticCurveTo(sX+4,fY+2,sX+14,fY+8);
+    ctx.stroke();
+    // Head (drooping forward)
+    ctx.beginPath(); ctx.arc(sX+16,fY+6,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,120,220,0.75)'; ctx.fill();
+    ctx.strokeStyle='rgba(220,140,235,0.75)'; ctx.stroke();
+    // Upper legs hanging down
+    ctx.strokeStyle='rgba(220,140,235,0.65)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(sX,fY+4); ctx.quadraticCurveTo(sX-3,fY+16,sX-2,fY+26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sX,fY+4); ctx.quadraticCurveTo(sX+3,fY+16,sX+2,fY+26); ctx.stroke();
+    // Arms hanging limp
+    ctx.beginPath(); ctx.moveTo(sX+6,fY); ctx.quadraticCurveTo(sX+10,fY+10,sX+8,fY+18); ctx.stroke();
+    ctx.restore();
+
+    // Bird silhouette above stake (Quran 12:41 birds eat from his head)
+    var bX = sX+18+Math.sin(t*0.015)*8, bY = fY-20+Math.sin(t*0.02)*4;
+    ctx.save();
+    ctx.strokeStyle='rgba(200,150,220,0.55)'; ctx.lineWidth=0.9;
+    ctx.beginPath();
+    ctx.moveTo(bX-8,bY); ctx.quadraticCurveTo(bX-4,bY-4,bX,bY);
+    ctx.quadraticCurveTo(bX+4,bY-4,bX+8,bY);
+    ctx.stroke();
+    ctx.restore();
+
+    // Arabic text
+    ctx.font='bold 14px Amiri,serif';
+    ctx.fillStyle='rgba(232,121,249,0.75)';
+    ctx.textAlign='right';
+    ctx.fillText('وَفِرْعَوْنَ ذِي الْأَوْتَادِ', W-18, H-12);
+
+    t++; requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ══ S2 CANVAS Cross vs Stake comparison ══ */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width||640, H = cv.height||190;
+  var startTs=null, TOTAL=1200;
+
+  function tick(ts) {
+    if(!startTs) startTs=ts;
+    var p = Math.min((ts-startTs)/TOTAL,1);
+    var lA = Math.min(p*2,1), rA = Math.max(0,Math.min((p-0.4)*2.5,1));
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#040810'; ctx.fillRect(0,0,W,H);
+    var gap=12, pW=(W-gap*3)/2;
+
+    // LEFT Roman T-cross (what skeptics assumed)
+    ctx.globalAlpha=lA;
+    ctx.fillStyle='#1a0d0d';
+    ctx.beginPath(); ctx.roundRect(gap,8,pW,H-16,10); ctx.fill();
+    ctx.strokeStyle='rgba(248,113,113,0.22)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(248,113,113,0.85)'; ctx.font='700 10px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('WHAT SKEPTICS ASSUMED', gap+pW/2, 28);
+    ctx.fillStyle='rgba(248,113,113,0.55)'; ctx.font='500 10px DM Sans,sans-serif';
+    ctx.fillText('Roman T-cross 4th century BC', gap+pW/2, 44);
+    // Draw T-cross
+    var cx=gap+pW/2, cy=H*0.56;
+    ctx.strokeStyle='rgba(248,113,113,0.65)'; ctx.lineWidth=5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(cx,cy-44); ctx.lineTo(cx,cy+30); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-28,cy-28); ctx.lineTo(cx+28,cy-28); ctx.stroke();
+    // X mark
+    ctx.strokeStyle='rgba(248,113,113,0.9)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx+34,cy-50); ctx.lineTo(cx+44,cy-40); ctx.moveTo(cx+44,cy-50); ctx.lineTo(cx+34,cy-40); ctx.stroke();
+    ctx.fillStyle='rgba(248,113,113,0.45)'; ctx.font='500 9px DM Sans,sans-serif';
+    ctx.fillText('"Error Romans invented this"', cx, H-16);
+    ctx.globalAlpha=1;
+
+    // RIGHT Egyptian stake (Quran + archaeology)
+    var rx=gap*2+pW;
+    ctx.globalAlpha=rA;
+    ctx.fillStyle='#0a0818';
+    ctx.beginPath(); ctx.roundRect(rx,8,pW,H-16,10); ctx.fill();
+    ctx.strokeStyle='rgba(232,121,249,0.22)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(232,121,249,0.9)'; ctx.font='700 10px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('QURAN + ARCHAEOLOGY', rx+pW/2, 28);
+    ctx.fillStyle='rgba(232,121,249,0.60)'; ctx.font='500 10px DM Sans,sans-serif';
+    ctx.fillText('Stake impalement pre-Roman Egypt', rx+pW/2, 44);
+    // Draw upright stake
+    var sx=rx+pW/2, sy=H*0.55;
+    ctx.strokeStyle='rgba(180,90,200,0.8)'; ctx.lineWidth=4; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(sx,sy-48); ctx.lineTo(sx,sy+32); ctx.stroke();
+    // Pointed top
+    ctx.beginPath(); ctx.moveTo(sx-4,sy-44); ctx.lineTo(sx,sy-54); ctx.lineTo(sx+4,sy-44); ctx.closePath();
+    ctx.fillStyle='rgba(200,120,220,0.8)'; ctx.fill();
+    // Impaled figure bent over stake (hieroglyph shape)
+    var fy=sy-26;
+    ctx.strokeStyle='rgba(232,121,249,0.8)'; ctx.lineWidth=1.6; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(sx,fy-4); ctx.quadraticCurveTo(sx+5,fy+3,sx+16,fy+8); ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx+18,fy+7,4.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,100,220,0.75)'; ctx.fill();
+    ctx.strokeStyle='rgba(232,121,249,0.75)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.strokeStyle='rgba(200,130,220,0.65)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(sx,fy+4); ctx.quadraticCurveTo(sx-3,fy+16,sx-1,fy+26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx,fy+4); ctx.quadraticCurveTo(sx+2,fy+16,sx+1,fy+26); ctx.stroke();
+    // Checkmark
+    ctx.strokeStyle='rgba(34,197,94,0.9)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(sx+28,sy-46); ctx.lineTo(sx+33,sy-40); ctx.lineTo(sx+42,sy-52); ctx.stroke();
+    ctx.fillStyle='rgba(232,121,249,0.45)'; ctx.font='500 9px DM Sans,sans-serif';
+    ctx.fillText('Papyrus Boulaq 18 confirms', rx+pW/2, H-24);
+    ctx.fillText('"put on the stake" 13th Dynasty', rx+pW/2, H-13);
+    ctx.globalAlpha=1;
+
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ══ ENGINE ══ */
+var stage=0;
+function ease(t){return 1-Math.pow(1-t,3);}
+function animFrom(el,from,to,ms,cb){var t0=null;(function run(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/ms,1);el.textContent=Math.round(from+ease(p)*(to-from));if(p<1)requestAnimationFrame(run);else if(cb)cb();})(performance.now());}
+var barMap={0:'0%',1:'0%',2:'33%',3:'66%',4:'100%'};
+var metaMap={0:"Lesson · Pharaoh's Stakes",1:'Exercise 1 of 3',2:'Exercise 2 of 3',3:'Exercise 3 of 3',4:'Lesson Complete'};
+
+function go(n){
+  document.getElementById('s'+stage).classList.remove('active');
+  stage=n;
+  document.getElementById('s'+stage).classList.add('active');
+  document.getElementById('lbar').style.width=barMap[n];
+  document.getElementById('lmeta').textContent=metaMap[n];
+  window.scrollTo(0,0);
+  if(n===2) setTimeout(initS2Canvas,60);
+  if(n===4){
+    saveProgress('pharaoh-crucifixion');
+    setTimeout(function(){
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function(){
+        animFrom(document.getElementById('mv0'),0,1400,1600);
+        animFrom(document.getElementById('mv1'),0,1800,1600);
+      },400);
+    },300);
+  }
+}
+
+function saveProgress(id){var d=new Set(JSON.parse(localStorage.getItem('qn_done')||'[]'));if(!d.has(id)){d.add(id);localStorage.setItem('qn_done',JSON.stringify([...d]));localStorage.setItem('qn_xp',String(parseInt(localStorage.getItem('qn_xp')||'0')+30));}}
+function hideFb(){document.getElementById('fbPanel').className='fb-panel';}
+function showOk(sub,onContinue){document.getElementById('fbIcon').textContent='✓';document.getElementById('fbTitle').textContent='Correct!';document.getElementById('fbSub').textContent=sub;var p=document.getElementById('fbPanel');p.className='fb-panel fb-ok show';document.getElementById('fbBtn').onclick=function(){hideFb();onContinue();};}
+
+function pickEx1(el,correct){
+  if(document.querySelector('#s1 .ac-correct'))return;
+  if(correct){el.classList.add('ac-correct');document.querySelectorAll('#s1 .answer-card').forEach(function(c){if(!c.classList.contains('ac-correct'))c.classList.add('ac-disabled');});showOk('Quran 20:71 says "on the trunks of palm trees" an upright post, not a T-cross. And since the same verse says hands were cut off first, nailing was impossible. This is stake-impalement, the Assyrian-Babylonian-Egyptian method.',function(){go(2);});}
+  else{el.classList.add('ac-wrong');setTimeout(function(){el.classList.remove('ac-wrong');},500);}
+}
+function pickEx2(el,correct){
+  if(document.querySelector('#s2 .ac-correct'))return;
+  if(correct){el.classList.add('ac-correct');document.querySelectorAll('#s2 .answer-card').forEach(function(c){if(!c.classList.contains('ac-correct'))c.classList.add('ac-disabled');});showOk('The Quran\'s word الأوتاد (autad) means stakes not cross. Quran 20:71 says palm-tree trunks. The hieroglyph shows a body bent over an upright stake. All consistent with pre-Roman Egyptian impalement practice.',function(){go(3);});}
+  else{el.classList.add('ac-wrong');setTimeout(function(){el.classList.remove('ac-wrong');},500);}
+}
+function pickEx3(el,correct){
+  if(document.querySelector('#s3 .ac-correct'))return;
+  if(correct){el.classList.add('ac-correct');document.querySelectorAll('#s3 .answer-card').forEach(function(c){if(!c.classList.contains('ac-correct'))c.classList.add('ac-disabled');});showOk('Papyrus Boulaq 18 (13th Dynasty, ~1800 BC) records "the comrade was put on the stake." This is over 1,400 years before Rome invented crucifixion and exactly what the Quran described.',function(){go(4);});}
+  else{el.classList.add('ac-wrong');setTimeout(function(){el.classList.remove('ac-wrong');},500);}
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"pharaoh-crucifixion");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: 'pharaoh-crucifixion',
+  question: 'Egyptian hieroglyphs were undecipherable for centuries. In what year were they finally decoded?',
+  unit: "CE",
+  inputType: "excavate",
+  min: 1760, max: 1895, step: 1,
+  correct: 1822,
+  correctLabel: '1822 (Champollion)',
+  curiositySeed: {
+    question: 'The name \'Haman\' appears in the Bible in Persia. The Quran places Haman in Egypt. Archaeology found his name in hieroglyphs — when?',
+    nextUrl: 'quran-haman.html',
+    nextTitle: 'Haman in Egypt'
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 89:10–12 "Pharaoh of the Stakes (الأوتاد)." Papyrus Boulaq 18 confirmed
+   Egyptian stake-impalement ~1800 BC predating Rome by 1,500 years. */
+QuranValidator.attach('qv-crucifixion',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 89:10–12 "Pharaoh of the Stakes (الأوتاد)." Egyptologists confirmed stake-impalement in ancient Egypt.',
+  groups:[
+    {id:'stakes', label:'Pharaoh of the Stakes', arabic:'الْأَوْتَادِ', color:'#fb923c', occurrences:[[89,10],[89,11],[89,12]]}
+  ]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+<title>Life &amp; Death · Quranic Numerics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0b1622;--surface:#111e2e;--surface2:#182840;
+  --border:rgba(255,255,255,0.08);--text:#e2ddd4;--muted:#7a8fa3;
+      --accent: #22c55e;
+  --life:#16a34a;--life-light:#4ade80;
+  --life-dim:rgba(22,163,74,0.12);--life-ring:rgba(74,222,128,0.25);
+  --death:#7c3aed;--death-light:#a78bfa;
+  --death-dim:rgba(124,58,237,0.12);--death-ring:rgba(167,139,250,0.25);
+  --gold:#f59e0b;--gold-light:#fcd34d;
+  --gold-dim:rgba(245,158,11,0.12);--gold-ring:rgba(252,211,77,0.25);
+  --ok:#22c55e;--ok-bg:#052e16;--ok-border:#166534;
+  --err-light:#f87171;--err-bg:#2d0707;--err-border:#991b1b;
+}
+
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;padding:44px 20px 160px;
+  display:flex;align-items:flex-start;justify-content:center;
+}
+.container{width:100%;max-width:660px}
+
+/* ── Lesson bar ── */
+.lesson-bar-wrap{height:8px;background:var(--surface2);border-radius:4px;margin-bottom:8px;overflow:hidden}
+.lesson-bar-fill{height:100%;width:0%;background: var(--accent);border-radius:4px;transition:width .5s cubic-bezier(0.34,1.56,0.64,1)}
+.bar-meta{font-size:11px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:32px;min-height:16px}
+
+/* ── Stage transitions ── */
+.stage{display:none}
+.stage.active{display:block;animation:rise .4s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── Typography ── */
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:16px;color:var(--gold-light)}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(22px,5vw,34px);line-height:1.22;margin-bottom:18px}
+.acc-life{color:var(--life-light)}.acc-death{color:var(--death-light)}.acc-gold{color:var(--gold-light)}
+.step-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.body-text{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:24px}
+.sec-hdg{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:8px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:9px;padding:12px 26px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn:active{transform:scale(0.97)}
+.btn-gold{background:var(--life);color:#fff}.btn-gold:hover{background:var(--life-light)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
+
+/* ── Answer cards ── */
+.answer-card{
+  background:var(--surface);border:1px solid var(--border);border-bottom:4px solid var(--border);
+  border-radius:10px;padding:15px 20px;cursor:pointer;margin-bottom:10px;font-size:15px;
+  transition:border-color .15s,background .15s,transform .15s;user-select:none;
+}
+.answer-card:hover{border-color:rgba(255,255,255,0.22);transform:translateY(-1px)}
+.answer-card.correct{border-color:var(--ok);border-bottom-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.answer-card.wrong{border-color:var(--err-light);border-bottom-color:var(--err-border);background:var(--err-bg);animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.q-label{font-size:13px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.q-text{font-size:17px;line-height:1.5;font-weight:500;margin-bottom:22px}
+
+/* ── Feedback panel ── */
+.fb-panel{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:18px 20px 32px;transform:translateY(110%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fb-panel.show{transform:translateY(0)}
+.fb-panel.fb-ok{background:var(--ok-bg);border-top:3px solid var(--ok)}
+.fb-left{display:flex;align-items:center;gap:14px}
+.fb-icon{width:36px;height:36px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ok-bg)}
+.fb-title{font-weight:700;font-size:15px;color:var(--ok);margin-bottom:2px}
+.fb-sub{font-size:13px;color:var(--muted);line-height:1.5;max-width:360px}
+.fb-btn{padding:14px 30px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.fb-panel.fb-ok .fb-btn{background:var(--ok);color:var(--ok-bg)}
+
+/* ── Nav back ── */
+.nav-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+
+/* ── Dot field ── */
+.dot-field{position:fixed;top:0;right:0;width:260px;height:260px;opacity:.02;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:20px 20px;pointer-events:none}
+
+/* ── XP badge ── */
+.xp-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-dim);border:1px solid var(--gold-ring);border-radius:20px;padding:8px 20px;margin-bottom:28px;font-size:13px;font-weight:500;color:var(--gold-light);opacity:0;transform:scale(0.85);transition:opacity .4s,transform .4s}
+.xp-badge.show{opacity:1;transform:scale(1)}
+
+/* ── Stage 0: Intro ── */
+.verse-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 22px;margin-bottom:22px;border-top:3px solid var(--gold-light)}
+.vc-ref{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);margin-bottom:12px}
+.vc-ar{font-family:'Amiri',serif;direction:rtl;text-align:right;font-size:clamp(18px,3vw,24px);line-height:2.2;margin-bottom:14px}
+.wl{color:var(--life-light);font-weight:700}.wd{color:var(--death-light);font-weight:700}
+.vc-tr{font-size:13px;line-height:1.8;color:var(--muted);font-style:italic}
+.vc-tr strong{font-style:normal;color:var(--text)}
+
+.concept-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.cp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
+.cp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.cp-life::after{background:linear-gradient(90deg,#166534,var(--life-light))}
+.cp-death::after{background:linear-gradient(90deg,#4c1d95,var(--death-light))}
+.cp-arabic{font-family:'Amiri',serif;font-size:38px;direction:rtl;margin-bottom:4px;line-height:1.2}
+.cp-arabic.life{color:var(--life-light)}.cp-arabic.death{color:var(--death-light)}
+.cp-root{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.cp-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── Stage 2: Balance display ── */
+.balance-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:22px}
+.bal-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;position:relative;overflow:hidden}
+.bal-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.bc-death::after{background:linear-gradient(90deg,#4c1d95,var(--death-light))}
+.bc-life::after{background:linear-gradient(90deg,#166534,var(--life-light))}
+.bc-word{font-family:'Amiri',serif;font-size:28px;direction:rtl;line-height:1.2;margin-bottom:2px}
+.bc-word.death{color:var(--death-light)}.bc-word.life{color:var(--life-light)}
+.bc-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.bc-num{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,64px);font-weight:700;line-height:1;margin-bottom:4px}
+.bc-note{font-size:11px;color:var(--muted)}
+.bal-eq{font-family:'Playfair Display',serif;font-size:28px;color:var(--muted);text-align:center;transition:color .5s,text-shadow .5s}
+.bal-eq.lit{color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.45)}
+
+/* ── Stage 2: Exclusion groups ── */
+.excl-intro{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:18px}
+.excl-intro strong{color:var(--text)}
+.excl-group{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:opacity .5s,background .4s,border-color .4s}
+.excl-group.done{opacity:.3;background:transparent;border-color:rgba(255,255,255,0.03)}
+.eg-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.eg-arabic{font-family:'Amiri',serif;font-size:26px;direction:rtl;color:var(--life-light)}
+.eg-arabic.removed{color:var(--muted);text-decoration:line-through}
+.eg-info{flex:1}
+.eg-meaning{font-size:14px;font-weight:500;color:var(--text)}
+.eg-count{font-size:12px;color:var(--muted);margin-top:1px}
+.eg-reason{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.eg-btn{display:inline-flex;align-items:center;gap:7px;background:var(--life-dim);border:1px solid var(--life-ring);border-radius:7px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--life-light);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.eg-btn:hover{background:rgba(22,163,74,0.2)}
+.eg-btn.used{background:transparent;border-color:var(--border);color:var(--muted);cursor:default;pointer-events:none}
+
+/* ── Stage 4: Verdict ── */
+.verdict-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:26px}
+.vp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 12px;text-align:center;position:relative;overflow:hidden}
+.vp-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.vpc-life::after{background:linear-gradient(90deg,#166534,var(--life-light))}
+.vpc-death::after{background:linear-gradient(90deg,#4c1d95,var(--death-light))}
+.vp-word{font-family:'Amiri',serif;font-size:26px;direction:rtl;line-height:1.2;margin-bottom:2px}
+.vpc-life .vp-word{color:var(--life-light)}.vpc-death .vp-word{color:var(--death-light)}
+.vp-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.vp-num{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,64px);font-weight:700;line-height:1}
+.vpc-life .vp-num{color:var(--life-light);text-shadow:0 0 50px rgba(22,163,74,0.3)}
+.vpc-death .vp-num{color:var(--death-light);text-shadow:0 0 50px rgba(124,58,237,0.3)}
+.vp-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.vp-eq{font-family:'Playfair Display',serif;font-size:28px;color:var(--muted);text-align:center;transition:color .6s,text-shadow .6s}
+.vp-eq.lit{color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.5)}
+
+.death-table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:22px}
+.death-table th{text-align:left;color:var(--muted);font-weight:400;padding:8px 12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.death-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.death-table .ar-cell{font-family:'Amiri',serif;font-size:18px;direction:rtl;color:var(--death-light)}
+.death-table .num-cell{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--death-light);text-align:right}
+.death-table .total-row td{border-top:1px solid var(--border);border-bottom:none;font-weight:500;color:var(--text)}
+.death-table .total-row .num-cell{color:var(--death-light);font-size:20px}
+.death-table tr{opacity:0;transform:translateY(5px);transition:opacity .3s,transform .3s}
+.death-table thead tr{opacity:1;transform:none}
+.death-table tr.show{opacity:1;transform:translateY(0)}
+
+.excl-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.excl-card.show{opacity:1;transform:translateY(0)}
+.excl-card-ar{font-family:'Amiri',serif;font-size:22px;direction:rtl;color:var(--muted);text-decoration:line-through;flex-shrink:0}
+.excl-card-info{flex:1}
+.excl-card-name{font-size:14px;color:var(--text)}
+.excl-card-meaning{font-size:12px;color:var(--muted);margin-top:2px}
+.excl-card-num{font-family:'Playfair Display',serif;font-size:20px;color:var(--err-light);font-weight:700}
+
+.excl-total{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-radius:8px;padding:12px 18px;font-size:14px;margin-bottom:22px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.excl-total.show{opacity:1;transform:translateY(0)}
+
+.prob-block{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:22px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.prob-block.show{opacity:1;transform:translateY(0)}
+.prob-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:14px}
+.prob-row:last-of-type{border-bottom:none}
+.pr-l{color:var(--muted)}.pr-r{color:var(--text);font-weight:500}.pr-r.hl{color:var(--gold-light)}
+.prob-footer{padding:14px 16px;background:var(--gold-dim);border-top:1px solid var(--gold-ring)}
+.prob-footer .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.prob-footer .val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold-light)}
+
+.gold-box{background:var(--surface);border-radius:14px;border:1px solid var(--border);border-top:3px solid var(--gold-light);padding:26px 22px;text-align:center;margin-bottom:28px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.gold-box.show{opacity:1;transform:translateY(0)}
+.gold-box h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:12px}
+.gold-box p{font-size:14px;color:var(--muted);line-height:1.8}
+.gold-box strong{color:var(--text)}.gold-box em{font-style:normal;color:var(--gold-light)}
+
+.verdict-nav{display:flex;gap:12px;flex-wrap:wrap;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.verdict-nav.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-hell-paradise.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Pattern 6 · Hell &amp; Paradise
+  </a>
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="barFill"></div></div>
+  <div class="bar-meta" id="barMeta"></div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 0 · INTRO
+  ════════════════════════════════ -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow">Pattern 7 · Life &amp; Death</div>
+    <h1 class="hero-title">
+      The Quran pairs <span class="acc-life">life</span> and <span class="acc-death">death</span>
+      as divine creations.<br>The numbers match perfectly.
+    </h1>
+
+    <div class="verse-card">
+      <div class="vc-ref">Quran 67:2 the pairing</div>
+      <div class="vc-ar">
+        ٱلَّذِى خَلَقَ <span class="wd">ٱلْمَوْتَ</span> وَ<span class="wl">ٱلْحَيَوٰةَ</span> لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا
+      </div>
+      <div class="vc-tr">
+        "He who created <strong>death</strong> and <strong>life</strong> to test which of you is best in deed."
+      </div>
+    </div>
+
+    <p class="body-text">
+      The Quran treats life and death as one paired creation. Count how many times the Quran uses <strong style="color:var(--text)">noun forms</strong> of each root not verbs, not adjectives. Nouns carry the concept itself: what life and death <em style="font-style:normal;color:var(--text)">are</em>.
+    </p>
+
+    <div class="concept-pair">
+      <div class="cp-card cp-life">
+        <div class="cp-arabic life">حياة</div>
+        <div class="cp-root">Root ح-ي-ي · Life</div>
+        <div class="cp-desc">ḥayāt, ḥayy, ḥayawān, maḥyā all meaning life or living</div>
+      </div>
+      <div class="cp-card cp-death">
+        <div class="cp-arabic death">موت</div>
+        <div class="cp-root">Root م-و-ت · Death</div>
+        <div class="cp-desc">mawt, mayyit, maytat, mamāt all meaning death or dead</div>
+      </div>
+    </div>
+
+    <button class="btn btn-gold" onclick="go(1)">
+      Take the lesson
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#ffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 1 · MC: Death count
+  ════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <p class="q-label">Multiple choice</p>
+    <p class="q-text">How many noun forms does the Quran use for "death" all forms from the م-و-ت root (mawt, mayyit, mamāt…)?</p>
+
+    <div class="answer-card" onclick="pickEx1(0)">88 noun forms</div>
+    <div class="answer-card" onclick="pickEx1(1)">100 noun forms</div>
+    <div class="answer-card" onclick="pickEx1(2)">105 noun forms</div>
+    <div class="answer-card" onclick="pickEx1(3)">120 noun forms</div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 2 · INTERACTIVE EXCLUSION
+  ════════════════════════════════ -->
+  <div class="stage" id="s2">
+    <div class="step-lbl">Interactive · The Life Side</div>
+
+    <div class="balance-row">
+      <div class="bal-card bc-death">
+        <div class="bc-word death">موت</div>
+        <div class="bc-label">Death nouns</div>
+        <div class="bc-num" style="color:var(--death-light)">105</div>
+        <div class="bc-note">Zero exclusions needed</div>
+      </div>
+      <div class="bal-eq" id="balEq">=</div>
+      <div class="bal-card bc-life">
+        <div class="bc-word life">حياة</div>
+        <div class="bc-label">Life nouns</div>
+        <div class="bc-num" id="lifeCount" style="color:var(--life-light)">113</div>
+        <div class="bc-note" id="lifeNote">Remove non-life forms below</div>
+      </div>
+    </div>
+
+    <div class="excl-intro">
+      The life root (ح-ي-ي) produces <strong>113 noun forms</strong> in the Quran. But Arabic roots sometimes generate words with completely different meanings. Below are three groups that share the root letters but don't mean "life." You decide whether to remove themsand watch the count change.
+    </div>
+
+    <div class="excl-group" id="eg2-snake">
+      <div class="eg-top">
+        <div class="eg-arabic" id="ar2-snake">حَيَّة</div>
+        <div class="eg-info">
+          <div class="eg-meaning">Snake</div>
+          <div class="eg-count">1 occurrence same root letters, entirely different meaning</div>
+        </div>
+      </div>
+      <div class="eg-reason">
+        حَيَّة means "snake" or "serpent." It shares the ح-ي-ي root letters but refers to the animal, not to the concept of being alive. Including it would be like counting the word "alive" to describe a snake bite.
+      </div>
+      <button class="eg-btn" id="rbtn-snake" onclick="removeGroup('snake',1)">
+        ✕ &nbsp;Remove means "snake," not "life"
+      </button>
+    </div>
+
+    <div class="excl-group" id="eg2-greet">
+      <div class="eg-top">
+        <div class="eg-arabic" id="ar2-greet">تَحِيَّة</div>
+        <div class="eg-info">
+          <div class="eg-meaning">Greeting / Salutation</div>
+          <div class="eg-count">6 occurrences the word for salutation in Arabic</div>
+        </div>
+      </div>
+      <div class="eg-reason">
+        تَحِيَّة means "greeting" or "salutation." Etymologically derived from wishing long life, but in every Quranic occurrence it means the act of greeting not the concept of life. Semantics, not etymology, determines the count.
+      </div>
+      <button class="eg-btn" id="rbtn-greet" onclick="removeGroup('greet',6)">
+        ✕ &nbsp;Remove means "greeting," not "life"
+      </button>
+    </div>
+
+    <div class="excl-group" id="eg2-shy">
+      <div class="eg-top">
+        <div class="eg-arabic" id="ar2-shy">ٱسْتِحْيَآء</div>
+        <div class="eg-info">
+          <div class="eg-meaning">Shyness / Modesty</div>
+          <div class="eg-count">1 occurrence an emotion, not a life concept</div>
+        </div>
+      </div>
+      <div class="eg-reason">
+        ٱسْتِحْيَآء means "shyness" or "modesty" a completely different semantic domain. Its connection to the life root is purely etymological. In the Quran it describes an emotion, not the state of being alive.
+      </div>
+      <button class="eg-btn" id="rbtn-shy" onclick="removeGroup('shy',1)">
+        ✕ &nbsp;Remove means "shyness," not "life"
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 3 · MC: Methodology
+  ════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <p class="q-label">Multiple choice</p>
+    <p class="q-text">You just caught 3 imposters in the life count — a snake, six greetings, and a shy word, all hiding behind the ح-ي-ي root. One rule exposed all three. What was it?</p>
+
+    <div class="answer-card" onclick="pickEx3(0)">Same root letters = same concept. Don't overthink it.</div>
+    <div class="answer-card" onclick="pickEx3(1)">What a word actually means in context beats shared letters every time.</div>
+    <div class="answer-card" onclick="pickEx3(2)">Rare forms are usually false positives just remove the uncommon ones.</div>
+    <div class="answer-card" onclick="pickEx3(3)">Keep trimming the bigger side until both numbers match.</div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       STAGE 4 · VERDICT
+  ════════════════════════════════ -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">+10 XP &nbsp;·&nbsp; Pattern Complete</div>
+
+    <div class="eyebrow">Pattern 7 · Verified</div>
+    <h2 class="hero-title" style="font-size:clamp(20px,4vw,28px);margin-bottom:24px">
+      <span class="acc-life">105</span> life nouns &nbsp;=&nbsp; <span class="acc-death">105</span> death nouns
+    </h2>
+
+    <div class="verdict-pair">
+      <div class="vp-card vpc-life">
+        <div class="vp-word">حياة</div>
+        <div class="vp-label">Life nouns</div>
+        <div class="vp-num" id="vLifeNum">0</div>
+        <div class="vp-sub">113 − 8 excluded</div>
+      </div>
+      <div class="vp-eq" id="vEq">=</div>
+      <div class="vp-card vpc-death">
+        <div class="vp-word">موت</div>
+        <div class="vp-label">Death nouns</div>
+        <div class="vp-num" id="vDeathNum">0</div>
+        <div class="vp-sub">0 exclusions needed</div>
+      </div>
+    </div>
+
+    <div class="sec-hdg">Death side audit all 6 forms, zero exclusions</div>
+    <table class="death-table" id="vDeathTable">
+      <thead>
+        <tr><th>Form</th><th>Arabic</th><th>Meaning</th><th style="text-align:right">Count</th></tr>
+      </thead>
+      <tbody>
+        <tr id="vdr0"><td>mawt</td><td class="ar-cell">مَوْت</td><td>Death</td><td class="num-cell">50</td></tr>
+        <tr id="vdr1"><td>mayyit</td><td class="ar-cell">مَيِّت</td><td>Dead person</td><td class="num-cell">38</td></tr>
+        <tr id="vdr2"><td>maytat</td><td class="ar-cell">مَيْتَة</td><td>Dead animal</td><td class="num-cell">6</td></tr>
+        <tr id="vdr3"><td>mayt</td><td class="ar-cell">مَيْت</td><td>Dead</td><td class="num-cell">5</td></tr>
+        <tr id="vdr4"><td>mamāt</td><td class="ar-cell">مَمَات</td><td>Death, dying</td><td class="num-cell">3</td></tr>
+        <tr id="vdr5"><td>mawtat</td><td class="ar-cell">مَوْتَة</td><td>Death (instance)</td><td class="num-cell">3</td></tr>
+        <tr id="vdr6" class="total-row"><td colspan="3" style="color:var(--text);font-weight:600">Total every form means death</td><td class="num-cell">105</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sec-hdg">Life side 8 forms excluded (semantic, not arbitrary)</div>
+    <div class="excl-card" id="vExcl0">
+      <div class="excl-card-ar">حَيَّة</div>
+      <div class="excl-card-info">
+        <div class="excl-card-name">ḥayyah Snake</div>
+        <div class="excl-card-meaning">Same root letters; refers to the animal</div>
+      </div>
+      <div class="excl-card-num">−1</div>
+    </div>
+    <div class="excl-card" id="vExcl1">
+      <div class="excl-card-ar">تَحِيَّة</div>
+      <div class="excl-card-info">
+        <div class="excl-card-name">taḥiyyah Greeting</div>
+        <div class="excl-card-meaning">Etymological link only; means salutation</div>
+      </div>
+      <div class="excl-card-num">−6</div>
+    </div>
+    <div class="excl-card" id="vExcl2">
+      <div class="excl-card-ar">ٱسْتِحْيَآء</div>
+      <div class="excl-card-info">
+        <div class="excl-card-name">istiḥyāʾ Shyness</div>
+        <div class="excl-card-meaning">Different semantic domain; means modesty</div>
+      </div>
+      <div class="excl-card-num">−1</div>
+    </div>
+    <div class="excl-total" id="vExclTotal">
+      <span style="color:var(--muted)">113 forms &minus; 8 excluded =</span>
+      <span style="font-family:'Playfair Display',serif;font-size:22px;color:var(--life-light)">105 life nouns</span>
+    </div>
+
+    <div class="prob-block" id="vProb">
+      <div class="prob-row"><span class="pr-l">Life root total forms in Quran</span><span class="pr-r">184</span></div>
+      <div class="prob-row"><span class="pr-l">Death root total forms in Quran</span><span class="pr-r">165</span></div>
+      <div class="prob-row"><span class="pr-l">Life noun forms before semantic filter</span><span class="pr-r">113</span></div>
+      <div class="prob-row"><span class="pr-l">Death noun forms zero filter needed</span><span class="pr-r hl">105</span></div>
+      <div class="prob-row"><span class="pr-l">Excluded from life (snake + greeting + shyness)</span><span class="pr-r hl">8</span></div>
+      <div class="prob-row"><span class="pr-l">Chance of 105:105 balance after fair filter</span><span class="pr-r">&lt; 1 in 200</span></div>
+      <div class="prob-footer">
+        <div class="lbl">Statistical significance</div>
+        <div class="val">p &lt; 0.1% highly significant</div>
+      </div>
+    </div>
+
+    <div class="gold-box" id="vGold">
+      <h3>What you have just confirmed</h3>
+      <p>
+        Quran 67:2 pairs <strong>death and life</strong> as divine creations. Count every noun form from each root: death produces <em>105</em>, life produces 113 but three groups share root letters while meaning snake, greeting, and shyness. Remove them: <em>113 &minus; 8 = 105</em>. The death side needed <strong>zero exclusions</strong>, proving the methodology is clean. Both roots land on the same number across 114 chapters, 6,236 verses, and 23 years of oral revelation. <em>The text that calls them a pair counts them as a pair.</em>
+      </p>
+    </div>
+
+    <div id="qv-life-death"></div>
+
+    <div id="curiositySeed"></div>
+    <div class="verdict-nav" id="vNav">
+      <a href="quran-hell-paradise.html" class="btn btn-ghost">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pattern 6 · Hell &amp; Paradise
+      </a>
+      <a href="quran-angels-devils.html" class="btn btn-gold">
+        Pattern 8 · Angels &amp; Devils
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon">✓</div>
+    <div>
+      <div class="fb-title">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" onclick="hideFb()">Continue</button>
+</div>
+
+<script>
+var stage = 0;
+var barMap  = {0:'0%', 1:'22%', 2:'52%', 3:'78%', 4:'100%'};
+var metaMap = {0:'', 1:'Question 1 of 2', 2:'Interactive · The Life Side', 3:'Question 2 of 2', 4:'Verdict'};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('barFill').style.width = barMap[n];
+  document.getElementById('barMeta').textContent = metaMap[n];
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (n === 4) { saveProgress('life-death'); initVerdict(); }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(step);
+    else if (cb) cb();
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── Feedback panel ── */
+var fbCb = null;
+
+function showOk(sub, cb) {
+  fbCb = cb;
+  document.getElementById('fbSub').textContent = sub;
+  document.getElementById('fbPanel').className = 'fb-panel fb-ok show';
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').classList.remove('show');
+  if (fbCb) { var f = fbCb; fbCb = null; setTimeout(f, 200); }
+}
+
+/* ── MC 1 ── */
+var answerLocked1 = false;
+function pickEx1(idx) {
+  if (answerLocked1) return;
+  var correct = 2;
+  var cards = document.querySelectorAll('#s1 .answer-card');
+  if (idx === correct) {
+    answerLocked1 = true;
+    cards[idx].classList.add('correct');
+    showOk('Exactly 105 death noun forms and not a single one was excluded. Every form means death, dead, or dying.', function() { go(2); });
+  } else {
+    cards[idx].classList.add('wrong');
+    setTimeout(function() { cards[idx].classList.remove('wrong'); }, 500);
+  }
+}
+
+/* ── Stage 2: Interactive exclusion ── */
+var excl = { snake: false, greet: false, shy: false };
+var lifeRemaining = 113;
+var eqShown = false;
+
+function removeGroup(id, count) {
+  if (excl[id]) return;
+  excl[id] = true;
+  document.getElementById('rbtn-' + id).classList.add('used');
+  document.getElementById('ar2-' + id).classList.add('removed');
+  setTimeout(function() { document.getElementById('eg2-' + id).classList.add('done'); }, 300);
+  var prev = lifeRemaining;
+  lifeRemaining -= count;
+  animCountDown(prev, lifeRemaining);
+}
+
+function animCountDown(from, to) {
+  var el = document.getElementById('lifeCount');
+  var dur = 500;
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / dur, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = to;
+      if (to === 105 && !eqShown) {
+        eqShown = true;
+        celebrateMatch();
+      }
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function celebrateMatch() {
+  document.getElementById('lifeNote').textContent = 'Now matches death\'s 105';
+  document.getElementById('balEq').classList.add('lit');
+  setTimeout(function() {
+    showOk('113 − 8 = 105. Three groups share the root letters but mean snake, greeting, and shyness not life. Remove them and the balance is exact.', function() { go(3); });
+  }, 700);
+}
+
+/* ── MC 3 ── */
+var answerLocked3 = false;
+function pickEx3(idx) {
+  if (answerLocked3) return;
+  var correct = 1;
+  var cards = document.querySelectorAll('#s3 .answer-card');
+  if (idx === correct) {
+    answerLocked3 = true;
+    cards[idx].classList.add('correct');
+    showOk('Exactly. The death side is the control group. If the counting were arbitrary, wrong forms would slip through. None did. The methodology proves itself.', function() { go(4); });
+  } else {
+    cards[idx].classList.add('wrong');
+    setTimeout(function() { cards[idx].classList.remove('wrong'); }, 500);
+  }
+}
+
+/* ── Verdict ── */
+function initVerdict() {
+  setTimeout(function() { document.getElementById('xpBadge').classList.add('show'); }, 300);
+  var lifeEl  = document.getElementById('vLifeNum');
+  var deathEl = document.getElementById('vDeathNum');
+  var eqEl    = document.getElementById('vEq');
+  var done = 0;
+  function onDone() {
+    done++;
+    if (done === 2) {
+      setTimeout(function() {
+        eqEl.classList.add('lit');
+        setTimeout(buildVerdictCascade, 500);
+      }, 200);
+    }
+  }
+  setTimeout(function() {
+    animFrom(lifeEl,  0, 105, 1000, onDone);
+    animFrom(deathEl, 0, 105, 1000, onDone);
+  }, 600);
+}
+
+function buildVerdictCascade() {
+  var rows = document.querySelectorAll('#vDeathTable tbody tr');
+  rows.forEach(function(r, i) {
+    setTimeout(function() { r.classList.add('show'); }, i * 200);
+  });
+  var after = rows.length * 200 + 200;
+  ['vExcl0','vExcl1','vExcl2'].forEach(function(id, i) {
+    setTimeout(function() { document.getElementById(id).classList.add('show'); }, after + i * 180);
+  });
+  setTimeout(function() { document.getElementById('vExclTotal').classList.add('show'); }, after + 3 * 180);
+  setTimeout(function() { document.getElementById('vProb').classList.add('show'); }, after + 3 * 180 + 280);
+  setTimeout(function() { document.getElementById('vGold').classList.add('show'); }, after + 3 * 180 + 580);
+  setTimeout(function() { document.getElementById('vNav').classList.add('show'); }, after + 3 * 180 + 840);
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, offset = 0;
+  var BEAT = [0,0,0,0,0,0,0,1,3,8,-15,28,-6,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+  var BL = BEAT.length;
+  function frame() {
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#050c14'); g.addColorStop(1,'#0a1825');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.035)'; ctx.lineWidth=1;
+    for(var x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(var y=0;y<H;y+=25){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.beginPath();
+    for(var i=0;i<W;i++) {
+      var bi=Math.floor((i+offset)/3)%BL;
+      var py=H*0.52-BEAT[bi]*H*0.009;
+      i===0?ctx.moveTo(i,py):ctx.lineTo(i,py);
+    }
+    ctx.strokeStyle='rgba(74,222,128,0.9)'; ctx.lineWidth=2;
+    ctx.shadowColor='rgba(74,222,128,0.6)'; ctx.shadowBlur=10;
+    ctx.stroke(); ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.moveTo(0,H*0.72); ctx.lineTo(W,H*0.72);
+    ctx.strokeStyle='rgba(167,139,250,0.18)'; ctx.lineWidth=1.5; ctx.stroke();
+    offset+=2; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"life-death");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: "life-death",
+  question: "The word 'life' (حياة) appears 105 times. How many times does 'death' (موت) appear?",
+  unit: "",
+  inputType: "scale-balance",
+  leftLabel: "Life", leftArabic: "حياة", leftCount: 105,
+  rightLabel: "Death", rightArabic: "موت",
+  min: 0, max: 210, step: 1,
+  correct: 105,
+  correctLabel: "105 times each",
+  curiositySeed: {
+    question: "Angels appear 88 times in the Quran. How many times do devils (شياطين) appear?",
+    nextUrl:  "quran-angels-devils.html",
+    nextTitle:"Angels & Devils"
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+var LIFE_LIST=[[2,85],[2,86],[2,96],[2,154],[2,179],[2,204],[2,212],[2,255],[3,2],[3,14],[3,27],[3,27],[3,117],[3,169],[3,185],[4,74],[4,94],[4,109],[6,29],[6,32],[6,70],[6,95],[6,95],[6,130],[6,162],[7,32],[7,51],[7,152],[9,38],[9,38],[9,55],[10,7],[10,23],[10,24],[10,31],[10,31],[10,64],[10,88],[10,98],[11,15],[13,26],[13,26],[13,34],[14,3],[14,27],[16,21],[16,97],[16,107],[17,75],[18,28],[18,45],[18,46],[18,104],[19,15],[19,31],[19,33],[19,66],[20,72],[20,97],[20,111],[20,131],[21,30],[23,33],[23,37],[24,33],[25,3],[25,58],[28,60],[28,61],[28,79],[29,25],[29,64],[29,64],[30,7],[30,19],[30,19],[30,50],[31,33],[33,28],[35,5],[35,22],[36,70],[39,26],[40,39],[40,51],[40,65],[41,16],[41,31],[41,39],[42,36],[43,32],[43,35],[45,21],[45,24],[45,35],[46,20],[47,36],[53,29],[57,20],[57,20],[67,2],[77,26],[79,38],[87,16],[89,24]];
+var DEATH_LIST=[[2,19],[2,28],[2,56],[2,73],[2,94],[2,133],[2,154],[2,164],[2,173],[2,180],[2,243],[2,259],[2,260],[3,27],[3,27],[3,49],[3,143],[3,168],[3,169],[3,185],[4,15],[4,18],[4,78],[4,100],[4,159],[5,3],[5,106],[5,106],[5,110],[6,36],[6,61],[6,93],[6,95],[6,95],[6,111],[6,122],[6,139],[6,145],[6,162],[7,57],[7,57],[8,6],[10,31],[10,31],[11,7],[13,31],[14,17],[14,17],[16,21],[16,65],[16,115],[17,75],[21,35],[22,6],[23,15],[23,99],[25,3],[25,49],[27,80],[29,57],[29,63],[30,19],[30,19],[30,19],[30,24],[30,50],[30,50],[30,52],[32,11],[33,16],[33,19],[34,14],[34,14],[35,9],[35,9],[35,22],[36,12],[36,33],[37,58],[37,59],[39,30],[39,30],[39,42],[39,42],[41,39],[42,9],[43,11],[44,35],[44,56],[44,56],[45,5],[45,21],[46,33],[47,20],[49,12],[50,11],[50,19],[56,60],[57,17],[62,6],[62,8],[63,10],[67,2],[75,40],[77,26]];
+QuranValidator.attach('qv-life-death',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'105 life noun forms · 105 death noun forms count them yourself',
+  groups:[
+    {id:'life', label:'Life', arabic:'الحياة', color:'#22c55e', occurrences:LIFE_LIST},
+    {id:'death',label:'Death',arabic:'الموت',  color:'#f87171', occurrences:DEATH_LIST}
+  ]
+});
+</script>
+</body>
+</html>

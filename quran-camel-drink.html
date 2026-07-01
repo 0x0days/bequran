@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Fastest Drinkers · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #c2855a;
+      --accent-light: #ddb892;
+      --accent-dim:   rgba(194,133,90,0.10);
+      --accent-ring:  rgba(194,133,90,0.22);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; padding:44px 20px 160px;
+    }
+    .dot-field {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:radial-gradient(rgba(255,255,255,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    .container { max-width:720px; margin:0 auto; position:relative; z-index:1; }
+
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent-light)); width:0%; transition:width .7s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:28px; }
+
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:22px 0; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:22px; line-height:2.1; direction:rtl; text-align:right; color:var(--text); margin-bottom:10px; }
+    .verse-ar .hl { color:var(--accent-light); }
+    .verse-en { font-size:14px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .verse-en .hl { color:var(--accent-light); font-style:normal; font-weight:600; }
+
+    .lesson-eyebrow { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .lesson-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+    .lesson-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+    .claim-box { background:var(--accent-dim); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:22px 0; }
+    .claim-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .claim-text { font-size:15px; line-height:1.65; color:var(--text); }
+
+    .prompt { font-family:'Playfair Display',serif; font-size:18px; line-height:1.5; margin:24px 0 16px; }
+
+    .answers { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .answer-card {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+      cursor:pointer; transition:border-color .18s, background .18s;
+    }
+    .answer-card:hover { border-color:rgba(255,255,255,0.2); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); pointer-events:none; }
+    .answer-card.ac-wrong   { border-color:var(--err-border); background:var(--err-bg); animation:shake .35s ease; }
+    .answer-card.ac-disabled{ opacity:.45; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .ac-letter { width:26px; height:26px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:2px; }
+    .ac-big { font-size:16px; font-weight:600; line-height:1.3; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:transform .18s, box-shadow .18s; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-accent { background:var(--accent); color:#0b1622; box-shadow:0 4px 20px rgba(194,133,90,0.22); }
+    .btn-accent:hover { box-shadow:0 8px 30px rgba(194,133,90,0.32); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    .ex-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--accent-light); line-height:1; }
+    .ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+    .ex-result.show { display:block; }
+    .ex-arena { display:flex; gap:14px; margin:20px 0; }
+    .ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 14px; text-align:center; transition:border-color .3s, background .3s; }
+    .ex-panel.lit { border-color:var(--accent-ring); background:var(--accent-dim); }
+
+    .verdict-title { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,28px); font-weight:700; line-height:1.3; margin-bottom:10px; }
+    .verdict-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:28px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:14px 18px; margin-bottom:22px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .stat-row { display:flex; gap:14px; margin:22px 0; flex-wrap:wrap; }
+    .stat-box { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:16px 14px; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--accent-light); }
+    .stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:4px; }
+    .verdict-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .verdict-table th { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+    .verdict-table td { font-size:13px; padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .verdict-table tr:last-child td { border-bottom:none; }
+    .td-check { color:var(--ok); font-weight:700; }
+
+    .gold-box { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.18); border-radius:12px; padding:18px 20px; margin:24px 0; }
+    .gt { font-family:'Playfair Display',serif; font-size:16px; line-height:1.55; color:var(--gold-light); margin-bottom:8px; }
+    .gs { font-size:13px; color:var(--muted); line-height:1.7; }
+
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:28px; transition:color .18s; }
+    .nav-back:hover { color:var(--text); }
+    .nav-next-wrap { margin-top:36px; padding-top:24px; border-top:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; }
+
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:18px 20px 32px;transform:translateY(110%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .fb-panel.show{transform:translateY(0)}
+    .fb-panel.fb-ok{background:var(--ok-bg);border-top:3px solid var(--ok)}
+    .fb-panel.fb-err{background:var(--err-bg);border-top:3px solid var(--err-light)}
+    .fb-left{display:flex;align-items:center;gap:12px}
+    .fb-icon{font-size:24px;line-height:1}
+    .fb-title{font-size:17px;font-weight:700}
+    .fb-panel.fb-ok .fb-title{color:var(--ok)}
+    .fb-panel.fb-err .fb-title{color:var(--err-light)}
+    .fb-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:3px;line-height:1.55;max-width:340px}
+    .fb-btn{flex-shrink:0;padding:14px 30px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+    .fb-btn:active{transform:scale(0.96)}
+    .fb-panel.fb-ok .fb-btn{background:var(--ok);color:var(--ok-bg)}
+    .fb-panel.fb-err .fb-btn{background:var(--err-light);color:var(--err-bg)}
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to all lessons
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Fastest Drinkers</div>
+
+  <!-- ── SP PREDICTION ── -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ── S0 INTRO ── -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="lesson-eyebrow">Zoology · Animal Physiology</p>
+    <h1 class="lesson-title">Fastest Drinkers</h1>
+    <p class="lesson-sub">The Quran compares the drinking of people in Hell to thirsty camels. Only recently did science discover why that comparison is precise camels are the fastest drinkers on Earth.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">56:54-55 · Surah Al-Waqi'ah</div>
+      <div class="verse-ar">فَشَارِبُونَ عَلَيْهِ مِنَ الْحَمِيمِ <span class="hl">فَشَارِبُونَ شُرْبَ الْهِيمِ</span></div>
+      <div class="verse-en">"They will drink on top of it boiling water. <span class="hl">Drinking the drink of thirsty camels.</span>"</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovery</div>
+      <div class="claim-text">The word <strong style="color:var(--accent-light)">الهِيمِ</strong> (al-haym) specifically means extremely thirsty camels. A 600 kg camel can drink <strong style="color:var(--accent-light)">200 liters of water in just three minutes</strong> the fastest drinking rate of any mammal. This was unknown in the 7th century.</div>
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 Comparison canvas + MC ── -->
+  <div id="s1" class="stage">
+
+    <p class="prompt">What does Quran 56:55 specifically compare the drinking to?</p>
+
+    <canvas id="s1Canvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div id="s1Mc" style="display:none">
+      <div class="answers">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">The drinking of any thirsty creature</div>
+            <div class="ac-sub">A general description of extreme thirst</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">The drinking of extremely thirsty camels</div>
+            <div class="ac-sub">The word الهِيمِ names camels specifically</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">The drinking of boiling water</div>
+            <div class="ac-sub">That is described in the previous verse, 56:54</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 Water intake animation ── -->
+  <div id="s2" class="stage">
+
+    <p class="prompt">Watch how much water a thirsty camel takes in.</p>
+    <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">The animation compresses three minutes into a few seconds. In reality, the camel drinks continuously without pause.</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="ex-arena">
+      <div class="ex-panel" id="s2PanelA">
+        <div class="ex-unit">Water intake</div>
+        <div class="ex-num" id="driftCount">0</div>
+        <div class="ex-unit">liters</div>
+      </div>
+      <div class="ex-panel" id="s2PanelB">
+        <div class="ex-unit">Time taken</div>
+        <div class="ex-num">3</div>
+        <div class="ex-unit">minutes</div>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="s2Btn" onclick="startDrinking()">
+      Simulate camel drinking
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="ex-result" id="s2Result">
+      <div style="font-size:13px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">200 liters in 3 minutes</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">That is roughly 66 liters per minute no other mammal on Earth comes close. The Quran's word: <em style="color:var(--text)">"the drink of thirsty camels."</em></div>
+    </div>
+  </div>
+
+  <!-- ── S3 MC ── -->
+  <div id="s3" class="stage">
+
+    <p class="prompt">What makes the comparison to camels in 56:55 scientifically precise?</p>
+
+    <div class="answers">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Camels can survive the longest without water</div>
+          <div class="ac-sub">True, but not what the verse's comparison highlights</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Thirsty camels drink faster than any other mammal</div>
+          <div class="ac-sub">200 liters in 3 minutes an unmatched rate</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Camels store water in their humps for later use</div>
+          <div class="ac-sub">A common myth humps store fat, not water</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ── -->
+  <div id="s4" class="stage">
+
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">The Quran chose the fastest drinker on Earth.</h2>
+    <p class="verdict-sub">The word الهِيمِ refers to camels driven to extreme thirst, capable of consuming 200 liters in just three minutes a rate no other mammal matches. The verse could have said "drinking of the thirsty" and still been true. Instead it specified camels the one animal whose drinking speed is unmatched. Choosing camels, out of all animals, for a drinking comparison could only come from someone who already knew the fact.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="mv0">0</div>
+        <div class="stat-lbl">liters in 3 minutes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="mv1">0</div>
+        <div class="stat-lbl">years before science confirmed it</div>
+      </div>
+    </div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr><th>Statement in Quran 56:55</th><th>Modern science confirms</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Uses الهِيمِ (thirsty camels), not general thirst</td><td>Camels are the fastest drinkers among all mammals</td><td class="td-check">✓</td></tr>
+        <tr><td>Implies an extreme, distinctive drinking speed</td><td>200L in 3 min ≈ 66.7 L/min, unmatched in nature</td><td class="td-check">✓</td></tr>
+        <tr><td>Specifically names camels not horses, not dogs</td><td>No other mammal drinks at anything near this rate</td><td class="td-check">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">"شُرْبَ الْهِيمِ" the fastest drinker, named 1,400 years early.</div>
+      <div class="gs">The verse could have said "drinking of the thirsty" and still been technically correct. Instead it specified camels the one animal whose drinking speed is extraordinary. That specificity has only one explanation: the author already knew the fact. No one in the 7th century had the equipment or methods to measure comparative drinking rates across species.</div>
+    </div>
+
+    <div id="qv-camel"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ── CORE ENGINE ────────────────────────────────── */
+var stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · Fastest Drinkers',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initS1Canvas, 80);
+  if (n === 2) setTimeout(initS2Canvas, 80);
+  if (n === 4) {
+    saveProgress('camel-drinking');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 200, 1800);
+        animFrom(document.getElementById('mv1'), 0, 1400, 2100);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The word الهِيمِ specifically refers to extremely thirsty camels not just any thirsty creature. That precision is the key to the scientific claim.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('A 600 kg camel can drink 200 liters in 3 minutes making it the fastest drinking mammal on Earth. The Quran\'s comparison is exactly right.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HELPERS ────────────────────────────────────── */
+function makeRng(seed) {
+  var s = seed;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+
+
+
+/* ── HERO CANVAS ────────────────────────────────── */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = 640, H = 130;
+  cv.width = W; cv.height = H;
+  var t = 0;
+
+  var stars = [
+    {x: 45, y: 12, s: 1.2, sp: 0.02}, {x: 120, y: 35, s: 0.6, sp: 0.04}, 
+    {x: 200, y: 8, s: 1.8, sp: 0.015}, {x: 280, y: 45, s: 0.5, sp: 0.05}, 
+    {x: 350, y: 20, s: 1.0, sp: 0.03}, {x: 420, y: 55, s: 0.8, sp: 0.045},
+    {x: 510, y: 15, s: 1.5, sp: 0.025}, {x: 590, y: 40, s: 0.7, sp: 0.035},
+    {x: 80, y: 60, s: 0.4, sp: 0.06}, {x: 160, y: 50, s: 0.9, sp: 0.02},
+    {x: 310, y: 65, s: 0.6, sp: 0.055}, {x: 450, y: 30, s: 1.1, sp: 0.018},
+    {x: 550, y: 60, s: 0.5, sp: 0.04}, {x: 620, y: 10, s: 1.4, sp: 0.022},
+    {x: 30, y: 40, s: 0.3, sp: 0.07}, {x: 240, y: 25, s: 0.7, sp: 0.03},
+    {x: 480, y: 50, s: 0.9, sp: 0.028}, {x: 380, y: 5, s: 1.6, sp: 0.012}
+  ];
+
+  function drawSparkle(x, y, size, alpha) {
+    ctx.fillStyle = 'rgba(255, 255, 240, ' + alpha + ')';
+    ctx.fillRect(x - size/2, y - 0.5, size, 1);
+    ctx.fillRect(x - 0.5, y - size/2, 1, size);
+  }
+
+  /* ── ACCURATE CAMEL ANATOMY ── */
+  function drawLeg(hipX, hipY, phase) {
+    var thighSwing = Math.sin(phase) * 14;
+    var shinBend = Math.sin(phase - 0.9) * 10;
+    
+    var kneeX = hipX + thighSwing * 0.6;
+    var kneeY = hipY + 16;
+    var hoofX = kneeX + shinBend * 0.5;
+    var hoofY = kneeY + 14;
+
+    ctx.beginPath();
+    ctx.moveTo(hipX - 2.5, hipY);
+    ctx.quadraticCurveTo(kneeX - 2, kneeY - 4, kneeX - 1.5, kneeY);
+    ctx.quadraticCurveTo(hoofX - 1, hoofY - 4, hoofX - 1.5, hoofY);
+    ctx.lineTo(hoofX + 1.5, hoofY);
+    ctx.quadraticCurveTo(hoofX + 1, hoofY - 4, kneeX + 1.5, kneeY);
+    ctx.quadraticCurveTo(kneeX + 2, kneeY - 4, hipX + 2.5, hipY);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // Hoof
+    ctx.beginPath();
+    ctx.ellipse(hoofX, hoofY + 1, 2.5, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+  }
+
+  function drawCamel(cx, baseY) {
+    var walk = t * 0.065;
+    var bob = Math.sin(walk * 2) * 1.2;
+    var headBob = Math.sin(walk * 2 + 0.5) * 0.8;
+    
+    ctx.save();
+    ctx.translate(cx, baseY + bob);
+
+    // Colors: Deep warm umber fill, Bright golden rim light
+    var fillColor = '#1c1610'; 
+    var rimLight = 'rgba(255, 210, 140, 0.4)';
+    var rimWidth = 2.2;
+
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = rimLight;
+    ctx.lineWidth = rimWidth;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    // Shadow on sand
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.scale(1.1, 0.15);
+    ctx.translate(0, 180);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 35, 30, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+    ctx.restore();
+    
+    // Reset styles after shadow
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = rimLight;
+    ctx.lineWidth = rimWidth;
+
+    // Legs (Drawn back to front)
+    ctx.globalAlpha = 0.8; // Back legs slightly faded for depth
+    drawLeg(-14, -10, walk + Math.PI); // Back Left
+    drawLeg(-10, -10, walk);           // Back Right
+    ctx.globalAlpha = 1;               // Front legs full opacity
+    drawLeg(14, -10, walk);            // Front Right
+    drawLeg(10, -10, walk + Math.PI);  // Front Left
+
+    // Main Body, Hump, Neck, Head (Single fluid vector path)
+    ctx.beginPath();
+    // 1. Start at chest
+    ctx.moveTo(18, -18);
+    // 2. Belly curve
+    ctx.bezierCurveTo(10, -8, -10, -8, -20, -18);
+    // 3. Rump
+    ctx.bezierCurveTo(-26, -22, -26, -28, -22, -34);
+    // 4. Back slope to Hump
+    ctx.bezierCurveTo(-18, -38, -12, -46, -4, -48);
+    // 5. Hump peak down to shoulder
+    ctx.bezierCurveTo(4, -50, 10, -44, 14, -38);
+    // 6. Shoulder to Throat
+    ctx.bezierCurveTo(16, -42, 18, -36, 20, -30);
+    // 7. Throat up to Jaw
+    ctx.bezierCurveTo(22, -40, 26, -52, 30, -60 + headBob);
+    // 8. Top of Head/Snout
+    ctx.bezierCurveTo(34, -64 + headBob, 40, -62 + headBob, 42, -58 + headBob);
+    // 9. Nose tip
+    ctx.bezierCurveTo(43, -56 + headBob, 42, -54 + headBob, 40, -54 + headBob);
+    // 10. Under jaw back to throat
+    ctx.bezierCurveTo(36, -52 + headBob, 30, -52 + headBob, 24, -48);
+    // 11. Throat chest connection
+    ctx.bezierCurveTo(22, -40, 20, -30, 18, -18);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // Inner ear detail
+    ctx.beginPath();
+    ctx.ellipse(32, -62 + headBob, 1.5, 3, -0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#0e0a06'; ctx.fill();
+    ctx.strokeStyle = rimLight; ctx.lineWidth = 1; ctx.stroke();
+
+    // Eye (Glowing pinpoint)
+    ctx.beginPath();
+    ctx.arc(36, -58 + headBob, 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 250, 230, 0.9)';
+    ctx.fill();
+
+    // Nostril
+    ctx.beginPath();
+    ctx.arc(41, -55 + headBob, 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#0e0a06';
+    ctx.fill();
+
+    // Tail (Rope-like)
+    ctx.beginPath();
+    ctx.moveTo(-24, -24);
+    ctx.bezierCurveTo(-30, -20, -34, -12, -32 + Math.sin(t * 0.04) * 2, -6);
+    ctx.strokeStyle = rimLight;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Tail tuft
+    ctx.beginPath();
+    ctx.arc(-32 + Math.sin(t * 0.04) * 2, -5, 2, 0, Math.PI * 2);
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /* ── DUNE SYSTEM ── */
+  function drawDuneLayer(baseY, offset, color1, color2, amp1, amp2, freq1, freq2) {
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (var x = 0; x <= W; x += 4) {
+      var y = baseY + Math.sin((x + offset) * freq1) * amp1 + Math.sin((x + offset) * freq2) * amp2;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    var grd = ctx.createLinearGradient(0, baseY - amp1, 0, H);
+    grd.addColorStop(0, color1);
+    grd.addColorStop(1, color2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+  }
+
+  /* ── MAIN ANIMATION LOOP ── */
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 1. Night Sky
+    var sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#020408');
+    sky.addColorStop(0.4, '#0a1020');
+    sky.addColorStop(0.8, '#151008');
+    sky.addColorStop(1, '#1a140a');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // 2. Milky Way hint
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    ctx.rotate(-0.4);
+    var mw = ctx.createLinearGradient(0, -H, 0, H);
+    mw.addColorStop(0, 'rgba(40, 50, 80, 0)');
+    mw.addColorStop(0.4, 'rgba(60, 70, 110, 0.06)');
+    mw.addColorStop(0.5, 'rgba(80, 90, 130, 0.10)');
+    mw.addColorStop(0.6, 'rgba(60, 70, 110, 0.06)');
+    mw.addColorStop(1, 'rgba(40, 50, 80, 0)');
+    ctx.fillStyle = mw;
+    ctx.fillRect(-W, -H, W*2, H*2);
+    ctx.restore();
+
+    // 3. Moon
+    var moonX = W * 0.82, moonY = H * 0.18, moonR = 14;
+    var moonGlow = ctx.createRadialGradient(moonX, moonY, moonR * 0.8, moonX, moonY, moonR * 4);
+    moonGlow.addColorStop(0, 'rgba(200, 200, 180, 0.08)');
+    moonGlow.addColorStop(1, 'rgba(200, 200, 180, 0)');
+    ctx.fillStyle = moonGlow;
+    ctx.beginPath(); ctx.arc(moonX, moonY, moonR * 4, 0, Math.PI*2); ctx.fill();
+    
+    ctx.beginPath(); ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8e0d0'; ctx.fill();
+    ctx.beginPath(); ctx.arc(moonX + 6, moonY - 3, moonR * 0.85, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a1020'; ctx.fill();
+
+    // 4. Stars
+    stars.forEach(function(st) {
+      var twinkle = 0.4 + Math.sin(t * st.sp + st.x) * 0.6;
+      if (st.s > 1.0) {
+        drawSparkle(st.x, st.y, st.s * 2, twinkle * 0.8);
+      } else {
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, st.s * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 240, ' + (twinkle * 0.6) + ')';
+        ctx.fill();
+      }
+    });
+
+    // 5. Dunes
+    drawDuneLayer(H * 0.65, t * 0.15, 'rgba(35, 40, 55, 0.5)', 'rgba(20, 25, 35, 0.7)', 6, 3, 0.008, 0.02);
+    drawDuneLayer(H * 0.75, t * 0.3, '#14120c', '#0c0a06', 8, 4, 0.012, 0.025);
+
+    // 6. Camel
+    drawCamel(W * 0.35, H * 0.84);
+
+    // 7. Front Dunes
+    drawDuneLayer(H * 0.9, t * 0.5, '#0e0c06', '#060504', 10, 5, 0.015, 0.035);
+
+    // 8. Vignette
+    var vig = ctx.createRadialGradient(W/2, H/2, W*0.3, W/2, H/2, W*0.75);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.4)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    t++;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+
+
+
+/* ── S1 CANVAS Two-panel comparison ──────────── */
+function initS1Canvas() {
+  var cv = document.getElementById('s1Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var startTs = null;
+  var ANIM_DUR = 3500;
+
+  /* 
+    PROFESSIONAL FIX: Replace the emoji fallbacks with your PNGs.
+    1. Put 'mammal.png' and 'camel.png' in your folder.
+    2. Uncomment the img.src lines and comment out the emoji lines.
+  */
+  var assets = {
+    mammal: null, 
+    camel: null
+  };
+
+  // UNCOMMENT THESE TO USE YOUR OWN PNGS:
+  /*
+  var imgM = new Image(); imgM.src = 'mammal.png'; assets.mammal = imgM;
+  var imgC = new Image(); imgC.src = 'camel.png'; assets.camel = imgC;
+  */
+
+  // FALLBACK: High-quality vector emojis (Works instantly, looks sharp)
+  function loadFallbacks() {
+    var c1 = document.createElement('canvas'); c1.width = 128; c1.height = 128;
+    var x1 = c1.getContext('2d'); x1.font = '100px serif'; x1.textAlign = 'center'; x1.textBaseline = 'middle';
+    x1.fillText('🐎', 64, 68); assets.mammal = c1;
+    
+    var c2 = document.createElement('canvas'); c2.width = 128; c2.height = 128;
+    var x2 = c2.getContext('2d'); x2.font = '100px serif'; x2.textAlign = 'center'; x2.textBaseline = 'middle';
+    x2.fillText('🐪', 64, 68); assets.camel = c2;
+  }
+  loadFallbacks();
+
+  /* ── WATER STREAM PHYSICS ── */
+  function drawStream(x, y1, y2, time, isFast) {
+    var speed = isFast ? 0.2 : 0.03;
+    var width = isFast ? 6 : 2.5;
+    var alpha = isFast ? 0.7 : 0.4;
+    var dashLen = isFast ? 12 : 4;
+    var gapLen = isFast ? 4 : 10;
+
+    ctx.setLineDash([dashLen, gapLen]);
+    ctx.lineDashOffset = -time * speed;
+    ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2);
+    ctx.strokeStyle = 'rgba(100, 200, 255, ' + alpha + ')'; 
+    ctx.lineWidth = width; ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (isFast) {
+      for(var i=0; i<4; i++) {
+        var sp = ((time * 0.006 + i * 0.25) % 1);
+        var sx = x + Math.sin(sp * 8 + i) * (3 + sp * 5);
+        var sy = y2 - sp * 10;
+        ctx.beginPath(); ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(150, 220, 255, ' + ((1-sp)*0.8) + ')'; ctx.fill();
+      }
+    } else {
+      var dp = ((time * 0.001) % 1);
+      ctx.beginPath(); ctx.arc(x, y1 + (y2-y1)*dp, 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(130, 200, 255, ' + (1 - dp) + ')'; ctx.fill();
+    }
+  }
+
+  /* ── INFOGRAPHIC GAUGE ── */
+  function drawGauge(x, y, w, maxW, progress, color, bgColor) {
+    ctx.fillStyle = bgColor;
+    roundRect(ctx, x, y, maxW, 6, 3); ctx.fill();
+    if (progress > 0) {
+      var fillW = Math.max(6, maxW * Math.min(progress, 1));
+      ctx.fillStyle = color;
+      roundRect(ctx, x, y, fillW, 6, 3); ctx.fill();
+    }
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    c.beginPath(); c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+  }
+
+  /* ── SMART IMAGE DRAW (Prevents distortion) ── */
+  function drawAsset(asset, cx, cy, maxW, maxH) {
+    if (!asset) return;
+    var ratio = Math.min(maxW / asset.width, maxH / asset.height);
+    var w = asset.width * ratio;
+    var h = asset.height * ratio;
+    ctx.drawImage(asset, cx - w/2, cy - h/2, w, h);
+  }
+
+  /* ── MAIN LOOP ── */
+  function frame(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+    var progress = Math.min(elapsed / ANIM_DUR, 1);
+
+    ctx.clearRect(0, 0, W, H);
+    var bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#060a14'); bg.addColorStop(1, '#0a0e18');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    // Divider
+    ctx.beginPath(); ctx.moveTo(W/2, 15); ctx.lineTo(W/2, H - 15);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1; ctx.stroke();
+
+    var baseY = H * 0.72;
+    var sourceY = H * 0.08;
+    var gaugeY = H - 18;
+    var gaugeW = W * 0.32;
+
+    // ── LEFT SIDE (SLOW) ──
+    var lx = W * 0.25;
+    ctx.fillStyle = 'rgba(130, 170, 255, 0.7)';
+    ctx.font = '700 8px DM Sans'; ctx.textAlign = 'center';
+    ctx.fillText('NORMAL MAMMAL', lx, 16);
+
+    ctx.fillStyle = 'rgba(100, 150, 255, 0.3)'; ctx.fillRect(lx - 6, sourceY, 12, 4);
+    drawStream(lx, sourceY + 4, baseY - 45, elapsed, false);
+    
+    // Draws the perfect asset (Emoji or your PNG)
+    drawAsset(assets.mammal, lx, baseY, 80, 80);
+
+    ctx.fillStyle = 'rgba(130, 170, 255, 0.4)';
+    ctx.font = '600 7px DM Sans'; ctx.textAlign = 'left';
+    ctx.fillText('VOLUME', lx - gaugeW/2, gaugeY - 5);
+    drawGauge(lx - gaugeW/2, gaugeY, gaugeW * (progress * 0.1), gaugeW, 'rgba(96, 165, 250, 0.8)', 'rgba(30, 58, 138, 0.2)');
+    ctx.fillStyle = 'rgba(130, 170, 255, 0.8)'; ctx.font = '800 9px DM Sans'; ctx.textAlign = 'right';
+    ctx.fillText('Slow', lx + gaugeW/2 + 25, gaugeY + 5);
+
+    // ── RIGHT SIDE (FAST) ──
+    var rx = W * 0.75;
+    ctx.fillStyle = 'rgba(255, 200, 120, 0.7)';
+    ctx.font = '700 8px DM Sans'; ctx.textAlign = 'center';
+    ctx.fillText('CAMEL (الهِيمِ)', rx, 16);
+
+    ctx.fillStyle = 'rgba(255, 200, 120, 0.3)'; ctx.fillRect(rx - 6, sourceY, 12, 4);
+    drawStream(rx, sourceY + 4, baseY - 45, elapsed, true);
+    
+    // Draws the perfect asset (Emoji or your PNG)
+    drawAsset(assets.camel, rx, baseY, 80, 80);
+
+    ctx.fillStyle = 'rgba(255, 200, 120, 0.4)';
+    ctx.font = '600 7px DM Sans'; ctx.textAlign = 'left';
+    ctx.fillText('VOLUME', rx - gaugeW/2, gaugeY - 5);
+    drawGauge(rx - gaugeW/2, gaugeY, gaugeW * progress, gaugeW, 'rgba(251, 191, 36, 0.8)', 'rgba(120, 80, 20, 0.2)');
+    ctx.fillStyle = 'rgba(255, 200, 120, 0.8)'; ctx.font = '800 9px DM Sans'; ctx.textAlign = 'right';
+    ctx.fillText('Fastest ✓', rx + gaugeW/2 + 35, gaugeY + 5);
+
+    if (progress < 1) requestAnimationFrame(frame);
+    else document.getElementById('s1Mc').style.display = 'block';
+  }
+  requestAnimationFrame(frame);
+}
+
+
+
+//* ── S2 CANVAS Water filling beaker ──────────── */
+var s2Running = false;
+
+// Add standard ease function just in case it's missing in your scope
+if (typeof ease !== 'function') { function ease(t) { return 1 - Math.pow(1 - t, 3); } }
+
+// Generate bubbles once
+var s2Bubbles = [];
+for (var i = 0; i < 10; i++) {
+  s2Bubbles.push({ x: Math.random(), y: Math.random(), r: 1 + Math.random() * 2.5, speed: 0.3 + Math.random() * 0.7 });
+}
+
+function drawS2Frame(ctx, W, H, fillFrac, lblA, time) {
+  ctx.clearRect(0, 0, W, H);
+  
+  // Deep clean background
+  var bg = ctx.createRadialGradient(W/2, H/2, 50, W/2, H/2, W * 0.7);
+  bg.addColorStop(0, '#0a0f18');
+  bg.addColorStop(1, '#040810');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Beaker dimensions
+  var bw = 160, bh = 160, taper = 15;
+  var bx = (W - bw) / 2;
+  var by = 20;
+
+  // ── 1. PREMIUM GLASS EFFECT ──
+  
+  // Outer glass glow
+  ctx.strokeStyle = 'rgba(130, 180, 220, 0.08)';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(bx - taper, by); ctx.lineTo(bx, by + bh);
+  ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw + taper, by);
+  ctx.stroke();
+
+  // Main glass outline (Crisp)
+  ctx.strokeStyle = 'rgba(150, 200, 240, 0.25)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bx - taper, by); ctx.lineTo(bx, by + bh);
+  ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw + taper, by);
+  ctx.stroke();
+
+  // Thick glass bottom
+  ctx.beginPath(); ctx.moveTo(bx - 2, by + bh); ctx.lineTo(bx + bw + 2, by + bh);
+  ctx.strokeStyle = 'rgba(150, 200, 240, 0.4)'; ctx.lineWidth = 3; ctx.stroke();
+
+  // Left edge reflection (3D illusion)
+  ctx.beginPath();
+  ctx.moveTo(bx - taper + 4, by + 10);
+  ctx.lineTo(bx + 4, by + bh - 10);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)'; ctx.lineWidth = 6; ctx.stroke();
+
+  // ── 2. WATER VOLUME & PHYSICS ──
+  var ef = ease(fillFrac);
+  var waterH = bh * ef;
+  var waterY = by + bh - waterH;
+
+  if (waterH > 2) {
+    var wFrac = waterH / bh;
+    var leftAtW = bx - taper + taper * wFrac;
+    var rightAtW = bx + bw + taper - taper * wFrac;
+
+    // Water body gradient
+    var wg = ctx.createLinearGradient(0, waterY, 0, by + bh);
+    wg.addColorStop(0, 'rgba(60, 160, 220, 0.25)');
+    wg.addColorStop(1, 'rgba(20, 80, 140, 0.15)');
+    ctx.fillStyle = wg;
+
+    ctx.beginPath();
+    ctx.moveTo(bx, by + bh);
+    ctx.lineTo(leftAtW, waterY);
+    
+    // Smooth fluid surface wave
+    for (var wx = leftAtW; wx <= rightAtW; wx += 1) {
+      var wave = Math.sin(wx * 0.04 + (time || 0) * 0.004) * 1.5;
+      ctx.lineTo(wx, waterY + wave);
+    }
+    ctx.lineTo(rightAtW, waterY);
+    ctx.lineTo(bx + bw, by + bh);
+    ctx.closePath();
+    ctx.fill();
+
+    // Sharp surface highlight
+    ctx.beginPath();
+    for (var wx2 = leftAtW; wx2 <= rightAtW; wx2 += 1) {
+      var wave2 = Math.sin(wx2 * 0.04 + (time || 0) * 0.004) * 1.5;
+      if (wx2 === leftAtW) ctx.moveTo(wx2, waterY + wave2);
+      else ctx.lineTo(wx2, waterY + wave2);
+    }
+    ctx.strokeStyle = 'rgba(120, 210, 255, 0.5)'; ctx.lineWidth = 1.2; ctx.stroke();
+
+    // Rising Bubbles
+    ctx.fillStyle = 'rgba(150, 220, 255, 0.3)';
+    s2Bubbles.forEach(function(b) {
+      if (b.y < ef) { // Only draw if below water surface
+        var bpx = leftAtW + b.x * (rightAtW - leftAtW);
+        var bpy = by + bh - (b.y * waterH);
+        
+        // Animate upwards
+        b.y -= b.speed * 0.002;
+        if (b.y < 0) { b.y = 1; b.x = Math.random(); } // Reset at bottom
+        
+        ctx.beginPath(); ctx.arc(bpx, bpy, b.r, 0, Math.PI * 2);
+        ctx.fill();
+        // Tiny highlight
+        ctx.beginPath(); ctx.arc(bpx - b.r*0.3, bpy - b.r*0.3, b.r*0.3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fill();
+        ctx.fillStyle = 'rgba(150, 220, 255, 0.3)'; // reset
+      }
+    });
+
+    // Surface glow
+    var glowGrad = ctx.createLinearGradient(0, waterY - 10, 0, waterY + 15);
+    glowGrad.addColorStop(0, 'rgba(100,200,255,0)');
+    glowGrad.addColorStop(0.5, 'rgba(100,200,255,0.05)');
+    glowGrad.addColorStop(1, 'rgba(100,200,255,0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(leftAtW - 5, waterY - 10, rightAtW - leftAtW + 10, 25);
+  }
+
+  // ── 3. PRECISE MEASUREMENT MARKS ──
+  ctx.font = '500 8px DM Sans, sans-serif';
+  ctx.textAlign = 'right';
+  var marks = [50, 100, 150, 200];
+  marks.forEach(function(m) {
+    var frac = m / 200;
+    var my = by + bh - bh * frac;
+    var taperAtMark = taper * (1 - frac);
+    var markLeft = bx - taperAtMark;
+    var markRight = bx + bw + taperAtMark;
+
+    // Tick
+    ctx.beginPath(); ctx.moveTo(markLeft, my); ctx.lineTo(markLeft - 6, my);
+    ctx.strokeStyle = 'rgba(150, 200, 240, 0.3)'; ctx.lineWidth = 1; ctx.stroke();
+
+    // Subtle guide
+    ctx.setLineDash([1, 5]);
+    ctx.beginPath(); ctx.moveTo(markLeft, my); ctx.lineTo(markRight, my);
+    ctx.strokeStyle = 'rgba(150, 200, 240, 0.05)'; ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(150, 200, 240, 0.4)';
+    ctx.fillText(m + ' L', markLeft - 10, my + 3);
+  });
+
+  // ── 4. DYNAMIC CURRENT LEVEL INDICATOR ──
+  if (ef > 0.02) {
+    var curL = Math.round(ef * 200);
+    var curFrac = ef;
+    var curY = by + bh - bh * curFrac;
+    var curTaper = taper * (1 - curFrac);
+    var curLeft = bx - curTaper;
+    var curRight = bx + bw + curTaper;
+
+    // Dashed indicator line
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(curLeft, curY); ctx.lineTo(curRight, curY);
+    ctx.strokeStyle = 'rgba(100, 220, 255, 0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrow
+    ctx.beginPath();
+    ctx.moveTo(curLeft - 2, curY);
+    ctx.lineTo(curLeft - 9, curY - 4);
+    ctx.lineTo(curLeft - 9, curY + 4);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(100, 220, 255, 0.8)'; ctx.fill();
+  }
+
+  // ── 5. CENTERED DATA DISPLAY (No broken animals, just pure data) ──
+  if (lblA > 0) {
+    ctx.globalAlpha = lblA;
+    
+    // Massive central number
+    ctx.font = '800 42px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Text shadow for pop
+    ctx.fillStyle = 'rgba(60, 180, 255, 0.15)';
+    ctx.fillText('200 L', W/2, by + bh / 2);
+    
+    ctx.fillStyle = 'rgba(200, 235, 255, 0.9)';
+    ctx.fillText('200 L', W/2, by + bh / 2);
+
+    // Subtext
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(150, 200, 240, 0.6)';
+    ctx.fillText('CONSUMED IN UNDER 3 MINUTES', W/2, by + bh / 2 + 28);
+
+    ctx.globalAlpha = 1;
+  }
+}
+
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  drawS2Frame(ctx, cv.width, cv.height, 0, 0, 0);
+}
+
+function startDrinking() {
+  if (s2Running) return;
+  s2Running = true;
+  document.getElementById('s2Btn').disabled = true;
+
+  var cv = document.getElementById('s2Canvas');
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var FILL_MS = 2800, LABEL_MS = 600;
+  var startTs = null;
+  var countEl = document.getElementById('driftCount');
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var elapsed = ts - startTs;
+    var fFrac = Math.min(elapsed / FILL_MS, 1);
+    var lA  = elapsed > FILL_MS ? Math.min((elapsed - FILL_MS) / LABEL_MS, 1) : 0;
+
+    drawS2Frame(ctx, W, H, fFrac, lA, elapsed);
+    if (countEl) countEl.textContent = Math.round(ease(fFrac) * 200);
+
+    if (elapsed < FILL_MS + LABEL_MS) {
+      requestAnimationFrame(tick);
+    } else {
+      document.getElementById('s2PanelA').classList.add('lit');
+      document.getElementById('s2PanelB').classList.add('lit');
+      document.getElementById('s2Result').classList.add('show');
+      setTimeout(function() {
+        showOk('200 liters in 3 minutes the fastest drinking rate of any mammal. The Quran\'s word choice was precisely accurate.', function() { go(3); });
+      }, 900);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"camel-drink");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"camel-drinking","question":"How many litres can a dehydrated camel drink in 3 minutes?","inputType":"vessel","unit":"litres","min":0,"max":300,"step":10,"correct":200,"correctLabel":"~200 litres","curiositySeed":{"question":"The Quran calls a mosquito 'Ba'udah' — a feminine noun. Only female mosquitoes bite. When was this confirmed?","nextUrl":"quran-mosquito.html","nextTitle":"The Mosquito"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 56:54-55 الهِيمِ (thirsty camels). Camels drink 200L in 3 minutes fastest of any mammal. */
+QuranValidator.attach('qv-camel',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 56:54–55 "drinking the drink of الهِيمِ (thirsty camels)." Fastest drinkers on Earth confirmed by science.',
+  groups:[
+    {id:'camel', label:'Thirsty camels (al-haym)', arabic:'الْهِيمِ', color:'#fdba74', occurrences:[[56,54],[56,55]]}
+  ]
+});
+</script>
+</body>
+</html>

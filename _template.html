@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  Quranic Numerics — PAGE TEMPLATE                               ║
+  ║  Copy this file to quran-[topic-slug].html                      ║
+  ║  Search for every [FILL: ...] comment and replace it.           ║
+  ║  Do NOT rename CSS classes, JS functions, or HTML ids.          ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- No-flash theme init: MUST stay before any stylesheet -->
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <!-- FILL: lesson title in the <title> tag -->
+  <title>[LESSON TITLE] · Quranic Numerics</title>
+  <!-- NEVER change this font link -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — NEVER MODIFY THE CORE VARIABLES
+       Only fill in the four --accent variables below.
+    ══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+
+      /* FILL: unique accent for this lesson (see CLAUDE.md for used colors) */
+      --accent:       #[HEX];              /* e.g. #2dd4bf */
+      --accent-light: #[HEX];              /* lighter tint, e.g. #99f6e4 */
+      --accent-dim:   rgba([R],[G],[B],0.12); /* same hue, 12% opacity */
+      --accent-ring:  rgba([R],[G],[B],0.28); /* same hue, 28% opacity */
+
+      /* FILL: optional secondary color if needed (e.g. --moon for moon landing) */
+      /* --topic-color: #[HEX]; */
+    }
+
+    /* ── RESET & BASE ── never change ─────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* 160px bottom padding is REQUIRED — clears the fixed feedback panel */
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── LESSON PROGRESS BAR ── never change ───────────────────── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--ok); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── TYPOGRAPHY ── never change ────────────────────────────── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.used { opacity: .4; pointer-events: none; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── INTRO VERSE BOX (stage 0) ── never change ─────────────── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(22px, 5vw, 32px); line-height: 2.0; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 500; }
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(40px, 9vw, 60px); font-weight: 700; line-height: 1; color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); color: var(--muted); }
+
+    /* ── ANSWER CARDS ── never change ──────────────────────────── */
+    .answer-card {
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.28);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+    }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-ar { font-family: 'Amiri', serif; font-size: 17px; direction: rtl; text-align: right; color: var(--text); line-height: 1.9; }
+    .ac-ref { font-size: 10px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-top: 1px; }
+    .ac-tr { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── CALCULATION BOX (stage 2 — use if mechanic is a calculation) ── */
+    .calc-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 22px; margin: 20px 0; }
+    .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; font-size: 15px; }
+    .calc-row.minus { color: var(--muted); }
+    .calc-row.minus::before { content: '−'; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--muted); margin-right: 8px; }
+    .calc-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+    .calc-divider { border-top: 2px solid var(--border); margin: 10px 0; }
+    .calc-row.result { font-weight: 500; }
+    .calc-result-num { font-family: 'Playfair Display', serif; font-size: clamp(28px, 7vw, 40px); font-weight: 700; color: var(--muted); transition: color .4s, text-shadow .4s; min-width: 80px; text-align: right; }
+    .calc-result-num.lit { color: var(--gold-light); text-shadow: 0 0 30px rgba(252,211,77,0.45); }
+
+    /* ── VERDICT STAGE (stage 4) ── never change ───────────────── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-num.mc1 { color: var(--accent-light); text-shadow: 0 0 40px var(--accent-ring); }
+    .match-num.mc2 { color: var(--gold-light);   text-shadow: 0 0 40px rgba(252,211,77,0.4); }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-eq { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── FEEDBACK PANEL ── never change ────────────────────────── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<!-- Theme toggle — fixed top-right; CSS handles positioning -->
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <!-- FILL: href = previous lesson's filename; link text = previous lesson title -->
+  <a href="quran-[PREV_SLUG].html" class="nav-back">← [PREV LESSON TITLE]</a>
+
+  <!-- Progress bar — never modify the HTML, only the JS barMap/metaMap -->
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · [LESSON TITLE]</div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE Sp — PREDICTION (always first, always active on load)
+       FILL: set the prediction question and input type via
+             Prediction.init() at the bottom of the <script> block.
+       DO NOT add content here — prediction.js renders it automatically.
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE 0 — INTRO
+       Contains: predictReveal (auto-filled) + heroCanvas + eyebrow
+                 + hero title + intro verse + claim-row + body text
+                 + Begin button → go(1)
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage" id="s0">
+
+    <!-- Prediction reveal — DO NOT REMOVE, auto-filled by prediction.js -->
+    <div id="predictReveal"></div>
+
+    <!-- Hero canvas: topic-relevant animation. NEVER remove or resize. -->
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <!-- FILL: accent color inline for eyebrow text -->
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · [LESSON TITLE]</p>
+
+    <!-- FILL: one-sentence hook that sets up the discovery without revealing it -->
+    <h1 class="hero-title">[ONE SENTENCE HOOK — sets up the mystery without solving it]</h1>
+
+    <!-- FILL: the main verse that anchors this lesson -->
+    <div class="intro-verse">
+      <div class="iv-ref">[VERSE REFERENCE] — Surah [SURAH NAME] · [SURAH TRANSLATION]</div>
+      <!-- Highlight the key word(s) with <span class="hl"> -->
+      <div class="iv-ar">[FULL ARABIC VERSE — highlight key word with <span class="hl">word</span>]</div>
+      <div class="iv-tr">"[ENGLISH TRANSLATION — highlight key phrase with <span class="hl">phrase</span>]"</div>
+    </div>
+
+    <!-- FILL: the two numbers that match (the discovery) — shown before the lesson -->
+    <!-- Remove the cr-eq + second cr-block if only one number is relevant -->
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">[NUMBER 1]</div>
+        <div class="cr-lbl">[What this number represents in the Quran]</div>
+      </div>
+      <div class="cr-eq">=</div>
+      <div class="cr-block">
+        <div class="cr-num">[NUMBER 2]</div>
+        <div class="cr-lbl">[What this number represents in science/history]</div>
+      </div>
+    </div>
+
+    <!-- FILL: 2-3 sentences explaining the discovery clearly -->
+    <p class="body-text">[BODY TEXT: explain what the discovery is, why it matters, what makes it remarkable]</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Begin the lesson →</button>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE 1 — EXERCISE 1 (Multiple Choice)
+       Ask a question that confirms the student understands the setup.
+       Always 3 options (A/B/C). Only one is correct.
+       Correct card: onclick="pickEx1(this, true)"
+       Wrong cards:  onclick="pickEx1(this, false)"
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage" id="s1">
+    <p class="step-lbl">Exercise 1 of 3</p>
+    <!-- FILL: question about a key fact from stage 0 -->
+    <p class="prompt">[MULTIPLE CHOICE QUESTION]</p>
+
+    <!-- WRONG answer -->
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <!-- Use ac-big for numbers/short answers, ac-ar + ac-ref + ac-tr for verses -->
+        <div class="ac-big">[WRONG OPTION A]</div>
+        <div class="ac-sub">[Optional subtitle / context]</div>
+      </div>
+    </div>
+
+    <!-- CORRECT answer -->
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">[CORRECT OPTION B]</div>
+        <div class="ac-sub">[Optional subtitle / context]</div>
+      </div>
+    </div>
+
+    <!-- WRONG answer -->
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">[WRONG OPTION C]</div>
+        <div class="ac-sub">[Optional subtitle / context]</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE 2 — EXERCISE 2 (Topic-specific interactive)
+       Options: calculation box, verse span ruler, word counter,
+                form builder, two-path convergence, etc.
+       Must end with showOk('explanation', () => go(3))
+       after the student completes the interaction.
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage" id="s2">
+    <p class="step-lbl">Exercise 2 of 3</p>
+    <!-- FILL: question or instruction for the interactive -->
+    <p class="prompt">[INTERACTIVE QUESTION OR INSTRUCTION]</p>
+
+    <!-- ── OPTION A: Calculation box ──────────────────────────── -->
+    <!--
+    <div class="calc-box">
+      <div class="calc-row">
+        <span>[Row label]</span>
+        <span class="calc-val">[Value]</span>
+      </div>
+      <div class="calc-row minus">
+        <span>[Subtraction label]</span>
+        <span class="calc-val">[Value]</span>
+      </div>
+      <div class="calc-divider"></div>
+      <div class="calc-row result">
+        <span>[Result label]</span>
+        <span class="calc-result-num" id="calcResult">?</span>
+      </div>
+    </div>
+    <button class="btn" id="calcBtn" onclick="runCalc()" style="background:var(--accent);color:#fff">Calculate →</button>
+    -->
+
+    <!-- ── OPTION B: Custom interactive — add your own HTML here ── -->
+    <!-- FILL: whatever interactive element fits the topic -->
+    <div class="insight-box">
+      <strong>[FILL: Interactive label]</strong> [FILL: explanation or instructions]
+    </div>
+
+    <!-- FILL: completion trigger — call showOk then go(3) -->
+    <button class="btn" id="s2Btn" onclick="completeEx2()" style="background:var(--accent);color:#fff">[ACTION BUTTON TEXT] →</button>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE 3 — EXERCISE 3 (Multiple Choice — conclusion question)
+       Ask something that confirms the student grasped the discovery.
+       Pattern identical to stage 1 but uses pickEx3().
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage" id="s3">
+    <p class="step-lbl">Exercise 3 of 3</p>
+    <!-- FILL: conclusion question — typically "what does [number] represent in science/history?" -->
+    <p class="prompt">[CONCLUSION MULTIPLE CHOICE QUESTION]</p>
+
+    <!-- WRONG answer -->
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">[WRONG OPTION A]</div>
+        <div class="ac-sub">[Optional context]</div>
+      </div>
+    </div>
+
+    <!-- WRONG answer -->
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">[WRONG OPTION B]</div>
+        <div class="ac-sub">[Optional context]</div>
+      </div>
+    </div>
+
+    <!-- CORRECT answer -->
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">[CORRECT OPTION C]</div>
+        <div class="ac-sub">[Optional context]</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STAGE 4 — VERDICT
+       Contains: xpBadge + title + match-wrap counters
+                 + sci-table + insight-box + gold-box
+                 + nav buttons (back + next)
+  ════════════════════════════════════════════════════════════ -->
+  <div class="stage" id="s4">
+
+    <!-- XP badge — verbatim, never modify -->
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <!-- FILL: one-sentence verdict — states what the student just proved -->
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">[VERDICT SENTENCE — what was just discovered]</h2>
+
+    <!-- FILL: animated counter(s). Use mc1 class for accent color, mc2 for gold.
+         If only one number animates, remove the cr-eq and second match-block.
+         The animFrom() calls happen in go(4) below in the script. -->
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num mc1" id="mv0">0</div>
+        <div class="match-lbl">[Label for counter 1 — Quran side]</div>
+      </div>
+      <div class="match-eq">=</div>
+      <div class="match-block">
+        <div class="match-num mc2" id="mv1">0</div>
+        <div class="match-lbl">[Label for counter 2 — science/history side]</div>
+      </div>
+    </div>
+
+    <!-- FILL: facts table — list the key numbers with their source -->
+    <table class="sci-table" style="margin-top:28px">
+      <thead>
+        <tr><th>Fact</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <!-- FILL: 3-6 rows of verified facts. Mark the key match row with class="hl" -->
+        <tr>
+          <td>[Fact description]</td>
+          <td class="td-v">[Value]</td>
+        </tr>
+        <tr>
+          <td>[Fact description]</td>
+          <td class="td-v">[Value]</td>
+        </tr>
+        <tr class="hl">
+          <td>[THE KEY MATCHING FACT]</td>
+          <td class="td-v"><strong>[THE MATCHING NUMBER]</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FILL: explain WHY this is significant / address skeptics -->
+    <div class="insight-box">
+      <strong>[INSIGHT LABEL]:</strong> [Explain why the match is meaningful, what makes it non-trivial, how the counting was done]
+    </div>
+
+    <!-- FILL: closing gold-box summary — the most memorable 1-2 sentences -->
+    <div class="gold-box">
+      <div class="gt">[BOLD CLOSING STATEMENT — the single most memorable fact]</div>
+      <div class="gs">[Supporting detail — explain the data source, precision, no rounding was needed, etc.]</div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <a href="quran-[PREV_SLUG].html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to [PREV LESSON TITLE]</a>
+    <a href="quran-[NEXT_SLUG].html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · [NEXT LESSON TITLE] →</a>
+  </div>
+
+</div><!-- /.container -->
+
+<!-- ════════════════════════════════════════════════════════════════
+     FEEDBACK PANEL — outside .container, verbatim, never modify
+════════════════════════════════════════════════════════════════ -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   CORE ENGINE — never modify these functions
+════════════════════════════════════════════════════════════════ */
+let stage = 0;
+
+/* FILL: replace '[LESSON_ID]' with the lesson's id string (matches index.html lessons array) */
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from)).toLocaleString();
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+/* FILL: update 'Lesson · [LESSON TITLE]' text only */
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · [LESSON TITLE]',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        saveProgress('[LESSON_ID]');
+        /* FILL: animate the verdict counters.
+           animFrom(element, startValue, endValue, durationMs, callback)
+           Example:
+             animFrom(document.getElementById('mv0'), 0, [NUMBER1], 1800, null);
+             animFrom(document.getElementById('mv1'), 0, [NUMBER2], 1800, null);
+        */
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* ════════════════════════════════════════════════════════════════
+   STAGE 1 — MC handler
+   FILL: the showOk() text (explain why the correct answer is right)
+════════════════════════════════════════════════════════════════ */
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('[FILL: one sentence explaining why this answer is correct]', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   STAGE 2 — Interactive mechanic
+   FILL: implement the topic-specific interaction.
+   Must call showOk('explanation', () => go(3)) when complete.
+
+   Common patterns:
+   ── Calculation: animate a number counter, then showOk on completion
+   ── Two-path convergence: two buttons, track doneA/doneB, showOk when both done
+   ── Word counter/builder: add cards one by one with running total
+   ── Verse ruler: animate a span measurement
+════════════════════════════════════════════════════════════════ */
+let ex2Done = false;
+
+function completeEx2() {
+  if (ex2Done) return;
+  ex2Done = true;
+  document.getElementById('s2Btn').classList.add('used');
+  /* FILL: animate or reveal result, then: */
+  showOk('[FILL: explanation of what exercise 2 proved]', function() { go(3); });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   STAGE 3 — MC handler
+   FILL: the showOk() text (explain the final scientific connection)
+════════════════════════════════════════════════════════════════ */
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('[FILL: one sentence confirming the scientific fact]', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HERO CANVAS — initHeroCanvas()
+   FILL: implement a topic-relevant looping canvas animation.
+
+   Rules:
+   - Dark background: ctx.fillStyle = '#040810' (or similar near-black)
+   - Subtle, never distracting — it supports the title
+   - Must loop with requestAnimationFrame
+   - Canvas is 640×130px logical (actual size scales with CSS)
+   - Common patterns: star field, orbiting object, wave, particle field,
+     crystal lattice, ruler/span animation, temperature glow, etc.
+   - Keep frame function self-contained
+   - Always end with: initHeroCanvas();
+════════════════════════════════════════════════════════════════ */
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height, t = 0;
+
+  /* FILL: declare any state variables (particles, positions, etc.) here */
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* FILL: draw background */
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* FILL: draw animation elements */
+
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+
+/* ════════════════════════════════════════════════════════════════
+   PREDICTION ENGINE — Prediction.init()
+   FILL: question, unit, correct value, curiosity seed.
+   This drives Stage Sp and the reveal panel at the top of S0.
+
+   inputType options:
+     'slider'  — numeric range (set min, max, step, correct)
+     'choice'  — discrete options (set choices:['A','B','C'], correct:'B')
+
+   curiositySeed: question that seeds the NEXT lesson's prediction.
+   Leave nextUrl blank if this is the last lesson.
+════════════════════════════════════════════════════════════════ */
+Prediction.init({
+  lessonId: '[LESSON_ID]',         /* FILL: same as saveProgress id */
+  question: '[FILL: prediction question before any explanation]',
+  unit:     '[FILL: e.g. %, °C, km, years]',
+  inputType: 'slider',             /* 'slider' or 'choice' */
+  min: 0, max: 100, step: 1,       /* FILL: for slider */
+  /* choices: ['Option A', 'Option B', 'Option C'],  for choice type */
+  correct:      0,                 /* FILL: the real answer as a number */
+  correctLabel: '[FILL: display string, e.g. "71%" or "1,064°C"]',
+  curiositySeed: {
+    question: '[FILL: teaser question about the NEXT lesson]',
+    nextUrl:  '[FILL: quran-next-topic.html]',
+    nextTitle:'[FILL: Next Topic Name]'
+  }
+});
+</script>
+<script src="prediction.js?v=20260615h"></script>
+<script src="theme.js?v=20260615h"></script>
+</body>
+</html>

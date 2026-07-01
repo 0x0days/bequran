@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Pulsars &amp; Black Holes · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #facc15;
+      --accent-light: #fde68a;
+      --accent-dim:   rgba(250,204,21,0.12);
+      --accent-ring:  rgba(250,204,21,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(22px, 5vw, 32px); line-height: 2.2; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 15px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Claim row ── */
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); font-weight: 700; line-height: 1; color: var(--accent-light); text-shadow: 0 0 40px rgba(250,204,21,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    .ac-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(18px, 4vw, 24px); line-height: 1.8; color: var(--text); }
+
+    /* ── S2: Two-path explorer ── */
+    .reveal-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .reveal-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .reveal-btn.used { opacity: .45; pointer-events: none; }
+    .rb-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--accent-dim); border: 1px solid var(--accent-ring); font-size: 20px; }
+    .reveal-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: none; animation: rise .35s ease; }
+    .reveal-result.show { display: block; }
+    .rr-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .rr-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 22px; color: var(--accent-light); margin-bottom: 8px; }
+    .rr-stat { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--accent-light); margin-bottom: 3px; }
+    .rr-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Exercise animations ── */
+    .knock-canvas-wrap { margin: 10px 0 8px; border-radius: 10px; overflow: hidden; }
+    .collapse-demo { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px 0 8px; height: 56px; }
+    .collapse-demo .cd-label { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; width: 64px; text-align: center; }
+    .star-dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: radial-gradient(circle at 38% 34%, #fff 0%, #facc15 42%, rgba(250,204,21,0.28) 100%);
+      box-shadow: 0 0 18px rgba(250,204,21,0.55);
+      animation: starCollapse 3.2s cubic-bezier(.4,0,.2,1) infinite;
+    }
+    @keyframes starCollapse {
+      0%, 18%  { width: 26px; height: 26px; box-shadow: 0 0 18px rgba(250,204,21,0.55); background: radial-gradient(circle at 38% 34%, #fff, #facc15 42%, rgba(250,204,21,0.28) 100%); }
+      52%      { width: 9px;  height: 9px;  box-shadow: 0 0 8px rgba(250,204,21,0.4);  background: radial-gradient(circle at 38% 34%, #fff, rgba(250,204,21,0.9) 60%); }
+      72%      { width: 3px;  height: 3px;  box-shadow: 0 0 0 7px rgba(0,0,0,0.55), 0 0 0 11px rgba(250,204,21,0.22); background: #030608; }
+      85%,100% { width: 3px;  height: 3px;  box-shadow: 0 0 0 5px rgba(0,0,0,0.7), 0 0 0 12px rgba(250,204,21,0.18), 0 0 0 18px rgba(250,204,21,0.06); background: #030608; }
+    }
+    .conv-panel { background: linear-gradient(135deg, rgba(250,204,21,0.08) 0%, rgba(250,204,21,0.02) 100%); border: 1px solid rgba(250,204,21,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 10px; font-weight: 600; }
+    .conv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 26px; color: var(--accent-light); font-weight: 700; margin-bottom: 8px; line-height: 2; }
+    .conv-sub { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-sep { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(250,204,21,0.05); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-wormholes.html" class="nav-back">&larr; Wormholes</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Pulsars &amp; Black Holes</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Astrophysics</p>
+    <h1 class="hero-title">Two Arabic words in one verse describe a knocking star that makes a hole. Science calls them pulsars and black holes.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 86:1–3 Surah Al-Tariq &middot; The Knocker</div>
+      <div class="iv-ar">
+        وَالسَّمَاءِ وَ<span class="hl">الطَّارِقِ</span><br>
+        وَمَا أَدْرَاكَ مَا الطَّارِقُ<br>
+        <span class="hl">النَّجْمُ الثَّاقِبُ</span>
+      </div>
+      <div class="iv-tr">"And the heaven and <span class="hl">the Knocker</span> And what could tell you what the Knocker is? <span class="hl">The piercing star.</span>"</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">الطَّارِقُ</div>
+        <div class="cr-lbl">The Knocker → Pulsar</div>
+      </div>
+      <div class="cr-eq">+</div>
+      <div class="cr-block">
+        <div class="cr-num">الثَّاقِبُ</div>
+        <div class="cr-lbl">The Hole-maker → Black Hole</div>
+      </div>
+    </div>
+
+    <p class="body-text">Pulsars are rotating neutron stars that emit regular radio pulses. Connect a radio telescope to a speaker and you hear a persistent knocking sound. The Arabic word <em>Tarek</em> means "the one who knocks." The same verse then calls this star <em>Thakeb</em> from the root <em>thukb</em> (ثقب), meaning "hole." When a neutron star gains enough mass, it collapses and tears a hole in spacetime a black hole. Two words. Two precise properties. One verse written 1,400 years before either was discovered.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#040810">Begin the lesson &rarr;</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">What does الطَّارِقُ (Al-Tariq) mean in Arabic?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-ar">الْمُضِيءُ</div>
+        <div class="ac-big">The shining one</div>
+        <div class="ac-sub">A star known for its brightness</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">الطَّارِقُ</div>
+        <div class="ac-big">The knocker something that strikes repeatedly with rhythm</div>
+        <div class="ac-sub">The same root word used when someone knocks on a door at night</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-ar">السَّائِرُ</div>
+        <div class="ac-big">The traveler a moving object in space</div>
+        <div class="ac-sub">A star drifting through the cosmos</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 Two-path explorer ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">Explore both Arabic words then see what science confirmed.</p>
+
+    <button class="reveal-btn" id="btnA" onclick="revealA()">
+      <div class="rb-icon">📡</div>
+      <div>
+        <div style="font-weight:600">الطَّارِقُ The Knocker</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">What does a pulsar actually sound like?</div>
+      </div>
+    </button>
+    <div class="reveal-result" id="resA">
+      <div class="rr-ar">الطَّارِقُ</div>
+      <div class="rr-stat">Knock · Knock · Knock</div>
+      <!-- Mini pulsar knock animation -->
+      <div class="knock-canvas-wrap">
+        <canvas id="knockCanvas" width="580" height="52" style="width:100%;height:52px;border-radius:8px;display:block;"></canvas>
+      </div>
+      <div class="rr-note">Pulsars emit radio waves at precise, regular intervals. When recorded and played through a speaker, they sound exactly like someone persistently knocking. Astronomers first detected them in 1967 but the Quran called this star "the knocker" in the 7th century.</div>
+    </div>
+
+    <button class="reveal-btn" id="btnB" onclick="revealB()">
+      <div class="rb-icon">🕳️</div>
+      <div>
+        <div style="font-weight:600">النَّجْمُ الثَّاقِبُ The Piercing Star</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">What does the root word "thukb" mean?</div>
+      </div>
+    </button>
+    <div class="reveal-result" id="resB">
+      <div class="rr-ar">ثقب = hole</div>
+      <div class="rr-stat">A hole in spacetime</div>
+      <!-- CSS collapse animation: neutron star → black hole -->
+      <div class="collapse-demo">
+        <div class="cd-label">Neutron star</div>
+        <div class="star-dot"></div>
+        <div class="cd-label">Black hole</div>
+      </div>
+      <div class="rr-note">The root word <em>thukb</em> (ثقب) means "hole." <em>Thakeb</em> means "the one that makes a hole." As a neutron star gains mass, gravity eventually overwhelms all other forces the star collapses and tears a hole in spacetime. This is a black hole. The Quran links the knocker to the hole-maker in the same breath.</div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-lbl">One verse. Two properties. One type of star.</div>
+      <div class="conv-ar">النَّجْمُ الثَّاقِبُ</div>
+      <div class="conv-sub">Neutron stars knock as pulsars. Neutron stars become black holes. The Quran described both properties of the same object 1,400 years before either was understood.</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">What can a neutron star become when it gains enough mass?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">A white dwarf it shrinks and slowly cools down over billions of years</div>
+        <div class="ac-sub">The burned-out remnant of a less massive star</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">A supernova it explodes in a single burst and vanishes</div>
+        <div class="ac-sub">A one-time explosive event, not an ongoing structure</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">A black hole gravity overwhelms all forces and tears a hole in spacetime</div>
+        <div class="ac-sub">The word الثَّاقِبُ in Quran 86:3 means exactly this: a hole-maker</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">Two words in Quran 86:3 described pulsars and black holes 1,400 years before either was discovered.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num" id="mv0" style="color:var(--accent-light);text-shadow:0 0 40px rgba(250,204,21,0.4)">0</div>
+        <div class="match-lbl">years before pulsars discovered (1967)</div>
+      </div>
+      <div class="match-sep">&middot;</div>
+      <div class="match-block">
+        <div class="match-num" id="mv1" style="color:var(--gold-light);text-shadow:0 0 40px rgba(252,211,77,0.4);font-size:clamp(36px,7vw,52px)">0</div>
+        <div class="match-lbl">Arabic words = both discoveries</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Arabic word</th><th>Literal meaning</th><th>Modern discovery</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td style="font-family:'Amiri',serif;direction:rtl;font-size:18px">الطَّارِقُ</td>
+          <td class="td-v">The Knocker</td>
+          <td class="td-v">Pulsar (1967)</td>
+        </tr>
+        <tr class="hl">
+          <td style="font-family:'Amiri',serif;direction:rtl;font-size:18px">النَّجْمُ الثَّاقِبُ</td>
+          <td class="td-v">The Hole-making Star</td>
+          <td class="td-v">Black Hole (GR 1915)</td>
+        </tr>
+        <tr>
+          <td>Same star, one verse</td>
+          <td class="td-v">86:3</td>
+          <td class="td-v">Neutron star → Black hole</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>The knocking sound is real:</strong> Pulsars are the most precise natural clocks in the universe. They spin up to 700 times per second, emitting radio pulses with millisecond accuracy. When converted to audio, slow pulsars sound like steady, rhythmic knocking. The Arabic word <em>tarek</em> is the same root used for "someone knocking at the door."
+    </div>
+
+    <div class="insight-box">
+      <strong>One star, two fates:</strong> A neutron star with enough mass inevitably collapses into a black hole. The Quran linked both phenomena the knocking and the hole-making to the same star in a single line. Astrophysicists confirmed this exact relationship in the 20th century.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">"The Knocker the piercing star." Three words. Two scientific discoveries. One verse from the 7th century.</div>
+      <div class="gs">Pulsars were first detected in 1967 by Jocelyn Bell Burnell. Black holes were theorized in 1915 and confirmed in the 20th century. No human in 7th-century Arabia had any basis for describing a star that knocks rhythmically and also makes a hole in space yet the Quran described both in the same breath.</div>
+    </div>
+
+    <div id="qv-pulsars"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+          <div id="curiositySeed"></div>
+
+      <a href="quran-wormholes.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Wormholes</a>
+      <a href="quran-age-of-universe.html" class="btn" style="background:var(--accent);color:#040810">Next &middot; Age of Universe &rarr;</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Pulsars & Black Holes',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('pulsars-blackholes');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1400, 1600, null);
+        animFrom(document.getElementById('mv1'), 0, 2, 800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Al-Tariq means the knocker the one who knocks. Pulsars literally sound like persistent knocking when recorded and played through a speaker.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+var doneA = false, doneB = false;
+
+function revealA() {
+  if (doneA) return;
+  doneA = true;
+  document.getElementById('btnA').classList.add('used');
+  document.getElementById('resA').classList.add('show');
+  initKnockCanvas();
+  checkBoth();
+}
+
+function initKnockCanvas() {
+  var kc = document.getElementById('knockCanvas');
+  if (!kc || kc._running) return;
+  kc._running = true;
+  var kctx = kc.getContext('2d');
+  var kW = kc.width, kH = kc.height;
+  var kcx = kW / 2, kcy = kH / 2;
+  var kRings = [];
+  var kFrame = 0;
+  var kLast = -999;
+  var kPeriod = 48;
+
+  function kDraw() {
+    kctx.fillStyle = '#040810';
+    kctx.fillRect(0, 0, kW, kH);
+
+    /* Emit a knock ring once per period */
+    if (kFrame - kLast > kPeriod) {
+      kRings.push({ born: kFrame });
+      kLast = kFrame;
+    }
+
+    /* Draw rings */
+    for (var r = kRings.length - 1; r >= 0; r--) {
+      var age = kFrame - kRings[r].born;
+      if (age > 68) { kRings.splice(r, 1); continue; }
+      var t = age / 68;
+      var radius = t * (kW * 0.46);
+      var alpha = (1 - t) * 0.72;
+      kctx.beginPath();
+      kctx.arc(kcx, kcy, radius, 0, Math.PI * 2);
+      kctx.strokeStyle = 'rgba(250,204,21,' + alpha.toFixed(2) + ')';
+      kctx.lineWidth = 2.8 - t * 1.8;
+      kctx.stroke();
+    }
+
+    /* KNOCK flash label appears briefly at each pulse */
+    if (kRings.length > 0) {
+      var newest = kFrame - kRings[kRings.length - 1].born;
+      if (newest < 16) {
+        var ta = (1 - newest / 16);
+        kctx.fillStyle = 'rgba(250,204,21,' + ta.toFixed(2) + ')';
+        kctx.font = '700 11px "DM Sans", sans-serif';
+        kctx.textAlign = 'center';
+        kctx.fillText('KNOCK', kcx, kcy - 18);
+        kctx.textAlign = 'left';
+      }
+    }
+
+    /* Bright central neutron star */
+    var grd = kctx.createRadialGradient(kcx, kcy, 0, kcx, kcy, 9);
+    grd.addColorStop(0,   'rgba(255,255,255,1)');
+    grd.addColorStop(0.45,'rgba(250,204,21,0.85)');
+    grd.addColorStop(1,   'transparent');
+    kctx.fillStyle = grd;
+    kctx.beginPath();
+    kctx.arc(kcx, kcy, 9, 0, Math.PI * 2);
+    kctx.fill();
+
+    kFrame++;
+    requestAnimationFrame(kDraw);
+  }
+  kDraw();
+}
+
+function revealB() {
+  if (doneB) return;
+  doneB = true;
+  document.getElementById('btnB').classList.add('used');
+  document.getElementById('resB').classList.add('show');
+  checkBoth();
+}
+
+function checkBoth() {
+  if (doneA && doneB) {
+    document.getElementById('convPanel').classList.add('show');
+    setTimeout(function() {
+      showOk('The same star: a neutron star that knocks as a pulsar and can collapse into a black hole. The Quran named both properties 1,400 years before science did.', function() { go(3); });
+    }, 1200);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Correct. The Arabic word الثَّاقِبُ means "the hole-maker." When a neutron star exceeds its mass limit, it collapses into a black hole a hole in spacetime.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero Canvas: Rotating pulsar with rhythmic knock rings ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  const W = cv.width, H = cv.height;
+  const cx = W / 2, cy = H / 2;
+
+  /* Seeded star field */
+  const stars = [];
+  var seed = 17;
+  function rng() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; }
+  for (var i = 0; i < 60; i++) {
+    stars.push({ x: rng() * W, y: rng() * H, r: rng() * 1.1 + 0.2, a: rng() * 0.4 + 0.1 });
+  }
+
+  /* Knock rings pool */
+  var rings = [];
+  var lastKnockFrame = -999;
+
+  var frame = 0;
+  const PERIOD = 55; /* frames per full rotation */
+
+  function draw() {
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Stars */
+    stars.forEach(function(s) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + s.a + ')';
+      ctx.fill();
+    });
+
+    /* Rotation angle */
+    var angle = (frame / PERIOD) * Math.PI * 2;
+
+    /* Emit knock ring once per rotation when beam sweeps toward viewer */
+    var phase = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    if (phase < 0.18 && frame - lastKnockFrame > PERIOD * 0.85) {
+      rings.push({ born: frame });
+      lastKnockFrame = frame;
+    }
+
+    /* Beams */
+    var BEAM_LEN = W * 0.52;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    for (var dir = 0; dir < 2; dir++) {
+      var beam = ctx.createLinearGradient(0, 0, BEAM_LEN, 0);
+      beam.addColorStop(0,   'rgba(250,204,21,0.55)');
+      beam.addColorStop(0.25,'rgba(250,204,21,0.20)');
+      beam.addColorStop(0.6, 'rgba(250,204,21,0.05)');
+      beam.addColorStop(1,   'transparent');
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(0, -4);
+      ctx.lineTo(BEAM_LEN, -10);
+      ctx.lineTo(BEAM_LEN,  10);
+      ctx.lineTo(0,  4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.rotate(Math.PI);
+    }
+    ctx.restore();
+
+    /* Knock rings */
+    for (var r = rings.length - 1; r >= 0; r--) {
+      var age = frame - rings[r].born;
+      var maxAge = 90;
+      if (age > maxAge) { rings.splice(r, 1); continue; }
+      var t = age / maxAge;
+      var radius = t * 260;
+      var alpha = (1 - t) * 0.55;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(250,204,21,' + alpha.toFixed(2) + ')';
+      ctx.lineWidth = 2.5 - t * 1.5;
+      ctx.stroke();
+    }
+
+    /* Central neutron star */
+    var grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 14);
+    grd.addColorStop(0,   'rgba(255,255,255,1)');
+    grd.addColorStop(0.35,'rgba(250,204,21,0.9)');
+    grd.addColorStop(0.7, 'rgba(250,204,21,0.3)');
+    grd.addColorStop(1,   'transparent');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Dark core hinting at black hole potential */
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fill();
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"pulsars-blackholes");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"pulsars-blackholes","question":"How fast can a pulsar (rotating neutron star) spin?","inputType":"pulsar","unit":"/s","min":0,"max":1000,"step":20,"correct":700,"correctLabel":"up to 700/sec","curiositySeed":{"question":"Earth is 4.6 billion years old. The universe is 13.8 billion years old. What fraction of creation time did Earth take?","nextUrl":"quran-age-of-universe.html","nextTitle":"Age of Universe"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 86:1–3 الطَّارِقُ (the Knocker) and النَّجْمُ الثَّاقِبُ (the piercing star).
+   Pulsars were discovered in 1967. These words are from 610 CE. */
+QuranValidator.attach('qv-pulsars',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 86:1–3 "The Knocker… the piercing star." Pulsars were discovered 1,357 years later.',
+  groups:[
+    {id:'tariq', label:'The Knocker (pulsar)',       arabic:'الطَّارِقُ',  color:'#a78bfa', occurrences:[[86,1],[86,2],[86,3]]},
+    {id:'thaqib',label:'The Piercing Star (black hole)', arabic:'الثَّاقِبُ', color:'#38bdf8', occurrences:[[86,3]]}
+  ]
+});
+</script>
+</body>
+</html>

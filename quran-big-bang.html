@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Big Bang · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0b1622;--surface:#111e2e;--surface2:#182840;
+      --border:rgba(255,255,255,0.08);--text:#e2ddd4;--muted:#7a8fa3;
+      --gold:#f59e0b;--gold-light:#fcd34d;
+      --ok:#22c55e;--ok-bg:#052e16;--ok-border:#166534;
+      --err-light:#f87171;--err-bg:#2d0707;--err-border:#991b1b;
+      --accent:#60a5fa;--accent-light:#93c5fd;
+      --accent-dim:rgba(96,165,250,0.12);--accent-ring:rgba(96,165,250,0.28);
+    }
+    html[data-theme="light"]{
+      --accent:#1d4ed8;--accent-light:#1e40af;--accent-dim:rgba(29,78,216,0.10);--accent-ring:rgba(29,78,216,0.22);
+    }
+
+    /* ── Light-mode: darken all pastel hardcoded colors ── */
+    html[data-theme="light"] .mg-card{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.07)!important;}
+    html[data-theme="light"] .mg-sub{color:rgba(0,0,0,0.48)!important;}
+
+    html[data-theme="light"] .mg:nth-child(1){--mc:#2563eb!important;background:rgba(37,99,235,0.06)!important;border-color:rgba(37,99,235,0.18)!important;}
+    html[data-theme="light"] .mg:nth-child(1) .mg-tag,
+    html[data-theme="light"] .mg:nth-child(1) .mg-ar,
+    html[data-theme="light"] .mg:nth-child(1) .mg-en,
+    html[data-theme="light"] .mg:nth-child(1) .mg-eq{color:#2563eb!important;}
+
+    html[data-theme="light"] .mg:nth-child(2){--mc:#dc2626!important;background:rgba(220,38,38,0.05)!important;border-color:rgba(220,38,38,0.16)!important;}
+    html[data-theme="light"] .mg:nth-child(2) .mg-tag,
+    html[data-theme="light"] .mg:nth-child(2) .mg-ar,
+    html[data-theme="light"] .mg:nth-child(2) .mg-en,
+    html[data-theme="light"] .mg:nth-child(2) .mg-eq{color:#dc2626!important;}
+
+    html[data-theme="light"] .mg:nth-child(3){--mc:#15803d!important;background:rgba(21,128,61,0.05)!important;border-color:rgba(21,128,61,0.16)!important;}
+    html[data-theme="light"] .mg:nth-child(3) .mg-tag,
+    html[data-theme="light"] .mg:nth-child(3) .mg-ar,
+    html[data-theme="light"] .mg:nth-child(3) .mg-en,
+    html[data-theme="light"] .mg:nth-child(3) .mg-eq{color:#15803d!important;}
+
+    /* Word-split panel */
+    html[data-theme="light"] .ws-side.compress{background:rgba(37,99,235,0.06)!important;border-color:rgba(37,99,235,0.18)!important;}
+    html[data-theme="light"] .ws-side.compress .ws-ar,
+    html[data-theme="light"] .ws-side.compress .ws-en{color:#2563eb!important;}
+    html[data-theme="light"] .ws-side.compress .ws-science{color:rgba(37,99,235,0.7)!important;}
+
+    html[data-theme="light"] .ws-side.tear{background:rgba(220,38,38,0.05)!important;border-color:rgba(220,38,38,0.16)!important;}
+    html[data-theme="light"] .ws-side.tear .ws-ar,
+    html[data-theme="light"] .ws-side.tear .ws-en{color:#dc2626!important;}
+    html[data-theme="light"] .ws-side.tear .ws-science{color:rgba(220,38,38,0.7)!important;}
+
+    /* Discovery cards */
+    html[data-theme="light"] .disc-card:nth-child(1) .dc-num,
+    html[data-theme="light"] .disc-card:nth-child(1) .dc-ar{color:#2563eb!important;}
+    html[data-theme="light"] .disc-card:nth-child(2) .dc-num,
+    html[data-theme="light"] .disc-card:nth-child(2) .dc-ar{color:#dc2626!important;}
+    html[data-theme="light"] .disc-card:nth-child(3) .dc-num,
+    html[data-theme="light"] .disc-card:nth-child(3) .dc-ar{color:#15803d!important;}
+
+    /* Verse gold highlights */
+    html[data-theme="light"] .vb-hl2,
+    html[data-theme="light"] .vb-hl2-en{color:#b45309!important;}
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:44px 20px 160px;}
+    .container{max-width:660px;margin:0 auto;position:relative;z-index:1;}
+    .dot-field{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:28px 28px;}
+    .nav-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;transition:color .2s;}
+    .nav-back:hover{color:var(--text);}
+    .stage{display:none;}.stage.active{display:block;animation:rise .4s ease;}
+    @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .lesson-bar-wrap{background:var(--surface2);border-radius:100px;height:10px;margin-bottom:6px;overflow:hidden;}
+    .lesson-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .65s cubic-bezier(.4,0,.2,1);width:0%;}
+    .lesson-meta{font-size:11px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:36px;}
+    .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:14px;color:var(--accent-light);}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4.8vw,34px);line-height:1.22;margin-bottom:18px;}
+    .body-text{font-size:15px;line-height:1.85;color:var(--muted);margin-bottom:22px;}
+    .prompt{font-family:'Playfair Display',serif;font-size:clamp(17px,4vw,22px);line-height:1.4;margin-bottom:22px;}
+    .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-accent{background:var(--accent);color:#fff;}.btn-accent:hover{filter:brightness(1.12);}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+    .insight-box{background:var(--surface);border-radius:10px;border-left:3px solid var(--accent);padding:16px 20px;font-size:14px;color:var(--muted);line-height:1.85;margin:20px 0;}
+    .insight-box strong{color:var(--text);}
+
+    /* verse */
+    .verse-box{background:var(--surface);border:1px solid var(--accent-ring);border-radius:14px;padding:22px;text-align:center;margin:20px 0;}
+    .vb-ref{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .vb-ar{font-family:'Amiri',serif;direction:rtl;font-size:clamp(17px,4vw,24px);line-height:2.3;color:var(--text);}
+    .vb-hl{color:var(--accent-light);font-weight:700;}
+    .vb-hl2{color:#fcd34d;font-weight:700;}
+    .vb-tr{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.7;border-top:1px solid var(--border);padding-top:11px;font-style:italic;}
+    .vb-hl-en{color:var(--accent-light);font-style:normal;font-weight:600;}
+    .vb-hl2-en{color:#fcd34d;font-style:normal;font-weight:600;}
+
+    /* word split panel */
+    .word-split{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:0;margin:22px 0;}
+    .ws-side{padding:16px 14px;border-radius:10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .ws-side.compress{background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.22);}
+    .ws-side.tear{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.20);}
+    .ws-ar{font-family:'Amiri',serif;direction:rtl;font-size:clamp(24px,5vw,32px);line-height:1.7;}
+    .ws-side.compress .ws-ar{color:#93c5fd;}
+    .ws-side.tear .ws-ar{color:#fca5a5;}
+    .ws-en{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;}
+    .ws-side.compress .ws-en{color:#93c5fd;}
+    .ws-side.tear .ws-en{color:#fca5a5;}
+    .ws-def{font-size:12px;color:var(--muted);line-height:1.55;}
+    .ws-science{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+    .ws-side.compress .ws-science{color:rgba(147,197,253,0.70);}
+    .ws-side.tear .ws-science{color:rgba(252,165,165,0.70);}
+    .ws-div{display:flex;align-items:center;justify-content:center;padding:0 10px;font-family:'Playfair Display',serif;font-size:18px;color:var(--muted);}
+
+    /* discovery cards */
+    .disc-wrap{margin:22px 0;}
+    .disc-card{background:var(--surface);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;border:1px solid var(--border);}
+    .disc-card.vis{opacity:1;transform:translateY(0);}
+    .disc-card:nth-child(1){border-left:3px solid #60a5fa;}
+    .disc-card:nth-child(2){border-left:3px solid #f87171;}
+    .disc-card:nth-child(3){border-left:3px solid #4ade80;}
+    .dc-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;flex-shrink:0;width:36px;text-align:center;line-height:1.2;}
+    .disc-card:nth-child(1) .dc-num{color:#93c5fd;}
+    .disc-card:nth-child(2) .dc-num{color:#fca5a5;}
+    .disc-card:nth-child(3) .dc-num{color:#86efac;}
+    .dc-body{flex:1;}
+    .dc-ar{font-family:'Amiri',serif;direction:rtl;font-size:18px;line-height:1.9;}
+    .disc-card:nth-child(1) .dc-ar{color:#93c5fd;}
+    .disc-card:nth-child(2) .dc-ar{color:#fca5a5;}
+    .disc-card:nth-child(3) .dc-ar{color:#86efac;}
+    .dc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+    .dc-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+    .dc-year{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:5px;color:var(--muted);}
+
+    /* match groups (verdict) */
+    .matches{display:flex;flex-direction:column;gap:12px;margin:22px 0;}
+    .mg{border-radius:14px;padding:16px;position:relative;overflow:hidden;}
+    .mg::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--mc),transparent);opacity:.7;}
+    .mg-tag{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin-bottom:12px;opacity:.85;}
+    .mg-row{display:flex;align-items:center;gap:8px;}
+    .mg-card{flex:1;padding:12px 10px;border-radius:8px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);text-align:center;}
+    .mg-ar{font-family:'Amiri',serif;direction:rtl;font-size:20px;line-height:1.8;}
+    .mg-en{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;}
+    .mg-sub{font-size:10px;color:rgba(122,143,163,0.75);margin-top:5px;line-height:1.4;}
+    .mg-eq{font-family:'Playfair Display',serif;font-size:20px;opacity:.45;flex-shrink:0;}
+
+    /* answer cards */
+    .answer-card{background:var(--surface);border:2px solid rgba(255,255,255,0.10);border-bottom:4px solid rgba(0,0,0,0.28);border-radius:14px;padding:15px 18px;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;margin-bottom:11px;display:flex;align-items:flex-start;gap:14px;user-select:none;}
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong){border-color:var(--accent);transform:translateY(-2px);}
+    .answer-card.ac-correct{border-color:var(--ok);background:rgba(34,197,94,0.08);pointer-events:none;}
+    .answer-card.ac-wrong{animation:shake .4s ease;border-color:var(--err-light)!important;}
+    .answer-card.ac-disabled{opacity:.38;pointer-events:none;}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+    .ac-letter{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;color:var(--muted);}
+    .answer-card.ac-correct .ac-letter{background:rgba(34,197,94,0.2);border-color:var(--ok);color:var(--ok);}
+    .ac-body{flex:1;}.ac-big{font-size:15px;font-weight:600;color:var(--text);line-height:1.4;}
+    .ac-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+    /* xp + verdict */
+    .xp-badge{display:none;align-items:center;gap:10px;background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:12px;padding:12px 18px;margin-bottom:24px;font-size:14px;font-weight:600;color:var(--ok);}
+    .xp-badge.show{display:flex;animation:rise .4s ease;}
+    .v-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0;}
+    .v-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+    .v-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--accent-light);line-height:1;}
+    .v-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:6px;}
+    .verdict-quote{font-family:'Playfair Display',serif;font-size:clamp(17px,3.8vw,22px);line-height:1.55;color:var(--text);margin:24px 0 18px;border-left:3px solid var(--accent-light);padding-left:18px;}
+
+    /* fb panel */
+    .fb-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);padding:14px 24px;display:none;justify-content:space-between;align-items:center;gap:16px;z-index:100;}
+    .fb-panel.show{display:flex;animation:slideup .3s ease;}
+    @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .fb-panel.fb-ok{border-top-color:var(--ok-border);background:var(--ok-bg);}
+    .fb-left{display:flex;align-items:center;gap:14px;}
+    .fb-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;background:rgba(255,255,255,0.08);}
+    .fb-panel.fb-ok .fb-icon{background:rgba(34,197,94,0.2);color:var(--ok);}
+    .fb-title{font-weight:700;font-size:16px;}
+    .fb-sub{font-size:13px;color:var(--muted);line-height:1.5;max-width:380px;}
+    .fb-btn{padding:12px 28px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;background:var(--ok);color:#fff;}
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+
+
+<div class="container">
+  <a href="quran-age-of-universe.html" class="nav-back">← Age of Universe</a>
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <p class="lesson-meta" id="lmeta">Lesson · Big Bang</p>
+
+  <!-- ══ SP PREDICTION ══════════════════════════════════════════ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ══ S0 INTRO ══════════════════════════════════════════════ -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+    <p class="eyebrow">Lesson · Cosmology</p>
+    <h1 class="hero-title">Three 20th-Century Discoveries. One 7th-Century Sentence.</h1>
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:26px;display:block;"></canvas>
+
+    <div class="verse-box">
+      <div class="vb-ref">Surah Al-Anbiya · 21:30</div>
+      <div class="vb-ar">أَوَلَمْ يَرَ الَّذِينَ كَفَرُوا أَنَّ السَّمَاوَاتِ وَالْأَرْضَ كَانَتَا <span class="vb-hl">رَتْقًا فَفَتَقْنَاهُمَا</span> ۖ وَجَعَلْنَا مِنَ <span class="vb-hl2">الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</span></div>
+      <div class="vb-tr">"The heavens and the Earth were <span class="vb-hl-en">meshed together then We ripped them apart</span>. And We made from <span class="vb-hl2-en">water every living thing</span>."</div>
+    </div>
+
+    <p class="body-text">In 1927, Georges Lemaître proposed the Big Bang. In 1964, Penzias and Wilson confirmed it with cosmic microwave background radiation. In 1998, dark energy was discovered the force tearing the universe apart. The Quran described all three in a single sentence more than 1,000 years before the first of them was proposed.</p>
+
+    <div class="insight-box">
+      <strong>This lesson breaks down each word.</strong> رَتْقًا (ratq) describes the singularity. فَتَقْنَاهُمَا (fataqna) describes not an explosion but a tearing of fabric the precise mechanism of dark energy. مِنَ الْمَاءِ (from water) describes the basis of all biology.
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">Start Lesson →</button>
+  </div>
+
+  <!-- ══ S1 THE TWO KEY WORDS ══════════════════════════════════ -->
+  <div id="s1" class="stage">
+    <p class="eyebrow">Exercise 1 of 3 · The Words</p>
+    <h2 class="hero-title">Two Precise Words Two Precise Events</h2>
+
+    <p class="body-text">The Quran uses two very specific Arabic words in 21:30. Watch both in real time:</p>
+
+    <canvas id="s1Canvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:14px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="word-split">
+      <div class="ws-side compress">
+        <div class="ws-ar">رَتْقًا</div>
+        <div class="ws-en">Ratq</div>
+        <div class="ws-def">Tight, compact, sealed together like fabric so tightly woven it forms one mass</div>
+        <div class="ws-science">→ The Singularity</div>
+      </div>
+      <div class="ws-div">+</div>
+      <div class="ws-side tear">
+        <div class="ws-ar">فَتَقْنَاهُمَا</div>
+        <div class="ws-en">Fataqna</div>
+        <div class="ws-def">Tearing cloth by pulling its fabric in opposite directions a stretching tear</div>
+        <div class="ws-science">→ Dark Energy</div>
+      </div>
+    </div>
+
+    <p class="prompt">What was the state of the universe described by رَتْقًا (ratq) before creation?</p>
+
+    <div onclick="pickEx(this,1,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Extremely hot a fireball of energy</div><div class="ac-sub">Heat is a property, not a description of how matter is arranged</div></div>
+    </div>
+    <div onclick="pickEx(this,1,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Tight and compact all matter sealed into a single compressed mass</div>
+        <div class="ac-sub">Ratq is the Arabic word for stitched-shut, sealed fabric everything in one inseparable point. The Big Bang singularity.</div>
+      </div>
+    </div>
+    <div onclick="pickEx(this,1,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Spinning rapidly at high speed</div></div>
+    </div>
+  </div>
+
+  <!-- ══ S2 THREE DISCOVERIES IN ONE VERSE ══════════════════════ -->
+  <div id="s2" class="stage">
+    <p class="eyebrow">Exercise 2 of 3 · Three Discoveries</p>
+    <h2 class="hero-title">One Verse. Three Scientific Bombshells.</h2>
+
+    <p class="body-text">Quran 21:30 contains three distinct scientific discoveries each confirmed by a different field of science in a different century. Watch them reveal:</p>
+
+    <div class="disc-wrap" id="discWrap">
+      <div class="disc-card" id="dc0">
+        <div class="dc-num">1</div>
+        <div class="dc-body">
+          <div class="dc-ar">رَتْقًا</div>
+          <div class="dc-name">The Big Bang Singularity</div>
+          <div class="dc-desc">The heavens and Earth were a single compressed mass the singularity. Before creation, all matter and energy occupied one infinitely dense point.</div>
+          <div class="dc-year">Confirmed: 1927 (Lemaître) · 1964 (Penzias & Wilson, CMB radiation)</div>
+        </div>
+      </div>
+      <div class="disc-card" id="dc1">
+        <div class="dc-num">2</div>
+        <div class="dc-body">
+          <div class="dc-ar">فَفَتَقْنَاهُمَا</div>
+          <div class="dc-name">Dark Energy Spacetime Tearing Apart</div>
+          <div class="dc-desc">Fatq means tearing fabric by pulling in opposite directions not an explosion. Dark Energy stretches spacetime itself. Every point in the universe is moving away from every other point.</div>
+          <div class="dc-year">Confirmed: 1929 (Hubble, expansion) · 1998 (accelerating expansion, Nobel Prize 2011)</div>
+        </div>
+      </div>
+      <div class="disc-card" id="dc2">
+        <div class="dc-num">3</div>
+        <div class="dc-body">
+          <div class="dc-ar">مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</div>
+          <div class="dc-name">Water Is the Basis of All Life</div>
+          <div class="dc-desc">"We made from water every living thing." Every living cell is primarily water. Finding liquid water on a planet is now the first indicator in the search for extraterrestrial life.</div>
+          <div class="dc-year">Confirmed: 19th–20th century (cellular biology, astrobiology)</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="prompt" id="s2prompt" style="opacity:0;transition:opacity .4s ease .1s">These three discoveries span multiple centuries of science. Which was confirmed MOST RECENTLY?</p>
+
+    <div id="s2mc" style="opacity:0;transition:opacity .4s ease .2s">
+      <div onclick="pickEx(this,2,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body"><div class="ac-big">The singularity everything once compressed into one point</div><div class="ac-sub">Proposed 1927, confirmed 1964 by cosmic microwave background radiation</div></div>
+      </div>
+      <div onclick="pickEx(this,2,false)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body"><div class="ac-big">Water-based life all living things require water</div><div class="ac-sub">Established through cellular biology in the 19th and early 20th centuries</div></div>
+      </div>
+      <div onclick="pickEx(this,2,true)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Dark Energy the accelerating expansion of spacetime</div>
+          <div class="ac-sub">Discovered 1998 by Riess, Perlmutter, Schmidt. Nobel Prize Physics 2011. Still unexplained.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ S3 FATQ: FABRIC, NOT EXPLOSION ════════════════════════ -->
+  <div id="s3" class="stage">
+    <p class="eyebrow">Exercise 3 of 3 · The Precision</p>
+    <h2 class="hero-title">فَتَقَ Is Not "Explosion." It Is "Tearing Fabric."</h2>
+
+    <p class="body-text">Arabic has many words for separation. The Quran chose فَتَقَ specifically the word for tearing cloth by pulling its threads in opposite directions. Watch the difference in real time:</p>
+
+    <canvas id="s3Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:14px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="insight-box">
+      <strong>Why this matters:</strong> An explosion pushes matter through space. Dark Energy does not move matter it stretches the fabric of spacetime itself, so that every point moves away from every other point simultaneously. This is precisely what فَتَقَ describes: a tear where both sides are pulled apart, not a blast where fragments fly outward.
+    </div>
+
+    <p class="prompt">The word فَتَقْنَاهُمَا (fataqnahuma) best describes which force?</p>
+
+    <div onclick="pickEx(this,3,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Gravity pulling matter together</div><div class="ac-sub">Gravity does the opposite of fatq it compresses, not tears apart</div></div>
+    </div>
+    <div onclick="pickEx(this,3,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Dark Energy stretching the fabric of spacetime in all directions simultaneously</div>
+        <div class="ac-sub">Every point in the universe moves away from every other. Not matter flying through space but space itself expanding. Exactly what fatq describes.</div>
+      </div>
+    </div>
+    <div onclick="pickEx(this,3,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Nuclear fusion energy radiating outward from a star</div></div>
+    </div>
+  </div>
+
+  <!-- ══ S4 VERDICT ════════════════════════════════════════════ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>Lesson complete · +30 XP</span>
+    </div>
+
+    <p class="eyebrow">One Verse. Three Fields. Three Centuries.</p>
+    <h2 class="hero-title">كَانَتَا رَتْقًا فَفَتَقْنَاهُمَا</h2>
+
+    <div class="v-grid">
+      <div class="v-card">
+        <div class="v-num" id="vn1">0</div>
+        <div class="v-lbl">CE Big Bang confirmed (CMB radiation)</div>
+      </div>
+      <div class="v-card">
+        <div class="v-num" id="vn2">0</div>
+        <div class="v-lbl">CE Dark Energy confirmed (Nobel Prize 2011)</div>
+      </div>
+    </div>
+
+    <blockquote class="verdict-quote">A 7th-century merchant who could neither read nor write described the singularity, the mechanism of Dark Energy, and the biochemical basis of life in a single sentence of 16 words.</blockquote>
+
+
+
+
+
+
+
+  <!-- Match groups replacing the boring table -->
+    <div class="matches">
+      <div class="mg" style="--mc:#93c5fd;background:rgba(96,165,250,0.09);border:1px solid rgba(96,165,250,0.25)">
+        <div class="mg-tag" style="color:#93c5fd">Discovery 1 · The Singularity</div>
+        <div class="mg-row">
+          <div class="mg-card">
+            <div class="mg-ar" style="color:#93c5fd">رَتْقًا</div>
+            <div class="mg-en" style="color:#93c5fd">Ratq</div>
+            <div class="mg-sub">tight, sealed, compressed into one</div>
+          </div>
+          <div class="mg-eq" style="color:#93c5fd">=</div>
+          <div class="mg-card">
+            <div class="mg-en" style="color:#93c5fd;font-size:13px;font-weight:700">Big Bang Singularity</div>
+            <div class="mg-sub">all matter in one infinitely dense point<br>Confirmed 1964</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mg" style="--mc:#fca5a5;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,133,0.22)">
+        <div class="mg-tag" style="color:#fca5a5">Discovery 2 · Dark Energy</div>
+        <div class="mg-row">
+          <div class="mg-card">
+            <div class="mg-ar" style="color:#fca5a5;font-size:16px">فَفَتَقْنَاهُمَا</div>
+            <div class="mg-en" style="color:#fca5a5">Fataqna</div>
+            <div class="mg-sub">tearing fabric by pulling in opposite directions</div>
+          </div>
+          <div class="mg-eq" style="color:#fca5a5">=</div>
+          <div class="mg-card">
+            <div class="mg-en" style="color:#fca5a5;font-size:13px;font-weight:700">Dark Energy Expansion</div>
+            <div class="mg-sub">spacetime fabric stretched apart<br>Confirmed 1998</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mg" style="--mc:#86efac;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.20)">
+        <div class="mg-tag" style="color:#86efac">Discovery 3 · Water-Based Life</div>
+        <div class="mg-row">
+          <div class="mg-card">
+            <div class="mg-ar" style="color:#86efac;font-size:14px">مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ</div>
+            <div class="mg-en" style="color:#86efac">Min al-ma&apos; kull shay&apos; hay</div>
+            <div class="mg-sub">from water every living thing</div>
+          </div>
+          <div class="mg-eq" style="color:#86efac">=</div>
+          <div class="mg-card">
+            <div class="mg-en" style="color:#86efac;font-size:13px;font-weight:700">Water-Based Biology</div>
+            <div class="mg-sub">all cells require liquid water<br>Confirmed 19th–20th c.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+    <div class="insight-box" style="border-left-color:#fcd34d">
+      <strong>The word fatq is not accidental:</strong> Arabic has simpler words for "separation" or "opening." The Quran chose fatq the word specifically for tearing fabric by pulling its threads in opposite directions. This is not metaphor. This is the precise description of how Dark Energy works: it pulls the threads of spacetime apart. The word was chosen 1,400 years before physicists understood what it described.
+    </div>
+
+    <div id="qv-big-bang"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
+      <a href="quran-age-of-universe.html" class="btn btn-ghost">← Age of Universe</a>
+      <a href="quran-internal-mountains.html" class="btn btn-accent">Next · Internal Mountains →</a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div><div class="fb-title" id="fbTitle">Correct!</div><div class="fb-sub" id="fbSub"></div></div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+var stage=0;
+var barMap  = {0:'0%',1:'0%',2:'33%',3:'66%',4:'100%'};
+var metaMap = {0:'Lesson · Big Bang',1:'',2:'',3:'',4:'Lesson Complete'};
+function ease(t){return 1-Math.pow(1-t,3);}
+function animFrom(el,from,to,ms,cb){var t0=null;var run=function(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/ms,1);el.textContent=Math.round(from+ease(p)*(to-from));if(p<1)requestAnimationFrame(run);else if(cb)cb();};requestAnimationFrame(run);}
+function saveProgress(id){var d=new Set(JSON.parse(localStorage.getItem('qn_done')||'[]'));if(!d.has(id)){d.add(id);localStorage.setItem('qn_done',JSON.stringify([...d]));localStorage.setItem('qn_xp',String(parseInt(localStorage.getItem('qn_xp')||'0')+30));}}
+function hideFb(){document.getElementById('fbPanel').className='fb-panel';}
+function showOk(sub,onContinue){document.getElementById('fbIcon').textContent='✓';document.getElementById('fbTitle').textContent='Correct!';document.getElementById('fbSub').textContent=sub;document.getElementById('fbPanel').className='fb-panel fb-ok show';document.getElementById('fbBtn').onclick=function(){hideFb();onContinue();};}
+
+function go(n){
+  document.getElementById('s'+stage).classList.remove('active');
+  stage=n;
+  document.getElementById('s'+stage).classList.add('active');
+  document.getElementById('lbar').style.width=barMap[n];
+  document.getElementById('lmeta').textContent=metaMap[n];
+  window.scrollTo(0,0);
+  if(n===1) setTimeout(initWordCanvas,80);
+  if(n===2) revealDiscoveries();
+  if(n===3) setTimeout(initFabricCanvas,80);
+  if(n===4){saveProgress('big-bang');setTimeout(function(){document.getElementById('xpBadge').classList.add('show');setTimeout(function(){animFrom(document.getElementById('vn1'),0,1964,1400);animFrom(document.getElementById('vn2'),0,1998,1600);},400);},300);}
+}
+
+function revealDiscoveries(){
+  var cards=['dc0','dc1','dc2'];
+  cards.forEach(function(id,i){
+    setTimeout(function(){ document.getElementById(id).classList.add('vis'); },i*500);
+  });
+  setTimeout(function(){
+    document.getElementById('s2prompt').style.opacity='1';
+    document.getElementById('s2mc').style.opacity='1';
+  }, cards.length*500+300);
+}
+
+var SUBS={
+  1:'Ratq means sealed tight, compressed into one inseparable mass like fabric so tightly woven it forms a single unit. This is the Big Bang singularity: all matter and energy in one point before creation.',
+  2:'Dark Energy was discovered in 1998, when astronomers found the expansion of the universe is accelerating. This earned the Nobel Prize in Physics in 2011. It remains the most recent of the three discoveries in 21:30 and still unexplained.',
+  3:'Fatq specifically means tearing cloth by pulling its threads in opposite directions. Dark Energy does not push matter through space it stretches the fabric of spacetime itself so every point recedes from every other. The word matches the physics with precision that goes beyond coincidence.'
+};
+var NEXT={1:2,2:3,3:4};
+function pickEx(el,sN,correct){
+  if(document.querySelector('#s'+sN+' .ac-correct'))return;
+  if(correct){el.classList.add('ac-correct');document.querySelectorAll('#s'+sN+' .answer-card').forEach(function(c){if(!c.classList.contains('ac-correct'))c.classList.add('ac-disabled');});showOk(SUBS[sN],function(){go(NEXT[sN]);});}
+  else{el.classList.add('ac-wrong');setTimeout(function(){el.classList.remove('ac-wrong');},500);}
+}
+
+function makeRng(seed){var s=seed;return function(){s=(s*1664525+1013904223)&0xffffffff;return (s>>>0)/0xffffffff;};}
+
+/* ══ HERO cyclic Big Bang: compress → singularity → BANG → expand ══ */
+function initHeroCanvas(){
+  var c=document.getElementById('heroCanvas');if(!c)return;
+  var ctx=c.getContext('2d');if(!ctx)return{stop:function(){}};var W=c.width,H=c.height;
+  var cx=W*0.42,cy=H*0.50;
+  var CYCLE=320,t=0;
+  var parts=[];
+  (function(){var r=makeRng(77);for(var i=0;i<80;i++)parts.push({a:r()*Math.PI*2,spd:0.6+r()*1.8,sz:0.8+r()*1.8,ph:r()*6.28,hue:r()});})();
+
+  function frame(){
+    ctx.fillStyle='#040810';ctx.fillRect(0,0,W,H);
+    var phase=(t%CYCLE)/CYCLE;
+
+    if(phase<0.35){
+      /* EXPAND particles flying outward */
+      var p=ease(phase/0.35);
+      var flash=phase<0.04?(1-phase/0.04)*0.6:0;
+      if(flash>0){var fg=ctx.createRadialGradient(cx,cy,0,cx,cy,W*0.5);fg.addColorStop(0,'rgba(255,255,255,'+flash+')');fg.addColorStop(0.3,'rgba(96,165,250,'+(flash*0.5)+')');fg.addColorStop(1,'rgba(96,165,250,0)');ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);}
+      parts.forEach(function(pt){
+        var dist=p*pt.spd*280;
+        var px=cx+Math.cos(pt.a)*dist,py=cy+Math.sin(pt.a)*dist*0.70;
+        if(px<-10||px>W+10||py<-10||py>H+10)return;
+        var alpha=p<0.75?0.85:(1-(p-0.75)/0.25)*0.85;
+        var col=pt.hue>0.6?'rgba(147,197,253,':'rgba(196,181,253,';
+        ctx.beginPath();ctx.arc(px,py,pt.sz,0,Math.PI*2);
+        ctx.fillStyle=col+Math.max(0,alpha)+')';ctx.fill();
+      });
+      /* central glow */
+      var cg=ctx.createRadialGradient(cx,cy,0,cx,cy,30);
+      cg.addColorStop(0,'rgba(96,165,250,'+(0.6*(1-p))+')');cg.addColorStop(1,'rgba(96,165,250,0)');
+      ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);
+
+    } else if(phase<0.85){
+      /* COMPRESS particles drift back inward */
+      var p2=ease((phase-0.35)/0.50);
+      parts.forEach(function(pt){
+        var maxDist=pt.spd*280;
+        var dist=maxDist*(1-p2*0.94);
+        var px=cx+Math.cos(pt.a)*dist,py=cy+Math.sin(pt.a)*dist*0.70;
+        if(px<-10||px>W+10||py<-10||py>H+10)return;
+        ctx.beginPath();ctx.arc(px,py,pt.sz*(1-p2*0.4),0,Math.PI*2);
+        ctx.fillStyle='rgba(147,197,253,'+(0.25+0.30*p2)+')';ctx.fill();
+      });
+
+    } else {
+      /* SINGULARITY pulse */
+      var p3=(phase-0.85)/0.15;
+      var pulse=Math.sin(p3*Math.PI);
+      var sg=ctx.createRadialGradient(cx,cy,0,cx,cy,22+pulse*28);
+      sg.addColorStop(0,'rgba(255,255,255,'+(0.6+pulse*0.4)+')');
+      sg.addColorStop(0.3,'rgba(147,197,253,'+(0.5+pulse*0.3)+')');
+      sg.addColorStop(1,'rgba(96,165,250,0)');
+      ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
+      ctx.beginPath();ctx.arc(cx,cy,3+pulse*5,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+(0.85+pulse*0.15)+')';ctx.fill();
+    }
+
+    /* label */
+    ctx.fillStyle='rgba(147,197,253,0.25)';ctx.font='9px DM Sans,sans-serif';
+    ctx.textAlign='right';ctx.textBaseline='alphabetic';
+    ctx.fillText('21:30 · رَتْقًا فَفَتَقْنَاهُمَا',W-12,H-9);
+    t++;requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ══ S1 ratq (converge) vs fatq (tear) side by side ══ */
+function initWordCanvas(){
+  var c=document.getElementById('s1Canvas');if(!c||c._run)return;c._run=true;
+  var ctx=c.getContext('2d');if(!ctx)return{stop:function(){}};var W=c.width,H=c.height,t=0;
+  var MX=W*0.50,cy=H*0.50;
+  /* particles for left (ratq = converge) */
+  var rParts=[];
+  (function(){var r=makeRng(11);for(var i=0;i<30;i++)rParts.push({x:r()*MX*0.9+4,y:r()*H,vx:0,vy:0,ph:r()*6.28});})();
+  /* grid points for right (fatq = stretch) */
+  var gPts=[];var COLS=7,ROWS=5;
+  for(var gx=0;gx<COLS;gx++)for(var gy=0;gy<ROWS;gy++)gPts.push({bx:MX+20+gx*(W-MX-28)/(COLS-1),by:H*0.12+gy*(H*0.78)/(ROWS-1)});
+
+  function frame(){
+    ctx.fillStyle='#040810';ctx.fillRect(0,0,W,H);
+    /* divider */
+    ctx.beginPath();ctx.moveTo(MX,14);ctx.lineTo(MX,H-14);
+    ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;ctx.stroke();
+
+    /* LEFT: ratq particles converging to center */
+    var lcx=MX*0.50;
+    var pullP=0.35+0.35*Math.sin(t*0.03);
+    rParts.forEach(function(p){
+      p.vx+=(lcx-p.x)*0.018;p.vy+=(cy-p.y)*0.018;
+      p.vx*=0.88;p.vy*=0.88;
+      p.x+=p.vx;p.y+=p.vy;
+      var dist=Math.sqrt((p.x-lcx)*(p.x-lcx)+(p.y-cy)*(p.y-cy));
+      if(dist<4){p.x=4+Math.random()*(MX-8);p.y=4+Math.random()*(H-8);}
+      ctx.beginPath();ctx.arc(p.x,p.y,1.8,0,Math.PI*2);
+      ctx.fillStyle='rgba(147,197,253,0.65)';ctx.fill();
+    });
+    /* center glow (singularity forming) */
+    var cg=ctx.createRadialGradient(lcx,cy,0,lcx,cy,20+pullP*12);
+    cg.addColorStop(0,'rgba(147,197,253,'+(0.4+pullP*0.5)+')');cg.addColorStop(1,'rgba(147,197,253,0)');
+    ctx.fillStyle=cg;ctx.fillRect(0,0,MX,H);
+    ctx.beginPath();ctx.arc(lcx,cy,3+pullP*4,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.90)';ctx.fill();
+    ctx.fillStyle='rgba(147,197,253,0.55)';ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('compressing to one point',lcx,H-20);
+
+    /* RIGHT: fatq grid stretching apart from center */
+    var stretchP=0.06+0.06*Math.sin(t*0.025);
+    var rcx=(MX+W)*0.50,rcy=cy;
+    /* draw grid lines */
+    for(var i=0;i<gPts.length;i++){
+      var p=gPts[i];
+      var dx=p.bx-rcx,dy=p.by-rcy;
+      var sx=rcx+dx*(1+stretchP*3.5),sy=rcy+dy*(1+stretchP*3.5);
+      /* connect to right and down neighbors */
+      for(var j=i+1;j<gPts.length;j++){
+        var q=gPts[j];
+        var qi=gPts.indexOf(q);
+        if(!(qi===i+1&&Math.floor(i/COLS)===Math.floor(j/COLS))&&!(qi===i+COLS))continue;
+        var dx2=q.bx-rcx,dy2=q.by-rcy;
+        var sx2=rcx+dx2*(1+stretchP*3.5),sy2=rcy+dy2*(1+stretchP*3.5);
+        var lineDist=Math.sqrt((sx2-sx)*(sx2-sx)+(sy2-sy)*(sy2-sy));
+        var lineAlpha=Math.max(0,0.35-lineDist/220);
+        ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx2,sy2);
+        ctx.strokeStyle='rgba(248,113,113,'+lineAlpha+')';ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(sx,sy,2,0,Math.PI*2);
+      ctx.fillStyle='rgba(252,165,165,0.70)';ctx.fill();
+    }
+    /* outward arrows */
+    [[1,0],[0,1],[-1,0],[0,-1]].forEach(function(d,i){
+      var arrowDist=50+stretchP*60;
+      var ax=rcx+d[0]*arrowDist,ay=rcy+d[1]*arrowDist;
+      ctx.fillStyle='rgba(248,113,113,0.45)';ctx.font='bold 13px sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(d[0]>0?'→':d[0]<0?'←':d[1]>0?'↓':'↑',ax,ay);
+    });
+    ctx.fillStyle='rgba(248,113,113,0.55)';ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('spacetime fabric stretching',rcx,H-20);
+
+    t++;requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ══ S3 fabric stretch canvas: dark energy vs explosion ══ */
+function initFabricCanvas(){
+  var c=document.getElementById('s3Canvas');if(!c||c._run)return;c._run=true;
+  var ctx=c.getContext('2d');if(!ctx)return{stop:function(){}};var W=c.width,H=c.height,t=0;
+
+  /* Left half: explosion (particles fly out) */
+  var eParts=[];
+  (function(){var r=makeRng(55);for(var i=0;i<24;i++)eParts.push({a:r()*Math.PI*2,spd:0.5+r()*1.2,sz:1.4+r()*1.2,ph:r()*6.28});})();
+
+  /* Right half: fabric grid */
+  var GCOLS=8,GROWS=6;
+  var gPts2=[];
+  for(var gx2=0;gx2<GCOLS;gx2++)for(var gy2=0;gy2<GROWS;gy2++){
+    var bx2=(W*0.55)+(gx2/(GCOLS-1))*(W*0.42);
+    var by2=(H*0.10)+(gy2/(GROWS-1))*(H*0.80);
+    gPts2.push({bx:bx2,by:by2,col:gx2,row:gy2});
+  }
+
+  function frame(){
+    ctx.fillStyle='#040810';ctx.fillRect(0,0,W,H);
+    var MX2=W*0.50;
+    /* divider */
+    ctx.beginPath();ctx.moveTo(MX2,12);ctx.lineTo(MX2,H-12);
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();
+
+    /* LEFT: explosion (particles cycling outward) */
+    var eCX=MX2*0.50,eCY=H*0.50;
+    var ePhase=(t*0.018)%1;
+    eParts.forEach(function(p){
+      var dist=ease(ePhase)*p.spd*MX2*0.90;
+      var px=eCX+Math.cos(p.a)*dist,py=eCY+Math.sin(p.a)*dist;
+      if(px<4||px>MX2-4)return;
+      var alpha=(ePhase<0.7)?0.80:(1-(ePhase-0.7)/0.3)*0.80;
+      ctx.beginPath();ctx.arc(px,py,p.sz,0,Math.PI*2);
+      ctx.fillStyle='rgba(248,113,113,'+Math.max(0,alpha)+')';ctx.fill();
+    });
+    /* flash at start of each cycle */
+    if(ePhase<0.06){var fl=(1-ePhase/0.06)*0.4;var fg=ctx.createRadialGradient(eCX,eCY,0,eCX,eCY,28);fg.addColorStop(0,'rgba(255,200,200,'+fl+')');fg.addColorStop(1,'rgba(255,200,200,0)');ctx.fillStyle=fg;ctx.fillRect(0,0,MX2,H);}
+    ctx.beginPath();ctx.arc(eCX,eCY,4,0,Math.PI*2);ctx.fillStyle='rgba(248,113,133,0.90)';ctx.fill();
+    ctx.fillStyle='rgba(248,113,113,0.50)';ctx.font='bold 10px DM Sans,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('Explosion',eCX,H-36);
+    ctx.fillStyle='rgba(248,113,113,0.35)';ctx.font='9px DM Sans,sans-serif';
+    ctx.fillText('matter flies through space',eCX,H-23);
+    ctx.fillStyle='rgba(248,113,113,0.50)';ctx.font='bold 9px DM Sans,sans-serif';
+    ctx.fillText('NOT what fatq means',eCX,H-11);
+
+    /* RIGHT: fabric stretch (space itself expanding) */
+    var rCX2=(MX2+W)*0.50,rCY=H*0.50;
+    var stretch=0.08+0.08*Math.sin(t*0.022);
+    gPts2.forEach(function(p){
+      var dx=p.bx-rCX2,dy=p.by-rCY;
+      p.sx=rCX2+dx*(1+stretch*2.2);p.sy=rCY+dy*(1+stretch*2.2);
+    });
+    /* draw grid lines */
+    gPts2.forEach(function(p){
+      var right=gPts2.filter(function(q){return q.col===p.col+1&&q.row===p.row;})[0];
+      var down= gPts2.filter(function(q){return q.col===p.col&&q.row===p.row+1;})[0];
+      [right,down].forEach(function(nb){
+        if(!nb)return;
+        var d=Math.sqrt((nb.sx-p.sx)*(nb.sx-p.sx)+(nb.sy-p.sy)*(nb.sy-p.sy));
+        var a=Math.max(0,0.40-d/150);
+        ctx.beginPath();ctx.moveTo(p.sx,p.sy);ctx.lineTo(nb.sx,nb.sy);
+        ctx.strokeStyle='rgba(96,165,250,'+a+')';ctx.lineWidth=0.9;ctx.stroke();
+      });
+      ctx.beginPath();ctx.arc(p.sx,p.sy,2.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(147,197,253,0.75)';ctx.fill();
+    });
+    /* two galaxy markers */
+    var g1=gPts2.filter(function(p){return p.col===2&&p.row===2;})[0];
+    var g2=gPts2.filter(function(p){return p.col===5&&p.row===3;})[0];
+    [g1,g2].forEach(function(g){
+      if(!g)return;
+      ctx.beginPath();ctx.arc(g.sx,g.sy,5,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.85)';ctx.fill();
+    });
+    ctx.fillStyle='rgba(96,165,250,0.55)';ctx.font='bold 10px DM Sans,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('Dark Energy (Fatq)',rCX2,H-36);
+    ctx.fillStyle='rgba(96,165,250,0.35)';ctx.font='9px DM Sans,sans-serif';
+    ctx.fillText('spacetime fabric stretches',rCX2,H-23);
+    ctx.fillStyle='rgba(96,165,250,0.55)';ctx.font='bold 9px DM Sans,sans-serif';
+    ctx.fillText('what fatq describes ✓',rCX2,H-11);
+
+    t++;requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"big-bang");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"big-bang","question":"How long ago did the Big Bang occur?","inputType":"expand","unit":"Byr","min":0,"max":20,"step":0.1, "correct":13.8,"correctLabel":"13.8 billion years","curiositySeed":{"question":"Deep inside Earth, there are mountains taller than Everest — but underground. When were they discovered?","nextUrl":"quran-internal-mountains.html","nextTitle":"Internal Mountains"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 21:30 three discoveries in one verse: singularity (رَتْقًا), Dark Energy (فَتَقْنَاهُمَا), water-based life (الْمَاءِ). */
+QuranValidator.attach('qv-big-bang',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 21:30 singularity + Dark Energy + water-based life in one 7th-century sentence',
+  groups:[
+    {id:'ratq',  label:'Singularity (ratq)',    arabic:'رَتْقًا',        color:'#60a5fa', occurrences:[[21,30]]},
+    {id:'fatq',  label:'Dark Energy (fatq)',    arabic:'فَفَتَقْنَاهُمَا', color:'#f87171', occurrences:[[21,30]]},
+    {id:'water', label:'Water-based life',      arabic:'الْمَاءِ',       color:'#4ade80', occurrences:[[21,30]]}
+  ]
+});
+</script>
+</body>
+</html>

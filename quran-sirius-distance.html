@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Earth–Sirius Distance · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #0b1622;
+      --surface:     #111e2e;
+      --surface2:    #182840;
+      --border:      rgba(255,255,255,0.08);
+      --text:        #e2ddd4;
+      --muted:       #7a8fa3;
+      --accent:      #1d4ed8;
+      --accent-light:#93c5fd;
+      --accent-dim:  rgba(29,78,216,0.12);
+      --accent-ring: rgba(147,197,253,0.28);
+      --star:        #93c5fd;
+      --gold:        #f59e0b;
+      --gold-light:  #fcd34d;
+      --ok:          #22c55e;
+      --ok-bg:       #052e16;
+      --ok-border:   #166534;
+      --err-light:   #f87171;
+      --err-bg:      #2d0707;
+      --err-border:  #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 660px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .45s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 16px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.hidden { opacity: 0; pointer-events: none; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--star); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── Duolingo progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* Stage 0 cascade flow */
+    .cascade { display: flex; flex-direction: column; align-items: center; margin: 28px 0 8px; }
+    .cnode { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 28px; text-align: center; min-width: 176px; opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s; }
+    .cnode.show { opacity: 1; transform: none; }
+    .cnode.star-node { border-color: rgba(29,78,216,0.4); box-shadow: 0 0 22px rgba(29,78,216,0.12); }
+    .cnode.sirius-node { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .cnode-ar { font-family: 'Amiri', serif; font-size: 26px; direction: rtl; line-height: 1.9; }
+    .cnode-ar.blue { color: var(--star); }
+    .cnode-ar.gold { color: var(--gold); }
+    .cnode-ref { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .clink { display: flex; flex-direction: column; align-items: center; padding: 6px 0; }
+    .clink-line { width: 1px; height: 12px; background: var(--border); }
+    .clink-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 16px; display: flex; align-items: baseline; gap: 7px; opacity: 0; transform: scale(0.88); transition: opacity .55s, transform .55s; }
+    .clink-pill.show { opacity: 1; transform: none; }
+    .clink-num { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+    .clink-num.lt { color: var(--star); }
+    .clink-num.wd { color: var(--gold); }
+    .clink-unit { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .dist-label { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 25px); color: var(--gold); text-align: center; opacity: 0; transform: translateY(8px); transition: opacity .7s, transform .7s; margin: 10px 0 32px; }
+    .dist-label.show { opacity: 1; transform: none; }
+
+    /* Stage 2 dual counting */
+    .paths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+    @media (max-width: 480px) { .paths-grid { grid-template-columns: 1fr; } }
+    .path-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: border-color .4s, box-shadow .4s; }
+    .path-card.lit-l { border-color: rgba(147,197,253,0.45); box-shadow: 0 0 26px rgba(29,78,216,0.1); }
+    .path-card.lit-w { border-color: rgba(245,158,11,0.45); box-shadow: 0 0 26px rgba(245,158,11,0.1); }
+    .ptag { display: inline-block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; margin-bottom: 10px; font-weight: 500; }
+    .ptag-l { background: rgba(29,78,216,0.18); color: var(--star); }
+    .ptag-w { background: rgba(245,158,11,0.18); color: var(--gold); }
+    .path-route { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .path-method { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .path-breakdown { font-size: 12px; color: var(--muted); line-height: 1.85; background: rgba(255,255,255,0.03); border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; }
+    .path-breakdown span { color: var(--text); font-weight: 500; }
+    .path-breakdown .bd-total { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
+    .path-counter { text-align: center; margin: 10px 0; }
+    .path-num { font-family: 'Playfair Display', serif; font-size: clamp(36px, 9vw, 54px); font-weight: 700; line-height: 1; color: var(--muted); transition: color .45s, text-shadow .45s; }
+    .path-num.done-l { color: var(--star); text-shadow: 0 0 32px rgba(147,197,253,0.5); }
+    .path-num.done-w { color: var(--gold); text-shadow: 0 0 32px rgba(245,158,11,0.5); }
+    .path-lbl { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+    .path-enc { font-size: 12px; text-align: center; opacity: 0; transition: opacity .5s; margin-top: 4px; font-weight: 500; }
+    .path-enc.show { opacity: 1; }
+    .path-enc.enc-l { color: var(--star); }
+    .path-enc.enc-w { color: var(--gold); }
+    .path-btn { display: block; width: 100%; margin-top: 12px; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+    .path-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .path-btn.used { opacity: 0.4; cursor: default; pointer-events: none; }
+    .path-btn.w-style { border-color: rgba(245,158,11,0.25); }
+    .path-btn.w-style:hover { border-color: rgba(245,158,11,0.5); }
+    .conv-panel { background: linear-gradient(135deg, rgba(29,78,216,0.08) 0%, rgba(245,158,11,0.07) 100%); border: 1px solid rgba(147,197,253,0.2); border-radius: 12px; padding: 22px; text-align: center; margin: 20px 0; opacity: 0; transform: translateY(8px); transition: opacity .6s, transform .6s; }
+    .conv-panel.show { opacity: 1; transform: none; }
+    .cp-row { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
+    .cp-item { text-align: center; }
+    .cp-val { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 34px); font-weight: 700; }
+    .cp-val.cv-l { color: var(--star); }
+    .cp-val.cv-w { color: var(--gold); }
+    .cp-sub { font-size: 11px; color: var(--muted); letter-spacing:.06em; text-transform: uppercase; margin-top: 4px; }
+    .cp-arrow { font-size: 24px; color: var(--muted); }
+    .cp-dist { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); color: var(--gold-light); margin-top: 14px; }
+    .cp-dsub { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing:.06em; text-transform: uppercase; }
+
+    /* Astronomy / verdict */
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 24px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 12px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--star); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .timeline { position: relative; padding-left: 26px; margin: 20px 0 28px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(to bottom, var(--star), var(--gold)); }
+    .tl-item { position: relative; margin-bottom: 26px; }
+    .tl-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--star); }
+    .tl-item:last-child::before { border-color: var(--gold); background: var(--gold); }
+    .tl-year { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--star); margin-bottom: 4px; }
+    .tl-text { font-size: 15px; line-height: 1.75; }
+    .tl-sub { font-size: 13px; color: var(--muted); display: block; margin-top: 3px; }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+    .prob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+    .prob-row .pr-label { color: var(--muted); }
+    .prob-row .pr-val { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--star); }
+    .prob-row.pr-total .pr-val { color: var(--gold); font-size: 18px; }
+
+    /* ── Duolingo answer cards ── */
+    .answer-card {
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.28);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+    }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct {
+      border-color: var(--ok);
+      border-bottom-color: var(--ok-border);
+      background: rgba(34,197,94,0.08);
+      pointer-events: none;
+    }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter {
+      width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border);
+      flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s;
+    }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── XP badge ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+
+    /* ── Fixed feedback panel (Duolingo) ── */
+    .fb-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      padding: 18px 20px 32px;
+      transform: translateY(110%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok); color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-gold-melting.html" class="nav-back">← Gold Melting</a>
+
+  <!-- Duolingo-style progress bar -->
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · Sirius Distance</div>
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <p class="eyebrow" style="color:var(--star)">Quranic Numerics · Earth–Sirius Distance</p>
+    <h1 class="hero-title">Surah 53 is "The Star." It names exactly one star in the entire Quran: Sirius. The distance to Sirius 8.6 light-years is encoded in that same surah twice, in two different units.</h1>
+
+    <div class="cascade">
+      <div class="cnode star-node" id="cn0">
+        <div class="cnode-ar blue">ٱلنَّجْمِ</div>
+        <div class="cnode-ref">53:1 · The Star</div>
+      </div>
+      <div class="clink">
+        <div class="clink-line"></div>
+        <div class="clink-pill" id="cp0">
+          <span class="clink-num lt" id="cg0">0</span>
+          <span class="clink-unit">letters</span>
+        </div>
+        <div class="clink-line"></div>
+      </div>
+      <div class="cnode" id="cn1">
+        <div class="cnode-ar">ٱلْأَرْضِ</div>
+        <div class="cnode-ref">53:32 · The Earth</div>
+      </div>
+      <div class="clink">
+        <div class="clink-line"></div>
+        <div class="clink-pill" id="cp1">
+          <span class="clink-num wd" id="cg1">0</span>
+          <span class="clink-unit">words</span>
+        </div>
+        <div class="clink-line"></div>
+      </div>
+      <div class="cnode sirius-node" id="cn2">
+        <div class="cnode-ar gold">ٱلشِّعْرَىٰ</div>
+        <div class="cnode-ref">53:49 · Sirius</div>
+      </div>
+    </div>
+    <div class="dist-label" id="drev">= 8.6 light-years from Earth</div>
+
+    <p class="body-text">861 letters from the Star verse to the Earth verse encoding 8.61 light-years. Then 86 words from the Earth verse to Sirius encoding 8.6 light-years. Both measurements point to the same astronomical fact. The surah was named "The Star" 1,200 years before stellar distances could be measured.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#0a1929">Begin the lesson →</button>
+  </div>
+
+  <!-- ── STAGE 1: MC Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">Surah 53 of the Quran is named "An-Najm." What does an-najm (النَّجْم) mean in Arabic?</p>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">The Moon</div>
+        <div class="ac-sub">The moon's name is al-qamar</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">The Planet</div>
+        <div class="ac-sub">Planets have different Arabic names</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">The Star</div>
+        <div class="ac-sub">An-najm the only surah named after a star</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 2: Two-Path Interactive ── -->
+  <div class="stage" id="s2">
+    <h2 class="hero-title">Two units. Two segments. The same distance encoded at two levels of precision.</h2>
+    <p class="body-text">Count the letters in the first segment and the words in the second. They are independent run them in any order.</p>
+
+    <div class="paths-grid">
+      <div class="path-card" id="pcl">
+        <div><span class="ptag ptag-l">Letters · 53:1 → 53:32</span></div>
+        <div class="path-route">Star → Earth</div>
+        <div class="path-method">Inclusive endpoints (both anchor letters counted)</div>
+        <div class="path-breakdown">
+          Letters after <span style="font-family:Amiri;font-size:15px">ٱلنَّجْمِ</span> in 53:1: <span>6</span><br>
+          53:2 through 53:31: <span>783</span><br>
+          Letters before <span style="font-family:Amiri;font-size:15px">ٱلْأَرْضِ</span> in 53:32: <span>70</span><br>
+          <span class="bd-total">Subtotal (exclusive): <span>859</span></span><br>
+          + Last letter of ٱلنَّجْمِ: <span>+1</span><br>
+          + First letter of ٱلْأَرْضِ: <span>+1</span><br>
+          <span class="bd-total">Total (inclusive): <span>861</span></span>
+        </div>
+        <div class="path-counter">
+          <div class="path-num" id="pnl">0</div>
+          <div class="path-lbl">letters</div>
+        </div>
+        <div class="path-enc enc-l" id="encl">= 8.61 light-years</div>
+        <button class="path-btn" id="btn-pl" onclick="runPath('l')">Count the letters →</button>
+      </div>
+
+      <div class="path-card" id="pcw">
+        <div><span class="ptag ptag-w">Words · 53:32 → 53:49</span></div>
+        <div class="path-route">Earth → Sirius</div>
+        <div class="path-method">Words after الأرض through الشعرى</div>
+        <div class="path-breakdown">
+          53:32 after <span style="font-family:Amiri;font-size:15px">ٱلْأَرْضِ</span>: <span>13</span><br>
+          53:33 through 53:48: <span>69</span><br>
+          53:49 through <span style="font-family:Amiri;font-size:15px">ٱلشِّعْرَىٰ</span>: <span>4</span><br>
+          <span class="bd-total">Total: <span>86</span></span>
+        </div>
+        <div class="path-counter">
+          <div class="path-num" id="pnw">0</div>
+          <div class="path-lbl">words</div>
+        </div>
+        <div class="path-enc enc-w" id="encw">= 8.6 light-years</div>
+        <button class="path-btn w-style" id="btn-pw" onclick="runPath('w')">Count the words →</button>
+      </div>
+    </div>
+
+    <div class="conv-panel" id="cpanel">
+      <div class="cp-row">
+        <div class="cp-item">
+          <div class="cp-val cv-l">861</div>
+          <div class="cp-sub">letters</div>
+        </div>
+        <div class="cp-arrow">↔</div>
+        <div class="cp-item">
+          <div class="cp-val cv-w">86</div>
+          <div class="cp-sub">words</div>
+        </div>
+      </div>
+      <div class="cp-dist">Both encode: 8.6 light-years Earth to Sirius</div>
+      <div class="cp-dsub">8.61 ly (letters) · 8.6 ly (words) · Actual: 8.60 ± 0.04 ly</div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 3: MC Exercise 2 ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">The modern measured distance from Earth to Sirius is 8.60 ± 0.04 light-years (Hipparcos satellite, 1989). The Quran's two encodings are 8.61 (letters) and 8.6 (words). Which statement is true?</p>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">Neither encoding falls within the range</div>
+        <div class="ac-sub">8.61 is outside 8.60 ± 0.04</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">Only the word count (8.6) matches</div>
+        <div class="ac-sub">The letter count of 8.61 is too high</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Both encodings fall within the uncertainty range</div>
+        <div class="ac-sub">8.56 to 8.64 ly both 8.6 and 8.61 are inside</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">One surah. One star. Two encodings. Both exact. Measured 1,200 years after the text was written.</h2>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin:24px 0;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div id="mv0" style="font-family:'Playfair Display',serif;font-size:clamp(44px,10vw,64px);font-weight:700;color:var(--star,#93c5fd);text-shadow:0 0 40px rgba(147,197,253,0.4);line-height:1">0</div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">letters · 53:1 → 53:32 · = 8.61 ly</div>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);color:var(--muted)">·</div>
+      <div style="text-align:center">
+        <div id="mv1" style="font-family:'Playfair Display',serif;font-size:clamp(44px,10vw,64px);font-weight:700;color:var(--gold,#f59e0b);text-shadow:0 0 40px rgba(245,158,11,0.4);line-height:1">0</div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">words · 53:32 → 53:49 · = 8.6 ly</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div class="prob-row">
+        <span class="pr-label">Word count landing on 86 (chance)</span>
+        <span class="pr-val">~1 in 60</span>
+      </div>
+      <div class="prob-row">
+        <span class="pr-label">Letter count landing on 861 (chance)</span>
+        <span class="pr-val">~1 in 1,441</span>
+      </div>
+      <div class="prob-row pr-total">
+        <span class="pr-label">Both encodings in the same surah</span>
+        <span class="pr-val">~1 in 86,000</span>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>The scale relationship is exact:</strong> 8.61 light-years = 861 centi-light-years. 8.6 light-years = 86 deci-light-years. The letter count encodes one more decimal of precision than the word count and both are measured within the same 18-verse surah, with Earth as the midpoint between the Star and Sirius.
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Property</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Star</td>
+          <td class="td-v">Sirius (α Canis Majoris)</td>
+        </tr>
+        <tr>
+          <td>Arabic name in Quran</td>
+          <td class="td-v" style="font-family:'Amiri',serif;font-size:18px">ٱلشِّعْرَىٰ</td>
+        </tr>
+        <tr>
+          <td>Distance from Earth</td>
+          <td class="td-v">8.60 ± 0.04 ly</td>
+        </tr>
+        <tr>
+          <td>Apparent magnitude</td>
+          <td class="td-v">−1.46</td>
+        </tr>
+        <tr class="hl">
+          <td>Letter encoding (53:1→53:32)</td>
+          <td class="td-v">861 = 8.61 ly</td>
+        </tr>
+        <tr class="hl">
+          <td>Word encoding (53:32→53:49)</td>
+          <td class="td-v">86 = 8.6 ly</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">7th century Arabia 610 CE</div>
+        <div class="tl-text">
+          The Quran is revealed. Surah 53 opens with an oath by the star. It names Sirius as being under God's lordship addressing tribes who worshipped it. The word "الشعرى" appears for the first and only time in the Quran.
+          <span class="tl-sub">Stellar distances: completely impossible to measure anywhere on Earth. The concept of a light-year does not exist.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1838 CE Königsberg, Prussia</div>
+        <div class="tl-text">
+          Friedrich Bessel measures the first stellar parallax for the star 61 Cygni. This is the first time any stellar distance is measured. Humanity now knows that stars are light-years away.
+          <span class="tl-sub">~1,228 years after the Quran. Sirius's distance measured with precision only decades later.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Modern Hipparcos satellite (1989)</div>
+        <div class="tl-text">
+          The European Space Agency's Hipparcos mission measures Sirius's parallax to unprecedented precision: 8.60 ± 0.04 light-years. The Quranic letter count of 861 falls within this uncertainty range. The word count of 86 encodes the same value at one decimal place.
+          <span class="tl-sub">Verified: Tanzil Ḥafṣ/Uthmānī text · arabic letters only, no diacritics</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">A 7th-century text in Arabia names the brightest star in the sky by name. Within the surah named "The Star," the precise distance to that star is embedded twice once in letters, once in words. The Earth sits exactly between these two encodings, as the midpoint verse.</div>
+      <div class="gs">The star was named. The distance was unknown. The encoding was already in the text waiting 1,200 years for the science to catch up and confirm it. Both figures land inside the modern measurement uncertainty of 8.60 ± 0.04 light-years.</div>
+    </div>
+
+    <div class="insight-box">
+      <strong>The surah's own name is النجم "The Star."</strong> The distance encoding is not hidden in an arbitrary passage. It sits in the surah explicitly devoted to the star, with the anchor verses being the star oath (53:1), the human origin (53:32), and the only named star in the Quran (53:49).
+    </div>
+
+    <div id="qv-sirius"></div>
+
+        <div id="curiositySeed"></div>
+
+
+    <a href="quran-gold-melting.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Gold Melting</a>
+    <a href="quran-moon-landing.html" class="btn" style="background:var(--accent);color:#0a1929;margin-left:12px">Next · Moon Landing →</a>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let doneL = false, doneW = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Sirius Distance', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('sirius-distance');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 861, 2000, null);
+        animFrom(document.getElementById('mv1'), 0, 86, 1400, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('An-najm means "The Star." The surah opens with an oath by a star (53:1), refers to Earth (53:32), and names Sirius by name (53:49) the only star named in the entire Quran.', function(){ go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runPath(which) {
+  if (which === 'l' && !doneL) {
+    document.getElementById('btn-pl').classList.add('used');
+    animFrom(document.getElementById('pnl'), 0, 861, 2200, function() {
+      document.getElementById('pnl').classList.add('done-l');
+      document.getElementById('pcl').classList.add('lit-l');
+      document.getElementById('encl').classList.add('show');
+      doneL = true;
+      checkBoth();
+    });
+  }
+  if (which === 'w' && !doneW) {
+    document.getElementById('btn-pw').classList.add('used');
+    animFrom(document.getElementById('pnw'), 0, 86, 1500, function() {
+      document.getElementById('pnw').classList.add('done-w');
+      document.getElementById('pcw').classList.add('lit-w');
+      document.getElementById('encw').classList.add('show');
+      doneW = true;
+      checkBoth();
+    });
+  }
+}
+
+function checkBoth() {
+  if (doneL && doneW) {
+    setTimeout(function() {
+      document.getElementById('cpanel').classList.add('show');
+      setTimeout(function() {
+        showOk('861 letters = 8.61 light-years. 86 words = 8.6 light-years. Both encode Sirius\'s actual distance of 8.60 ± 0.04 ly.', function(){ go(3); });
+      }, 600);
+    }, 300);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('8.60 ± 0.04 means the range is 8.56–8.64 ly. Both 8.61 (letters) and 8.6 (words) fall within this range. No rounding, no selection.', function(){ go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() { document.getElementById('cn0').classList.add('show'); }, 200);
+  setTimeout(function() { document.getElementById('cn1').classList.add('show'); }, 500);
+  setTimeout(function() { document.getElementById('cn2').classList.add('show'); }, 800);
+  setTimeout(function() {
+    document.getElementById('cp0').classList.add('show');
+    document.getElementById('cp1').classList.add('show');
+    animFrom(document.getElementById('cg0'), 0, 861, 2000, null);
+    animFrom(document.getElementById('cg1'), 0, 86, 1400, null);
+  }, 1100);
+  setTimeout(function() {
+    document.getElementById('drev').classList.add('show');
+  }, 3400);
+});
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, t = 0;
+  var stars = Array.from({length:50},function(_,i){
+    return{x:(i*137.5%W+W)%W,y:(i*89.3%H+H)%H,sz:0.5+Math.random()*1.1,ph:i*0.42};
+  });
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#040810'; ctx.fillRect(0,0,W,H);
+    stars.forEach(function(s){
+      var a=0.25+Math.sin(t*1.5+s.ph)*0.22;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.sz,0,Math.PI*2);
+      ctx.fillStyle='rgba(200,215,255,'+a+')'; ctx.fill();
+    });
+    var sx=W*0.6, sy=H*0.36, pulse=1+Math.sin(t*2)*0.12;
+    [32,20,11,5].forEach(function(r,i){
+      var alphas=[0.035,0.07,0.18,0.9];
+      ctx.beginPath(); ctx.arc(sx,sy,r*pulse,0,Math.PI*2);
+      ctx.fillStyle='rgba(185,205,255,'+alphas[i]+')'; ctx.fill();
+    });
+    [[-1,0],[1,0],[0,-1],[0,1]].forEach(function(d){
+      var lg=ctx.createLinearGradient(sx,sy,sx+d[0]*42*pulse,sy+d[1]*42*pulse);
+      lg.addColorStop(0,'rgba(185,205,255,0.5)'); lg.addColorStop(1,'rgba(185,205,255,0)');
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+d[0]*42*pulse,sy+d[1]*42*pulse);
+      ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.stroke();
+    });
+    ctx.fillStyle='rgba(185,205,255,0.45)'; ctx.font='11px DM Sans,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('Sirius α CMa',sx,sy+52);
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"sirius-distance");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"sirius-distance","question":"How far is the star Sirius from Earth in light-years?","inputType":"parallax","unit":"ly","min":0,"max":20,"step":0.1, "correct":8.6,"correctLabel":"8.6 light-years","curiositySeed":{"question":"Surah 54 is called 'The Moon.' Apollo 11 landed on the moon in Hijri year 1389. Can you guess what verse 54:1 is about?","nextUrl":"quran-moon-landing.html","nextTitle":"Moon Landing"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 53:1 (oath by the star), 53:49 (الشعرى Sirius, only named star in Quran).
+   861 letters between them encode 8.61 light-years Earth–Sirius distance. */
+QuranValidator.attach('qv-sirius',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 53:1 "By the star" and 53:49 "the Sirius (الشعرى)." 861 letters between them = 8.61 light-years to Sirius.',
+  groups:[
+    {id:'star',   label:'By the Star (oath)',    arabic:'ٱلنَّجْمِ',  color:'#93c5fd', occurrences:[[53,1]]},
+    {id:'sirius', label:'Sirius only named star', arabic:'ٱلشِّعْرَىٰ', color:'#fcd34d', occurrences:[[53,49]]}
+  ]
+});
+</script>
+</body>
+</html>

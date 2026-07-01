@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Sea & Land · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #2e86c1;
+      --accent-light: #5ba3d0;
+      --accent-dim:   rgba(46,134,193,0.12);
+      --accent-ring:  rgba(91,163,208,0.28);
+      --land:         #b45309;
+      --land-light:   #e0b04a;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; border: none; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn:hover { opacity: .88; }
+
+    .answers-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 16px 20px; cursor: pointer; user-select: none; transition: border-color .15s, background .15s; text-align: center; font-size: 15px; font-weight: 500; line-height: 1.4; }
+    .answer-card:hover { border-color: rgba(255,255,255,0.24); background: rgba(255,255,255,0.02); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+    .word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .word-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 16px 22px; text-align: center; position: relative; overflow: hidden; }
+    .word-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .wc-sea::after  { background: linear-gradient(90deg, #1a5f8a, #5ba3d0); }
+    .wc-land::after { background: linear-gradient(90deg, #7a5a10, #e0b04a); }
+    .arabic-xl { font-family: 'Amiri', serif; direction: rtl; font-size: 44px; line-height: 1.15; margin-bottom: 4px; }
+    .arabic-sm { font-family: 'Amiri', serif; direction: rtl; font-size: 20px; }
+    .roman { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 18px; }
+    .count-big { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; line-height: 1; }
+    .count-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .ratio-item { margin-bottom: 20px; }
+    .ratio-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .ratio-name { display: flex; align-items: center; gap: 10px; }
+    .ratio-pct { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+    .bar-track { height: 12px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0; border-radius: 6px; transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .fill-sea  { background: linear-gradient(90deg, #1a5f8a, #5ba3d0); }
+    .fill-land { background: linear-gradient(90deg, #7a5a10, #e0b04a); }
+
+    .globe-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+    .globe-card { text-align: center; }
+    .globe-title { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .globe-ring { position: relative; width: 160px; height: 160px; margin: 0 auto 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.06); transition: box-shadow .8s ease; }
+    .globe-ring.lit { box-shadow: 0 0 40px rgba(46,134,193,0.32), 0 0 80px rgba(46,134,193,0.12); }
+    .globe-inner { position: absolute; inset: 24px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .globe-num { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; transition: color .4s; }
+    .globe-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .legend { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .diff-badge { display: flex; align-items: center; justify-content: center; gap: 14px; background: rgba(46,134,193,0.08); border: 1px solid rgba(46,134,193,0.22); border-radius: 40px; padding: 14px 28px; margin-bottom: 28px; }
+    .diff-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--accent-light); }
+    .diff-lbl { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .insight-box { background: var(--surface); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; color: var(--muted); line-height: 1.75; border-left: 3px solid var(--accent); }
+    .gold-box { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .gt { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; color: var(--gold-light); margin-bottom: 10px; }
+    .gs { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+    .enhanced-section { border-top: 1px solid var(--border); padding-top: 22px; margin-bottom: 28px; }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .toggle-info h4 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .toggle-info p { font-size: 12px; color: var(--muted); }
+    .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .track { position: absolute; inset: 0; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; transition: background .25s, border-color .25s; }
+    .switch input:checked + .track { background: #1a5f8a; border-color: var(--accent); }
+    .thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); pointer-events: none; transition: transform .25s, background .25s; }
+    .switch input:checked ~ .thumb { transform: translateX(20px); background: var(--accent-light); }
+    .enhanced-panel { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; animation: rise .3s ease; }
+    .enhanced-panel.open { display: block; }
+    .verse-block { border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 16px; background: rgba(255,255,255,0.03); }
+    .verse-arabic { font-family: 'Amiri', serif; font-size: 20px; direction: rtl; text-align: right; color: var(--text); margin-bottom: 8px; line-height: 1.9; }
+    .verse-ref { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .dtable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+    .dtable th { text-align: left; color: var(--muted); font-weight: 400; padding: 6px 14px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .dtable td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .dtable .acell { font-family: 'Amiri', serif; font-size: 22px; direction: rtl; }
+    .sea-col  { color: var(--accent-light); }
+    .land-col { color: var(--land-light); }
+
+    .calc-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #05192e; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-top: 4px; }
+    .calc-btn.used { opacity: 0.5; pointer-events: none; }
+
+    /* ── INLINE VALIDATOR ─────────────────────────── */
+    .ve-panel{display:none;margin-top:14px;}
+    .ve-panel.open{display:block;animation:rise .3s ease;}
+    .ve-loading{display:flex;align-items:center;gap:10px;padding:20px;justify-content:center;background:var(--surface);border-radius:10px;font-size:13px;color:var(--muted);}
+    .ve-spinner{width:18px;height:18px;border-radius:50%;border:2px solid var(--surface2);border-top-color:var(--accent);animation:spin .8s linear infinite;flex-shrink:0;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .ve-embed{border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:500px;background:var(--bg);}
+    .ve-guide{flex-shrink:0;background:var(--surface2);border-bottom:1px solid var(--border);padding:10px 14px;}
+    .ve-guide-r1{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .ve-badge{font-family:'Amiri',serif;font-size:18px;font-weight:700;padding:2px 9px;border-radius:5px;direction:rtl;flex-shrink:0;line-height:1.5;}
+    .ve-badge.sea{background:rgba(14,165,233,0.14);border:1px solid rgba(14,165,233,0.32);color:#7dd3fc;}
+    .ve-badge.land{background:rgba(245,158,11,0.13);border:1px solid rgba(245,158,11,0.30);color:#fcd34d;}
+    .ve-badge.yabas{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.26);color:#86efac;}
+    .ve-ginfo{font-size:13px;color:var(--text);flex:1;line-height:1.35;}
+    .ve-gsub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .ve-pills{display:flex;gap:5px;flex-shrink:0;}
+    .ve-pill{font-size:10px;font-weight:700;padding:3px 7px;border-radius:100px;letter-spacing:.03em;}
+    .ve-pill.sea{background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.28);color:var(--accent-light);}
+    .ve-pill.land{background:rgba(245,158,11,0.11);border:1px solid rgba(245,158,11,0.26);color:#fcd34d;}
+    .ve-guide-r2{display:grid;grid-template-columns:1fr 1.4fr 1fr 1fr;gap:7px;}
+    .ve-btn{height:40px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+    .ve-btn.prev,.ve-btn.next,.ve-btn.skip{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+    .ve-btn.confirm{background:var(--ok);color:var(--ok-bg);font-weight:700;}
+    .ve-btn.confirm:disabled{opacity:.4;cursor:default;filter:none;}
+    .ve-btn:active{transform:scale(.96);}
+    .ve-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+    .ve-page{max-width:580px;margin:0 auto;padding:10px 15px 12px;}
+    .ve-nav{flex-shrink:0;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--surface);border-top:1px solid var(--border);}
+    .ve-nav-btn{height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .ve-pinfo{font-size:11px;color:var(--muted);}
+    /* verses */
+    .ve-shdr{text-align:center;padding:10px 0 7px;}
+    .ve-sorn{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+    .ve-sorl{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.18),transparent);}
+    .ve-sord{color:rgba(245,158,11,0.32);font-size:8px;}
+    .ve-sar{font-family:'Amiri',serif;direction:rtl;font-size:16px;color:rgba(245,158,11,0.70);}
+    .ve-sen{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+    .ve-v{display:flex;align-items:baseline;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+    .ve-v:last-child{border-bottom:none;}
+    .ve-vt{flex:1;font-family:'Amiri',serif;direction:rtl;text-align:right;font-size:clamp(15px,3.6vw,18px);line-height:2.1;color:var(--text);word-break:break-word;}
+    .ve-vn{font-family:'Amiri',serif;font-size:11px;color:var(--muted);flex-shrink:0;direction:rtl;opacity:.6;}
+    .ve-v.ve-tgt{background:rgba(14,165,233,0.06);border-radius:5px;padding:5px 7px;border-left:2px solid rgba(14,165,233,0.5);animation:vpbs 2s ease infinite;}
+    .ve-v.ve-tgt.lt{background:rgba(245,158,11,0.05);border-left-color:rgba(245,158,11,0.5);animation:vpbl 2s ease infinite;}
+    .ve-v.ve-tgt.yt{background:rgba(74,222,128,0.05);border-left-color:rgba(74,222,128,0.5);animation:vpby 2s ease infinite;}
+    @keyframes vpbs{0%,100%{border-left-color:rgba(14,165,233,0.28)}50%{border-left-color:rgba(14,165,233,0.90)}}
+    @keyframes vpbl{0%,100%{border-left-color:rgba(245,158,11,0.28)}50%{border-left-color:rgba(245,158,11,0.90)}}
+    @keyframes vpby{0%,100%{border-left-color:rgba(74,222,128,0.28)}50%{border-left-color:rgba(74,222,128,0.90)}}
+    .hl-sea{background:rgba(14,165,233,0.18);color:#7dd3fc;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(14,165,233,0.50);cursor:pointer;transition:background .12s;}
+    .hl-sea:hover{background:rgba(14,165,233,0.30);}
+    .hl-land{background:rgba(245,158,11,0.15);color:#fcd34d;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(245,158,11,0.45);cursor:pointer;transition:background .12s;}
+    .hl-land:hover{background:rgba(245,158,11,0.28);}
+    .hl-yabas{background:rgba(74,222,128,0.13);color:#86efac;border-radius:3px;padding:1px 2px;border-bottom:1px solid rgba(74,222,128,0.40);cursor:pointer;}
+    .hl-confirmed{opacity:.42;}
+    .hl-sea.hl-confirmed::after,.hl-land.hl-confirmed::after,.hl-yabas.hl-confirmed::after{content:' ✓';font-size:9px;color:var(--ok);font-family:'DM Sans',sans-serif;}
+    /* done */
+    .ve-done{display:none;flex-direction:column;align-items:center;padding:22px 14px;gap:11px;text-align:center;}
+    .ve-done.vis{display:flex;}
+    .ve-done-box{background:var(--surface);border:1px solid rgba(14,165,233,0.26);border-radius:10px;padding:16px;width:100%;max-width:300px;}
+    /* light mode */
+    html[data-theme="light"] .ve-vt{color:#1c2b3a;}
+    html[data-theme="light"] .hl-sea{background:rgba(14,165,233,0.13);color:#0369a1;border-bottom-color:#0ea5e9;}
+    html[data-theme="light"] .hl-land{background:rgba(245,158,11,0.12);color:#92400e;border-bottom-color:#f59e0b;}
+    html[data-theme="light"] .ve-sar{color:#92400e;}
+
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 100px; padding: 6px 16px 6px 10px; margin-bottom: 24px; opacity: 0; transform: translateY(-6px) scale(0.95); transition: opacity .4s, transform .4s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 13px; font-weight: 600; color: var(--ok); letter-spacing: .04em; }
+
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-left { display: flex; align-items: center; gap: 14px; }
+    .fb-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--ok); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ok-bg); }
+    .fb-title { font-weight: 700; font-size: 15px; color: var(--ok); margin-bottom: 2px; }
+    .fb-sub { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 340px; }
+    .fb-btn { padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .fb-panel.fb-ok .fb-btn { background: var(--ok); color: var(--ok-bg); }
+
+    .wave-wrap { margin: 28px 0 32px; border-radius: 14px; height: 72px; background: linear-gradient(180deg, rgba(46,134,193,0.10) 0%, rgba(26,95,138,0.04) 100%); position: relative; overflow: hidden; }
+    .wave-svg { position: absolute; bottom: 0; left: 0; width: 200%; animation: waveMarch 4s linear infinite; }
+    @keyframes waveMarch { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .words-intro { display: flex; gap: 16px; justify-content: center; margin-bottom: 28px; }
+    .word-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 22px; text-align: center; }
+    .word-chip .arabic-xl { font-size: 36px; line-height: 1.1; }
+
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 14px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table tr.hl td { color: var(--gold-light); font-weight: 600; }
+    .td-v { text-align: right; font-family: 'Playfair Display', serif; font-size: 16px; }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <div class="lesson-bar-wrap"><div class="lesson-bar-fill" id="lbar"></div></div>
+  <div class="lesson-meta" id="lmeta">Lesson · Sea &amp; Land</div>
+
+  <div class="stage active" id="sp"></div>
+
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <div class="eyebrow" style="color:var(--accent-light)">Quranic linguistics · numerical patterns</div>
+    <h1 class="hero-title">Two words. Written 1,400 years ago. They encode a measurement no human had yet made.</h1>
+
+    <div class="words-intro">
+      <div class="word-chip">
+        <div class="arabic-xl" style="color:var(--accent-light);font-family:'Amiri',serif;direction:rtl">البحر</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:6px">Al-Baḥr · Sea</div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--muted);font-size:22px;font-family:'Playfair Display',serif">vs</div>
+      <div class="word-chip">
+        <div class="arabic-xl" style="color:var(--land-light);font-family:'Amiri',serif;direction:rtl">البر</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:6px">Al-Barr · Land</div>
+      </div>
+    </div>
+
+    <p class="body-text">The Quran was revealed long before satellites, oceanography, or any measurement of Earth's surface. Count how many times each word appears. What that ratio reveals has startled scientists and linguists for decades.</p>
+
+    <div class="wave-wrap">
+      <svg class="wave-svg" height="72" viewBox="0 0 1200 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 44 Q150 16 300 44 Q450 72 600 44 Q750 16 900 44 Q1050 72 1200 44 Q1350 16 1500 44 Q1650 72 1800 44 Q1950 16 2100 44 Q2250 72 2400 44 V72 H0Z" fill="rgba(46,134,193,0.20)"/>
+        <path d="M0 54 Q150 38 300 54 Q450 70 600 54 Q750 38 900 54 Q1050 70 1200 54 Q1350 38 1500 54 Q1650 70 1800 54 Q1950 38 2100 54 Q2250 70 2400 54 V72 H0Z" fill="rgba(46,134,193,0.12)"/>
+        <path d="M0 62 Q150 52 300 62 Q450 72 600 62 Q750 52 900 62 Q1050 72 1200 62 Q1350 52 1500 62 Q1650 72 1800 62 Q1950 52 2100 62 Q2250 72 2400 62 V72 H0Z" fill="rgba(46,134,193,0.06)"/>
+      </svg>
+    </div>
+
+    <button class="btn" style="background:var(--accent);color:#05192e" onclick="go(1)">
+      Begin the discovery
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#05192e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="stage" id="s1">
+    <div class="prompt">In the Quran, which word appears more often?</div>
+
+    <div class="answers-grid" style="grid-template-columns:1fr">
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-size:13px;color:var(--muted)">They appear an equal number of times</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-family:'Amiri',serif;font-size:26px;direction:rtl;color:var(--land-light);line-height:1.2;margin-bottom:4px">البر</div>
+        <div style="font-size:12px;color:var(--muted)">Al-Barr · Land appears more</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,true)">
+        <div style="font-family:'Amiri',serif;font-size:26px;direction:rtl;color:var(--accent-light);line-height:1.2;margin-bottom:4px">البحر</div>
+        <div style="font-size:12px;color:var(--muted)">Al-Baḥr · Sea appears more</div>
+      </div>
+      <div class="answer-card" onclick="pickEx1(this,false)">
+        <div style="font-size:13px;color:var(--muted)">Neither, the Quran never counts these words</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="s2">
+    <div class="prompt">Count each word across all 6,236 verses.</div>
+
+    <div class="word-grid">
+      <div class="word-card wc-sea">
+        <div class="arabic-xl" style="color:var(--accent-light)">البحر</div>
+        <div class="roman">Al-Baḥr · "The Sea"</div>
+        <div class="count-big sea-col" id="n-sea">—</div>
+        <div class="count-lbl">occurrences</div>
+      </div>
+      <div class="word-card wc-land">
+        <div class="arabic-xl" style="color:var(--land-light)">البر</div>
+        <div class="roman">Al-Barr · "The Land"</div>
+        <div class="count-big land-col" id="n-land">—</div>
+        <div class="count-lbl">occurrences</div>
+      </div>
+    </div>
+
+    <div id="ratioSection" style="opacity:0;transition:opacity .7s;margin-bottom:20px">
+      <div class="ratio-item">
+        <div class="ratio-head">
+          <div class="ratio-name">
+            <span class="arabic-sm sea-col">البحر</span>
+            <span style="font-size:13px;color:var(--muted)">Sea · 32 of 45</span>
+          </div>
+          <div class="ratio-pct sea-col" id="pct-sea">0%</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-sea" id="bar-sea"></div></div>
+      </div>
+      <div class="ratio-item">
+        <div class="ratio-head">
+          <div class="ratio-name">
+            <span class="arabic-sm land-col">البر</span>
+            <span style="font-size:13px;color:var(--muted)">Land · 13 of 45</span>
+          </div>
+          <div class="ratio-pct land-col" id="pct-land">0%</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill fill-land" id="bar-land"></div></div>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="countBtn" onclick="runCounting()">Count both words across the Quran</button>
+  </div>
+
+  <div class="stage" id="s3">
+    <div class="prompt">What percentage of Earth's surface is covered by ocean?</div>
+    <p class="body-text" style="margin-bottom:20px">Oceanographic surveys and NASA satellite data have measured this precisely. Choose the correct value.</p>
+
+    <div class="answers-grid" style="grid-template-columns:1fr 1fr">
+      <div class="answer-card" onclick="pickEx3(this,false)">55%</div>
+      <div class="answer-card" onclick="pickEx3(this,true)">71%</div>
+      <div class="answer-card" onclick="pickEx3(this,false)">83%</div>
+      <div class="answer-card" onclick="pickEx3(this,false)">90%</div>
+    </div>
+  </div>
+
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">The Quran's two words encode Earth's surface ratio, 1,400 years before satellites measured it.</h2>
+
+    <div class="globe-wrap">
+      <div class="globe-card">
+        <div class="globe-title">Quranic word ratio</div>
+        <div class="globe-ring" id="gQuran">
+          <div class="globe-inner">
+            <div class="globe-num sea-col" id="gQNum">0%</div>
+            <div class="globe-sub">البحر</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span>البحر 71.11%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--land)"></div><span>البر 28.88%</span></div>
+        </div>
+      </div>
+      <div class="globe-card">
+        <div class="globe-title">Earth's actual surface</div>
+        <div class="globe-ring" id="gEarth">
+          <div class="globe-inner">
+            <div class="globe-num sea-col" id="gENum">0%</div>
+            <div class="globe-sub">ocean</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span>Ocean 71%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--land)"></div><span>Land 29%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="diff-badge">
+      <div class="diff-num">±0.115%</div>
+      <div class="diff-lbl">difference between<br>the two ratios</div>
+    </div>
+
+    <table class="sci-table">
+      <thead><tr><th>Measurement</th><th style="text-align:right">Value</th></tr></thead>
+      <tbody>
+        <tr><td>البحر occurrences (definite singular)</td><td class="td-v sea-col">32</td></tr>
+        <tr><td>البر occurrences (definite singular)</td><td class="td-v land-col">13</td></tr>
+        <tr><td>Total occurrences</td><td class="td-v">45</td></tr>
+        <tr><td>Quranic sea ratio (32 ÷ 45)</td><td class="td-v sea-col">71.11%</td></tr>
+        <tr class="hl"><td>Earth's ocean surface (NASA)</td><td class="td-v">71%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">The word البحر (sea) appears 32 times. البر (land) appears 13 times. Their ratio is 71.11 : 28.88 matching Earth's ocean coverage of 70.8% and 29.2% of land ratio.</div>
+      <div class="gs">The Quran was compiled in the 7th century CE. Earth's ocean surface ratio was not scientifically measured until the satellite era. The ratio was not selected, it is the count. No rounding, no adjustment, no choice of which words to include.</div>
+    </div>
+
+    <div class="enhanced-section">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Enhanced analysis</h4>
+          <p>Include يَبَسًا (dry land) from Quran 20:77</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="eswitch" onchange="toggleEnhanced(this.checked)">
+          <div class="track"></div>
+          <div class="thumb"></div>
+        </label>
+      </div>
+      <div class="enhanced-panel" id="epanel">
+        <div class="verse-block">
+          <div class="verse-arabic">فَاضْرِبْ لَهُمْ طَرِيقًا فِي الْبَحْرِ يَبَسًا</div>
+          <div class="verse-ref">Quran 20:77, "Strike for them a dry path through the sea." The word يَبَسًا (yabasā) means completely dry land, a distinct token from البر.</div>
+        </div>
+        <table class="dtable">
+          <thead><tr><th>Word</th><th>Arabic</th><th>Count</th><th>%</th></tr></thead>
+          <tbody>
+            <tr><td>Sea</td><td class="acell sea-col">البحر</td><td>32</td><td class="sea-col" style="font-weight:500">71.11%</td></tr>
+            <tr><td>Land</td><td class="acell land-col">البر</td><td>12</td><td class="land-col">—</td></tr>
+            <tr><td>Dry land</td><td class="acell land-col" style="font-size:17px">يَبَسًا</td><td>1</td><td class="land-col" style="font-weight:500">28.89%</td></tr>
+            <tr style="border-top:1px solid var(--border)"><td colspan="2" style="font-weight:500">Total</td><td>45</td><td>100%</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:13px;color:var(--muted);line-height:1.75">Including يَبَسًا moves the ratio to <strong style="color:var(--text)">71.11% : 28.89%</strong> actually <span style="color:var(--accent-light)">closer</span> to Earth's known composition, with a margin of just <strong style="color:var(--text)">±0.11%</strong>. Whether you include it or not, the ratio holds.</p>
+      </div>
+    </div>
+
+    <div class="enhanced-section" style="margin-top:0;border-top:1px solid var(--border);padding-top:22px;">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Read it yourself in the Quran</h4>
+          <p>Open the full Quran count البحر (sea, 32) and البر + يَبَسًا (land, 12+1=13) with your own eyes</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="vswitch" onchange="toggleValidator(this.checked)">
+          <div class="track"></div>
+          <div class="thumb"></div>
+        </label>
+      </div>
+      <div class="ve-panel" id="vePanel">
+        <!-- Loading -->
+        <div class="ve-loading" id="veLoading">
+          <div class="ve-spinner"></div>Loading Quran text…
+        </div>
+        <!-- Embedded validator card -->
+        <div class="ve-embed" id="veEmbed" style="display:none">
+          <div class="ve-guide">
+            <div class="ve-guide-r1">
+              <span class="ve-badge sea" id="veBadge">البحر</span>
+              <div style="flex:1">
+                <div class="ve-ginfo" id="veInfo">Sea word 1 of 32</div>
+                <div class="ve-gsub" id="veSub">Tap the blue word to confirm</div>
+              </div>
+              <div class="ve-pills">
+                <span class="ve-pill sea" id="veSeaP">0/32</span>
+                <span class="ve-pill land" id="veLandP">0/12</span>
+              </div>
+            </div>
+            <div class="ve-guide-r2">
+              <button class="ve-btn prev" onclick="vePrev()" id="veBP" disabled>← Prev</button>
+              <button class="ve-btn confirm" onclick="veConfirm()" id="veBC">✓ Confirm</button>
+              <button class="ve-btn skip" onclick="veSkip()">Skip</button>
+              <button class="ve-btn next" onclick="veNext()">Next →</button>
+            </div>
+          </div>
+          <div class="ve-content" id="veContent">
+            <div class="ve-page" id="vePage"></div>
+            <div class="ve-done" id="veDone">
+              <div style="font-size:28px;color:#fcd34d">✦</div>
+              <div style="font-family:'Playfair Display',serif;color:#fcd34d;font-size:20px">Verified!</div>
+              <div class="ve-done-box">
+                <div id="veDoneEq" style="font-size:22px;font-weight:700;color:var(--accent-light);margin-bottom:6px">32÷44=72.7%</div>
+                <div id="veDoneSub" style="font-size:12px;color:var(--muted);line-height:1.7"></div>
+              </div>
+              <div style="font-size:13px;color:var(--ok);font-weight:600">You counted it yourself.</div>
+            </div>
+          </div>
+          <div class="ve-nav">
+            <button class="ve-nav-btn" onclick="vePrevPage()">← Prev</button>
+            <span class="ve-pinfo" id="vePInfo">—</span>
+            <button class="ve-nav-btn" onclick="veNextPage()">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="curiositySeed"></div>
+
+    <a href="quran-chromosomes.html" class="btn" style="background:var(--accent);color:#05192e">Next · Chromosomes &amp; The Bee →</a>
+  </div>
+
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let countDone = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+const metaMap = { 0:'Lesson · Sea & Land', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('sea-land');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() { animGlobes(); }, 500);
+    }, 300);
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('البحر appears 32 times. البر appears only 13 times. Sea is mentioned 2.46× more than land in the Quran.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runCounting() {
+  if (countDone) return;
+  countDone = true;
+  document.getElementById('countBtn').classList.add('used');
+  const seaEl  = document.getElementById('n-sea');
+  const landEl = document.getElementById('n-land');
+  seaEl.textContent = '0';
+  landEl.textContent = '0';
+  animFrom(seaEl, 0, 32, 1600, function() {
+    setTimeout(function() {
+      animFrom(landEl, 0, 13, 900, function() {
+        const rs = document.getElementById('ratioSection');
+        rs.style.opacity = '1';
+        setTimeout(function() {
+          document.getElementById('bar-sea').style.width = '71.11%';
+          document.getElementById('bar-land').style.width = '28.88%';
+          let t0 = null;
+          (function tick(ts) {
+            if (!t0) t0 = ts;
+            const p = Math.min((ts - t0) / 1300, 1);
+            const e = ease(p);
+            document.getElementById('pct-sea').textContent  = (e * 71.11).toFixed(2) + '%';
+            document.getElementById('pct-land').textContent = (e * 28.88).toFixed(2) + '%';
+            if (p < 1) { requestAnimationFrame(tick); }
+            else {
+              showOk('32 ÷ 45 = 71.11% sea. 13 ÷ 45 = 28.88% land. A specific ratio, locked in 7th-century text.', function() { go(3); });
+            }
+          })(performance.now());
+        }, 350);
+      });
+    }, 200);
+  });
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk("Earth’s ocean coverage is 71% confirmed by NASA satellite measurement. The Quran’s ratio is 71.11%. The gap is 0.115 percentage points.", function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function animGlobes() {
+  const qEl    = document.getElementById('gQuran');
+  const eEl    = document.getElementById('gEarth');
+  const qNumEl = document.getElementById('gQNum');
+  const eNumEl = document.getElementById('gENum');
+  const qTarget = 71.11;
+  const eTarget = 71;
+  let t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / 1900, 1);
+    const e = ease(p);
+    const qDeg = e * qTarget * 3.6;
+    const eDeg = e * eTarget * 3.6;
+    qEl.style.background = 'conic-gradient(from -90deg, var(--accent) 0deg ' + qDeg.toFixed(1) + 'deg, var(--land) ' + qDeg.toFixed(1) + 'deg 360deg)';
+    eEl.style.background = 'conic-gradient(from -90deg, var(--accent) 0deg ' + eDeg.toFixed(1) + 'deg, var(--land) ' + eDeg.toFixed(1) + 'deg 360deg)';
+    qNumEl.textContent = (e * qTarget).toFixed(1) + '%';
+    eNumEl.textContent = (e * eTarget).toFixed(0) + '%';
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      qEl.classList.add('lit');
+      eEl.classList.add('lit');
+    }
+  })(performance.now());
+}
+
+function toggleEnhanced(on) {
+  document.getElementById('epanel').classList.toggle('open', on);
+  /* update validator if it is open */
+  ve_useEnhanced = on;
+  if (ve_loaded && document.getElementById('vePanel').classList.contains('open')) {
+    veBuildComb(); ve_gIdx=0; ve_conf={};
+    veUpdProg(); veGoTo(0);
+    document.getElementById('veDone').classList.remove('vis');
+    document.getElementById('vePage').style.display='';
+  }
+}
+
+function toggleValidator(on) {
+  var panel = document.getElementById('vePanel');
+  panel.classList.toggle('open', on);
+  if (on && !ve_loaded) veLoad();
+}
+
+/* ── INLINE VALIDATOR ─────────────────────────────────────── */
+var ve_VPP=15, ve_allV=[], ve_curP=0, ve_totP=0, ve_gIdx=0, ve_conf={};
+var ve_comb=[], ve_loaded=false, ve_useEnhanced=false;
+var VE_SEA=[[2,50],[2,164],[5,96],[6,59],[6,63],[6,97],[7,138],[7,163],[10,22],[10,90],[14,32],[16,14],[17,66],[17,67],[17,70],[18,61],[18,63],[18,79],[18,109],[20,77],[22,65],[26,63],[27,63],[30,41],[31,27],[31,31],[35,12],[42,32],[44,24],[45,12],[52,6],[55,24]];
+var VE_LAND=[[5,96],[6,59],[6,63],[6,97],[10,22],[17,67],[17,68],[17,70],[27,63],[29,65],[30,41],[31,32]];
+var VE_YABAS=[[20,77]];
+var VE_SN={1:"Al-Fatihah",2:"Al-Baqarah",3:"Ali 'Imran",4:"An-Nisa",5:"Al-Ma'idah",6:"Al-An'am",7:"Al-A'raf",8:"Al-Anfal",9:"At-Tawbah",10:"Yunus",11:"Hud",12:"Yusuf",13:"Ar-Ra'd",14:"Ibrahim",15:"Al-Hijr",16:"An-Nahl",17:"Al-Isra",18:"Al-Kahf",19:"Maryam",20:"Ta-Ha",21:"Al-Anbiya",22:"Al-Hajj",23:"Al-Mu'minun",24:"An-Nur",25:"Al-Furqan",26:"Ash-Shu'ara",27:"An-Naml",28:"Al-Qasas",29:"Al-'Ankabut",30:"Ar-Rum",31:"Luqman",32:"As-Sajdah",35:"Fatir",42:"Ash-Shura",44:"Ad-Dukhan",45:"Al-Jathiyah",52:"At-Tur",55:"Ar-Rahman"};
+
+function veBuildComb(){
+  /* يَبَسًا (dry land, 20:77) is always included it IS one of the 13 land words */
+  ve_comb=VE_SEA.map(function(x){return{s:x[0],a:x[1],t:'sea'};})
+    .concat(VE_LAND.map(function(x){return{s:x[0],a:x[1],t:'land'};}))
+    .concat(VE_YABAS.map(function(x){return{s:x[0],a:x[1],t:'yabas'};}));
+  ve_comb.sort(function(a,b){return a.s!==b.s?a.s-b.s:a.a-b.a;});
+}
+function veNorm(t){return t.replace(/[ً-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]/g,'').replace(/[ٱأإآ]/g,'ا');}
+function veAr(n){return String(n).replace(/[0-9]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[+d];});}
+function veEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function veIsSea(s,a){return VE_SEA.some(function(x){return x[0]===s&&x[1]===a;});}
+function veIsLand(s,a){return VE_LAND.some(function(x){return x[0]===s&&x[1]===a;});}
+function veIsYabas(s,a){return VE_YABAS.some(function(x){return x[0]===s&&x[1]===a;});}
+function veVIdx(s,a){for(var i=0;i<ve_allV.length;i++)if(ve_allV[i].s===s&&ve_allV[i].a===a)return i;return 0;}
+function veCCnt(t){var n=0;for(var k in ve_conf)if(ve_conf[k]&&k.split(':')[2]===t)n++;return n;}
+
+function veHlV(text,s,a){
+  var hs=veIsSea(s,a),hl=veIsLand(s,a),hy=veIsYabas(s,a);
+  if(!hs&&!hl&&!hy)return veEsc(text);
+  var sk=s+':'+a+':sea',lk=s+':'+a+':land',yk=s+':'+a+':yabas';
+  return text.split(' ').map(function(w){
+    var wn=veNorm(w);
+    if(hs&&wn.indexOf('البحر')!==-1&&wn.indexOf('البحرين')===-1&&wn.length<=14)
+      return '<span class="hl-sea'+(ve_conf[sk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="sea" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    if(hl&&['البر','بالبر','والبر','فالبر'].indexOf(wn)!==-1)
+      return '<span class="hl-land'+(ve_conf[lk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="land" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    if(hy&&wn.indexOf('يبس')!==-1)
+      return '<span class="hl-yabas'+(ve_conf[yk]?' hl-confirmed':'')+'" data-s="'+s+'" data-a="'+a+'" data-t="yabas" onclick="veClickW(this)">'+veEsc(w)+'</span>';
+    return veEsc(w);
+  }).join(' ');
+}
+
+function veRenderP(pn,dir){
+  var pg=document.getElementById('vePage');
+  var start=pn*ve_VPP,end=Math.min(start+ve_VPP,ve_allV.length);
+  var tgt=ve_comb[ve_gIdx]||null;
+  var prevS=-1,html='';
+  for(var i=start;i<end;i++){
+    var v=ve_allV[i];
+    if(v.s!==prevS){
+      var name=VE_SN[v.s]||('Surah '+v.s);
+      html+='<div class="ve-shdr"><div class="ve-sorn"><div class="ve-sorl"></div><div class="ve-sord">✦</div><div class="ve-sorl"></div></div><div class="ve-sar">'+veEsc(name)+'</div><div class="ve-sen">Surah '+v.s+'</div></div>';
+      prevS=v.s;
+    }
+    var isT=tgt&&tgt.s===v.s&&tgt.a===v.a;
+    var tc=isT?('ve-tgt'+(tgt.t==='land'?' lt':tgt.t==='yabas'?' yt':'')):'';
+    html+='<div class="ve-v '+tc+'" id="vev-'+v.s+'-'+v.a+'"><div class="ve-vt">'+veHlV(v.text,v.s,v.a)+'</div><div class="ve-vn">﴿'+veAr(v.a)+'﴾</div></div>';
+  }
+  if(dir){
+    pg.style.transition='transform .18s ease,opacity .18s ease';
+    pg.style.transform=dir==='f'?'translateX(-14px)':'translateX(14px)';
+    pg.style.opacity='0';
+    var _pn=pn;
+    setTimeout(function(){
+      pg.innerHTML=html;ve_curP=_pn;
+      pg.style.transition='none';pg.style.transform='none';pg.style.opacity='1';
+      document.getElementById('vePInfo').textContent='Page '+(ve_curP+1)+' / '+ve_totP;
+      veScrollTgt();
+    },185);
+  } else {
+    pg.style.transition='';pg.style.transform='';pg.style.opacity='1';
+    pg.innerHTML=html;ve_curP=pn;
+    document.getElementById('vePInfo').textContent='Page '+(ve_curP+1)+' / '+ve_totP;
+    veScrollTgt();
+  }
+}
+function veScrollTgt(){
+  var t=ve_comb[ve_gIdx];if(!t)return;
+  setTimeout(function(){
+    var el=document.getElementById('vev-'+t.s+'-'+t.a);
+    if(!el)return;
+    var content=document.getElementById('veContent');
+    /* Scroll only the inner content div never touch the main page scroll */
+    var elRect=el.getBoundingClientRect();
+    var cRect=content.getBoundingClientRect();
+    var relTop=elRect.top-cRect.top+content.scrollTop;
+    var target=relTop-(content.clientHeight/2)+(el.clientHeight/2);
+    content.scrollTo({top:Math.max(0,target),behavior:'smooth'});
+  },80);
+}
+function veUpdGuide(){
+  if(ve_gIdx>=ve_comb.length){veCheckDone();return;}
+  var o=ve_comb[ve_gIdx];
+  var badge=document.getElementById('veBadge');
+  badge.textContent=o.t==='sea'?'البحر':o.t==='land'?'البر':'يَبَسًا';
+  badge.className='ve-badge '+o.t;
+  var n=ve_comb.slice(0,ve_gIdx+1).filter(function(x){return x.t===o.t;}).length;
+  var tot=o.t==='sea'?VE_SEA.length:(o.t==='land'?VE_LAND.length:VE_YABAS.length);
+  var name=VE_SN[o.s]||('Surah '+o.s);
+  document.getElementById('veInfo').textContent=(o.t==='sea'?'Sea':o.t==='land'?'Land':'Dry land')+' word '+n+' of '+tot+' · '+name+' · '+o.s+':'+o.a;
+  document.getElementById('veSub').textContent='Find the '+(o.t==='sea'?'blue':o.t==='land'?'gold':'green')+' word and tap Confirm';
+  document.getElementById('veBP').disabled=ve_gIdx===0;
+  document.getElementById('veBC').disabled=!!(ve_conf[o.s+':'+o.a+':'+o.t]);
+}
+function veUpdProg(){
+  var sc=veCCnt('sea'),lc=veCCnt('land'),yc=veCCnt('yabas');
+  var sl=VE_SEA.length,ll=VE_LAND.length+VE_YABAS.length;
+  document.getElementById('veSeaP').textContent=sc+'/'+sl;
+  document.getElementById('veLandP').textContent=(lc+yc)+'/'+ll;
+}
+function veGoTo(idx){
+  if(idx<0||idx>=ve_comb.length)return;
+  ve_gIdx=idx;
+  var o=ve_comb[idx];
+  var vi=veVIdx(o.s,o.a);
+  var tp=Math.floor(vi/ve_VPP);
+  var dir=tp>ve_curP?'f':(tp<ve_curP?'b':null);
+  if(tp!==ve_curP)veRenderP(tp,dir); else veRenderP(ve_curP,null);
+  veUpdGuide();
+}
+function veNext(){if(ve_gIdx<ve_comb.length-1)veGoTo(ve_gIdx+1);}
+function vePrev(){if(ve_gIdx>0)veGoTo(ve_gIdx-1);}
+function veSkip(){veNext();}
+function veConfirm(){
+  if(ve_gIdx>=ve_comb.length)return;
+  var o=ve_comb[ve_gIdx],k=o.s+':'+o.a+':'+o.t;
+  if(ve_conf[k])return;
+  ve_conf[k]=true;veUpdProg();veRenderP(ve_curP,null);
+  if(ve_gIdx<ve_comb.length-1)setTimeout(function(){veGoTo(ve_gIdx+1);},110);
+  else veCheckDone();
+}
+function veClickW(el){
+  var s=+el.dataset.s,a=+el.dataset.a,t=el.dataset.t;
+  var o=ve_comb[ve_gIdx];
+  if(o&&o.s===s&&o.a===a&&o.t===t)veConfirm();
+}
+function vePrevPage(){if(ve_curP>0)veRenderP(ve_curP-1,'b');}
+function veNextPage(){if(ve_curP<ve_totP-1)veRenderP(ve_curP+1,'f');}
+function veCheckDone(){
+  var sc=veCCnt('sea'),lc=veCCnt('land'),yc=veCCnt('yabas');
+  /* يَبَسًا is always required it is the 13th land word */
+  var need=VE_SEA.length+VE_LAND.length+VE_YABAS.length;
+  if(sc+lc+yc<need)return;
+  var tot=sc+lc+yc,rat=(sc/tot*100).toFixed(1);
+  document.getElementById('veDoneEq').textContent=sc+' ÷ '+tot+' = '+rat+'%';
+  var sub='البحر (sea): '+sc+' · البر (land): '+lc+' · يَبَسًا (dry land): '+yc;
+  sub+='\nTotal land words: '+(lc+yc)+' · Earth ocean coverage: 71%';
+  document.getElementById('veDoneSub').textContent=sub;
+  document.getElementById('vePage').style.display='none';
+  document.getElementById('veDone').classList.add('vis');
+}
+function veLoad(){
+  var loading=document.getElementById('veLoading');
+  var embed=document.getElementById('veEmbed');
+  loading.style.display='flex'; embed.style.display='none';
+  ve_useEnhanced=document.getElementById('eswitch').checked;
+  /* use cached data if already fetched */
+  if(window._veQData){
+    ve_allV=window._veQData;
+    veInit(); return;
+  }
+  fetch('book/quran-uthmani.txt')
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(function(txt){
+      var vv=[];
+      txt.split('\n').forEach(function(ln){
+        ln=ln.trim();if(!ln)return;
+        var p=ln.split('|');if(p.length<3)return;
+        vv.push({s:+p[0],a:+p[1],text:p.slice(2).join('|')});
+      });
+      window._veQData=vv; ve_allV=vv; veInit();
+    })
+    .catch(function(e){
+      loading.innerHTML='<span style="color:#f87171">Could not load: '+e.message+'</span>';
+    });
+}
+function veInit(){
+  ve_loaded=true; ve_gIdx=0; ve_conf={};
+  ve_totP=Math.ceil(ve_allV.length/ve_VPP);
+  veBuildComb();
+  document.getElementById('veLoading').style.display='none';
+  document.getElementById('veEmbed').style.display='flex';
+  document.getElementById('veDone').classList.remove('vis');
+  document.getElementById('vePage').style.display='';
+  var f=ve_comb[0];
+  ve_curP=Math.floor(veVIdx(f.s,f.a)/ve_VPP);
+  veRenderP(ve_curP,null);
+  veUpdGuide(); veUpdProg();
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = c.offsetWidth || c.width;
+  var H = c.offsetHeight || c.height;
+  c.width = Math.round(W * dpr);
+  c.height = Math.round(H * dpr);
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  ctx.scale(dpr, dpr);
+
+  var t = 0, seaW = W * 0.71;
+
+  function waveY(x, yBase, amp, freq, speed) {
+    return H * yBase
+      + Math.sin(x * freq + t * speed) * amp * 0.6
+      + Math.sin(x * freq * 1.8 + t * speed * 1.4 + 1.2) * amp * 0.3
+      + Math.sin(x * freq * 0.4 + t * speed * 0.5 + 2.8) * amp * 0.5;
+  }
+
+  function mtY(x, yBase, scale, speed) {
+    return H * yBase
+      - Math.abs(Math.sin(x * 0.012 * scale + speed * t)) * H * 0.14 * scale
+      - Math.abs(Math.sin(x * 0.023 * scale + speed * t * 0.7 + 1)) * H * 0.07 * scale
+      - Math.abs(Math.sin(x * 0.005 * scale + speed * t * 0.3 + 3)) * H * 0.09 * scale;
+  }
+
+  var waves = [
+    [0.10, 5,  0.022, 0.50, 0,    0.06, 0.7],
+    [0.22, 9,  0.018, 0.65, 0.02, 0.10, 0.9],
+    [0.35, 14, 0.021, 0.80, 0.035,0.16, 1.3],
+    [0.48, 11, 0.026, 0.70, 0.025,0.12, 1.1],
+    [0.62, 8,  0.032, 0.95, 0.015,0.08, 0.9],
+    [0.76, 5,  0.038, 1.15, 0,    0.05, 0.6],
+    [0.88, 3,  0.042, 1.30, 0,    0.03, 0.5],
+  ];
+
+  var seaP = [], landP = [], foamP = [], sparks = [];
+  for (var i = 0; i < 40; i++) seaP.push({ x: Math.random()*seaW, y: Math.random()*H, r: 0.3+Math.random()*0.9, sp: 0.06+Math.random()*0.18, ph: Math.random()*6.283, al: 0.10+Math.random()*0.28 });
+  for (var i = 0; i < 18; i++) landP.push({ x: seaW+Math.random()*(W-seaW), y: Math.random()*H, r: 0.3+Math.random()*0.5, vx: -0.03-Math.random()*0.08, al: 0.06+Math.random()*0.18 });
+  for (var i = 0; i < 24; i++) foamP.push({ x: seaW+(Math.random()-0.5)*16, y: Math.random()*H, r: 0.4+Math.random()*1.3, vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.18, life: Math.random()*2.5, mx: 1.2+Math.random()*2, al: 0.22+Math.random()*0.35 });
+  for (var i = 0; i < 35; i++) sparks.push({ x: Math.random()*seaW, y: Math.random()*H, r: 0.4+Math.random()*0.9, ph: Math.random()*6.283, sp: 0.8+Math.random()*2.2 });
+
+  function frame() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    ctx.clearRect(0, 0, W, H);
+
+    var sg = ctx.createLinearGradient(0, 0, 0, H);
+    if (isLight) {
+      sg.addColorStop(0, '#dbeafe'); sg.addColorStop(0.3, '#bfdbfe');
+      sg.addColorStop(0.6, '#93c5fd'); sg.addColorStop(1, '#60a5fa');
+    } else {
+      sg.addColorStop(0, '#091e36'); sg.addColorStop(0.3, '#0c2844');
+      sg.addColorStop(0.6, '#0e3258'); sg.addColorStop(1, '#0b2640');
+    }
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, seaW, H);
+
+    var lg = ctx.createLinearGradient(seaW, 0, W, 0);
+    if (isLight) {
+      lg.addColorStop(0, '#d4a574'); lg.addColorStop(0.35, '#c8956a');
+      lg.addColorStop(0.7, '#b5845c'); lg.addColorStop(1, '#a07050');
+    } else {
+      lg.addColorStop(0, '#1f1508'); lg.addColorStop(0.35, '#1b1206');
+      lg.addColorStop(0.7, '#171005'); lg.addColorStop(1, '#140d04');
+    }
+    ctx.fillStyle = lg; ctx.fillRect(seaW, 0, W - seaW, H);
+
+    if (!isLight) {
+      ctx.save(); ctx.globalCompositeOperation = 'screen';
+      for (var r = 0; r < 5; r++) {
+        var rx = seaW * 0.08 + r * seaW * 0.19;
+        var ra = 0.022 + Math.sin(t * 0.35 + r * 1.4) * 0.01;
+        var wobble = Math.sin(t * 0.22 + r * 0.9) * 7;
+        ctx.beginPath();
+        ctx.moveTo(rx - 3, 0);
+        ctx.lineTo(rx + 22 + wobble, H);
+        ctx.lineTo(rx - 14 + wobble, H);
+        ctx.closePath();
+        var rg = ctx.createLinearGradient(rx, 0, rx, H);
+        rg.addColorStop(0, 'rgba(70,150,255,' + ra + ')');
+        rg.addColorStop(0.5, 'rgba(40,100,210,' + (ra * 0.35) + ')');
+        rg.addColorStop(1, 'rgba(20,60,140,0)');
+        ctx.fillStyle = rg; ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    var mts = [
+      { base: 0.52, sc: 1.0,  sp: 0.012, al: isLight ? 0.10 : 0.08 },
+      { base: 0.58, sc: 0.72, sp: 0.018, al: isLight ? 0.07 : 0.055 },
+      { base: 0.64, sc: 0.48, sp: 0.024, al: isLight ? 0.04 : 0.035 },
+    ];
+    mts.forEach(function(m) {
+      ctx.beginPath(); ctx.moveTo(seaW, H);
+      for (var x = seaW; x <= W; x += 2) ctx.lineTo(x, mtY(x - seaW, m.base, m.sc, m.sp));
+      ctx.lineTo(W, H); ctx.closePath();
+      ctx.fillStyle = isLight ? 'rgba(90,55,20,' + m.al + ')' : 'rgba(50,35,12,' + m.al + ')';
+      ctx.fill();
+    });
+
+    for (var ci = 0; ci < 6; ci++) {
+      ctx.beginPath();
+      for (var x = seaW + 4; x < W - 4; x += 2) {
+        var cy2 = H * (0.15 + ci * 0.13) + Math.sin(x * 0.028 + ci * 1.6 + t * 0.018) * 3.5;
+        x <= seaW + 4 ? ctx.moveTo(x, cy2) : ctx.lineTo(x, cy2);
+      }
+      ctx.strokeStyle = isLight ? 'rgba(90,55,20,' + (0.04 + ci * 0.012) + ')' : 'rgba(150,115,55,' + (0.03 + ci * 0.01) + ')';
+      ctx.lineWidth = 0.55; ctx.stroke();
+    }
+
+    waves.forEach(function(w) {
+      if (w[4] > 0) {
+        ctx.beginPath();
+        for (var x = 0; x <= seaW; x += 2) {
+          var wy = waveY(x, w[0], w[1], w[2], w[3]);
+          x === 0 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
+        }
+        ctx.lineTo(seaW, H); ctx.lineTo(0, H); ctx.closePath();
+        ctx.fillStyle = isLight ? 'rgba(14,116,144,' + w[4] + ')' : 'rgba(18,65,130,' + w[4] + ')';
+        ctx.fill();
+      }
+      ctx.beginPath();
+      for (var x = 0; x <= seaW; x += 2) {
+        var wy = waveY(x, w[0], w[1], w[2], w[3]);
+        x === 0 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
+      }
+      ctx.strokeStyle = isLight ? 'rgba(7,89,133,' + w[5] + ')' : 'rgba(56,130,200,' + w[5] + ')';
+      ctx.lineWidth = w[6]; ctx.stroke();
+    });
+
+    var shimX = ((t * 12) % (seaW + 120)) - 60;
+    var shim = ctx.createLinearGradient(shimX - 40, 0, shimX + 40, 0);
+    shim.addColorStop(0, 'transparent');
+    shim.addColorStop(0.5, isLight ? 'rgba(255,255,255,0.055)' : 'rgba(90,170,255,0.035)');
+    shim.addColorStop(1, 'transparent');
+    ctx.fillStyle = shim; ctx.fillRect(0, 0, seaW, H);
+
+    seaP.forEach(function(p) {
+      p.y -= p.sp * 0.22; p.x += Math.sin(t * 0.65 + p.ph) * 0.1;
+      if (p.y < -5) { p.y = H + 5; p.x = Math.random() * seaW; }
+      var a = p.al * (0.45 + 0.55 * Math.sin(t * 1.05 + p.ph));
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283);
+      ctx.fillStyle = isLight ? 'rgba(3,105,161,' + a + ')' : 'rgba(96,165,250,' + a + ')';
+      ctx.fill();
+    });
+
+    sparks.forEach(function(s) {
+      var a = Math.max(0, Math.sin(t * s.sp + s.ph));
+      if (a < 0.18) return;
+      var sz = s.r * a * 1.2;
+      ctx.strokeStyle = isLight ? 'rgba(255,255,255,' + (a * 0.55) + ')' : 'rgba(170,215,255,' + (a * 0.65) + ')';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(s.x - sz, s.y); ctx.lineTo(s.x + sz, s.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(s.x, s.y - sz); ctx.lineTo(s.x, s.y + sz); ctx.stroke();
+    });
+
+    landP.forEach(function(p) {
+      p.x += p.vx; p.y += Math.sin(t * 0.45 + p.x * 0.008) * 0.04;
+      if (p.x < seaW) { p.x = W + 2; p.y = Math.random() * H; }
+      var a = p.al * (0.35 + 0.65 * Math.sin(t * 0.75 + p.x * 0.007));
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283);
+      ctx.fillStyle = isLight ? 'rgba(110,65,25,' + a + ')' : 'rgba(180,135,70,' + a + ')';
+      ctx.fill();
+    });
+
+    foamP.forEach(function(p) {
+      p.life += 0.016;
+      if (p.life > p.mx) { p.life = 0; p.x = seaW + (Math.random()-0.5)*16; p.y = Math.random()*H; }
+      var lr = p.life / p.mx;
+      var fade = lr < 0.12 ? lr / 0.12 : Math.max(0, 1 - (lr - 0.12) / 0.88);
+      p.x += p.vx + Math.sin(t * 1.4 + p.y * 0.035) * 0.12;
+      p.y += p.vy;
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.1, p.r * fade), 0, 6.283);
+      ctx.fillStyle = isLight ? 'rgba(255,255,255,' + (p.al * fade * 0.45) + ')' : 'rgba(130,185,255,' + (p.al * fade) + ')';
+      ctx.fill();
+    });
+
+    var bg = ctx.createLinearGradient(seaW - 22, 0, seaW + 22, 0);
+    if (isLight) {
+      bg.addColorStop(0, 'rgba(56,189,248,0)');
+      bg.addColorStop(0.5, 'rgba(56,189,248,0.05)');
+      bg.addColorStop(1, 'rgba(56,189,248,0)');
+    } else {
+      bg.addColorStop(0, 'rgba(96,165,250,0)');
+      bg.addColorStop(0.5, 'rgba(96,165,250,0.04)');
+      bg.addColorStop(1, 'rgba(96,165,250,0)');
+    }
+    ctx.fillStyle = bg; ctx.fillRect(seaW - 22, 0, 44, H);
+
+    ctx.beginPath(); ctx.moveTo(seaW, 0); ctx.lineTo(seaW, H);
+    ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.09)' : 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 7]); ctx.lineDashOffset = -t * 10;
+    ctx.stroke(); ctx.setLineDash([]);
+
+    var fs = Math.max(24, Math.min(56, W * 0.082));
+    var labFs = Math.max(8, fs * 0.19);
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+    ctx.font = '800 ' + fs + 'px "DM Sans",sans-serif';
+    if (!isLight) { ctx.shadowColor = 'rgba(56,130,220,0.50)'; ctx.shadowBlur = 25; }
+    ctx.fillStyle = isLight ? 'rgba(7,89,133,0.75)' : 'rgba(96,165,250,0.85)';
+    ctx.fillText('71%', seaW * 0.48, H * 0.50);
+    ctx.shadowBlur = 0;
+    ctx.font = '600 ' + labFs + 'px "DM Sans",sans-serif';
+    ctx.fillStyle = isLight ? 'rgba(7,89,133,0.38)' : 'rgba(96,165,250,0.38)';
+    ctx.fillText('S E A', seaW * 0.48, H * 0.50 + fs * 0.54);
+
+    ctx.font = '800 ' + fs + 'px "DM Sans",sans-serif';
+    if (!isLight) { ctx.shadowColor = 'rgba(200,150,80,0.45)'; ctx.shadowBlur = 22; }
+    ctx.fillStyle = isLight ? 'rgba(110,65,25,0.75)' : 'rgba(225,180,110,0.85)';
+    ctx.fillText('29%', seaW + (W - seaW) * 0.50, H * 0.50);
+    ctx.shadowBlur = 0;
+    ctx.font = '600 ' + labFs + 'px "DM Sans",sans-serif';
+    ctx.fillStyle = isLight ? 'rgba(110,65,25,0.38)' : 'rgba(180,135,70,0.38)';
+    ctx.fillText('L A N D', seaW + (W - seaW) * 0.50, H * 0.50 + fs * 0.54);
+
+    ctx.restore();
+
+    var vT = ctx.createLinearGradient(0, 0, 0, H * 0.07);
+    vT.addColorStop(0, isLight ? 'rgba(219,234,254,0.85)' : 'rgba(9,30,54,0.85)');
+    vT.addColorStop(1, 'transparent');
+    ctx.fillStyle = vT; ctx.fillRect(0, 0, W, H * 0.07);
+    var vB = ctx.createLinearGradient(0, H * 0.93, 0, H);
+    vB.addColorStop(0, 'transparent');
+    vB.addColorStop(1, isLight ? 'rgba(96,165,250,0.55)' : 'rgba(11,38,64,0.85)');
+    ctx.fillStyle = vB; ctx.fillRect(0, H * 0.93, W, H * 0.07);
+    var vL = ctx.createLinearGradient(0, 0, W * 0.035, 0);
+    vL.addColorStop(0, isLight ? 'rgba(219,234,254,0.75)' : 'rgba(9,30,54,0.75)');
+    vL.addColorStop(1, 'transparent');
+    ctx.fillStyle = vL; ctx.fillRect(0, 0, W * 0.035, H);
+    var vR = ctx.createLinearGradient(W, 0, W * 0.965, 0);
+    vR.addColorStop(0, isLight ? 'rgba(160,112,80,0.65)' : 'rgba(20,13,4,0.75)');
+    vR.addColorStop(1, 'transparent');
+    ctx.fillStyle = vR; ctx.fillRect(W * 0.965, 0, W * 0.035, H);
+
+    t += 0.018;
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+}
+initHeroCanvas();
+/* Auto-open validator by default */
+setTimeout(function(){
+  var sw=document.getElementById('vswitch');
+  if(sw){sw.checked=true;toggleValidator(true);}
+},0);
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"sea-land");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId:     'sea-land',
+  question:     'What percentage of Earth\'s surface is covered by ocean?',
+  unit:         "%",
+  inputType:    "globe",
+  min: 0, max: 100, step: 1,
+  correct:      71,
+  correctLabel: '71%',
+  curiositySeed: {
+    question:  'The Quran\'s 16th chapter is named "The Bee." Male bees have exactly 16 chromosomes. Coincidence?',
+    nextUrl:   'quran-chromosomes.html',
+    nextTitle: 'Chromosomes & The Bee'
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+
+</body>
+</html>

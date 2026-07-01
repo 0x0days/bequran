@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Human Embryo · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #fdba74;
+      --accent-light: #fed7aa;
+      --accent-dim:   rgba(253,186,116,0.12);
+      --accent-ring:  rgba(253,186,116,0.28);
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Typography ── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--accent-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Intro verse ── */
+    .intro-verse { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(18px, 4vw, 26px); line-height: 2.4; color: var(--text); }
+    .iv-ar .hl { color: var(--accent-light); font-weight: 700; }
+    .iv-tr { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--accent-light); font-style: normal; font-weight: 600; }
+
+    /* ── Word claim blocks ── */
+    .word-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 24px 0; }
+    @media (max-width: 440px) { .word-blocks { grid-template-columns: 1fr; } }
+    .word-block { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 14px; padding: 20px 16px; text-align: center; }
+    .wb-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 26px; color: var(--accent-light); margin-bottom: 6px; font-weight: 700; }
+    .wb-eng { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .04em; margin-bottom: 6px; text-transform: uppercase; }
+    .wb-meaning { font-size: 13px; color: var(--accent-light); font-weight: 600; margin-bottom: 8px; }
+    .wb-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── No-microscope callout ── */
+    .no-scope { background: rgba(253,186,116,0.07); border: 1px solid rgba(253,186,116,0.22); border-radius: 12px; padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; margin: 20px 0 28px; }
+    .no-scope-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .no-scope-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .no-scope-text strong { color: var(--accent-light); }
+
+    /* ── Answer cards ── */
+    .answer-card { background: var(--surface); border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid rgba(0,0,0,0.28); border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: transform .1s ease, border-color .15s ease, background .15s ease; margin-bottom: 11px; display: flex; align-items: center; gap: 14px; user-select: none; }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { border-color: var(--accent-light); transform: translateY(-2px); }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct { border-color: var(--ok); border-bottom-color: var(--ok-border); background: rgba(34,197,94,0.08); pointer-events: none; }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s; }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(16px, 3.5vw, 21px); font-weight: 700; color: var(--text); line-height: 1.3; }
+    .ac-ar { font-family: 'Amiri', serif; font-size: 18px; direction: rtl; text-align: right; color: var(--text); line-height: 2; }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── S2: Two-path explorer ── */
+    .path-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all .2s; margin-bottom: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .path-btn:hover:not(.used) { border-color: var(--accent-ring); background: var(--accent-dim); }
+    .path-btn.used { opacity: .5; pointer-events: none; }
+    .path-btn .pb-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .path-result { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; display: none; animation: rise .35s ease; }
+    .path-result.show { display: block; }
+    .pr-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 12px; font-weight: 600; }
+    .pr-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .pr-img-wrap { border-radius: 10px; overflow: hidden; background: var(--surface2); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+    .pr-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pr-img-lbl { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-align: center; margin-top: 5px; }
+    .pr-text { font-size: 14px; color: var(--muted); line-height: 1.8; }
+    .pr-text strong { color: var(--text); }
+    .pr-word { font-family: 'Amiri', serif; direction: rtl; font-size: 20px; color: var(--accent-light); font-weight: 700; margin-bottom: 4px; }
+    .pr-word-en { font-size: 13px; color: var(--accent-light); font-weight: 600; margin-bottom: 10px; }
+    .conv-panel { background: linear-gradient(135deg, rgba(253,186,116,0.08) 0%, rgba(253,186,116,0.03) 100%); border: 1px solid rgba(253,186,116,0.28); border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0; display: none; animation: rise .4s ease; }
+    .conv-panel.show { display: block; }
+    .conv-lbl { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 8px; font-weight: 600; }
+    .conv-big { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 40px); font-weight: 700; color: var(--accent-light); display: block; text-shadow: 0 0 40px rgba(253,186,116,0.4); margin-bottom: 8px; }
+    .conv-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── S4: Verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .stat-n { font-family: 'Playfair Display', serif; font-size: clamp(48px, 11vw, 72px); font-weight: 700; line-height: 1; color: var(--accent-light); text-shadow: 0 0 50px rgba(253,186,116,0.4); text-align: center; display: block; }
+    .stat-l { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; margin-top: 6px; margin-bottom: 28px; }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--accent-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .word-verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 24px 0; }
+    @media (max-width: 440px) { .word-verdict { grid-template-columns: 1fr; } }
+    .wv-card { background: var(--surface); border: 1px solid var(--accent-ring); border-radius: 12px; padding: 18px; }
+    .wv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: 22px; color: var(--accent-light); font-weight: 700; margin-bottom: 4px; }
+    .wv-word { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+    .wv-check { font-size: 12px; color: var(--ok); font-weight: 600; margin-bottom: 6px; }
+    .wv-check2 { font-size: 12px; color: var(--ok); font-weight: 600; margin-bottom: 6px; }
+    .wv-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Scientist quote ── */
+    .scientist-box {
+      background: linear-gradient(135deg, rgba(253,186,116,0.07), rgba(253,186,116,0.02));
+      border: 1px solid rgba(253,186,116,0.22);
+      border-radius: 14px; padding: 20px 24px; margin: 24px 0;
+    }
+    .scientist-name { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+    .scientist-quote { font-size: 13px; line-height: 1.75; color: var(--muted); font-style: italic; }
+
+    /* ── Feedback panel ── */
+    .fb-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 300; padding: 18px 20px 32px; transform: translateY(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg);  border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok);        color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-pulsar-navigation.html" class="nav-back">&larr; Pulsar Navigation</a>
+
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson &middot; Human Embryo</div>
+
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics &middot; Human Embryology</p>
+    <h1 class="hero-title">Two words in a 7th-century text describe the human embryo with an accuracy that required a microscope to confirm.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 23:14 Surah Al-Mu'minun &middot; The Believers</div>
+      <div class="iv-ar">
+        ثُمَّ خَلَقْنَا النُّطْفَةَ <span class="hl">عَلَقَةً</span> فَخَلَقْنَا الْعَلَقَةَ <span class="hl">مُضْغَةً</span> فَخَلَقْنَا الْمُضْغَةَ عِظَامًا فَكَسَوْنَا الْعِظَامَ لَحْمًا ثُمَّ أَنْشَأْنَاهُ خَلْقًا آخَرَ
+      </div>
+      <div class="iv-tr">
+        "Then We developed the semen into a <span class="hl">leech</span>. Then We developed the leech into a <span class="hl">chewed lump</span>. Then We developed the lump into bones. Then We clothed the bones with flesh. Then We produced it into another creature."
+      </div>
+    </div>
+
+    <div class="word-blocks">
+      <div class="word-block">
+        <div class="wb-ar">عَلَقَةً</div>
+        <div class="wb-eng">Alaqa</div>
+        <div class="wb-meaning">Leech</div>
+        <div class="wb-desc">The early embryo (days 23–24) clings to the uterine wall to feed exactly as a leech clings to a host. Under a microscope, its shape is also curved and leech-like.</div>
+      </div>
+      <div class="word-block">
+        <div class="wb-ar">مُضْغَةً</div>
+        <div class="wb-eng">Mudgha</div>
+        <div class="wb-meaning">Something Chewed</div>
+        <div class="wb-desc">At week 6, the developing vertebrae (somites) create a surface that looks exactly like teeth marks pressed into soft clay or flesh.</div>
+      </div>
+    </div>
+
+    <div class="no-scope">
+      <div class="no-scope-icon">🔬</div>
+      <div class="no-scope-text"><strong>No microscope existed in 7th-century Arabia.</strong> The embryo at these stages is smaller than a grain of rice. These developmental details were invisible to the naked eye and unknown to any civilization of that era verified for the first time when microscopy became available in the 20th century.</div>
+    </div>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#1a0800">Begin the lesson &rarr;</button>
+  </div>
+
+
+  <!-- ── STAGE 1: Exercise 1 ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">What does the Arabic word عَلَقَةً (Alaqa) mean and why does it precisely describe the embryo at days 23–24?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">A water droplet</div>
+        <div class="ac-sub">Referring to the fluid environment of the womb</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">عَلَقَةً</div>
+        <div class="ac-sub">Leech the embryo looks like one AND clings to the uterine wall to feed, just as a leech clings to a host</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">A seed</div>
+        <div class="ac-sub">Comparing the embryo to a plant beginning to grow</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 2: Exercise 2 Two-path explorer ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">Explore both microscope-confirmed descriptions the leech stage and the chewed stage.</p>
+
+    <button class="path-btn" id="btnA" onclick="revealPath('a')">
+      <div class="pb-icon" style="background:var(--accent-dim);color:var(--accent-light)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">عَلَقَةً &nbsp;Alaqa The Leech Stage</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Days 23–24 of development</div>
+      </div>
+    </button>
+
+    <div class="path-result" id="resultA">
+      <div class="pr-label">Alaqa shape and behavior both match</div>
+      <div class="pr-img-row">
+        <div>
+          <div class="pr-img-wrap">
+            <img src="embryo-alaqa-fetus.webp" alt="Human embryo at days 23–24 leech-like appearance" loading="lazy">
+          </div>
+          <div class="pr-img-lbl">Embryo days 23–24</div>
+        </div>
+        <div>
+          <div class="pr-img-wrap">
+            <img src="embryo-alaqa-leech.jpg" alt="A leech" loading="lazy">
+          </div>
+          <div class="pr-img-lbl">A leech</div>
+        </div>
+      </div>
+      <div class="pr-text">
+        The word Alaqa captures a <strong>double accuracy</strong>:<br>
+        <strong>Shape:</strong> the embryo curves into the same elongated form as a leech.<br>
+        <strong>Behavior:</strong> it buries into the uterine wall and draws nutrients from the mother's blood precisely as a leech attaches to a host and feeds.<br><br>
+        Both resemblances were only visible after microscopy was developed.
+      </div>
+    </div>
+
+    <button class="path-btn" id="btnB" onclick="revealPath('b')">
+      <div class="pb-icon" style="background:var(--accent-dim);color:var(--accent-light)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:600">مُضْغَةً &nbsp;Mudgha The Chewed Stage</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Week 6 of development</div>
+      </div>
+    </button>
+
+    <div class="path-result" id="resultB">
+      <div class="pr-label">Mudgha somites that look like bite marks</div>
+      <div class="pr-img-row">
+        <div>
+          <div class="pr-img-wrap">
+            <img src="embryo-mudgha-comparison.png" alt="Embryo and chewed gum compared" loading="lazy">
+          </div>
+          <div class="pr-img-lbl">Embryo vs. chewed gum</div>
+        </div>
+        <div>
+          <div class="pr-img-wrap">
+            <img src="embryo-mudgha-gum.png" alt="Chewed gum the Mudgha comparison" loading="lazy">
+          </div>
+          <div class="pr-img-lbl">Chewed gum</div>
+        </div>
+      </div>
+      <div class="pr-text">
+        At week 6, the embryo develops <strong>somites</strong> paired blocks of tissue that form along the spine. These create a bumpy, indented surface that looks exactly like <strong>teeth marks pressed into a piece of clay or soft flesh</strong>. The Arabic word Mudgha means precisely that: something that has been chewed. The visual match was confirmed by modern microscopy.
+      </div>
+    </div>
+
+    <div class="conv-panel" id="convPanel">
+      <div class="conv-lbl">Both stages described in the 7th century both verified by microscope</div>
+      <span class="conv-big" id="convYears">0</span>
+      <div class="conv-sub">years before microscopic embryology was possible yet both descriptions are accurate in shape, behavior, and correct developmental order.</div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 3: Exercise 3 ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">At week 6, the embryo's developing vertebrae create a surface that looks like something chewed. What is the Arabic word for this stage, and what does it literally mean?</p>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">عَلَقَةً a clinging thing</div>
+        <div class="ac-sub">Alaqa referring to attachment to the uterine wall</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">مُضْغَةً something chewed</div>
+        <div class="ac-sub">Mudgha the somites (vertebrae blocks) give the embryo the appearance of a bitten piece of flesh</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">عِظَامًا bones</div>
+        <div class="ac-sub">The stage after the bones have already formed</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete &middot; +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">Two words. Two precise descriptions of microscopic embryo stages. Written 1,400 years before anyone could see them.</h2>
+
+    <span class="stat-n" id="mv0">0</span>
+    <div class="stat-l">years before microscopic embryology confirmed this</div>
+
+    <div class="word-verdict">
+      <div class="wv-card">
+        <div class="wv-ar">عَلَقَةً</div>
+        <div class="wv-word">Alaqa · Leech</div>
+        <div class="wv-check">✓ Shape matches</div>
+        <div class="wv-check2">✓ Behavior matches</div>
+        <div class="wv-note">The embryo at days 23–24 is curved like a leech and implants into the uterine wall to extract nutrients identical behavior to a leech on a host.</div>
+      </div>
+      <div class="wv-card">
+        <div class="wv-ar">مُضْغَةً</div>
+        <div class="wv-word">Mudgha · Chewed</div>
+        <div class="wv-check">✓ Visual match confirmed</div>
+        <div class="wv-check2">✓ Correct developmental order</div>
+        <div class="wv-note">At week 6, somites along the embryo's back create an appearance indistinguishable from teeth marks on soft flesh. Described correctly as the second stage, after the leech stage.</div>
+      </div>
+    </div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Milestone</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td>Quran 23:14 revealed</td>
+          <td class="td-v">~610 CE</td>
+        </tr>
+        <tr>
+          <td>First compound microscope invented</td>
+          <td class="td-v">~1590 CE</td>
+        </tr>
+        <tr>
+          <td>Human embryology established as a science</td>
+          <td class="td-v">19th century</td>
+        </tr>
+        <tr class="hl">
+          <td>Alaqa (leech) and Mudgha (chewed) descriptions confirmed by microscopy</td>
+          <td class="td-v">20th century</td>
+        </tr>
+        <tr class="hl">
+          <td>Gap between Quran and confirmation</td>
+          <td class="td-v">~1,400 years</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why "leech" is a double match:</strong> Most ancient descriptions of embryology (Greek, Indian, Egyptian) used metaphors from seeds, animals, or fluids none used "leech." The leech metaphor captures both the visual shape and the parasitic feeding mechanism simultaneously. Choosing this one word required knowing both facts neither visible without magnification.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">A text from the 7th century described two microscopic stages of human development using words so precise that modern embryologists recognize both immediately leech for the implantation stage, and chewed for the somite stage.</div>
+      <div class="gs">No microscope. No laboratory. No scientific tradition of embryology anywhere in 7th-century Arabia. The Quran's two-word description outperforms the entire ancient world's understanding of embryonic development by over a millennium.</div>
+    </div>
+       <div class="scientist-box">
+      <div class="scientist-name">Dr. Keith L. Moore · Professor of Anatomy, University of Toronto · Author of <em style="font-style:normal">The Developing Human</em></div>
+      <div class="scientist-quote">"It has been a great pleasure for me to help clarify statements in the Qur'an about human development. It is clear to me that these statements must have come to Muhammad from God, because almost all of this knowledge was not discovered until many centuries later. This gives evidence that Muhammad must have been a messenger of God."</div>
+    </div>
+
+
+    <div id="qv-embryo"></div>
+
+ 
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+          <div id="curiositySeed"></div>
+
+      <a href="quran-pulsar-navigation.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">&larr; Back to Pulsar Navigation</a>
+      <a href="quran-red-giant.html" class="btn" style="background:var(--accent);color:#fff">Next &middot; Sun Swallows Earth &rarr;</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = {
+  0: 'Lesson · Human Embryo',
+  1: 'Exercise 1 of 3',
+  2: 'Exercise 2 of 3',
+  3: 'Exercise 3 of 3',
+  4: 'Lesson Complete'
+};
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('human-embryo');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1400, 1800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+/* Stage 1 */
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Alaqa means leech and the match is double: the embryo\'s curved shape AND its blood-feeding attachment both mirror a leech. One word captures both facts.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* Stage 2 two-path explorer */
+var doneA = false, doneB = false;
+
+function revealPath(which) {
+  if (which === 'a' && !doneA) {
+    doneA = true;
+    document.getElementById('resultA').classList.add('show');
+    document.getElementById('btnA').classList.add('used');
+    checkBothPaths();
+  }
+  if (which === 'b' && !doneB) {
+    doneB = true;
+    document.getElementById('resultB').classList.add('show');
+    document.getElementById('btnB').classList.add('used');
+    checkBothPaths();
+  }
+}
+
+function checkBothPaths() {
+  if (!doneA || !doneB) return;
+  var panel = document.getElementById('convPanel');
+  panel.classList.add('show');
+  animFrom(document.getElementById('convYears'), 0, 1400, 1600, function() {
+    setTimeout(function() {
+      showOk('Both Alaqa and Mudgha are confirmed by microscopy in the correct developmental sequence described 1,400 years ago.', function() { go(3); });
+    }, 500);
+  });
+}
+
+/* Stage 3 */
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Mudgha the somites along the embryo\'s developing spine create exactly the look of a surface that has been chewed. The word is a perfect visual description.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── Hero Canvas: Morphogenesis Alaqa (leech) → Mudgha (chewed) ── */
+function initHeroCanvas() {
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  const W = cv.width, H = cv.height;
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeIn(t)  { return t * t * t; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  /* Timeline at ~60fps */
+  const ALAQA_HOLD   = 210;
+  const FADE_OUT     = 80;
+  const GAP          = 18;
+  const MUDGHA_IN    = 55;
+  const SOMITE_BUILD = 160;
+  const MUDGHA_HOLD  = 110;
+  const FADE_OUT2    = 80;
+  const TOTAL = ALAQA_HOLD + FADE_OUT + GAP + MUDGHA_IN + SOMITE_BUILD + MUDGHA_HOLD + FADE_OUT2;
+
+  const NUM_SOMITES = 7;
+  const CX = W * 0.42, CY = H * 0.5;
+  const WALL_X = W * 0.8;
+  let frame = 0;
+
+  /* Uterine wall warm textured band on the right */
+  function drawWall(alpha) {
+    const grad = ctx.createLinearGradient(WALL_X - 24, 0, W, 0);
+    grad.addColorStop(0,   'rgba(253,186,116,0)');
+    grad.addColorStop(0.2, `rgba(130,68,20,${alpha * 0.16})`);
+    grad.addColorStop(1,   `rgba(90,40,10,${alpha * 0.28})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(WALL_X - 24, 0, W - WALL_X + 24, H);
+    /* Subtle tissue lines */
+    for (let y = 7; y < H; y += 11) {
+      ctx.beginPath();
+      ctx.moveTo(WALL_X, y + Math.sin(y * 0.22) * 2);
+      ctx.bezierCurveTo(WALL_X + 18, y, WALL_X + 28, y + 2, W - 2, y + Math.sin(y * 0.35 + frame * 0.01) * 2);
+      ctx.strokeStyle = `rgba(253,186,116,${alpha * 0.045})`;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+  }
+
+  /* Build leech spine returns [{x,y,thick}] */
+  function leechSpine(undulate) {
+    const N = 80, bodyLen = 112;
+    const pts = [];
+    const x0 = CX - bodyLen * 0.38;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const x = x0 + t * bodyLen;
+      /* Gentle arc downward + travelling undulation wave (free end sways more) */
+      const arc  = Math.sin(t * Math.PI) * 5.5;
+      const wave = undulate * (1 - t * 0.72) * Math.sin(frame * 0.046 - t * 5.8);
+      const y    = CY - arc + wave;
+      /* Leech thickness: widest ~28% from head (attach end = right), fine tail */
+      const env  = Math.pow(t, 0.52) * Math.pow(1 - t, 0.38) * 2.35;
+      pts.push({ x, y, thick: 21 * env, t });
+    }
+    return pts;
+  }
+
+  /* Draw Alaqa (leech) */
+  function drawAlaqa(pts, alpha) {
+    ctx.save();
+
+    /* Warm glow cloud */
+    const mid = pts[Math.floor(pts.length * 0.32)];
+    const glow = ctx.createRadialGradient(mid.x, mid.y, 0, mid.x, mid.y, 62);
+    glow.addColorStop(0, `rgba(253,186,116,${alpha * 0.13})`);
+    glow.addColorStop(1, 'rgba(253,186,116,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(mid.x, mid.y, 62, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Smooth body outline */
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y - pts[0].thick);
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i], pp = pts[i - 1];
+      const mx = (pp.x + p.x) / 2, my = (pp.y - pp.thick + p.y - p.thick) / 2;
+      ctx.quadraticCurveTo(pp.x, pp.y - pp.thick, mx, my);
+    }
+    const last = pts[pts.length - 1];
+    ctx.lineTo(last.x, last.y);
+    for (let i = pts.length - 1; i >= 1; i--) {
+      const p = pts[i], pp = pts[i - 1];
+      const mx = (pp.x + p.x) / 2, my = (pp.y + pp.thick + p.y + p.thick) / 2;
+      ctx.quadraticCurveTo(p.x, p.y + p.thick, mx, my);
+    }
+    ctx.closePath();
+
+    const gx = ctx.createLinearGradient(pts[0].x, 0, last.x, 0);
+    gx.addColorStop(0,    `rgba(80,38,8,${alpha * 0.08})`);
+    gx.addColorStop(0.14, `rgba(210,118,45,${alpha * 0.30})`);
+    gx.addColorStop(0.40, `rgba(254,215,170,${alpha * 0.56})`);
+    gx.addColorStop(0.72, `rgba(253,186,116,${alpha * 0.44})`);
+    gx.addColorStop(1,    `rgba(170,90,30,${alpha * 0.28})`);
+    ctx.fillStyle = gx;
+    ctx.fill();
+
+    /* Dorsal highlight */
+    ctx.beginPath();
+    for (let i = 4; i < pts.length - 4; i++) {
+      const p = pts[i];
+      i === 4 ? ctx.moveTo(p.x, p.y - p.thick * 0.72) : ctx.lineTo(p.x, p.y - p.thick * 0.72);
+    }
+    ctx.strokeStyle = `rgba(255,242,220,${alpha * 0.18})`;
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    /* Annular rings (leech segments) */
+    for (let s = 1; s <= 8; s++) {
+      const idx = Math.floor(pts.length * (0.06 + s * 0.105));
+      if (idx >= pts.length) continue;
+      const p = pts[idx];
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - p.thick * 0.78);
+      ctx.lineTo(p.x, p.y + p.thick * 0.78);
+      ctx.strokeStyle = `rgba(180,100,35,${alpha * 0.11})`;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    /* Attachment thread to wall */
+    const attachY = CY + Math.sin(frame * 0.027) * 3;
+    ctx.beginPath();
+    ctx.moveTo(last.x, last.y);
+    ctx.bezierCurveTo(last.x + 14, last.y, WALL_X - 12, attachY, WALL_X, attachY);
+    ctx.strokeStyle = `rgba(253,186,116,${alpha * 0.42})`;
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+
+    /* Pulsing attachment dot + ripple */
+    const pr = 3.6 + Math.sin(frame * 0.16) * 1.1;
+    ctx.beginPath();
+    ctx.arc(WALL_X, attachY, pr, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(254,215,170,${alpha * 0.65})`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(WALL_X, attachY, pr + 5 + Math.sin(frame * 0.16) * 3, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(253,186,116,${alpha * 0.18})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+
+  /* Draw Mudgha (chewed) */
+  function drawMudgha(somiteP, alpha) {
+    const bodyLen = 98, bodyThick = 20;
+    const x0 = CX - bodyLen * 0.5;
+    const N  = 100;
+
+    function env(t) { return Math.sin(t * Math.PI); }
+
+    /* Build dorsal path with bite-mark dips */
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x0, CY);
+    for (let i = 0; i <= N; i++) {
+      const t  = i / N;
+      const x  = x0 + t * bodyLen;
+      const baseY = CY - bodyThick * env(t);
+      let dip = 0;
+      for (let s = 0; s < NUM_SOMITES; s++) {
+        const sc = (s + 0.5) / NUM_SOMITES;
+        const dist = Math.abs(t - sc);
+        const sP = clamp((somiteP * NUM_SOMITES - s) / 1.1, 0, 1);
+        if (dist < 0.08) dip += easeOut(sP) * bodyThick * 0.46 * Math.pow(1 - dist / 0.08, 1.8);
+      }
+      ctx.lineTo(x, baseY + dip);
+    }
+    for (let i = N; i >= 0; i--) {
+      const t = i / N;
+      ctx.lineTo(x0 + t * bodyLen, CY + bodyThick * env(t));
+    }
+    ctx.closePath();
+
+    const gx = ctx.createLinearGradient(x0, 0, x0 + bodyLen, 0);
+    gx.addColorStop(0,    `rgba(80,38,8,${alpha * 0.06})`);
+    gx.addColorStop(0.12, `rgba(210,118,45,${alpha * 0.30})`);
+    gx.addColorStop(0.50, `rgba(254,215,170,${alpha * 0.55})`);
+    gx.addColorStop(0.88, `rgba(210,118,45,${alpha * 0.30})`);
+    gx.addColorStop(1,    `rgba(80,38,8,${alpha * 0.06})`);
+    ctx.fillStyle = gx;
+    ctx.fill();
+
+    /* Ventral highlight */
+    ctx.beginPath();
+    for (let i = 5; i <= N - 5; i++) {
+      const t = i / N;
+      const x = x0 + t * bodyLen;
+      const y = CY + bodyThick * env(t) * 0.62;
+      i === 5 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(255,238,210,${alpha * 0.14})`;
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    /* Somite ridges + paired beads appearing in sequence */
+    for (let s = 0; s < NUM_SOMITES; s++) {
+      const sP  = clamp((somiteP * NUM_SOMITES - s) / 1.1, 0, 1);
+      if (sP <= 0.02) continue;
+      const sc  = (s + 0.5) / NUM_SOMITES;
+      const x   = x0 + sc * bodyLen;
+      const e   = env(sc);
+      const bite = easeOut(sP) * bodyThick * 0.46;
+      const topY = CY - bodyThick * e + bite;
+      const botY = CY + bodyThick * e * 0.88;
+
+      /* Groove */
+      ctx.beginPath();
+      ctx.moveTo(x, topY + 1.5);
+      ctx.lineTo(x, lerp(topY, botY, 0.55));
+      ctx.strokeStyle = `rgba(150,75,22,${alpha * sP * 0.24})`;
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+
+      /* Paired somite beads flanking each groove */
+      [-5.5, 5.5].forEach(function(dx) {
+        ctx.beginPath();
+        ctx.arc(x + dx, topY - 1.5, 2.8 * e * sP, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(254,215,170,${alpha * sP * 0.20})`;
+        ctx.fill();
+      });
+    }
+
+    /* Warm glow */
+    const glow = ctx.createRadialGradient(CX, CY, 0, CX, CY, 58);
+    glow.addColorStop(0, `rgba(253,186,116,${alpha * 0.10})`);
+    glow.addColorStop(1, 'rgba(253,186,116,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(CX, CY, 58, 0, Math.PI * 2); ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* Stage label */
+  function drawLabel(arabic, latin, alpha) {
+    if (alpha <= 0.02) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '400 12px Amiri, serif';
+    ctx.fillStyle = 'rgba(254,215,170,0.62)';
+    ctx.fillText(arabic, W * 0.42, H - 15);
+    ctx.font = '500 8.5px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(253,186,116,0.42)';
+    ctx.fillText(latin, W * 0.42, H - 4);
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Ambient warmth */
+    const atm = ctx.createRadialGradient(CX, CY, 0, CX, CY, 190);
+    atm.addColorStop(0, 'rgba(32,15,4,0.52)');
+    atm.addColorStop(1, 'rgba(4,8,16,0)');
+    ctx.fillStyle = atm; ctx.fillRect(0, 0, W, H);
+
+    const f = frame % TOTAL;
+    const T1 = ALAQA_HOLD;
+    const T2 = T1 + FADE_OUT;
+    const T3 = T2 + GAP;
+    const T4 = T3 + MUDGHA_IN;
+    const T5 = T4 + SOMITE_BUILD + MUDGHA_HOLD;
+    const T6 = T5 + FADE_OUT2;
+
+    if (f < T2) {
+      /* ── Alaqa phase ── */
+      const aIn  = f < 50 ? easeOut(f / 50) : 1;
+      const aOut = f >= T1 ? (1 - easeIn((f - T1) / FADE_OUT)) : 1;
+      const al   = aIn * aOut;
+      const und  = lerp(0, 9, clamp(f / 70, 0, 1));
+      drawWall(al);
+      drawAlaqa(leechSpine(und), al);
+      drawLabel('عَلَقَةً', 'ALAQA · LEECH', al);
+
+    } else if (f >= T3 && f < T6) {
+      /* ── Mudgha phase ── */
+      const elapsed = f - T3;
+      const aIn  = elapsed < MUDGHA_IN ? easeOut(elapsed / MUDGHA_IN) : 1;
+      const aOut = f >= T5 ? (1 - easeIn((f - T5) / FADE_OUT2)) : 1;
+      const al   = aIn * aOut;
+      const sP   = elapsed < MUDGHA_IN ? 0 : clamp((elapsed - MUDGHA_IN) / SOMITE_BUILD, 0, 1);
+      drawMudgha(sP, al);
+      drawLabel('مُضْغَةً', 'MUDGHA · CHEWED', al);
+    }
+    /* dark gap between cycles intentional breath */
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"human-embryo");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"human-embryo","question":"The Quran says the embryo looks like a leech at days 23-24. When was this confirmed by microscopy?","unit":"CE","inputType":"era","min":1900,"max":2010,"step":1,"correct":1981,"correctLabel":"1981","curiositySeed":{"question":"In approximately how many years will the Sun expand into a red giant and engulf Earth?","nextUrl":"quran-red-giant.html","nextTitle":"Sun Swallows Earth"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Both embryo words appear in 23:14. Navigate there and read them yourself. */
+QuranValidator.attach('qv-embryo',{
+  mode:'locate',
+  title:'Read the verse yourself',
+  subtitle:'Find 23:14 the verse describing the embryo as a leech (عَلَقَة) then a chewed lump (مُضْغَة)',
+  groups:[
+    {id:'alaqa', label:'Leech stage',       arabic:'عَلَقَة', color:'#fdba74', occurrences:[[23,14]]},
+    {id:'mudgha',label:'Chewed-lump stage', arabic:'مُضْغَة', color:'#7dd3fc', occurrences:[[23,14]]}
+  ]
+});
+</script>
+</body>
+</html>

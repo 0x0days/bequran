@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Moving Mountains · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+      --accent:       #a8a29e;
+      --accent-light: #d6d0ca;
+      --accent-dim:   rgba(168,162,158,0.10);
+      --accent-ring:  rgba(168,162,158,0.22);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      min-height:100vh; padding:44px 20px 160px;
+    }
+    .dot-field {
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:radial-gradient(rgba(255,255,255,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    .container { max-width:720px; margin:0 auto; position:relative; z-index:1; }
+
+    /* PROGRESS */
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent-light)); width:0%; transition:width .7s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:28px; }
+
+    /* STAGES */
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    /* VERSE */
+    .verse-block { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:20px 22px; margin:22px 0; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-ar { font-family:'Amiri',serif; font-size:22px; line-height:2.1; direction:rtl; text-align:right; color:var(--text); margin-bottom:10px; }
+    .verse-ar .hl { color:var(--accent-light); }
+    .verse-en { font-size:14px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .verse-en .hl { color:var(--accent-light); font-style:normal; font-weight:600; }
+
+    /* LESSON INTRO */
+    .lesson-eyebrow { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .lesson-title { font-family:'Playfair Display',serif; font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.2; margin-bottom:8px; }
+    .lesson-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+    /* CLAIM BOX */
+    .claim-box { background:var(--accent-dim); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:22px 0; }
+    .claim-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .claim-text { font-size:15px; line-height:1.65; color:var(--text); }
+
+    /* PROMPT */
+    .prompt { font-family:'Playfair Display',serif; font-size:18px; line-height:1.5; margin:24px 0 16px; }
+
+    /* ANSWERS */
+    .answers { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .answer-card {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+      cursor:pointer; transition:border-color .18s, background .18s;
+    }
+    .answer-card:hover { border-color:rgba(255,255,255,0.2); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); pointer-events:none; }
+    .answer-card.ac-wrong   { border-color:var(--err-border); background:var(--err-bg); animation:shake .35s ease; }
+    .answer-card.ac-disabled{ opacity:.45; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .ac-letter { width:26px; height:26px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0; margin-top:2px; }
+    .ac-big { font-size:16px; font-weight:600; line-height:1.3; }
+    .ac-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:transform .18s, box-shadow .18s; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-accent { background:var(--accent); color:#0b1622; box-shadow:0 4px 20px rgba(168,162,158,0.22); }
+    .btn-accent:hover { box-shadow:0 8px 30px rgba(168,162,158,0.32); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* INTERACTIVE */
+    .ex-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--accent-light); line-height:1; }
+    .ex-unit { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ex-result { background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:18px 20px; margin:16px 0; display:none; animation:rise .35s ease; }
+    .ex-result.show { display:block; }
+    .ex-arena { display:flex; gap:14px; margin:20px 0; }
+    .ex-panel { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 14px; text-align:center; transition:border-color .3s, background .3s; }
+    .ex-panel.lit { border-color:var(--accent-ring); background:var(--accent-dim); }
+
+    /* VERDICT */
+    .verdict-title { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,28px); font-weight:700; line-height:1.3; margin-bottom:10px; }
+    .verdict-sub { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:28px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:14px 18px; margin-bottom:22px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:14px; font-weight:600; color:var(--ok); }
+    .stat-row { display:flex; gap:14px; margin:22px 0; flex-wrap:wrap; }
+    .stat-box { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--accent-ring); border-radius:12px; padding:16px 14px; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--accent-light); }
+    .stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:4px; }
+    .verdict-table { width:100%; border-collapse:collapse; margin:18px 0; }
+    .verdict-table th { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+    .verdict-table td { font-size:13px; padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .verdict-table tr:last-child td { border-bottom:none; }
+    .td-check { color:var(--ok); font-weight:700; }
+
+    /* GOLD BOX */
+    .gold-box { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.18); border-radius:12px; padding:18px 20px; margin:24px 0; }
+    .gt { font-family:'Playfair Display',serif; font-size:16px; line-height:1.55; color:var(--gold-light); margin-bottom:8px; }
+    .gs { font-size:13px; color:var(--muted); line-height:1.7; }
+
+    /* NAV */
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:28px; transition:color .18s; }
+    .nav-back:hover { color:var(--text); }
+    .nav-next-wrap { margin-top:36px; padding-top:24px; border-top:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; }
+
+    /* FEEDBACK PANEL */
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:300; padding:18px 20px 32px; transform:translateY(110%); transition:transform .35s cubic-bezier(.4,0,.2,1); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok  { background:var(--ok-bg);  border-top:3px solid var(--ok); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top:3px solid var(--err-light); }
+    .fb-left { display:flex; align-items:center; gap:12px; }
+    .fb-icon { font-size:24px; line-height:1; }
+    .fb-title { font-size:17px; font-weight:700; }
+    .fb-panel.fb-ok  .fb-title { color:var(--ok); }
+    .fb-panel.fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:rgba(255,255,255,0.6); margin-top:3px; line-height:1.55; max-width:340px; }
+    .fb-btn { flex-shrink:0; padding:14px 30px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:transform .1s; }
+    .fb-btn:active { transform:scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background:var(--ok);        color:var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background:var(--err-light); color:var(--err-bg); }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-mountains.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Previous · Mountains as Pegs
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Moving Mountains</div>
+
+  <!-- ── SP PREDICTION ── -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ── S0 INTRO ── -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <p class="lesson-eyebrow">Geology · Plate Tectonics</p>
+    <h1 class="lesson-title">Moving Mountains</h1>
+    <p class="lesson-sub">For centuries, the idea that mountains could move was dismissed as a scientific blunder. The Quran stated it plainly 1,400 years before geologists proved it.</p>
+
+    <div class="verse-block">
+      <div class="verse-ref">27:88 · Surah An-Naml</div>
+      <div class="verse-ar">وَتَرَى الْجِبَالَ تَحْسَبُهَا جَامِدَةً <span class="hl">وَهِيَ تَمُرُّ مَرَّ السَّحَابِ</span> ۚ صُنْعَ اللَّهِ الَّذِي أَتْقَنَ كُلَّ شَيْءٍ</div>
+      <div class="verse-en">"You see the mountains and think them firmly fixed <span class="hl">but they are moving like clouds.</span> Such is the artistry of God, who perfects all things."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">The Discovery</div>
+      <div class="claim-text">Mountains <em>appear</em> fixed the verse uses the word جَامِدَة, meaning "frozen in place," to describe that appearance. Then it immediately corrects it: <strong style="color:var(--accent-light)">they are moving.</strong> Plate tectonics, discovered in the 1960s, confirmed every mountain on Earth rides a drifting plate up to 100 mm per year.</div>
+    </div>
+
+    <button class="btn btn-accent" onclick="go(1)">
+      Begin the lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── S1 Comparison canvas + MC ── -->
+  <div id="s1" class="stage">
+
+    <p class="prompt">What does Quran 27:88 specifically say about mountains?</p>
+
+    <canvas id="s1Canvas" width="640" height="210"
+      style="width:100%;height:210px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div id="s1Mc" style="display:none">
+      <div class="answers">
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">A</div>
+          <div class="ac-body">
+            <div class="ac-big">They contain deep roots that hold the Earth firm</div>
+            <div class="ac-sub">Their peg-like structure stabilises the crust</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,true)" class="answer-card">
+          <div class="ac-letter">B</div>
+          <div class="ac-body">
+            <div class="ac-big">They appear fixed but are actually moving like clouds</div>
+            <div class="ac-sub">The verse uses جَامِدَة ("frozen") only to deny it</div>
+          </div>
+        </div>
+        <div onclick="pickEx1(this,false)" class="answer-card">
+          <div class="ac-letter">C</div>
+          <div class="ac-body">
+            <div class="ac-big">They are the oldest permanent structures on Earth</div>
+            <div class="ac-sub">Never changed since creation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2 Tectonic plate animation ── -->
+  <div id="s2" class="stage">
+
+    <p class="prompt">Watch the plates drift and see how fast.</p>
+    <p style="font-size:13px;color:var(--muted);margin:-14px 0 20px;">The animation compresses geological time so the movement is visible. In reality this happens at the speed you grow a fingernail.</p>
+
+    <canvas id="s2Canvas" width="640" height="220"
+      style="width:100%;height:220px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div class="ex-arena">
+      <div class="ex-panel" id="s2PanelA">
+        <div class="ex-unit">Max plate drift</div>
+        <div class="ex-num" id="driftCount">0</div>
+        <div class="ex-unit">mm per year</div>
+      </div>
+      <div class="ex-panel" id="s2PanelB">
+        <div class="ex-unit">Major tectonic plates</div>
+        <div class="ex-num">7–8</div>
+        <div class="ex-unit">covering Earth's crust</div>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="s2Btn" onclick="startTectonics()">
+      Simulate plate motion
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="ex-result" id="s2Result">
+      <div style="font-size:13px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">Up to 100 mm every year</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">About the length of your hand continuously, without stopping. Over millions of years this moves entire continents. The Quran's phrase: <em style="color:var(--text)">"moving like clouds."</em></div>
+    </div>
+  </div>
+
+  <!-- ── S3 MC ── -->
+  <div id="s3" class="stage">
+
+    <p class="prompt">Which field of science, confirmed in the 1960s, proved that mountains and continents are constantly in motion?</p>
+
+    <div class="answers">
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">A</div>
+        <div class="ac-body">
+          <div class="ac-big">Meteorology</div>
+          <div class="ac-sub">The scientific study of weather and atmosphere</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,true)" class="answer-card">
+        <div class="ac-letter">B</div>
+        <div class="ac-body">
+          <div class="ac-big">Plate Tectonics</div>
+          <div class="ac-sub">Earth's lithosphere is divided into moving plates</div>
+        </div>
+      </div>
+      <div onclick="pickEx3(this,false)" class="answer-card">
+        <div class="ac-letter">C</div>
+        <div class="ac-body">
+          <div class="ac-big">Vulcanology</div>
+          <div class="ac-sub">The scientific study of volcanoes and lava</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4 VERDICT ── -->
+  <div id="s4" class="stage">
+
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="verdict-title">The mountains are moving just as written.</h2>
+    <p class="verdict-sub">The verse uses the word جَامِدَة "frozen, fixed" specifically to describe how mountains <em>appear</em>, then immediately contradicts it: "they are passing like clouds." A 7th-century author guessing about mountain behaviour would never phrase it this way. He would write that they are fixed full stop. The denial of the appearance is the unexpected, scientific part.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="mv0">0</div>
+        <div class="stat-lbl">mm per year (max drift)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="mv1">0</div>
+        <div class="stat-lbl">years before geologists confirmed it</div>
+      </div>
+    </div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr><th>Statement in Quran 27:88</th><th>Modern science confirms</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mountains appear fixed</td><td>Correct movement is imperceptible to naked eye</td><td class="td-check">✓</td></tr>
+        <tr><td>But they are actually moving</td><td>Tectonic plates drift 0–100 mm/yr</td><td class="td-check">✓</td></tr>
+        <tr><td>Movement is like clouds passing</td><td>Whole landmasses drift together, smoothly</td><td class="td-check">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="gold-box">
+      <div class="gt">"Moving like clouds" a phrase no 7th-century observer could verify.</div>
+      <div class="gs">Clouds move because they ride an invisible current of air. Mountains move because they ride an invisible current of mantle material. The analogy is structurally accurate. No ancient geology text uses this comparison because until the 1960s, no one knew mountains moved at all.</div>
+    </div>
+
+    <div id="qv-moving-mountains"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-mountains.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Mountains as Pegs
+      </a>
+      <a href="index.html" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All Lessons
+      </a>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+
+/* ── CORE ENGINE ────────────────────────────────── */
+var stage = 0;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  var run = function(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = {
+  0:'Lesson · Moving Mountains',
+  1:'Exercise 1 of 3',
+  2:'Exercise 2 of 3',
+  3:'Exercise 3 of 3',
+  4:'Lesson Complete'
+};
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 1) setTimeout(initS1Canvas, 80);
+  if (n === 2) setTimeout(initS2Canvas, 80);
+  if (n === 4) {
+    saveProgress('moving-mountains');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 100, 1800);
+        animFrom(document.getElementById('mv1'), 0, 1400, 2100);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('The verse uses جَامِدَة ("frozen") only to deny it then confirms movement. This is the scientific structure of the claim.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('Plate tectonics confirmed in the 1960s shows Earth\'s lithosphere is broken into 7–8 major plates that constantly drift, carrying mountains with them.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+/* ── HELPERS ────────────────────────────────────── */
+function makeRng(seed) {
+  var s = seed;
+  return function() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+}
+
+function setupCanvas(cv, logW, logH) {
+  var dpr = Math.min(window.devicePixelRatio || 1, 2); cv.width = logW * dpr; cv.height = logH * dpr; var ctx = cv.getContext('2d'); if(!ctx)return{stop:function(){}}; ctx.scale(dpr, dpr); return ctx;
+}
+
+function trackMouse(cv, cb) {
+  cv.addEventListener('mousemove', function(e) { var r = cv.getBoundingClientRect(); cb((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); });
+  cv.addEventListener('mouseleave', function() { cb(0.5, 0.5); });
+  cv.addEventListener('touchmove', function(e) { var r = cv.getBoundingClientRect(); var t = e.touches[0]; cb((t.clientX - r.left) / r.width, (t.clientY - r.top) / r.height); }, { passive: true });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HERO CANVAS — Cinematic Multi-Layer Parallax
+   ══════════════════════════════════════════════════════════════ */
+var heroState = { mx: 0.5, my: 0.5 };
+
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas'); if (!cv) return;
+  var W = 640, H = 130, ctx = setupCanvas(cv, W, H);
+  trackMouse(cv, function(nx, ny) { heroState.mx = nx; heroState.my = ny; });
+
+  var rng = makeRng(42);
+  var stars = []; for (var i = 0; i < 120; i++) stars.push({ x: rng() * W, y: rng() * H * 0.55, r: 0.2 + rng() * 1.8, twSpd: 0.3 + rng() * 2.5, ph: rng() * 6.28, bAlpha: 0.1 + rng() * 0.7, hue: 200 + rng() * 40 });
+  var shootingStars = [];
+
+  var layers = [
+    { peaks:[{cx:.06,ht:.20,hw:.055},{cx:.19,ht:.28,hw:.085},{cx:.36,ht:.36,hw:.11},{cx:.53,ht:.30,hw:.09},{cx:.68,ht:.33,hw:.10},{cx:.83,ht:.24,hw:.075},{cx:.96,ht:.18,hw:.055}], drift:0.08, parallax:0.20, yOff:0 },
+    { peaks:[{cx:.09,ht:.32,hw:.075},{cx:.26,ht:.48,hw:.11},{cx:.46,ht:.60,hw:.14},{cx:.63,ht:.42,hw:.095},{cx:.79,ht:.52,hw:.12},{cx:.94,ht:.35,hw:.08}], drift:0.14, parallax:0.50, yOff:4 },
+    { peaks:[{cx:.11,ht:.46,hw:.065},{cx:.30,ht:.60,hw:.095},{cx:.50,ht:.72,hw:.125},{cx:.67,ht:.54,hw:.085},{cx:.82,ht:.63,hw:.105},{cx:.97,ht:.42,hw:.075}], drift:0.22, parallax:1.0, yOff:8 }
+  ];
+
+  var clouds = []; for (var i = 0; i < 18; i++) { var puffs = []; var pLen = 3 + Math.floor(rng() * 3); for(var p=0; p<pLen; p++) puffs.push({ox: (rng()-0.5)*20, oy: (rng()-0.5)*6, rx: 8+rng()*15, ry: 3+rng()*5}); clouds.push({ x: rng() * (W + 60) - 30, y: H * 0.02 + rng() * H * 0.32, rx: 12 + rng() * 25, ry: 4 + rng() * 8, spd: 0.06 + rng() * 0.18, a: 0.02 + rng() * 0.06, ph: rng() * 6.28, puffs: puffs }); }
+  var drift = 0, t = 0, surfBase = H * 0.63;
+
+  function drawPeak(pk, ox, layerIdx) {
+    var bx = pk.cx * W + ox, surfY = surfBase + layers[layerIdx].yOff, ty = surfY - pk.ht * (surfY - 10), lw = pk.hw * W;
+    ctx.beginPath(); ctx.moveTo(bx - lw, surfY);
+    // Detailed Ridge Line
+    ctx.quadraticCurveTo(bx - lw * 0.6, ty + (surfY-ty)*0.3, bx - lw * 0.2, ty + 2); ctx.lineTo(bx, ty); ctx.lineTo(bx + lw * 0.2, ty + 2); ctx.quadraticCurveTo(bx + lw * 0.6, ty + (surfY-ty)*0.3, bx + lw, surfY); ctx.closePath();
+    
+    // 3D Gradient Lighting
+    var mg = ctx.createLinearGradient(bx - lw, ty, bx + lw, ty);
+    if (layerIdx === 0) { mg.addColorStop(0, 'rgba(50,70,100,0.6)'); mg.addColorStop(0.4, 'rgba(30,50,80,0.7)'); mg.addColorStop(1, 'rgba(10,20,40,0.8)'); }
+    else if (layerIdx === 1) { mg.addColorStop(0, 'rgba(40,60,90,0.8)'); mg.addColorStop(0.4, 'rgba(20,40,70,0.9)'); mg.addColorStop(1, 'rgba(5,15,35,0.95)'); }
+    else { mg.addColorStop(0, 'rgba(30,50,80,0.95)'); mg.addColorStop(0.4, 'rgba(15,30,60,1.0)'); mg.addColorStop(1, 'rgba(2,10,25,1.0)'); }
+    ctx.fillStyle = mg; ctx.fill();
+    
+    // Ridge highlight
+    ctx.beginPath(); ctx.moveTo(bx - lw*0.2, ty+2); ctx.lineTo(bx, ty); ctx.lineTo(bx + lw*0.2, ty+2); ctx.strokeStyle = 'rgba(150,180,220,0.3)'; ctx.lineWidth = 1.2; ctx.stroke();
+    // Snow
+    var snH = (surfY - ty) * 0.18; ctx.beginPath(); ctx.moveTo(bx - lw * 0.18, ty + snH); ctx.lineTo(bx - lw * 0.06, ty + 1); ctx.lineTo(bx, ty); ctx.lineTo(bx + lw * 0.06, ty + 1); ctx.lineTo(bx + lw * 0.18, ty + snH); ctx.closePath(); ctx.fillStyle = layerIdx === 2 ? 'rgba(240,245,255,0.6)' : 'rgba(200,215,235,0.3)'; ctx.fill();
+  }
+
+  function frame() {
+    t++; ctx.clearRect(0, 0, W, H);
+    var sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#000205'); sky.addColorStop(0.4, '#040c16'); sky.addColorStop(0.75, '#0a1828'); sky.addColorStop(1, '#122238'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+    var hGlow = ctx.createRadialGradient(W * 0.5 + (heroState.mx - 0.5) * 40, H * 0.65, 0, W * 0.5, H * 0.65, W * 0.6); hGlow.addColorStop(0, 'rgba(168,162,158,0.06)'); hGlow.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = hGlow; ctx.fillRect(0, 0, W, H);
+    
+    for (var i = 0; i < stars.length; i++) { var s = stars[i]; var sa = s.bAlpha * (0.3 + 0.7 * Math.pow(Math.sin(t * 0.02 * s.twSpd + s.ph), 2)); if (sa < 0.02) continue; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fillStyle = 'hsla(' + s.hue + ', 40%, 85%, ' + sa + ')'; ctx.fill(); if (s.r > 1.2 && sa > 0.5) { ctx.globalAlpha = sa * 0.4; ctx.strokeStyle = 'hsla(' + s.hue + ', 60%, 90%, 1)'; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(s.x - s.r * 3, s.y); ctx.lineTo(s.x + s.r * 3, s.y); ctx.stroke(); ctx.globalAlpha = 1; } }
+    if (Math.random() < 0.005) shootingStars.push({ x: Math.random()*W*0.8, y: Math.random()*H*0.3, len: 40+Math.random()*60, spd: 4+Math.random()*4, life: 1 });
+    for(var i=shootingStars.length-1; i>=0; i--) { var ss = shootingStars[i]; ss.x += ss.spd; ss.y += ss.spd*0.4; ss.life -= 0.025; if(ss.life <= 0) { shootingStars.splice(i, 1); continue; } ctx.beginPath(); ctx.moveTo(ss.x, ss.y); ctx.lineTo(ss.x - ss.len*0.7, ss.y - ss.len*0.3); var ssG = ctx.createLinearGradient(ss.x, ss.y, ss.x - ss.len*0.7, ss.y - ss.len*0.3); ssG.addColorStop(0, 'rgba(255,255,255,'+ss.life+')'); ssG.addColorStop(1, 'rgba(255,255,255,0)'); ctx.strokeStyle = ssG; ctx.lineWidth = 1.5; ctx.stroke(); }
+
+    for (var l = 0; l < layers.length; l++) { var layer = layers[l]; var px = (heroState.mx - 0.5) * 18 * layer.parallax; var py = (heroState.my - 0.5) * 6 * layer.parallax; ctx.save(); ctx.rect(0, 0, W, H); ctx.clip(); for (var m = -1; m <= 1; m++) { var ox = m * W + drift * layer.drift + px + py * 0.3; for (var pi = 0; pi < layer.peaks.length; pi++) { drawPeak(layer.peaks[pi], ox, l); } } ctx.restore(); if (l < layers.length - 1) { var fogY = surfBase + layer.yOff + 5; var fog = ctx.createLinearGradient(0, fogY - 14, 0, fogY + 14); fog.addColorStop(0, 'rgba(8,18,32,0)'); fog.addColorStop(0.5, 'rgba(8,18,32,0.40)'); fog.addColorStop(1, 'rgba(8,18,32,0)'); ctx.fillStyle = fog; ctx.fillRect(0, fogY - 14, W, 28); } }
+    
+    ctx.beginPath(); ctx.moveTo(0, surfBase + 8); ctx.lineTo(W, surfBase + 8); ctx.strokeStyle = 'rgba(140,170,200,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+    
+    ctx.globalCompositeOperation = 'screen'; for (var i = 0; i < clouds.length; i++) { var c = clouds[i]; c.x = (c.x + c.spd) % (W + 80) - 40; var ca = c.a * (0.6 + 0.4 * Math.sin(t * 0.015 + c.ph)); for(var p=0; p<c.puffs.length; p++) { var pf = c.puffs[p]; var cG = ctx.createRadialGradient(c.x + pf.ox, c.y + pf.oy, 0, c.x + pf.ox, c.y + pf.oy, pf.rx); cG.addColorStop(0, 'rgba(180,200,220,' + (ca*0.6).toFixed(4) + ')'); cG.addColorStop(0.5, 'rgba(140,160,180,' + (ca*0.2).toFixed(4) + ')'); cG.addColorStop(1, 'rgba(100,120,140,0)'); ctx.fillStyle = cG; ctx.beginPath(); ctx.ellipse(c.x + pf.ox, c.y + pf.oy, pf.rx, pf.ry, 0, 0, 6.28); ctx.fill(); } } ctx.globalCompositeOperation = 'source-over';
+
+    ctx.save(); ctx.shadowColor = 'rgba(180,200,255,0.5)'; ctx.shadowBlur = 15; ctx.font = 'bold 14px Amiri, serif'; ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(220,230,245,' + (0.25 + 0.1 * Math.sin(t * 0.01)).toFixed(3) + ')'; ctx.fillText('وَهِيَ تَمُرُّ مَرَّ السَّحَابِ', W - 16, H - 12); ctx.restore();
+    
+    [0.22, 0.52, 0.78].forEach(function(frac) { var ax = (frac * W + drift * 0.4) % W, ay = surfBase + 18, alpha = 0.06 + Math.sin(t * 0.025 + frac * 8) * 0.04; ctx.beginPath(); ctx.moveTo(ax - 8, ay); ctx.lineTo(ax + 8, ay); ctx.lineTo(ax + 3, ay - 4); ctx.moveTo(ax + 8, ay); ctx.lineTo(ax + 3, ay + 4); ctx.strokeStyle = 'rgba(168,162,158,' + alpha.toFixed(4) + ')'; ctx.lineWidth = 1; ctx.stroke(); });
+    drift += 0.12; requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   S1 CANVAS — Cinematic Two-Panel Comparison
+   ══════════════════════════════════════════════════════════════ */
+var s1State = { hoverPanel: null };
+
+function initS1Canvas() {
+  var cv = document.getElementById('s1Canvas'); if (!cv) return;
+  var W = 640, H = 260, ctx = setupCanvas(cv, W, H);
+  cv.addEventListener('mousemove', function(e) { var r = cv.getBoundingClientRect(); var nx = (e.clientX - r.left) / r.width; s1State.hoverPanel = nx < 0.47 ? 'left' : nx > 0.53 ? 'right' : null; });
+  cv.addEventListener('mouseleave', function() { s1State.hoverPanel = null; });
+
+  var rng = makeRng(91);
+  var frost = []; for (var i = 0; i < 60; i++) frost.push({ x: rng() * 0.44 + 0.03, y: rng(), spd: 0.0004 + rng() * 0.0008, sz: 1.2 + rng() * 2.5, ph: rng() * 6.28, a: 0.15 + rng() * 0.35, drift: (rng() - 0.5) * 0.0003, rot: rng()*6.28 });
+  var clouds = []; for (var i = 0; i < 12; i++) clouds.push({ x: 0.53 + rng() * 0.44, y: 0.05 + rng() * 0.4, rx: 10 + rng() * 20, ry: 5 + rng() * 10, spd: 0.0005 + rng() * 0.001, a: 0.04 + rng() * 0.08, ph: rng() * 6.28 });
+  var windLines = []; for (var i = 0; i < 15; i++) windLines.push({ x: 0.53 + rng() * 0.44, y: 0.1 + rng() * 0.6, len: 12 + rng() * 25, spd: 0.4 + rng() * 0.8, a: 0.04 + rng() * 0.08, ph: rng() * 6.28 });
+
+  var startTs = null, LEFT_DUR = 850, RIGHT_START = 650, RIGHT_DUR = 850, TOTAL = RIGHT_START + RIGHT_DUR + 450;
+
+  function drawMtn(bx, surfY, ht, hw, isFrozen, alpha) {
+    ctx.globalAlpha = alpha; var ty = surfY - ht;
+    // Detailed Ridge Shape
+    ctx.beginPath(); ctx.moveTo(bx - hw, surfY);
+    ctx.quadraticCurveTo(bx - hw * 0.6, ty + ht*0.3, bx - hw * 0.15, ty + 2); ctx.lineTo(bx, ty); ctx.lineTo(bx + hw * 0.15, ty + 2); ctx.quadraticCurveTo(bx + hw * 0.6, ty + ht*0.3, bx + hw, surfY); ctx.closePath();
+    
+    // 3D Lighting Gradient
+    var mg = ctx.createLinearGradient(bx - hw, ty, bx + hw, ty);
+    if (isFrozen) { mg.addColorStop(0, 'rgba(100,140,220,0.5)'); mg.addColorStop(0.4, 'rgba(60,90,160,0.6)'); mg.addColorStop(1, 'rgba(20,30,60,0.8)'); }
+    else { mg.addColorStop(0, 'rgba(140,130,110,0.6)'); mg.addColorStop(0.4, 'rgba(100,90,70,0.7)'); mg.addColorStop(1, 'rgba(40,35,25,0.9)'); }
+    ctx.fillStyle = mg; ctx.fill();
+    
+    // Ridge Edge Highlight
+    ctx.beginPath(); ctx.moveTo(bx - hw*0.15, ty+2); ctx.lineTo(bx, ty); ctx.lineTo(bx + hw*0.15, ty+2);
+    ctx.strokeStyle = isFrozen ? 'rgba(150,200,255,0.8)' : 'rgba(200,180,140,0.8)'; ctx.lineWidth = 1.5; ctx.stroke();
+    
+    // Snow
+    var snH = ht * 0.18; ctx.beginPath(); ctx.moveTo(bx - hw * 0.18, ty + snH); ctx.lineTo(bx, ty); ctx.lineTo(bx + hw * 0.18, ty + snH); ctx.closePath(); ctx.fillStyle = isFrozen ? 'rgba(180,210,255,0.5)' : 'rgba(240,235,220,0.6)'; ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawFrame(ts) {
+    if (!startTs) startTs = ts; var elapsed = ts - startTs;
+    var lA = ease(Math.min(elapsed / LEFT_DUR, 1)), rA = ease(Math.max(0, Math.min((elapsed - RIGHT_START) / RIGHT_DUR, 1)));
+    ctx.clearRect(0, 0, W, H); var bg = ctx.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#020408'); bg.addColorStop(1, '#040810'); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    var gap = 10, pW = (W - gap * 3) / 2, panelH = H - 20, surfY = panelH * 0.72 + 10;
+    var isLeftHover = s1State.hoverPanel === 'left', isRightHover = s1State.hoverPanel === 'right';
+    var lx = gap, ly = 10;
+
+    // LEFT PANEL
+    ctx.globalAlpha = lA; var lBg = ctx.createLinearGradient(lx, ly, lx, ly + panelH); lBg.addColorStop(0, isLeftHover ? '#0c1622' : '#081018'); lBg.addColorStop(1, isLeftHover ? '#060c16' : '#030608'); roundRect(ctx, lx, ly, pW, panelH, 12); ctx.fillStyle = lBg; ctx.fill();
+    ctx.strokeStyle = isLeftHover ? 'rgba(100,150,255,0.4)' : 'rgba(60,90,150,0.2)'; ctx.lineWidth = 1.5; roundRect(ctx, lx, ly, pW, panelH, 12); ctx.stroke();
+    var iceV = ctx.createRadialGradient(lx + pW/2, ly + panelH/2, pW*0.2, lx + pW/2, ly + panelH/2, pW*0.6); iceV.addColorStop(0, 'rgba(0,0,0,0)'); iceV.addColorStop(1, 'rgba(40,80,160,0.08)'); roundRect(ctx, lx, ly, pW, panelH, 12); ctx.fillStyle = iceV; ctx.fill(); ctx.globalAlpha = 1;
+
+    if (lA > 0.05) {
+      var lCx = lx + pW * 0.5; ctx.globalAlpha = lA * 0.8; ctx.beginPath(); ctx.moveTo(lx + 16, surfY); ctx.lineTo(lx + pW - 16, surfY); ctx.strokeStyle = 'rgba(100,140,200,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+      for (var hi = 0; hi < 10; hi++) { var hx = lx + 18 + hi * ((pW - 36) / 9); ctx.beginPath(); ctx.moveTo(hx, surfY); ctx.lineTo(hx - 5, surfY + 8); ctx.strokeStyle = 'rgba(100,140,200,0.12)'; ctx.lineWidth = 0.8; ctx.stroke(); }
+      drawMtn(lCx, surfY, 75, 50, true, lA);
+      [lCx - 35, lCx, lCx + 35].forEach(function(ax) { ctx.globalAlpha = lA * 0.9; ctx.strokeStyle = 'rgba(100,150,255,0.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ax, surfY + 5, 5, Math.PI, 0); ctx.stroke(); ctx.fillStyle = 'rgba(40,60,100,0.9)'; roundRect(ctx, ax - 6, surfY + 8, 12, 10, 2); ctx.fill(); ctx.strokeStyle = 'rgba(100,150,255,0.6)'; ctx.lineWidth = 1; roundRect(ctx, ax - 6, surfY + 8, 12, 10, 2); ctx.stroke(); });
+      for (var fi = 0; fi < frost.length; fi++) { var f = frost[fi]; f.y = (f.y + f.spd) % 1; f.x += f.drift + Math.sin(elapsed * 0.0008 + f.ph) * 0.0001; f.rot += 0.01; var fpx = lx + f.x * pW, fpy = ly + f.y * panelH; if (fpx < lx + 10 || fpx > lx + pW - 10) continue; var fa = f.a * lA * (0.4 + 0.6 * Math.sin(elapsed * 0.0015 + f.ph)); ctx.globalAlpha = fa; ctx.save(); ctx.translate(fpx, fpy); ctx.rotate(f.rot); ctx.strokeStyle = 'rgba(150,200,255,0.9)'; ctx.lineWidth = 0.8; for (var ci = 0; ci < 6; ci++) { var ca = ci * Math.PI / 3; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ca) * f.sz, Math.sin(ca) * f.sz); ctx.stroke(); ctx.beginPath(); ctx.moveTo(Math.cos(ca)*f.sz*0.6, Math.sin(ca)*f.sz*0.6); ctx.lineTo(Math.cos(ca+0.5)*f.sz*0.4, Math.sin(ca+0.5)*f.sz*0.4); ctx.stroke(); } ctx.restore(); }
+      ctx.globalAlpha = lA * 0.95; ctx.fillStyle = '#6090ff'; ctx.font = '700 10px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('THE ASSUMPTION', lCx, ly + 22); ctx.fillStyle = 'rgba(100,150,255,0.7)'; ctx.font = '600 12px DM Sans, sans-serif'; ctx.fillText('FIXED · IMMOVABLE', lCx, ly + panelH - 14);
+      ctx.globalAlpha = lA * (0.15 + 0.1 * Math.sin(elapsed * 0.003)); ctx.strokeStyle = '#4080ff'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(lCx - 35, surfY - 65); ctx.lineTo(lCx + 35, surfY - 10); ctx.stroke(); ctx.beginPath(); ctx.moveTo(lCx + 35, surfY - 65); ctx.lineTo(lCx - 35, surfY - 10); ctx.stroke(); ctx.lineCap = 'butt'; ctx.globalAlpha = 1;
+    }
+
+    // DIVIDER
+    var divX = gap * 1.5 + pW; var divPulse = 0.18 + 0.1 * Math.sin(elapsed * 0.003); ctx.beginPath(); ctx.moveTo(divX, ly + 12); ctx.lineTo(divX, ly + panelH - 12); ctx.strokeStyle = 'rgba(168,162,158,' + divPulse.toFixed(3) + ')'; ctx.lineWidth = 1; ctx.stroke();
+    var vsY = ly + panelH * 0.5; ctx.beginPath(); ctx.arc(divX, vsY, 12, 0, 6.28); ctx.fillStyle = '#020408'; ctx.fill(); ctx.strokeStyle = 'rgba(168,162,158,0.3)'; ctx.lineWidth = 1; ctx.stroke(); ctx.beginPath(); ctx.arc(divX, vsY, 8, 0, 6.28); ctx.fillStyle = 'rgba(168,162,158,0.05)'; ctx.fill(); ctx.fillStyle = 'rgba(168,162,158,0.5)'; ctx.font = '700 8px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VS', divX, vsY); ctx.textBaseline = 'alphabetic';
+
+    // RIGHT PANEL
+    var rx = gap * 2 + pW; ctx.globalAlpha = rA; var rBg = ctx.createLinearGradient(rx, ly, rx, ly + panelH); rBg.addColorStop(0, isRightHover ? '#0e1824' : '#0a1220'); rBg.addColorStop(1, isRightHover ? '#060c14' : '#03060a'); roundRect(ctx, rx, ly, pW, panelH, 12); ctx.fillStyle = rBg; ctx.fill();
+    ctx.strokeStyle = isRightHover ? 'rgba(168,162,158,0.4)' : 'rgba(168,162,158,0.2)'; ctx.lineWidth = 1.5; roundRect(ctx, rx, ly, pW, panelH, 12); ctx.stroke();
+    var warmV = ctx.createRadialGradient(rx + pW/2, ly + panelH/2, pW*0.2, rx + pW/2, ly + panelH/2, pW*0.6); warmV.addColorStop(0, 'rgba(0,0,0,0)'); warmV.addColorStop(1, 'rgba(100,80,40,0.05)'); roundRect(ctx, rx, ly, pW, panelH, 12); ctx.fillStyle = warmV; ctx.fill(); ctx.globalAlpha = 1;
+
+    if (rA > 0.05) {
+      var rCx = rx + pW * 0.5, dOff = Math.sin(elapsed * 0.0006) * 8; ctx.globalAlpha = rA * 0.8; ctx.beginPath(); ctx.moveTo(rx + 16, surfY); ctx.lineTo(rx + pW - 16, surfY); ctx.strokeStyle = 'rgba(168,162,158,0.22)'; ctx.lineWidth = 1; ctx.stroke();
+      drawMtn(rCx + dOff, surfY, 75, 50, false, rA);
+      ctx.globalAlpha = rA * 0.9; var arY = surfY - 16; ctx.beginPath(); ctx.moveTo(rCx - 22 + dOff, arY); ctx.lineTo(rCx + 22 + dOff, arY); ctx.lineTo(rCx + 15 + dOff, arY - 6); ctx.moveTo(rCx + 22 + dOff, arY); ctx.lineTo(rCx + 15 + dOff, arY + 6); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '700 8px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('DRIFT', rCx + dOff, arY - 10);
+      ctx.globalCompositeOperation = 'screen'; for (var ci = 0; ci < clouds.length; ci++) { var c = clouds[ci]; c.x += c.spd; if (c.x > 0.97) c.x = 0.53; var cpx = rx + (c.x - 0.53) / 0.44 * pW, cpy = ly + c.y * panelH + dOff * 0.2; var cAlpha = c.a * rA * (0.5 + 0.5 * Math.sin(elapsed * 0.0012 + c.ph)); var cG = ctx.createRadialGradient(cpx, cpy, 0, cpx, cpy, c.rx); cG.addColorStop(0, 'rgba(220,210,190,' + (cAlpha*0.8).toFixed(4) + ')'); cG.addColorStop(0.4, 'rgba(180,170,150,' + (cAlpha*0.4).toFixed(4) + ')'); cG.addColorStop(1, 'rgba(140,130,110,0)'); ctx.fillStyle = cG; ctx.beginPath(); ctx.ellipse(cpx, cpy, c.rx, c.ry, 0, 0, 6.28); ctx.fill(); } ctx.globalCompositeOperation = 'source-over';
+      for (var wi = 0; wi < windLines.length; wi++) { var wl = windLines[wi]; wl.x += wl.spd * 0.0012; if (wl.x > 0.97) wl.x = 0.53; var wpx = rx + (wl.x - 0.53) / 0.44 * pW, wpy = ly + wl.y * panelH; var wa = wl.a * rA * (0.3 + 0.7 * Math.sin(elapsed * 0.002 + wl.ph)); ctx.beginPath(); ctx.moveTo(wpx, wpy); ctx.lineTo(wpx + wl.len, wpy + Math.sin(elapsed*0.001+wl.ph)*2); ctx.strokeStyle = 'rgba(255,255,255,' + wa.toFixed(4) + ')'; ctx.lineWidth = 0.8; ctx.stroke(); }
+      ctx.globalAlpha = rA * 0.95; ctx.fillStyle = 'rgba(240,230,210,0.95)'; ctx.font = '700 10px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('QURAN 27:88', rCx, ly + 22); ctx.fillStyle = 'rgba(168,162,158,0.85)'; ctx.font = '600 12px DM Sans, sans-serif'; ctx.fillText('MOVES LIKE CLOUDS  ✓', rCx, ly + panelH - 14);
+      ctx.globalAlpha = rA * (0.06 + 0.03 * Math.sin(elapsed * 0.002)); var ckGlow = ctx.createRadialGradient(rCx, surfY - 38, 0, rCx, surfY - 38, 60); ckGlow.addColorStop(0, 'rgba(34,197,94,0.5)'); ckGlow.addColorStop(1, 'rgba(34,197,94,0)'); ctx.fillStyle = ckGlow; ctx.fillRect(rCx - 60, surfY - 98, 120, 120); ctx.globalAlpha = 1;
+    }
+
+    if (elapsed < TOTAL) { requestAnimationFrame(drawFrame); } else { document.getElementById('s1Mc').style.display = 'block'; }
+  }
+  requestAnimationFrame(drawFrame);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   S2 CANVAS — Premium Tectonic Cross-Section Simulator
+   ══════════════════════════════════════════════════════════════ */
+var s2Running = false;
+var s2 = { cv: null, ctx: null, W: 640, H: 280, time: 0, dFrac: 0, lblA: 0, simulating: false, simStart: 0, convection: [], magma: [], ripples: [], loopId: null, ready: false, mx: 0.5, my: 0.5 };
+
+function initS2Particles() {
+  var rng = makeRng(77); s2.convection = [];
+  for (var i = 0; i < 45; i++) s2.convection.push({ cell: 'left', angle: rng() * 6.28, speed: -(0.003 + rng() * 0.004), rX: 40 + rng() * 60, rY: 25 + rng() * 35, sz: 0.8 + rng() * 1.8, a: 0.15 + rng() * 0.25, trail: [] });
+  for (var i = 0; i < 45; i++) s2.convection.push({ cell: 'right', angle: rng() * 6.28, speed: 0.003 + rng() * 0.004, rX: 40 + rng() * 60, rY: 25 + rng() * 35, sz: 0.8 + rng() * 1.8, a: 0.15 + rng() * 0.25, trail: [] });
+  s2.magma = []; for (var i = 0; i < 25; i++) s2.magma.push({ y: s2.H * 0.75 + rng() * s2.H * 0.2, spd: -(0.2 + rng() * 0.5), sz: 1.5 + rng() * 3, a: 0.2 + rng() * 0.35, x: s2.W * 0.5 + (rng() - 0.5) * 24, life: rng() });
+  s2.ripples = [];
+}
+
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas'); if (!cv) return; s2.cv = cv; s2.W = 640; s2.H = 280; s2.ctx = setupCanvas(cv, s2.W, s2.H);
+  trackMouse(cv, function(nx, ny) { s2.mx = nx; s2.my = ny; });
+  cv.addEventListener('click', function(e) { var r = cv.getBoundingClientRect(); var x = (e.clientX - r.left) / r.width * s2.W; var y = (e.clientY - r.top) / r.height * s2.H; if (y > s2.H * 0.35) { s2.ripples.push({ x: x, y: y, rad: 5, a: 0.8, maxRad: 60 + Math.random()*40 }); for(var i=0; i<5; i++) { s2.magma.push({ y: y, spd: -(1 + Math.random()*1.5), sz: 1 + Math.random()*2, a: 0.5 + Math.random()*0.3, x: x + (Math.random()-0.5)*10, life: 1 }); } } });
+  initS2Particles(); s2.ready = true; drawS2Frame(s2.ctx, s2.W, s2.H, 0, 0, 0, s2.mx, s2.my);
+}
+
+function startTectonics() {
+  if (s2Running) return; s2Running = true; document.getElementById('s2Btn').disabled = true; s2.simulating = true; s2.simStart = performance.now(); if (!s2.ready) initS2Canvas(); var countEl = document.getElementById('driftCount');
+  function tick(ts) { if (!s2.simStart) s2.simStart = ts; var elapsed = ts - s2.simStart; var DRIFT_MS = 2800, LABEL_MS = 600; s2.dFrac = Math.min(elapsed / DRIFT_MS, 1); s2.lblA = elapsed > DRIFT_MS ? Math.min((elapsed - DRIFT_MS) / LABEL_MS, 1) : 0; s2.time = elapsed; drawS2Frame(s2.ctx, s2.W, s2.H, s2.dFrac, s2.lblA, s2.time, s2.mx, s2.my); countEl.textContent = Math.round(ease(s2.dFrac) * 100);
+    if (elapsed < DRIFT_MS + LABEL_MS) { s2.loopId = requestAnimationFrame(tick); } else { s2.simulating = false; document.getElementById('s2PanelA').classList.add('lit'); document.getElementById('s2PanelB').classList.add('lit'); document.getElementById('s2Result').classList.add('show'); setTimeout(function() { showOk('Up to 100 mm per year the exact motion the Quran called "moving like clouds."', function() { go(3); }); }, 900); function idle(ts) { s2.time = ts; drawS2Frame(s2.ctx, s2.W, s2.H, 1, 1, s2.time, s2.mx, s2.my); if (!s2.simulating) requestAnimationFrame(idle); } requestAnimationFrame(idle); } }
+  requestAnimationFrame(tick);
+}
+
+function drawS2Frame(ctx, W, H, dFrac, lblA, time, mx, my) {
+  ctx.clearRect(0, 0, W, H); var surfY = H * 0.28, midX = W * 0.5, lShift = ease(dFrac) * W * 0.055;
+  var sky = ctx.createLinearGradient(0, 0, 0, surfY); sky.addColorStop(0, '#010205'); sky.addColorStop(1, '#060e1a'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, surfY);
+
+  // Draw Plates with Wavy Strata
+  function drawPlate(startX, endX, shiftDir) {
+    ctx.save(); ctx.beginPath(); ctx.rect(startX, surfY, endX - startX, H - surfY); ctx.clip();
+    var pGrad = ctx.createLinearGradient(0, surfY, 0, H); pGrad.addColorStop(0, '#1a2530'); pGrad.addColorStop(0.3, '#141c24'); pGrad.addColorStop(1, '#080c12'); ctx.fillStyle = pGrad; ctx.fillRect(0, surfY, W, H - surfY);
+    var strataColors = ['rgba(40,50,60,0.4)', 'rgba(30,40,50,0.3)', 'rgba(50,60,70,0.4)', 'rgba(25,35,45,0.3)', 'rgba(35,45,55,0.3)'];
+    for(var s=0; s<5; s++) { var sy = surfY + (H-surfY) * (0.1 + s*0.17); ctx.beginPath(); ctx.moveTo(0, sy); for(var sx=0; sx<W; sx+=15) ctx.lineTo(sx, sy + Math.sin(sx*0.03 + s + shiftDir*2)*4); ctx.strokeStyle = strataColors[s]; ctx.lineWidth = 8; ctx.stroke(); }
+    ctx.restore();
+  }
+  
+  drawPlate(0, midX - lShift, -1);
+  drawPlate(midX + lShift, W, 1);
+
+  // Mantle Core
+  var mGrad = ctx.createRadialGradient(midX, H+20, 0, midX, H+20, H*0.6); mGrad.addColorStop(0, 'rgba(255,80,10,0.25)'); mGrad.addColorStop(0.5, 'rgba(160,40,5,0.10)'); mGrad.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = mGrad; ctx.fillRect(0, H*0.4, W, H*0.6);
+
+  // Convection
+  if (dFrac > 0) { var convA = ease(dFrac) * 0.9; for (var i = 0; i < s2.convection.length; i++) { var p = s2.convection[i]; p.angle += p.speed; var cx = p.cell === 'left' ? midX * 0.5 - lShift * 0.3 : midX + (W - midX) * 0.5 + lShift * 0.3; var cy = H * 0.62 + (H * 0.38) * 0.5; var px = cx + Math.cos(p.angle) * p.rX; var py = cy + Math.sin(p.angle) * p.rY * 0.5; p.trail.push({x: px, y: py}); if(p.trail.length > 8) p.trail.shift(); ctx.globalAlpha = convA * p.a * 0.4; ctx.beginPath(); ctx.moveTo(p.trail[0].x, p.trail[0].y); for(var ti=1; ti<p.trail.length; ti++) ctx.lineTo(p.trail[ti].x, p.trail[ti].y); ctx.strokeStyle = 'rgba(255,120,40,0.8)'; ctx.lineWidth = 2; ctx.stroke(); ctx.globalAlpha = convA * p.a; ctx.beginPath(); ctx.arc(px, py, p.sz, 0, 6.28); ctx.fillStyle = 'rgba(255,180,80,0.9)'; ctx.fill(); } ctx.globalAlpha = 1; }
+
+  // Magma
+  if (dFrac > 0) { var magA = ease(dFrac) * 0.8; for (var i = s2.magma.length - 1; i >= 0; i--) { var m = s2.magma[i]; m.y += m.spd; m.x += Math.sin(time*0.005 + i) * 0.4; m.life -= 0.004; if (m.y < surfY + 15 || m.life <= 0) { s2.magma.splice(i, 1); continue; } var magmA = m.a * magA * m.life; ctx.beginPath(); ctx.arc(m.x, m.y, m.sz, 0, 6.28); ctx.fillStyle = 'rgba(255,220,80,' + magmA.toFixed(4) + ')'; ctx.fill(); var gG = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.sz * 6); gG.addColorStop(0, 'rgba(255,100,20,' + (magmA * 0.5).toFixed(4) + ')'); gG.addColorStop(1, 'rgba(255,50,10,0)'); ctx.fillStyle = gG; ctx.beginPath(); ctx.arc(m.x, m.y, m.sz * 6, 0, 6.28); ctx.fill(); } }
+
+  // Ripples
+  for (var i = s2.ripples.length - 1; i >= 0; i--) { var r = s2.ripples[i]; r.rad += 1.2; r.a -= 0.015; if (r.a <= 0 || r.rad > r.maxRad) { s2.ripples.splice(i, 1); continue; } ctx.beginPath(); ctx.arc(r.x, r.y, r.rad, 0, 6.28); ctx.strokeStyle = 'rgba(255,180,60,' + r.a.toFixed(4) + ')'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.beginPath(); ctx.arc(r.x, r.y, r.rad * 0.6, 0, 6.28); ctx.strokeStyle = 'rgba(255,220,100,' + (r.a*0.5).toFixed(4) + ')'; ctx.lineWidth = 0.8; ctx.stroke(); }
+
+  // Fault Boundary Energy
+  var boundA = 0.15 + ease(dFrac) * 0.45; var bGrad = ctx.createLinearGradient(midX - 20, 0, midX + 20, 0); bGrad.addColorStop(0, 'rgba(255,100,20,0)'); bGrad.addColorStop(0.5, 'rgba(255,180,60,' + boundA + ')'); bGrad.addColorStop(1, 'rgba(255,100,20,0)'); ctx.fillStyle = bGrad; ctx.fillRect(midX - lShift - 12, surfY, lShift * 2 + 24, H - surfY);
+  
+  // Surface
+  ctx.beginPath(); ctx.moveTo(0, surfY); ctx.lineTo(W, surfY); ctx.strokeStyle = 'rgba(168,162,158,0.4)'; ctx.lineWidth = 1.5; ctx.stroke(); for(var gx=0; gx<W; gx+=6) { ctx.beginPath(); ctx.moveTo(gx, surfY); ctx.lineTo(gx+2, surfY - 2 - Math.random()*2); ctx.strokeStyle = 'rgba(140,160,130,0.2)'; ctx.lineWidth = 1; ctx.stroke(); }
+
+  // Mountains with Pegs/Roots
+  function drawMtn2(bx, ht, hw, depthRoot) { 
+    ctx.beginPath(); ctx.moveTo(bx - hw, surfY);
+    ctx.quadraticCurveTo(bx - hw * 0.5, surfY - ht*0.6, bx - hw * 0.1, surfY - ht + 2); ctx.lineTo(bx, surfY - ht); ctx.lineTo(bx + hw * 0.1, surfY - ht + 2); ctx.quadraticCurveTo(bx + hw * 0.5, surfY - ht*0.6, bx + hw, surfY); ctx.closePath();
+    var mg = ctx.createLinearGradient(bx - hw, surfY - ht, bx + hw, surfY); mg.addColorStop(0, 'rgba(160,150,130,0.6)'); mg.addColorStop(0.4, 'rgba(100,90,70,0.7)'); mg.addColorStop(1, 'rgba(40,35,25,0.9)'); ctx.fillStyle = mg; ctx.fill(); 
+    ctx.beginPath(); ctx.moveTo(bx - hw*0.1, surfY - ht + 2); ctx.lineTo(bx, surfY - ht); ctx.lineTo(bx + hw*0.1, surfY - ht + 2); ctx.strokeStyle = 'rgba(220,215,208,0.8)'; ctx.lineWidth = 1.5; ctx.stroke();
+    var snH = ht * 0.2; ctx.beginPath(); ctx.moveTo(bx - hw * 0.18, surfY - ht + snH); ctx.lineTo(bx, surfY - ht); ctx.lineTo(bx + hw * 0.18, surfY - ht + snH); ctx.closePath(); ctx.fillStyle = 'rgba(230,240,250,0.7)'; ctx.fill();
+    // Deep Root (Peg)
+    ctx.beginPath(); ctx.moveTo(bx - hw*0.3, surfY); ctx.quadraticCurveTo(bx - hw*0.1, surfY + depthRoot*0.5, bx, surfY + depthRoot); ctx.quadraticCurveTo(bx + hw*0.1, surfY + depthRoot*0.5, bx + hw*0.3, surfY); ctx.closePath();
+    var rg = ctx.createLinearGradient(bx, surfY, bx, surfY + depthRoot); rg.addColorStop(0, 'rgba(100,90,70,0.3)'); rg.addColorStop(1, 'rgba(40,35,25,0)'); ctx.fillStyle = rg; ctx.fill(); ctx.strokeStyle = 'rgba(100,90,70,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  drawMtn2(W * 0.20 - lShift * 0.8, 48, 32, 70); drawMtn2(W * 0.37 - lShift * 0.5, 60, 40, 90); drawMtn2(W * 0.63 + lShift * 0.5, 54, 38, 80); drawMtn2(W * 0.80 + lShift * 0.8, 42, 28, 65);
+
+  // Drift Arrows
+  if (dFrac > 0.08) { var arA = Math.min(ease(dFrac) * 1.1, 0.95); ctx.globalAlpha = arA; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; var laX = midX * 0.44 - lShift * 0.3, laY = surfY + (H - surfY) * 0.35; ctx.beginPath(); ctx.moveTo(laX + 28, laY); ctx.lineTo(laX - 28, laY); ctx.lineTo(laX - 18, laY - 8); ctx.moveTo(laX - 28, laY); ctx.lineTo(laX - 18, laY + 8); ctx.stroke(); var raX = midX + (W - midX) * 0.44 + lShift * 0.3; ctx.beginPath(); ctx.moveTo(raX - 28, laY); ctx.lineTo(raX + 28, laY); ctx.lineTo(raX + 18, laY - 8); ctx.moveTo(raX + 28, laY); ctx.lineTo(raX + 18, laY + 8); ctx.stroke(); ctx.lineCap = 'butt'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = '700 10px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('PLATE A', laX, laY + 24); ctx.fillText('PLATE B', raX, laY + 24); ctx.globalAlpha = 1; }
+
+  // Labels
+  if (lblA > 0) { ctx.globalAlpha = lblA; ctx.fillStyle = 'rgba(168,162,158,0.7)'; ctx.font = '700 10px DM Sans, sans-serif'; ctx.textAlign = 'left'; ctx.fillText('CRUST · SURFACE', 12, surfY - 8); ctx.fillStyle = 'rgba(255,120,40,0.7)'; ctx.fillText('UPPER MANTLE', 12, H - 12); ctx.globalAlpha = 1; }
+}
+
+/* Initialize Hero on load */
+initHeroCanvas();
+
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"moving-mountains");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"moving-mountains","question":"How fast do tectonic plates (and mountains) move per year?","inputType":"drift","unit":"cm/yr","min":0,"max":20,"step":1, "correct":5,"correctLabel":"2–10 cm/year","curiositySeed":{"question":"Worker ants outside the nest — are they male or female? The Quran uses a feminine Arabic verb for the ant.","nextUrl":"quran-ants.html","nextTitle":"Female Ants"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 27:88 "they are moving like clouds." Plate tectonics confirmed in the 20th century. */
+QuranValidator.attach('qv-moving-mountains',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 27:88 "you think them fixed, but they are moving like clouds." Confirmed by plate tectonics.',
+  groups:[
+    {id:'moving', label:'Moving like clouds', arabic:'الْجِبَالَ', color:'#a8a29e', occurrences:[[27,88]]}
+  ]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+    <link rel="stylesheet" href="theme.css?v=20260615h">
+    <title>Dead Sea · Quranic Numerics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b1622;
+            --surface: #111e2e;
+            --surface2: #182840;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e2ddd4;
+            --muted: #7a8fa3;
+            --gold: #f59e0b;
+            --gold-light: #fcd34d;
+            --ok: #22c55e;
+            --ok-bg: #052e16;
+            --ok-border: #166534;
+            --err-light: #f87171;
+            --err-bg: #2d0707;
+            --err-border: #991b1b;
+            --accent: #fdba74;
+            --accent-light: #fed7aa;
+            --accent-dim: rgba(253, 186, 116, 0.12);
+            --accent-ring: rgba(253, 186, 116, 0.28);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            padding: 44px 20px 160px;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+        .dot-field {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 260px;
+            height: 260px;
+            opacity: .02;
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .stage {
+            display: none;
+        }
+        .stage.active {
+            display: block;
+            animation: rise .4s ease;
+        }
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .lesson-bar-wrap {
+            background: var(--surface2);
+            border-radius: 100px;
+            height: 10px;
+            margin-bottom: 6px;
+            overflow: hidden;
+        }
+        .lesson-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 100px;
+            transition: width .65s cubic-bezier(.4, 0, .2, 1);
+            width: 0%;
+        }
+        .lesson-meta {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            transition: color .2s;
+        }
+        .nav-back:hover {
+            color: var(--text);
+        }
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(22px, 4.5vw, 34px);
+            line-height: 1.25;
+            margin-bottom: 20px;
+        }
+        .body-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--muted);
+            margin-bottom: 28px;
+        }
+        .step-lbl {
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .prompt {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(18px, 4vw, 24px);
+            line-height: 1.35;
+            margin-bottom: 24px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .2s, transform .1s;
+            border: none;
+            text-decoration: none;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn:hover {
+            opacity: .88;
+        }
+        .btn.used {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .intro-verse {
+            background: var(--surface);
+            border: 1px solid var(--accent-ring);
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .iv-ref {
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: 16px;
+        }
+        .iv-ar {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+            text-align: right;
+            font-size: clamp(22px, 4vw, 32px);
+            line-height: 2.2;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+        .iv-ar .hl {
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+        .iv-tr {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--muted);
+            font-style: italic;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+        .iv-tr .hl {
+            color: var(--text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .claim-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            align-items: center;
+        }
+        .cr-block {
+            text-align: center;
+        }
+        .cr-num {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 700;
+            color: var(--accent-light);
+            line-height: 1;
+            text-shadow: 0 0 40px rgba(253, 186, 116, 0.35);
+        }
+        .cr-lbl {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-top: 5px;
+            max-width: 130px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
+        .cr-eq {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--muted);
+        }
+
+        .answer-card {
+            background: var(--surface);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 4px solid rgba(0, 0, 0, 0.28);
+            border-radius: 14px;
+            padding: 16px 18px;
+            cursor: pointer;
+            user-select: none;
+            transition: border-color .15s, background .15s;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 11px;
+        }
+        .answer-card:hover {
+            border-color: rgba(255, 255, 255, 0.26);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .answer-card.ac-correct {
+            border-color: var(--ok);
+            border-bottom-color: var(--ok-border);
+            background: rgba(34, 197, 94, 0.08);
+            pointer-events: none;
+        }
+        .answer-card.ac-wrong {
+            animation: shake .4s ease;
+            border-color: var(--err-light) !important;
+        }
+        .answer-card.ac-disabled {
+            opacity: 0.38;
+            pointer-events: none;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+            20% {
+                transform: translateX(-8px)
+            }
+            40% {
+                transform: translateX(8px)
+            }
+            60% {
+                transform: translateX(-5px)
+            }
+            80% {
+                transform: translateX(5px)
+            }
+        }
+        .ac-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+        .ac-body {
+            flex: 1;
+        }
+        .ac-big {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.4;
+        }
+        .ac-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.55;
+        }
+
+        #cmpMc {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .depth-result {
+            background: var(--surface);
+            border: 1px solid var(--accent-ring);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 0 0 20px;
+            display: none;
+            animation: rise .35s ease;
+        }
+        .depth-result.show {
+            display: block;
+        }
+        .dr-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .dr-item {
+            text-align: center;
+            flex: 1;
+            min-width: 90px;
+        }
+        .dr-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent-light);
+            line-height: 1;
+        }
+        .dr-lbl {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+        .dr-note {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.65;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .xp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 100px;
+            padding: 8px 18px;
+            margin-bottom: 28px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity .5s, transform .5s;
+        }
+        .xp-badge.show {
+            opacity: 1;
+            transform: none;
+        }
+        .xp-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ok);
+        }
+        .match-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 24px 0 8px;
+            flex-wrap: wrap;
+        }
+        .match-block {
+            text-align: center;
+        }
+        .match-num {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(42px, 10vw, 64px);
+            font-weight: 700;
+            line-height: 1;
+        }
+        .match-num.mc1 {
+            color: var(--accent-light);
+            text-shadow: 0 0 40px var(--accent-ring);
+        }
+        .match-num.mc2 {
+            color: var(--gold-light);
+            text-shadow: 0 0 40px rgba(252, 211, 77, 0.4);
+        }
+        .match-lbl {
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        .match-eq {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(28px, 6vw, 44px);
+            color: var(--muted);
+        }
+        .sci-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 16px 0 22px;
+        }
+        .sci-table th {
+            text-align: left;
+            color: var(--muted);
+            font-weight: 400;
+            padding: 8px 12px;
+            font-size: 11px;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        .sci-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .sci-table .td-v {
+            color: var(--accent-light);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+        }
+        .sci-table tr.hl td {
+            background: rgba(245, 158, 11, 0.06);
+        }
+        .sci-table tr.hl .td-v {
+            color: var(--gold);
+        }
+        .insight-box {
+            background: var(--surface);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-light);
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        .insight-box strong {
+            color: var(--text);
+        }
+        .gold-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(252, 211, 77, 0.04) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.28);
+            border-radius: 14px;
+            padding: 26px;
+            text-align: center;
+            margin: 24px 0;
+        }
+        .gold-box .gt {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(17px, 3.5vw, 22px);
+            color: #fcd34d;
+            line-height: 1.6;
+        }
+        .gold-box .gs {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 12px;
+            line-height: 1.75;
+        }
+
+        .fb-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 300;
+            padding: 18px 20px 32px;
+            transform: translateY(110%);
+            transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .fb-panel.show {
+            transform: translateY(0);
+        }
+        .fb-panel.fb-ok {
+            background: var(--ok-bg);
+            border-top: 3px solid var(--ok);
+        }
+        .fb-panel.fb-err {
+            background: var(--err-bg);
+            border-top: 3px solid var(--err-light);
+        }
+        .fb-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .fb-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        .fb-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .fb-panel.fb-ok .fb-title {
+            color: var(--ok);
+        }
+        .fb-panel.fb-err .fb-title {
+            color: var(--err-light);
+        }
+        .fb-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3px;
+            line-height: 1.55;
+            max-width: 340px;
+        }
+        .fb-btn {
+            flex-shrink: 0;
+            padding: 14px 30px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .1s;
+        }
+        .fb-btn:active {
+            transform: scale(0.96);
+        }
+        .fb-panel.fb-ok .fb-btn {
+            background: var(--ok);
+            color: var(--ok-bg);
+        }
+        .fb-panel.fb-err .fb-btn {
+            background: var(--err-light);
+            color: var(--err-bg);
+        }
+
+        .canvas-interactive {
+            cursor: pointer;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            display: block;
+            touch-action: manipulation;
+        }
+        .canvas-interactive:active {
+            cursor: grabbing;
+        }
+
+        .pulse-hint {
+            animation: pulseHint 2.2s ease-in-out infinite;
+        }
+        @keyframes pulseHint {
+            0%,
+            100% {
+                opacity: 0.55;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 30px rgba(253, 186, 116, 0.5), 0 0 60px rgba(253, 186, 116, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+        <button class="tt-btn" data-theme-val="dark" title="Dark">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="tt-btn" data-theme-val="system" title="System">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </button>
+        <button class="tt-btn" data-theme-val="light" title="Light">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+    </div>
+    <a href="index.html" class="nav-home-fixed">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All lessons
+    </a>
+    <div class="dot-field"></div>
+    <div class="container">
+
+        <a href="quran-iron.html" class="nav-back">← Iron</a>
+
+        <div class="lesson-bar-wrap">
+            <div class="lesson-bar-fill" id="lbar"></div>
+        </div>
+        <div class="lesson-meta" id="lmeta">Lesson · Dead Sea</div>
+
+        <!-- ═══ STAGE SP PREDICTION ══════════════════════════════════ -->
+        <div class="stage active" id="sp"></div>
+
+        <!-- ═══ STAGE 0 INTRO ═══════════════════════════════════════ -->
+        <div class="stage" id="s0">
+            <div id="predictReveal"></div>
+
+            <canvas id="heroCanvas" width="640" height="130"
+            style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+            <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · Dead Sea</p>
+
+            <h1 class="hero-title">The Quran described a battle at <span style="color:var(--accent-light)">"the lowest land"</span> 1,400 years before science could measure which land on Earth was actually the lowest.</h1>
+
+            <div class="intro-verse">
+                <div class="iv-ref">30:2–3 Surah Ar-Rūm · The Romans</div>
+                <div class="iv-ar">غُلِبَتِ الرُّومُ ۝ فِي <span class="hl">أَدْنَى</span> الْأَرْضِ وَهُمْ مِنْ بَعْدِ غَلَبِهِمْ سَيَغْلِبُونَ</div>
+                <div class="iv-tr">"The Romans were defeated in <span class="hl">the lowest land</span>, and they, after this defeat, will be victorious."</div>
+            </div>
+
+            <div class="claim-row">
+                <div class="cr-block">
+                    <div class="cr-num" style="font-family:'Amiri',serif;font-size:clamp(28px,5vw,44px)">أَدْنَى</div>
+                    <div class="cr-lbl">Arabic for "lowest" superlative form indicating the absolute lowest</div>
+                </div>
+                <div class="cr-eq">=</div>
+                <div class="cr-block">
+                    <div class="cr-num">−430</div>
+                    <div class="cr-lbl">meters · Dead Sea shore, Earth's lowest land point</div>
+                </div>
+            </div>
+
+            <p class="body-text">The Quran uses the word <strong>أدنى (adnā)</strong> the superlative form meaning <strong>"lowest."</strong> The battle between the Romans and Persians occurred near the Dead Sea. Modern satellite altimetry reveals that the Dead Sea shore sits at <strong>430 meters below sea level</strong>, making it the single lowest land point on the entire planet. This precise geographical fact was only confirmed in the 20th century. No civilization in the 7th century possessed the instruments to measure it.</p>
+
+            <button class="btn" onclick="go(1)" style="background:var(--accent);color:#0b1622">Begin the lesson →</button>
+        </div>
+
+        <!-- ═══ STAGE 1 EXERCISE 1 (Elevation Discovery Canvas + MC) ═══ -->
+        <div class="stage" id="s1">
+            <p class="prompt">Explore Earth's lowest places. Tap each marker to reveal what lies at that elevation then discover which one the Quran pinpointed.</p>
+
+            <canvas id="elevCanvas" width="640" height="340"
+            class="canvas-interactive"
+            style="width:100%;height:340px;border-radius:14px;margin-bottom:8px;display:block;"
+            onclick="handleElevCanvasClick(event)" ontouchstart="handleElevCanvasTouch(event)"></canvas>
+
+            <div id="cmpMc">
+                <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">The Quran used the word <strong>أَدْنَى</strong> meaning <strong>"lowest"</strong> to describe the battle site near the Dead Sea. Why is this considered remarkable?</p>
+
+                <div onclick="pickEx1(this, false)" class="answer-card">
+                    <div class="ac-letter">A</div>
+                    <div class="ac-body">
+                        <div class="ac-big">Ancient civilizations had already measured the Dead Sea's depth</div>
+                        <div class="ac-sub">Greek and Roman surveyors were known to have mapped the region's elevation precisely</div>
+                    </div>
+                </div>
+                <div onclick="pickEx1(this, false)" class="answer-card">
+                    <div class="ac-letter">B</div>
+                    <div class="ac-body">
+                        <div class="ac-big">The Dead Sea is only the lowest point in the Middle East, not globally</div>
+                        <div class="ac-sub">Several locations in Africa and Asia are actually lower than the Dead Sea</div>
+                    </div>
+                </div>
+                <div onclick="pickEx1(this, true)" class="answer-card">
+                    <div class="ac-letter">C</div>
+                    <div class="ac-body">
+                        <div class="ac-big">Determining Earth's lowest land point required modern geodetic instruments</div>
+                        <div class="ac-sub">No 7th-century tool could measure below-sea-level elevation with global precision yet the Quran's word choice matches perfectly</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STAGE 2 EXERCISE 2 (Depth Scan) ════════════════════ -->
+        <div class="stage" id="s2">
+            <p class="prompt">How far below sea level is the Dead Sea? Scan to measure.</p>
+
+            <canvas id="depthCanvas" width="640" height="220"
+            style="width:100%;height:220px;border-radius:14px;margin-bottom:14px;display:block;"></canvas>
+
+            <div class="depth-result" id="depthResult">
+                <div class="dr-row">
+                    <div class="dr-item">
+                        <div class="dr-num">−430</div>
+                        <div class="dr-lbl">meters (modern measurement)</div>
+                    </div>
+                    <div class="dr-item">
+                        <div class="dr-num">#1</div>
+                        <div class="dr-lbl">lowest land on Earth</div>
+                    </div>
+                    <div class="dr-item">
+                        <div class="dr-num">7th c.</div>
+                        <div class="dr-lbl">when Quran was revealed</div>
+                    </div>
+                </div>
+                <div class="dr-note">The Dead Sea's surface sits at <strong>430.5 metres below sea level</strong>, making its shores the lowest land-based elevation on Earth. This measurement required satellite altimetry and modern geodetic instruments technology entirely unknown in the 7th century. The Quran's word <strong>أَدْنَى</strong> ("lowest") describes this precise geographical reality.</div>
+            </div>
+
+            <button class="btn" id="depthBtn" onclick="runDepthScan()" style="background:var(--accent);color:#0b1622">Measure the depth →</button>
+        </div>
+
+        <!-- ═══ STAGE 3 EXERCISE 3 ══════════════════════════════════ -->
+        <div class="stage" id="s3">
+            <p class="prompt">What makes the Quran's use of the word <strong>أَدْنَى</strong> ("lowest") in verse 30:3 a striking geographical claim?</p>
+
+            <div onclick="pickEx3(this, false)" class="answer-card">
+                <div class="ac-letter">A</div>
+                <div class="ac-body">
+                    <div class="ac-big">It was common knowledge in 7th-century Arabia that the Dead Sea was Earth's lowest point</div>
+                    <div class="ac-sub">Traders and travelers had long documented the region's unique topography</div>
+                </div>
+            </div>
+            <div onclick="pickEx3(this, true)" class="answer-card">
+                <div class="ac-letter">B</div>
+                <div class="ac-body">
+                    <div class="ac-big">Measuring absolute land elevation below sea level required instruments invented 1,300 years later</div>
+                    <div class="ac-sub">Satellite altimetry and precise geodetic surveying the only ways to confirm Earth's lowest point did not exist until the 20th century</div>
+                </div>
+            </div>
+            <div onclick="pickEx3(this, false)" class="answer-card">
+                <div class="ac-letter">C</div>
+                <div class="ac-body">
+                    <div class="ac-big">The Quran simply repeated information from earlier Greek geographical texts</div>
+                    <div class="ac-sub">The Dead Sea's status as Earth's lowest point was well-documented by Hellenistic scholars</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STAGE 4 VERDICT ════════════════════════════════════ -->
+        <div class="stage" id="s4">
+
+            <div class="xp-badge" id="xpBadge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="xp-text">Lesson complete · +30 XP</span>
+            </div>
+
+            <h2 class="hero-title" style="font-family:'Playfair Display',serif">The Quran used <span style="color:var(--accent-light)">أَدْنَى</span> the Arabic word for <span style="color:var(--accent-light)">"lowest"</span> to describe a battle site that modern science confirms is Earth's lowest land point at −430 meters. This fact was absolutely unknown in the 7th century.</h2>
+
+            <div class="match-wrap">
+                <div class="match-block">
+                    <div class="match-num mc1" id="mv0">0</div>
+                    <div class="match-lbl">meters below sea level</div>
+                </div>
+                <div class="match-eq">=</div>
+                <div class="match-block">
+                    <div class="match-num mc2" id="mv1">0</div>
+                    <div class="match-lbl">years before it could be measured</div>
+                </div>
+            </div>
+
+            <table class="sci-table" style="margin-top:28px">
+                <thead>
+                    <tr><th>Fact</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Arabic word used in Quran 30:3</td>
+                        <td class="td-v" style="font-family:'Amiri',serif;font-size:20px">أَدْنَى</td>
+                    </tr>
+                    <tr>
+                        <td>Meaning of أدنى (superlative form)</td>
+                        <td class="td-v">Lowest</td>
+                    </tr>
+                    <tr class="hl">
+                        <td>Dead Sea surface elevation</td>
+                        <td class="td-v"><strong>−430.5 m</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Rank among all land surfaces on Earth</td>
+                        <td class="td-v">Lowest (#1)</td>
+                    </tr>
+                    <tr>
+                        <td>Battle location (Roman defeat)</td>
+                        <td class="td-v">Near the Dead Sea</td>
+                    </tr>
+                    <tr>
+                        <td>When elevation was precisely confirmed</td>
+                        <td class="td-v">20th century (satellite altimetry)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="insight-box">
+                <strong>The precision is in the word:</strong> أدنى is the superlative form in Arabic, specifically meaning "lowest." The Quran used this exact word to describe a battle location that unknown to anyone at the time sits at Earth's absolute lowest land elevation. Confirming this required satellite altimetry and modern geodetic instruments developed in the 20th century. The word choice is surgically precise.
+            </div>
+
+            <div class="gold-box">
+                <div class="gt">One word. The lowest land. Verified by science 14 centuries later.</div>
+                <div class="gs">The battle near the Dead Sea occurred at Earth's lowest land point 430 metres below sea level. The Quran described it using the precise Arabic superlative <strong>أَدْنَى</strong> ("lowest"). Confirming this fact required instrumentation that did not exist until the 20th century.</div>
+            </div>
+
+            <div id="qv-dead-sea"></div>
+
+            <div id="curiositySeed"></div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+                <a href="quran-iron.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Iron</a>
+                <a href="quran-mountains.html" class="btn" style="background:var(--accent);color:#0b1622">Next · Mountains as Pegs →</a>
+            </div>
+        </div>
+
+    </div><!-- /.container -->
+
+    <div class="fb-panel" id="fbPanel">
+        <div class="fb-left">
+            <div class="fb-icon" id="fbIcon">✓</div>
+            <div>
+                <div class="fb-title" id="fbTitle">Correct!</div>
+                <div class="fb-sub" id="fbSub"></div>
+            </div>
+        </div>
+        <button class="fb-btn" id="fbBtn">Continue</button>
+    </div>
+
+    <script>
+        /* ── CORE ENGINE ──────────────────────────────────────────────── */
+        var stage = 0;
+
+        function saveProgress(id) {
+            var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+            if (!d.has(id)) {
+                d.add(id);
+                localStorage.setItem('qn_done', JSON.stringify([...d]));
+                localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+            }
+        }
+
+        function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+        function animFrom(el, from, to, ms, cb) {
+            var t0 = null;
+
+            function run(ts) {
+                if (!t0) t0 = ts;
+                var p = Math.min((ts - t0) / ms, 1);
+                el.textContent = Math.round(from + ease(p) * (to - from));
+                if (p < 1) requestAnimationFrame(run);
+                else if (cb) cb();
+            }
+            requestAnimationFrame(run);
+        }
+
+        var barMap = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+        var metaMap = {
+            0: 'Lesson · Dead Sea',
+            1: 'Exercise 1 of 3',
+            2: 'Exercise 2 of 3',
+            3: 'Exercise 3 of 3',
+            4: 'Lesson Complete'
+        };
+
+        function go(n) {
+            document.getElementById('s' + stage).classList.remove('active');
+            stage = n;
+            document.getElementById('s' + stage).classList.add('active');
+            document.getElementById('lbar').style.width = barMap[n];
+            document.getElementById('lmeta').textContent = metaMap[n];
+            window.scrollTo(0, 0);
+            if (n === 1) setTimeout(initElevCanvas, 80);
+            if (n === 2) setTimeout(initDepthCanvas, 80);
+            if (n === 4) {
+                setTimeout(function() {
+                    document.getElementById('xpBadge').classList.add('show');
+                    setTimeout(function() {
+                        saveProgress('dead-sea');
+                        animFrom(document.getElementById('mv0'), 0, 430, 1800, null);
+                        animFrom(document.getElementById('mv1'), 0, 1400, 2000, null);
+                    }, 400);
+                }, 300);
+            }
+        }
+
+        function hideFb() {
+            document.getElementById('fbPanel').className = 'fb-panel';
+        }
+
+        function showOk(sub, onContinue) {
+            document.getElementById('fbIcon').textContent = '✓';
+            document.getElementById('fbTitle').textContent = 'Correct!';
+            document.getElementById('fbSub').textContent = sub;
+            var p = document.getElementById('fbPanel');
+            p.className = 'fb-panel fb-ok show';
+            document.getElementById('fbBtn').onclick = function() { hideFb();
+                onContinue(); };
+        }
+
+        /* ── HERO CANVAS ─────────────────────────────────────────────── */
+        function initHeroCanvas() {
+            var c = document.getElementById('heroCanvas');
+            if (!c) return;
+            var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+            var W = c.width,
+                H = c.height;
+            var t = 0;
+
+            function makeRng(seed) {
+                var s = seed;
+                return function() {
+                    s = (s * 1664525 + 1013904223) & 0xffffffff;
+                    return (s >>> 0) / 0xffffffff;
+                };
+            }
+
+            var slY = H * 0.38;
+            var dsY = H * 0.74;
+            var bL = W * 0.26,
+                bR = W * 0.74;
+
+            function frame() {
+                ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = '#040810';
+                ctx.fillRect(0, 0, W, H);
+
+                var sky = ctx.createLinearGradient(0, 0, 0, slY);
+                sky.addColorStop(0, '#040810');
+                sky.addColorStop(1, '#070f1a');
+                ctx.fillStyle = sky;
+                ctx.fillRect(0, 0, W, slY);
+
+                var rng = makeRng(44);
+                for (var i = 0; i < 26; i++) {
+                    var sx = rng() * W,
+                        sy = rng() * slY * 0.88;
+                    var sa = 0.10 + 0.20 * Math.sin(t * 0.5 + i * 0.8);
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 0.7, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,' + sa + ')';
+                    ctx.fill();
+                }
+
+                var eg = ctx.createLinearGradient(0, slY, 0, H);
+                eg.addColorStop(0, '#1e2e14');
+                eg.addColorStop(1, '#111e0a');
+                ctx.fillStyle = eg;
+                ctx.beginPath();
+                ctx.moveTo(0, slY);
+                ctx.lineTo(bL - 40, slY);
+                ctx.bezierCurveTo(bL - 14, slY, bL, dsY - 6, bL + 16, dsY);
+                ctx.lineTo(bR - 16, dsY);
+                ctx.bezierCurveTo(bR, dsY - 6, bR + 14, slY, bR + 40, slY);
+                ctx.lineTo(W, slY);
+                ctx.lineTo(W, H);
+                ctx.lineTo(0, H);
+                ctx.closePath();
+                ctx.fill();
+
+                var wg = ctx.createLinearGradient(0, dsY, 0, H);
+                wg.addColorStop(0, 'rgba(12,50,90,0.88)');
+                wg.addColorStop(1, 'rgba(4,22,50,0.92)');
+                ctx.fillStyle = wg;
+                ctx.fillRect(bL + 16, dsY, bR - bL - 32, H - dsY);
+
+                var shimBase = dsY + 3;
+                ctx.strokeStyle = 'rgba(100,160,215,0.12)';
+                ctx.lineWidth = 1;
+                var rng2 = makeRng(55);
+                for (var j = 0; j < 5; j++) {
+                    var waveX = bL + 22 + rng2() * (bR - bL - 50);
+                    var waveW = 18 + rng2() * 30;
+                    var waveY = shimBase + 2 + rng2() * 6 + 1.5 * Math.sin(t * 1.2 + j * 1.5);
+                    ctx.beginPath();
+                    ctx.moveTo(waveX, waveY);
+                    ctx.lineTo(waveX + waveW, waveY);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(99,155,210,0.40)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([8, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, slY);
+                ctx.lineTo(W, slY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(147,197,253,0.42)';
+                ctx.font = '500 9px DM Sans, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillText('Sea Level  0 m', 10, slY - 4);
+
+                ctx.strokeStyle = 'rgba(253,186,116,0.50)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 4]);
+                ctx.beginPath();
+                ctx.moveTo(bR + 52, slY);
+                ctx.lineTo(bR + 52, dsY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                [slY, dsY].forEach(function(ay) {
+                    var dir = ay === slY ? 1 : -1;
+                    ctx.fillStyle = 'rgba(253,186,116,0.50)';
+                    ctx.beginPath();
+                    ctx.moveTo(bR + 52, ay + dir * 5);
+                    ctx.lineTo(bR + 46, ay + dir * 10);
+                    ctx.lineTo(bR + 58, ay + dir * 10);
+                    ctx.closePath();
+                    ctx.fill();
+                });
+
+                ctx.fillStyle = 'rgba(254,215,170,0.78)';
+                ctx.font = 'bold 10px DM Sans, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('−430 m', bR + 60, (slY + dsY) / 2);
+
+                ctx.fillStyle = 'rgba(253,186,116,0.55)';
+                ctx.font = '18px Amiri, serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('أَدْنَى الْأَرْضِ', W / 2, dsY + (H - dsY) * 0.48);
+
+                t += 0.016;
+                requestAnimationFrame(frame);
+            }
+            frame();
+        }
+        initHeroCanvas();
+
+        /* ── STAGE 1: ELEVATION DISCOVERY CANVAS ────────────────────── */
+        var elevMarkers = [
+            { yFrac: 0.18, elev: 85, label: 'Sea of Galilee shore', detail: '−214 m below sea level', isDeadSea: false,
+                revealed: false, cx: 0.55 },
+            { yFrac: 0.32, elev: -86, label: 'Death Valley (USA)', detail: '−86 m · lowest in North America',
+                isDeadSea: false, revealed: false, cx: 0.35 },
+            { yFrac: 0.48, elev: -154, label: 'Lake Assal (Djibouti)', detail: '−154 m · lowest in Africa',
+                isDeadSea: false, revealed: false, cx: 0.62 },
+            { yFrac: 0.82, elev: -430, label: 'DEAD SEA SHORE', detail: '−430 m · EARTH\'S LOWEST LAND POINT', isDeadSea: true, revealed: false, cx: 0.50 },
+            { yFrac: 0.52, elev: -255, label: 'Sea of Galilee depths', detail: '−255 m · lake bottom', isDeadSea: false,
+                revealed: false, cx: 0.44 },
+        ];
+
+        var elevRevealedCount = 0;
+        var elevDeadSeaRevealed = false;
+        var elevAllDone = false;
+
+        function initElevCanvas() {
+            var c = document.getElementById('elevCanvas');
+            if (!c) return;
+            elevMarkers.forEach(function(m) { m.revealed = false; });
+            elevRevealedCount = 0;
+            elevDeadSeaRevealed = false;
+            elevAllDone = false;
+            document.getElementById('cmpMc').style.display = 'none';
+            drawElevCanvas();
+        }
+
+        function drawElevCanvas() {
+            var c = document.getElementById('elevCanvas');
+            if (!c) return;
+            var ctx = c.getContext('2d');
+            var W = c.width,
+                H = c.height;
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#040810';
+            ctx.fillRect(0, 0, W, H);
+
+            var topM = 40,
+                botM = H - 30;
+            var totalH = botM - topM;
+
+            /* Elevation scale background */
+            var scaleGrad = ctx.createLinearGradient(0, topM, 0, botM);
+            scaleGrad.addColorStop(0, 'rgba(30,46,20,0.6)');
+            scaleGrad.addColorStop(0.4, 'rgba(22,34,16,0.7)');
+            scaleGrad.addColorStop(0.7, 'rgba(14,26,10,0.8)');
+            scaleGrad.addColorStop(1, 'rgba(6,16,6,0.9)');
+            ctx.fillStyle = scaleGrad;
+            ctx.fillRect(W * 0.08, topM, W * 0.84, totalH);
+
+            /* Border */
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(W * 0.08, topM, W * 0.84, totalH);
+
+            /* Sea level line */
+            var slY = topM + totalH * 0.22;
+            ctx.strokeStyle = 'rgba(99,155,210,0.50)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(W * 0.08, slY);
+            ctx.lineTo(W * 0.92, slY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(147,197,253,0.60)';
+            ctx.font = '500 11px DM Sans, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Sea Level — 0 m', W * 0.10, slY - 7);
+
+            /* Elevation labels */
+            [0.05, 0.22, 0.45, 0.65, 0.85].forEach(function(f) {
+                var y = topM + totalH * f;
+                var ev = Math.round(100 - f * 620);
+                ctx.fillStyle = 'rgba(122,143,163,0.35)';
+                ctx.font = '9px DM Sans, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText((ev >= 0 ? '+' : '') + ev + ' m', W * 0.10, y + 3);
+            });
+
+            /* Draw markers */
+            elevMarkers.forEach(function(m, idx) {
+                var mx = W * m.cx;
+                var my = topM + totalH * m.yFrac;
+                var radius = m.isDeadSea ? 16 : 12;
+
+                if (m.revealed) {
+                    /* Revealed marker */
+                    var glowAlpha = m.isDeadSea ? 0.55 : 0.20;
+                    var glow = ctx.createRadialGradient(mx, my, radius * 0.5, mx, my, radius * 3.2);
+                    glow.addColorStop(0, m.isDeadSea ? 'rgba(253,186,116,' + glowAlpha + ')' :
+                        'rgba(147,197,253,' + glowAlpha + ')');
+                    glow.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(mx, my, radius * 3.2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = m.isDeadSea ? '#fdba74' : 'rgba(147,197,253,0.70)';
+                    ctx.beginPath();
+                    ctx.arc(mx, my, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = m.isDeadSea ? '#fed7aa' : 'rgba(200,220,255,0.50)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    /* Checkmark inside */
+                    ctx.fillStyle = m.isDeadSea ? '#0b1622' : '#040810';
+                    ctx.font = 'bold 12px DM Sans, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('✓', mx, my);
+
+                    /* Label */
+                    ctx.fillStyle = m.isDeadSea ? '#fed7aa' : 'rgba(226,221,212,0.75)';
+                    ctx.font = (m.isDeadSea ? 'bold ' : '') + '12px DM Sans, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(m.label, mx, my - radius - 12);
+
+                    ctx.fillStyle = 'rgba(122,143,163,0.65)';
+                    ctx.font = '10px DM Sans, sans-serif';
+                    ctx.fillText(m.detail, mx, my + radius + 16);
+
+                    if (m.isDeadSea) {
+                        /* Connector line to Quran reference */
+                        ctx.strokeStyle = 'rgba(253,186,116,0.35)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([3, 5]);
+                        ctx.beginPath();
+                        ctx.moveTo(mx, my + radius + 28);
+                        ctx.lineTo(mx, my + radius + 52);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        ctx.fillStyle = 'rgba(253,186,116,0.70)';
+                        ctx.font = 'italic 11px Amiri, serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('أَدْنَى الْأَرْضِ', mx, my + radius + 66);
+                    }
+                } else {
+                    /* Unrevealed marker — pulsing dot */
+                    var pulse = 0.5 + 0.5 * Math.sin(Date.now() / 800 + idx * 1.7);
+                    var pulseR = radius + pulse * 4;
+
+                    ctx.fillStyle = 'rgba(253,186,116,' + (0.30 + pulse * 0.40) + ')';
+                    ctx.beginPath();
+                    ctx.arc(mx, my, pulseR, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(253,186,116,0.75)';
+                    ctx.beginPath();
+                    ctx.arc(mx, my, radius * 0.55, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(253,186,116,0.55)';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    /* Question mark */
+                    ctx.fillStyle = '#0b1622';
+                    ctx.font = 'bold 10px DM Sans, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('?', mx, my);
+                }
+            });
+
+            /* Hint text at bottom */
+            if (!elevAllDone) {
+                ctx.fillStyle = 'rgba(122,143,163,0.50)';
+                ctx.font = '11px DM Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Tap each glowing marker to reveal the location', W / 2, H - 8);
+            } else {
+                ctx.fillStyle = 'rgba(34,197,94,0.55)';
+                ctx.font = '500 11px DM Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('All locations revealed the Dead Sea is Earth\'s lowest point', W / 2, H - 8);
+            }
+
+            /* Continue animating if not all revealed */
+            if (!elevAllDone) {
+                requestAnimationFrame(function() { drawElevCanvas(); });
+            }
+        }
+
+        function handleElevCanvasClick(event) {
+            if (elevAllDone) return;
+            var c = document.getElementById('elevCanvas');
+            var rect = c.getBoundingClientRect();
+            var scaleX = c.width / rect.width;
+            var scaleY = c.height / rect.height;
+            var cx = (event.clientX - rect.left) * scaleX;
+            var cy = (event.clientY - rect.top) * scaleY;
+            checkElevTap(cx, cy);
+        }
+
+        function handleElevCanvasTouch(event) {
+            if (elevAllDone) return;
+            if (event.touches.length === 0) return;
+            event.preventDefault();
+            var c = document.getElementById('elevCanvas');
+            var rect = c.getBoundingClientRect();
+            var scaleX = c.width / rect.width;
+            var scaleY = c.height / rect.height;
+            var cx = (event.touches[0].clientX - rect.left) * scaleX;
+            var cy = (event.touches[0].clientY - rect.top) * scaleY;
+            checkElevTap(cx, cy);
+        }
+
+        function checkElevTap(cx, cy) {
+            var c = document.getElementById('elevCanvas');
+            var W = c.width,
+                H = c.height;
+            var topM = 40,
+                botM = H - 30;
+            var totalH = botM - topM;
+
+            var tappedAny = false;
+            elevMarkers.forEach(function(m, idx) {
+                if (m.revealed) return;
+                var mx = W * m.cx;
+                var my = topM + totalH * m.yFrac;
+                var hitR = 28;
+                var dx = cx - mx;
+                var dy = cy - my;
+                if (dx * dx + dy * dy < hitR * hitR) {
+                    m.revealed = true;
+                    elevRevealedCount++;
+                    if (m.isDeadSea) {
+                        elevDeadSeaRevealed = true;
+                    }
+                    tappedAny = true;
+                }
+            });
+
+            if (tappedAny && elevDeadSeaRevealed && !elevAllDone) {
+                elevAllDone = true;
+                setTimeout(function() {
+                    document.getElementById('cmpMc').style.display = 'block';
+                    document.getElementById('cmpMc').scrollIntoView({ behavior: 'smooth' });
+                }, 900);
+            }
+
+            if (!elevAllDone) {
+                drawElevCanvas();
+            } else {
+                /* Final draw without animation loop */
+                var ctx2 = c.getContext('2d');
+                var W2 = c.width,
+                    H2 = c.height;
+                ctx2.clearRect(0, 0, W2, H2);
+                ctx2.fillStyle = '#040810';
+                ctx2.fillRect(0, 0, W2, H2);
+                var topM2 = 40,
+                    botM2 = H2 - 30;
+                var totalH2 = botM2 - topM2;
+                var scaleGrad2 = ctx2.createLinearGradient(0, topM2, 0, botM2);
+                scaleGrad2.addColorStop(0, 'rgba(30,46,20,0.6)');
+                scaleGrad2.addColorStop(0.4, 'rgba(22,34,16,0.7)');
+                scaleGrad2.addColorStop(0.7, 'rgba(14,26,10,0.8)');
+                scaleGrad2.addColorStop(1, 'rgba(6,16,6,0.9)');
+                ctx2.fillStyle = scaleGrad2;
+                ctx2.fillRect(W2 * 0.08, topM2, W2 * 0.84, totalH2);
+                ctx2.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx2.lineWidth = 1;
+                ctx2.strokeRect(W2 * 0.08, topM2, W2 * 0.84, totalH2);
+                var slY2 = topM2 + totalH2 * 0.22;
+                ctx2.strokeStyle = 'rgba(99,155,210,0.50)';
+                ctx2.lineWidth = 1.5;
+                ctx2.setLineDash([10, 5]);
+                ctx2.beginPath();
+                ctx2.moveTo(W2 * 0.08, slY2);
+                ctx2.lineTo(W2 * 0.92, slY2);
+                ctx2.stroke();
+                ctx2.setLineDash([]);
+                ctx2.fillStyle = 'rgba(147,197,253,0.60)';
+                ctx2.font = '500 11px DM Sans, sans-serif';
+                ctx2.textAlign = 'left';
+                ctx2.fillText('Sea Level — 0 m', W2 * 0.10, slY2 - 7);
+                [0.05, 0.22, 0.45, 0.65, 0.85].forEach(function(f) {
+                    var y = topM2 + totalH2 * f;
+                    var ev = Math.round(100 - f * 620);
+                    ctx2.fillStyle = 'rgba(122,143,163,0.35)';
+                    ctx2.font = '9px DM Sans, sans-serif';
+                    ctx2.textAlign = 'left';
+                    ctx2.fillText((ev >= 0 ? '+' : '') + ev + ' m', W2 * 0.10, y + 3);
+                });
+                elevMarkers.forEach(function(m) {
+                    var mx = W2 * m.cx;
+                    var my = topM2 + totalH2 * m.yFrac;
+                    var radius = m.isDeadSea ? 16 : 12;
+                    var glowAlpha = m.isDeadSea ? 0.55 : 0.20;
+                    var glow = ctx2.createRadialGradient(mx, my, radius * 0.5, mx, my, radius * 3.2);
+                    glow.addColorStop(0, m.isDeadSea ? 'rgba(253,186,116,' + glowAlpha + ')' :
+                        'rgba(147,197,253,' + glowAlpha + ')');
+                    glow.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx2.fillStyle = glow;
+                    ctx2.beginPath();
+                    ctx2.arc(mx, my, radius * 3.2, 0, Math.PI * 2);
+                    ctx2.fill();
+                    ctx2.fillStyle = m.isDeadSea ? '#fdba74' : 'rgba(147,197,253,0.70)';
+                    ctx2.beginPath();
+                    ctx2.arc(mx, my, radius, 0, Math.PI * 2);
+                    ctx2.fill();
+                    ctx2.strokeStyle = m.isDeadSea ? '#fed7aa' : 'rgba(200,220,255,0.50)';
+                    ctx2.lineWidth = 2;
+                    ctx2.stroke();
+                    ctx2.fillStyle = m.isDeadSea ? '#0b1622' : '#040810';
+                    ctx2.font = 'bold 12px DM Sans, sans-serif';
+                    ctx2.textAlign = 'center';
+                    ctx2.textBaseline = 'middle';
+                    ctx2.fillText('✓', mx, my);
+                    ctx2.fillStyle = m.isDeadSea ? '#fed7aa' : 'rgba(226,221,212,0.75)';
+                    ctx2.font = (m.isDeadSea ? 'bold ' : '') + '12px DM Sans, sans-serif';
+                    ctx2.textAlign = 'center';
+                    ctx2.fillText(m.label, mx, my - radius - 12);
+                    ctx2.fillStyle = 'rgba(122,143,163,0.65)';
+                    ctx2.font = '10px DM Sans, sans-serif';
+                    ctx2.fillText(m.detail, mx, my + radius + 16);
+                    if (m.isDeadSea) {
+                        ctx2.strokeStyle = 'rgba(253,186,116,0.35)';
+                        ctx2.lineWidth = 1;
+                        ctx2.setLineDash([3, 5]);
+                        ctx2.beginPath();
+                        ctx2.moveTo(mx, my + radius + 28);
+                        ctx2.lineTo(mx, my + radius + 52);
+                        ctx2.stroke();
+                        ctx2.setLineDash([]);
+                        ctx2.fillStyle = 'rgba(253,186,116,0.70)';
+                        ctx2.font = 'italic 11px Amiri, serif';
+                        ctx2.textAlign = 'center';
+                        ctx2.fillText('أَدْنَى الْأَرْضِ', mx, my + radius + 66);
+                    }
+                });
+                ctx2.fillStyle = 'rgba(34,197,94,0.55)';
+                ctx2.font = '500 11px DM Sans, sans-serif';
+                ctx2.textAlign = 'center';
+                ctx2.fillText('All locations revealed the Dead Sea is Earth\'s lowest point', W2 / 2, H2 - 8);
+            }
+        }
+
+        /* Start elevation canvas animation loop on load for stage 1 */
+        setTimeout(function() {
+            if (stage === 1) initElevCanvas();
+        }, 100);
+
+        /* ── STAGE 1: MC ─────────────────────────────────────────────── */
+        function pickEx1(el, correct) {
+            if (document.querySelector('#s1 .ac-correct')) return;
+            if (correct) {
+                el.classList.add('ac-correct');
+                document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+                    if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+                });
+                showOk(
+                    'The Quran\'s word أدنى means "lowest" and the Dead Sea is indeed Earth\'s lowest land point. No 7th-century instrument could have measured this. The word choice is astonishingly precise.',
+                    function() { go(2); });
+            } else {
+                el.classList.add('ac-wrong');
+                setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+            }
+        }
+
+        /* ── STAGE 2: DEPTH CANVAS ──────────────────────────────────── */
+        function initDepthCanvas() {
+            var c = document.getElementById('depthCanvas');
+            if (!c) return;
+            var ctx = c.getContext('2d');
+            var W = c.width,
+                H = c.height;
+            drawDepthFrame(ctx, W, H, 0, 0);
+        }
+
+        function drawDepthFrame(ctx, W, H, scanFrac, labelAlpha) {
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#040810';
+            ctx.fillRect(0, 0, W, H);
+
+            var slY = H * 0.22;
+            var dsY = H * 0.80;
+            var botY = H - 10;
+
+            var skyG = ctx.createLinearGradient(0, 0, 0, slY);
+            skyG.addColorStop(0, 'rgba(4,8,16,0.9)');
+            skyG.addColorStop(1, 'rgba(6,14,28,0.9)');
+            ctx.fillStyle = skyG;
+            ctx.fillRect(0, 0, W, slY);
+
+            var earthG = ctx.createLinearGradient(0, slY, 0, dsY);
+            earthG.addColorStop(0, '#1c2e14');
+            earthG.addColorStop(1, '#152210');
+            ctx.fillStyle = earthG;
+
+            var bL = W * 0.22,
+                bR = W * 0.78;
+            ctx.beginPath();
+            ctx.moveTo(0, slY);
+            ctx.lineTo(bL - 50, slY);
+            ctx.bezierCurveTo(bL - 18, slY, bL, dsY - 10, bL + 20, dsY);
+            ctx.lineTo(bR - 20, dsY);
+            ctx.bezierCurveTo(bR, dsY - 10, bR + 18, slY, bR + 50, slY);
+            ctx.lineTo(W, slY);
+            ctx.lineTo(W, botY);
+            ctx.lineTo(0, botY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            [0.35, 0.55, 0.70].forEach(function(f) {
+                var y = slY + (dsY - slY) * f;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(W, y);
+                ctx.stroke();
+            });
+
+            ctx.strokeStyle = 'rgba(99,155,210,0.55)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([10, 6]);
+            ctx.beginPath();
+            ctx.moveTo(0, slY);
+            ctx.lineTo(W, slY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(147,197,253,0.60)';
+            ctx.font = '500 11px DM Sans, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText('Sea Level  0 m', 12, slY - 6);
+
+            var waterAlpha = scanFrac >= 0.82 ? Math.min(1, (scanFrac - 0.82) / 0.18) : 0;
+            if (waterAlpha > 0) {
+                var wg = ctx.createLinearGradient(0, dsY - 4, 0, botY);
+                wg.addColorStop(0, 'rgba(14,56,100,' + (0.85 * waterAlpha) + ')');
+                wg.addColorStop(1, 'rgba(6,26,56,' + (0.90 * waterAlpha) + ')');
+                ctx.fillStyle = wg;
+                ctx.fillRect(bL + 20, dsY - 4, bR - bL - 40, botY - dsY + 4);
+
+                ctx.strokeStyle = 'rgba(100,160,220,' + (0.15 * waterAlpha) + ')';
+                ctx.lineWidth = 1;
+                var shimY = dsY;
+                ctx.beginPath();
+                for (var wx = bL + 28; wx < bR - 28; wx += 40) {
+                    ctx.moveTo(wx, shimY);
+                    ctx.lineTo(wx + 18, shimY);
+                }
+                ctx.stroke();
+            }
+
+            var scanY = slY + scanFrac * (dsY - slY);
+            if (scanFrac > 0 && scanFrac < 1) {
+                ctx.strokeStyle = 'rgba(253,186,116,0.75)';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#fdba74';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.moveTo(bL + 20, scanY);
+                ctx.lineTo(bR - 20, scanY);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            if (scanFrac > 0) {
+                var curDepth = Math.round(scanFrac * 430);
+                ctx.fillStyle = '#fed7aa';
+                ctx.font = 'bold 18px Playfair Display, serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('−' + curDepth + ' m', W - 14, Math.min(scanY, dsY - 6));
+            }
+
+            if (labelAlpha > 0) {
+                ctx.save();
+                ctx.globalAlpha = labelAlpha;
+
+                ctx.fillStyle = '#fed7aa';
+                ctx.font = 'bold 13px DM Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText("DEAD SEA  ·  EARTH'S LOWEST POINT", W / 2, (dsY + botY) / 2);
+
+                ctx.strokeStyle = 'rgba(253,186,116,0.50)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 4]);
+                ctx.beginPath();
+                ctx.moveTo(bL - 16, slY);
+                ctx.lineTo(bL - 16, dsY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                [slY, dsY].forEach(function(ay) {
+                    var dir = ay === slY ? 1 : -1;
+                    ctx.fillStyle = 'rgba(253,186,116,0.55)';
+                    ctx.beginPath();
+                    ctx.moveTo(bL - 16, ay + dir * 7);
+                    ctx.lineTo(bL - 22, ay + dir * 14);
+                    ctx.lineTo(bL - 10, ay + dir * 14);
+                    ctx.closePath();
+                    ctx.fill();
+                });
+
+                ctx.fillStyle = 'rgba(254,215,170,0.80)';
+                ctx.font = '500 11px DM Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('430 m', bL - 16, (slY + dsY) / 2);
+
+                ctx.restore();
+            }
+        }
+
+        var depthDone = false;
+
+        function runDepthScan() {
+            if (depthDone) return;
+            depthDone = true;
+            document.getElementById('depthBtn').classList.add('used');
+
+            var c = document.getElementById('depthCanvas');
+            var ctx = c.getContext('2d');
+            var W = c.width,
+                H = c.height;
+            var SCAN_MS = 2400,
+                LABEL_MS = 700;
+            var t0 = null;
+
+            function tick(ts) {
+                if (!t0) t0 = ts;
+                var elapsed = ts - t0;
+                var scanFrac = Math.min(1, elapsed / SCAN_MS);
+                var labelAlpha = elapsed > SCAN_MS ? Math.min(1, (elapsed - SCAN_MS) / LABEL_MS) : 0;
+                drawDepthFrame(ctx, W, H, scanFrac, labelAlpha);
+                if (elapsed < SCAN_MS + LABEL_MS) {
+                    requestAnimationFrame(tick);
+                } else {
+                    document.getElementById('depthResult').classList.add('show');
+                    setTimeout(function() {
+                        showOk(
+                            'The Dead Sea sits 430 metres below sea level Earth\'s lowest land point. No 7th-century tool could measure this. The Quran\'s word أدنى ("lowest") captured it with stunning precision.',
+                            function() { go(3); });
+                    }, 1000);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        /* ── STAGE 3: MC ─────────────────────────────────────────────── */
+        function pickEx3(el, correct) {
+            if (document.querySelector('#s3 .ac-correct')) return;
+            if (correct) {
+                el.classList.add('ac-correct');
+                document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+                    if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+                });
+                showOk(
+                    'Measuring absolute below-sea-level elevation requires geodetic tools developed in the modern era. The Dead Sea\'s record depth of −430 m was precisely confirmed only with 20th-century satellite technology.',
+                    function() { go(4); });
+            } else {
+                el.classList.add('ac-wrong');
+                setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+            }
+        }
+    </script>
+    <script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"dead-sea");}</script>
+<script src="prediction.js?v=20260615h"></script>
+    <script>
+        Prediction.init({
+            "lessonId": "dead-sea",
+            "question": "What is the elevation of the Dead Sea shore (below sea level)?",
+            
+            "inputType": "dprobe","unit":"m","min":0,"max":800,"step":10,
+            
+            
+            
+            "correct": 430,
+            "correctLabel": "−430 m",
+            "curiositySeed": {
+                "question": "Mountains have deep underground roots, like pegs. The Quran calls them 'pegs' (أوتاد). When did geology confirm this?",
+                "nextUrl": "quran-mountains.html",
+                "nextTitle": "Mountains as Pegs"
+            }
+        });
+    </script>
+    <script src="theme.js?v=20260615h"></script>
+    <script src="quran-validator.js?v=20260615h"></script>
+    <script>
+        /* Locate 30:2-3 أَدْنَى means "lowest" (superlative form).
+           The Dead Sea shore is Earth's lowest land point at −430 m.
+           Confirmed by satellite altimetry in the 20th century. */
+        QuranValidator.attach('qv-dead-sea', {
+            mode: 'locate',
+            title: 'Read it yourself in the Quran',
+            subtitle: 'Find 30:2–3 — أَدْنَى means "lowest." The battle site is Earth\'s lowest land at −430m.',
+            groups: [
+                { id: 'adna', label: 'Lowest land', arabic: 'أَدْنَى', color: '#0ea5e9',
+                    occurrences: [
+                        [30, 2],
+                        [30, 3]
+                    ] }
+            ]
+        });
+    </script>
+</body>
+</html>

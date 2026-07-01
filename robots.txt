@@ -1,0 +1,43 @@
+# ==========================================
+# ROBOTS.TXT FOR BEQURAN
+# ==========================================
+
+# 1. ALLOW ALL HUMANS AND STANDARD SEARCH BOTS
+User-agent: *
+Allow: /
+
+# 2. EXPLICITLY ALLOW AI BOTS (To let AI learn from and cite your content)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# 3. BLOCK SYSTEM, BUILD, AND NON-CONTENT FOLDERS
+# This prevents Google from indexing your code dependencies and private files
+User-agent: *
+Disallow: /node_modules/
+Disallow: /.claude/
+Disallow: /.git/
+Disallow: /tools/
+Disallow: /scientists/
+Disallow: /book/
+
+# 4. POINT TO YOUR SITEMAP
+# IMPORTANT: Change 'https://www.yourdomain.com' to your actual Netlify URL!
+Sitemap: https://www.yourdomain.com/sitemap.xml

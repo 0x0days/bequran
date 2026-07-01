@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Brainstem · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1622; --surface: #111e2e; --surface2: #182840;
+      --border: rgba(255,255,255,0.08); --text: #e2ddd4; --muted: #7a8fa3;
+      --gold: #f59e0b; --gold-light: #fcd34d;
+      --ok: #22c55e; --ok-bg: #052e16; --ok-border: #166534;
+      --err-light: #f87171; --err-bg: #2d0707; --err-border: #991b1b;
+      --accent: #22d3ee;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:44px 20px 160px; }
+    .dot-field { position:fixed; inset:0; pointer-events:none; z-index:0; background-image:radial-gradient(circle,rgba(34,211,238,0.04) 1px,transparent 1px); background-size:28px 28px; }
+    .container { max-width:700px; margin:0 auto; position:relative; z-index:1; }
+    .nav-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); text-decoration:none; margin-bottom:20px; }
+    .nav-back:hover { color:var(--text); }
+    
+    .lesson-bar-wrap { background:var(--surface2); border-radius:100px; height:6px; margin-bottom:8px; overflow:hidden; }
+    #lbar { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),#0891b2); width:0%; transition:width .5s cubic-bezier(.4,0,.2,1); }
+    #lmeta { font-size:11px; color:var(--muted); margin-bottom:28px; letter-spacing:.05em; }
+    .stage { display:none; }
+    .stage.active { display:block; animation:rise .38s cubic-bezier(.4,0,.2,1); }
+    @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    .hero-verse { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin-bottom:24px; border-left:3px solid var(--accent); }
+    .verse-ar { font-family:'Amiri',serif; font-size:18px; color:var(--accent); direction:rtl; text-align:right; line-height:2.2; margin-bottom:10px; }
+    .verse-ref { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .verse-en { font-size:14px; color:var(--text); line-height:1.75; font-style:italic; }
+    .verse-highlight { color:var(--accent); font-style:normal; font-weight:600; }
+    .claim-box { background:linear-gradient(135deg,rgba(34,211,238,0.07),rgba(8,145,178,0.03)); border:1px solid rgba(34,211,238,0.17); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .claim-label { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:600; }
+    .claim-text { font-size:15px; line-height:1.7; }
+    .prompt { font-family:'Playfair Display',serif; font-size:20px; line-height:1.45; margin-bottom:22px; }
+    .answer-card { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .answer-card:hover { border-color:rgba(34,211,238,0.30); background:var(--surface2); }
+    .answer-card.ac-correct { border-color:var(--ok); background:var(--ok-bg); }
+    .answer-card.ac-wrong { border-color:var(--err-border); background:var(--err-bg); animation:shake .3s; }
+    .answer-card.ac-disabled { opacity:.4; pointer-events:none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .ac-letter { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+    .ac-body { flex:1; }
+    .ac-big { font-size:14px; font-weight:500; line-height:1.5; }
+    .ac-ref { font-size:10px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+    .ac-ar { font-family:'Amiri',serif; font-size:18px; direction:rtl; color:var(--accent); line-height:1.8; }
+    .ac-tr { font-size:12px; color:var(--muted); margin-top:2px; }
+    .xp-badge { display:none; align-items:center; gap:10px; background:var(--ok-bg); border:1px solid var(--ok-border); border-radius:10px; padding:12px 18px; margin-bottom:24px; }
+    .xp-badge.show { display:flex; animation:rise .4s ease; }
+    .xp-text { font-size:13px; font-weight:600; color:var(--ok); }
+    .verdict-hero { text-align:center; padding:12px 0 28px; }
+    .verdict-number { font-family:'Playfair Display',serif; font-size:clamp(52px,10vw,80px); font-weight:700; color:var(--accent); line-height:1; }
+    .verdict-label { font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:.06em; text-transform:uppercase; }
+    .stat-row { display:flex; gap:16px; margin:20px 0 28px; }
+    .stat-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .stat-card .n { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat-card .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:5px; }
+    .verdict-text { font-size:14px; line-height:1.8; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px; }
+    .verdict-text strong { color:var(--text); }
+    .source-box { background:linear-gradient(135deg,rgba(34,211,238,0.06),rgba(8,145,178,0.02)); border:1px solid rgba(34,211,238,0.17); border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+    .source-title { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; letter-spacing:.04em; }
+    .source-quote { font-size:12px; line-height:1.75; color:var(--muted); font-style:italic; }
+    .btn { display:inline-flex; align-items:center; gap:8px; border-radius:10px; padding:13px 26px; font-size:14px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-primary { background:var(--accent); color:#041014; box-shadow:0 4px 20px rgba(34,211,238,0.25); }
+    .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:rgba(34,211,238,0.4); color:var(--text); }
+    .nav-next-wrap { display:flex; justify-content:flex-end; margin-top:32px; }
+    .fb-panel { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .fb-panel.show { transform:translateY(0); }
+    .fb-panel.fb-ok { background:var(--ok-bg); border-top-color:var(--ok-border); }
+    .fb-panel.fb-err { background:var(--err-bg); border-top-color:var(--err-border); }
+    .fb-left { display:flex; align-items:center; gap:14px; }
+    .fb-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+    .fb-ok .fb-icon { background:rgba(34,197,94,0.2); color:var(--ok); }
+    .fb-err .fb-icon { background:rgba(248,113,113,0.2); color:var(--err-light); }
+    .fb-title { font-size:15px; font-weight:700; }
+    .fb-ok .fb-title { color:var(--ok); }
+    .fb-err .fb-title { color:var(--err-light); }
+    .fb-sub { font-size:13px; color:var(--muted); margin-top:2px; max-width:480px; line-height:1.5; }
+    .fb-btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+    .fb-ok .fb-btn { background:var(--ok); color:#fff; }
+    .fb-err .fb-btn { background:var(--err-light); color:#1a0000; }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+
+<div class="container">
+  <a href="quran-reading.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    ← Reading
+  </a>
+
+  <div class="lesson-bar-wrap"><div id="lbar"></div></div>
+  <div id="lmeta">Lesson · Brainstem</div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <div class="stage active" id="sp"></div>
+
+  <!-- ══ STAGE 0 ══ -->
+  <div id="s0" class="stage">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130"
+      style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+
+    <div class="hero-verse">
+      <div class="verse-ref">Quran 39:42 · Surah Az-Zumar</div>
+      <div class="verse-ar">اللَّهُ يَتَوَفَّى الْأَنْفُسَ حِينَ مَوْتِهَا وَالَّتِي <span style="color:#a5f3fc">لَمْ تَمُتْ فِي مَنَامِهَا</span></div>
+      <div class="verse-en">"Allah takes the souls at the time of their death, and <span class="verse-highlight">those that have not died during their sleep.</span> He retains those for whom He has decreed death, and releases the others until a predetermined time."</div>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-label">Same Organ Two Fates</div>
+      <div class="claim-text">
+        The Quran explicitly links <strong style="color:var(--accent)">sleep and death</strong> as two versions of the same event souls taken, some returned, some not. Skeptics called this a poetic mistake: sleep and death have nothing in common biologically.
+        <br><br>
+        Science has now proven they share the same organ: the <strong style="color:var(--accent)">brainstem</strong>. It controls the sleep-wake cycle and brainstem death is legally sufficient for death certification in multiple countries. The same structure that puts you to sleep each night is the structure whose failure ends your life.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="go(1)">
+      Begin Lesson
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- ══ STAGE 1 ══ -->
+  <div id="s1" class="stage">
+    <p class="prompt">The brainstem is the stalk connecting the spinal cord to the brain. According to the 2018 Neurology study, what does it regulate?</p>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Memory formation and long-term recall only it is a relay station between body and higher brain centers</div></div>
+    </div>
+
+    <div onclick="pickEx1(this,true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">The sleep-wake cycle, cardiovascular function, and respiration all critical to both consciousness and survival</div>
+        <div class="ac-ref">Neurology · Brainstem integration of arousal, sleep, cardiovascular, and respiratory control · 2018</div>
+        <div class="ac-tr">"The brainstem contains several critical areas involved in control of behavioral arousal, wake-sleep cycle, cardiovascular function, and respiration."</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this,false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body"><div class="ac-big">Vision and hearing processing it connects sensory organs to the visual and auditory cortex</div></div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 2 dual anatomy canvas ══ -->
+  <div id="s2" class="stage">
+    <p class="prompt">What does "brainstem death" mean and how does it connect to the Quran's linking of sleep and death?</p>
+
+    <canvas id="s2Canvas" width="640" height="240"
+      style="width:100%;height:240px;border-radius:12px;margin-bottom:20px;display:block;"></canvas>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">Brainstem death means the cortex has failed the thinking brain is dead but the brainstem keeps the body alive automatically</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">Brainstem death is a minor condition easily reversed doctors commonly resuscitate patients after brainstem failure</div></div>
+    </div>
+
+    <div onclick="pickEx2(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">Brainstem death is legally certified as death itself in multiple countries the same organ that controls sleep each night is the organ whose permanent failure constitutes death. Sleep and death share one structure.</div>
+        <div class="ac-ref">Wikipedia · Brainstem Death · 2022 UK, India, Trinidad & Tobago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 3 ══ -->
+  <div id="s3" class="stage">
+    <p class="prompt">Quran 39:42 says Allah takes souls "at death AND during sleep." What makes this verse scientifically significant, not just poetic?</p>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body"><div class="ac-big">It is purely metaphorical sleep "feels like" death, and the Quran used this common poetic comparison found in many ancient cultures</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body"><div class="ac-big">The verse is about the soul's weight scientists later measured that the human body loses weight during sleep, proving a "soul" departs</div></div>
+    </div>
+
+    <div onclick="pickEx3(this,true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">The Quran treats sleep and death as the same biological event "souls taken" in both. Science confirmed this: the brainstem governs sleep and brainstem failure IS death. One organ connects both. The Quran stated the biological link 1,400 years before anatomy discovered it.</div>
+        <div class="ac-ar">يَتَوَفَّى الْأَنْفُسَ حِينَ مَوْتِهَا وَالَّتِي لَمْ تَمُتْ فِي مَنَامِهَا</div>
+        <div class="ac-ref">39:42 · death and sleep same mechanism</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STAGE 4 VERDICT ══ -->
+  <div id="s4" class="stage">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <div class="verdict-hero">
+      <div class="verdict-number" id="mv0">0</div>
+      <div class="verdict-label">Years before science confirmed sleep &amp; death share the brainstem</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="n">1</div>
+        <div class="lbl">Organ brainstem governs both sleep and death</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="mv1">0</div>
+        <div class="lbl">Countries certify death by brainstem death alone</div>
+      </div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Neurology · 2018 · Brainstem integration of arousal, sleep, cardiovascular, and respiratory control</div>
+      <div class="source-quote">"The brainstem contains several critical areas involved in control of behavioral arousal, wake-sleep cycle, cardiovascular function, and respiration… Some of the findings provide insight into the brainstem pathophysiology of disorders such as… sudden infantile death syndrome, and sudden unexpected death in epilepsy."</div>
+    </div>
+
+    <div class="source-box">
+      <div class="source-title">Wikipedia · Brainstem Death · 2022</div>
+      <div class="source-quote">"Death of the brainstem alone is sufficient to produce this state [death]. A person is dead when consciousness and the ability to breathe are permanently lost, regardless of continuing life in the body and parts of the brain."</div>
+    </div>
+
+    <div class="verdict-text">
+      Every night, the brainstem dims consciousness and cycles your body through sleep. And when the brainstem fails permanently that is death. Not heart failure, not brain failure: <strong>brainstem failure.</strong> In the UK, India, and elsewhere, this alone is sufficient to legally certify death.
+      <br><br>
+      Quran 39:42 links sleep and death as one event souls taken, some temporarily, some permanently. The verse doesn't say sleep <em>feels like</em> death. It says the same act occurs in both: the soul is taken. What science revealed in modern times is that the same physical organ the brainstem is the mechanism of both.
+      <br><br>
+      A 7th-century man in Arabia, with no knowledge of neuroscience, wrote a verse that <em style="color:var(--accent)">precisely describes the brainstem</em>: one organ that controls the cycle of sleep, and whose cessation is death itself.
+    </div>
+
+    <div id="qv-brainstem"></div>
+
+    <div id="curiositySeed"></div>
+
+    <div class="nav-next-wrap">
+      <a href="quran-inner-ear.html" class="btn btn-primary">
+        Next: Inner Ear
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+/* ══ HERO CANVAS lateral brain anatomy: brainstem glowing, cycling SLEEP→DEATH ══ */
+function initHeroCanvas() {
+  var cv = document.getElementById('heroCanvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = 640, H = 130; cv.width = W; cv.height = H;
+  var t = 0;
+
+  /* EEG wave buffer scrolling */
+  var waveBuf = [];
+  for (var i = 0; i < 200; i++) waveBuf.push(0);
+
+  function drawBrain(ox, oy, scale, bsAlpha, bsColor, signalA) {
+    ctx.save();
+    ctx.translate(ox, oy); ctx.scale(scale, scale);
+
+    /* Cerebrum large dome */
+    ctx.beginPath();
+    ctx.moveTo(-70, 20);
+    ctx.bezierCurveTo(-80, -10, -60, -52, -20, -58);
+    ctx.bezierCurveTo(10, -65, 50, -58, 68, -38);
+    ctx.bezierCurveTo(82, -18, 78, 12, 65, 22);
+    ctx.bezierCurveTo(50, 32, 20, 36, 0, 34);
+    ctx.bezierCurveTo(-30, 34, -60, 28, -70, 20);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(30,50,80,0.70)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(34,211,238,0.28)'; ctx.lineWidth = 1; ctx.stroke();
+
+    /* Cortex fold lines */
+    ctx.strokeStyle = 'rgba(34,211,238,0.10)'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(-40,-40); ctx.quadraticCurveTo(-10,-52,20,-42); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-50,-10); ctx.quadraticCurveTo(-15,-22,30,-14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-60,10); ctx.quadraticCurveTo(-20,0,40,8); ctx.stroke();
+
+    /* Cerebellum small folded lobe at back-bottom */
+    ctx.beginPath();
+    ctx.moveTo(-52, 22);
+    ctx.bezierCurveTo(-68, 28, -74, 44, -62, 50);
+    ctx.bezierCurveTo(-50, 55, -36, 48, -30, 36);
+    ctx.bezierCurveTo(-22, 26, -34, 20, -52, 22);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(22,38,62,0.75)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(34,211,238,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
+    /* Cerebellum folds */
+    ctx.strokeStyle = 'rgba(34,211,238,0.10)'; ctx.lineWidth = 0.6;
+    [-6,-2,2].forEach(function(dy){ ctx.beginPath(); ctx.moveTo(-65,36+dy); ctx.lineTo(-38,36+dy); ctx.stroke(); });
+
+    /* BRAINSTEM the critical stalk */
+    var bsGlow = bsAlpha * 0.7;
+    ctx.save();
+    ctx.shadowColor = bsColor; ctx.shadowBlur = 14 * bsAlpha;
+    /* Brainstem body */
+    ctx.beginPath();
+    ctx.moveTo(-12, 34); ctx.lineTo(14, 34);
+    ctx.bezierCurveTo(16, 50, 14, 68, 10, 78);
+    ctx.lineTo(-8, 78);
+    ctx.bezierCurveTo(-12, 68, -14, 50, -12, 34);
+    ctx.closePath();
+    ctx.fillStyle = bsColor.replace('1)', bsAlpha + ')').replace('rgba(', 'rgba(').replace(/,[\d.]+\)/, ',' + (bsAlpha * 0.85) + ')');
+    /* Simpler: use literal colors */
+    ctx.fillStyle = bsAlpha > 0.5
+      ? 'rgba(' + (bsColor === 'SLEEP' ? '34,211,238' : '248,113,113') + ',' + (0.55 + bsAlpha * 0.25) + ')'
+      : 'rgba(40,70,110,0.60)';
+    ctx.fill();
+    ctx.strokeStyle = bsAlpha > 0.5
+      ? 'rgba(' + (bsColor === 'SLEEP' ? '34,211,238' : '248,113,113') + ',' + (0.65 + bsAlpha * 0.25) + ')'
+      : 'rgba(34,211,238,0.25)';
+    ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.restore();
+
+    /* Spinal cord extending down */
+    ctx.strokeStyle = 'rgba(34,211,238,0.18)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(1, 78); ctx.lineTo(1, 96); ctx.stroke();
+
+    /* Signal pulses cascading from brainstem upward */
+    if (signalA > 0.02) {
+      for (var si = 0; si < 4; si++) {
+        var sy = 28 - si * 14;
+        var sa = signalA * (1 - si * 0.22) * (0.5 + 0.4 * Math.sin(t * 0.08 + si * 0.7));
+        ctx.save();
+        ctx.shadowColor = 'rgba(34,211,238,0.6)'; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.arc(1, sy, 2.5 + si * 0.5, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(34,211,238,' + sa + ')'; ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* Background */
+    var bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#020810'); bg.addColorStop(0.5, '#030a12'); bg.addColorStop(1, '#020810');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    /* Cycle: 0–120 = SLEEP, 120–180 = transition, 180–300 = DEATH, 300–360 = transition */
+    var CYCLE = 360;
+    var phase = t % CYCLE;
+    var isSleep = phase < 150 || phase > 310;
+    var transIn = (phase >= 150 && phase < 180) ? (phase - 150) / 30 : (phase >= 310 && phase <= 360) ? (360 - phase) / 50 : 0;
+    var transOut = (phase >= 150 && phase < 180) ? (phase - 150) / 30 : 0;
+
+    var sleepAlpha = phase < 150 ? 1.0 : (phase < 180 ? 1 - transOut : (phase > 310 ? transIn : 0));
+    var deathAlpha = phase >= 180 && phase <= 310 ? Math.min((phase - 180) / 20, 1) : 0;
+
+    /* State label */
+    var stateLabel = isSleep ? 'SLEEP' : 'DEATH';
+    var stateColor = isSleep ? '34,211,238' : '248,113,113';
+    var stateAlpha = Math.max(sleepAlpha, deathAlpha);
+
+    /* Draw brain left center */
+    var bsColorKey = isSleep ? 'SLEEP' : 'DEATH';
+    drawBrain(W * 0.30, H * 0.42, 0.82, stateAlpha, bsColorKey, sleepAlpha > 0.3 ? 1 : 0);
+
+    /* EEG wave panel right side */
+    var waveX0 = W * 0.52, waveY = H * 0.50, waveW = W * 0.44, waveH = 36;
+
+    /* Panel bg */
+    ctx.fillStyle = 'rgba(6,16,28,0.80)';
+    ctx.beginPath(); ctx.roundRect(waveX0 - 4, waveY - waveH/2 - 8, waveW + 8, waveH + 22, 6); ctx.fill();
+    ctx.strokeStyle = 'rgba(34,211,238,0.15)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.roundRect(waveX0 - 4, waveY - waveH/2 - 8, waveW + 8, waveH + 22, 6); ctx.stroke();
+
+    /* Scrolling wave */
+    var newSample;
+    if (isSleep) {
+      /* Sleep: slow oscillating EEG-like wave */
+      newSample = Math.sin(t * 0.22) * 0.6 + Math.sin(t * 0.11) * 0.3 + Math.sin(t * 0.45) * 0.1;
+    } else {
+      /* Death: flatline with occasional death-spike artifact */
+      var spike = (phase % 40 < 3) ? Math.sin((phase % 40) * Math.PI / 3) * 1.5 : 0;
+      newSample = spike * 0.15;
+    }
+    waveBuf.push(newSample); if (waveBuf.length > 200) waveBuf.shift();
+
+    var wStep = waveW / waveBuf.length;
+    var wColor = 'rgba(' + stateColor + ',' + (0.70 + stateAlpha * 0.20) + ')';
+    ctx.save();
+    ctx.shadowColor = 'rgba(' + stateColor + ',0.5)'; ctx.shadowBlur = 4;
+    ctx.strokeStyle = wColor; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (var wi = 0; wi < waveBuf.length; wi++) {
+      var wx = waveX0 + wi * wStep;
+      var wy = waveY + waveBuf[wi] * waveH * 0.5;
+      if (wi === 0) ctx.moveTo(wx, wy); else ctx.lineTo(wx, wy);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    /* State label above wave */
+    ctx.font = '700 10px DM Sans,sans-serif';
+    ctx.fillStyle = 'rgba(' + stateColor + ',' + (0.55 + stateAlpha * 0.30) + ')';
+    ctx.textAlign = 'left';
+    ctx.fillText(stateLabel, waveX0, waveY - waveH/2 - 11);
+
+    /* Brainstem label under wave */
+    ctx.font = '500 8px DM Sans,sans-serif';
+    ctx.fillStyle = 'rgba(34,211,238,0.30)';
+    ctx.fillText('BRAINSTEM', waveX0, waveY + waveH/2 + 14);
+
+    /* Arabic text bottom right */
+    ctx.font = 'bold 11px Amiri,serif';
+    ctx.fillStyle = 'rgba(34,211,238,0.62)';
+    ctx.textAlign = 'right';
+    ctx.fillText('حِينَ مَوْتِهَا وَالَّتِي لَمْ تَمُتْ فِي مَنَامِهَا', W - 12, H - 8);
+
+    t += 0.5; requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ══ S2 CANVAS brainstem anatomy: SLEEP mode (left) and DEATH mode (right) ══ */
+function initS2Canvas() {
+  var cv = document.getElementById('s2Canvas');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width || 640, H = cv.height || 240;
+  var startTs = null, TOTAL = 1500;
+  var animT = 0;
+
+  /* Sleep EEG wave points */
+  var sleepWave = []; for (var i = 0; i < 80; i++) sleepWave.push(0);
+  /* Death wave (flat) */
+  var deathWave = []; for (var j = 0; j < 80; j++) deathWave.push(0);
+  var dSpike = 0;
+
+  function drawAnatomyBrain(ctx, cx, cy, sc, bsColor, bsGlowColor, label, wavePoints, waveColor, waveLabel) {
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc);
+
+    /* Cerebrum */
+    ctx.beginPath();
+    ctx.moveTo(-60,18); ctx.bezierCurveTo(-70,-8,-52,-46,-18,-52);
+    ctx.bezierCurveTo(8,-58,44,-50,58,-32); ctx.bezierCurveTo(70,-14,66,10,55,18);
+    ctx.bezierCurveTo(38,28,14,32,0,30); ctx.bezierCurveTo(-28,30,-52,24,-60,18);
+    ctx.closePath();
+    ctx.fillStyle='rgba(20,38,68,0.82)'; ctx.fill();
+    ctx.strokeStyle='rgba(34,211,238,0.30)'; ctx.lineWidth=1.0; ctx.stroke();
+
+    /* Fold lines */
+    ctx.strokeStyle='rgba(34,211,238,0.09)'; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.moveTo(-35,-35); ctx.quadraticCurveTo(-5,-45,22,-36); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-42,-8); ctx.quadraticCurveTo(-8,-18,28,-10); ctx.stroke();
+
+    /* Cerebellum */
+    ctx.beginPath();
+    ctx.moveTo(-45,20); ctx.bezierCurveTo(-60,25,-66,40,-54,46);
+    ctx.bezierCurveTo(-42,50,-28,44,-24,32); ctx.bezierCurveTo(-18,22,-30,16,-45,20);
+    ctx.closePath();
+    ctx.fillStyle='rgba(14,28,52,0.82)'; ctx.fill();
+    ctx.strokeStyle='rgba(34,211,238,0.20)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.strokeStyle='rgba(34,211,238,0.08)'; ctx.lineWidth=0.5;
+    [-5,-1,3].forEach(function(dy){ ctx.beginPath(); ctx.moveTo(-58,30+dy); ctx.lineTo(-30,30+dy); ctx.stroke(); });
+
+    /* BRAINSTEM glowing */
+    ctx.save();
+    ctx.shadowColor=bsGlowColor; ctx.shadowBlur=16;
+    ctx.beginPath();
+    ctx.moveTo(-10,30); ctx.lineTo(12,30); ctx.bezierCurveTo(14,44,12,60,8,70);
+    ctx.lineTo(-6,70); ctx.bezierCurveTo(-10,60,-12,44,-10,30); ctx.closePath();
+    ctx.fillStyle=bsColor; ctx.fill();
+    ctx.strokeStyle=bsGlowColor; ctx.lineWidth=1; ctx.stroke();
+    ctx.restore();
+
+    /* Label on brainstem */
+    ctx.font='bold 7px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText('BS', 1, 53);
+
+    /* Spinal cord */
+    ctx.strokeStyle='rgba(34,211,238,0.20)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(1,70); ctx.lineTo(1,85); ctx.stroke();
+
+    ctx.restore();
+
+    /* Wave panel */
+    var wx = cx - 55 * sc, wy = cy + 68 * sc, ww = 110 * sc, wh = 28;
+    ctx.fillStyle='rgba(4,12,22,0.80)';
+    ctx.beginPath(); ctx.roundRect(wx, wy, ww, wh, 4); ctx.fill();
+    ctx.strokeStyle='rgba(34,211,238,0.12)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.roundRect(wx, wy, ww, wh, 4); ctx.stroke();
+
+    /* Draw wave */
+    var step = ww / wavePoints.length;
+    ctx.save(); ctx.shadowColor=waveColor; ctx.shadowBlur=3;
+    ctx.strokeStyle=waveColor; ctx.lineWidth=1.4; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath();
+    for (var wi = 0; wi < wavePoints.length; wi++) {
+      var wpx = wx + wi * step, wpy = wy + wh/2 + wavePoints[wi] * wh * 0.42;
+      if (wi===0) ctx.moveTo(wpx,wpy); else ctx.lineTo(wpx,wpy);
+    }
+    ctx.stroke(); ctx.restore();
+
+    ctx.font='700 8px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle=waveColor; ctx.fillText(waveLabel, cx, wy + wh + 12);
+  }
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    var p = Math.min((ts - startTs) / TOTAL, 1);
+    animT += 0.5;
+    var lA = Math.min(p * 2.4, 1);
+    var rA = Math.max(0, Math.min((p - 0.38) * 2.1, 1));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#030810'; ctx.fillRect(0, 0, W, H);
+
+    var gap = 10, pW = (W - gap * 3) / 2;
+
+    /* ── LEFT SLEEP ── */
+    ctx.globalAlpha = lA;
+    ctx.fillStyle = '#030b16';
+    ctx.beginPath(); ctx.roundRect(gap, 8, pW, H-16, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(34,211,238,0.22)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(gap, 8, pW, H-16, 10); ctx.stroke();
+    ctx.fillStyle='rgba(34,211,238,0.85)'; ctx.font='700 10px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('BRAINSTEM → SLEEP', gap+pW/2, 26);
+
+    /* Animate sleep wave */
+    var ns = Math.sin(animT*0.20)*0.65 + Math.sin(animT*0.11)*0.28 + Math.sin(animT*0.42)*0.09;
+    sleepWave.push(ns); if(sleepWave.length>80) sleepWave.shift();
+
+    drawAnatomyBrain(ctx, gap + pW/2, 56, 0.72,
+      'rgba(34,211,238,0.75)', 'rgba(34,211,238,0.9)',
+      'SLEEP', sleepWave, 'rgba(34,211,238,0.80)', 'SLEEP CYCLE ACTIVE');
+    ctx.globalAlpha = 1;
+
+    /* ── RIGHT BRAINSTEM DEATH ── */
+    ctx.globalAlpha = rA;
+    ctx.fillStyle = '#100308';
+    ctx.beginPath(); ctx.roundRect(gap*2+pW, 8, pW, H-16, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(248,113,113,0.22)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(gap*2+pW, 8, pW, H-16, 10); ctx.stroke();
+    ctx.save();
+    ctx.shadowColor='rgba(248,113,113,0.5)'; ctx.shadowBlur=8;
+    ctx.fillStyle='rgba(248,113,113,0.88)'; ctx.font='700 10px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('BRAINSTEM → DEATH', gap*2+pW+pW/2, 26);
+    ctx.restore();
+
+    /* Death wave flat with rare spike */
+    dSpike = Math.max(0, dSpike - 0.08);
+    if (Math.random() < 0.008) dSpike = 1.0;
+    deathWave.push(dSpike * Math.sin(dSpike * Math.PI) * 0.6);
+    if (deathWave.length > 80) deathWave.shift();
+
+    drawAnatomyBrain(ctx, gap*2+pW + pW/2, 56, 0.72,
+      'rgba(100,20,20,0.75)', 'rgba(248,113,113,0.5)',
+      'DEATH', deathWave, 'rgba(248,113,113,0.75)', 'BRAINSTEM DEATH = LEGAL DEATH');
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ══ ENGINE ══ */
+var stage = 0;
+function ease(t) { return 1 - Math.pow(1-t, 3); }
+function animFrom(el, from, to, ms, cb) {
+  var t0 = null;
+  (function run(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts-t0)/ms, 1);
+    el.textContent = Math.round(from + ease(p)*(to-from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  })(performance.now());
+}
+var barMap  = { 0:'0%', 1:'0%', 2:'33%', 3:'66%', 4:'100%' };
+var metaMap = { 0:'Lesson · Brainstem', 1:'Exercise 1 of 3', 2:'Exercise 2 of 3', 3:'Exercise 3 of 3', 4:'Lesson Complete' };
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 2) setTimeout(initS2Canvas, 60);
+  if (n === 4) {
+    saveProgress('brainstem');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1400, 1800);
+        animFrom(document.getElementById('mv1'), 0, 3, 1400);
+      }, 400);
+    }, 300);
+  }
+}
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id); localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+function hideFb() { document.getElementById('fbPanel').className = 'fb-panel'; }
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  var p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('The 2018 Neurology study confirmed the brainstem controls arousal, the wake-sleep cycle, heart rate, and respiration all simultaneously. It is the hub that keeps you alive and governs whether you sleep or stay awake.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx2(el, correct) {
+  if (document.querySelector('#s2 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s2 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Brainstem death is legally certified as death in the UK, India, and Trinidad & Tobago. "Death of the brainstem alone is sufficient to produce death." The brainstem governs sleep each night. Its permanent failure is death. One organ two states.', function() { go(3); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) { if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Quran 39:42 treats sleep and death as the same event: souls taken, some temporarily returned. Modern science identified the mechanism: the brainstem governs sleep, and brainstem failure IS death. The Quran described this biological link 1,400 years before neuroscience confirmed it.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong'); setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"brainstem");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({
+  lessonId: 'brainstem',
+  question: 'The brainstem controls both consciousness during sleep and cessation at death. When did modern medicine confirm brainstem death as the medical definition of death?',
+  unit: "CE",
+  inputType: "era",
+  min: 1955, max: 1985, step: 1,
+  correct: 1968,
+  correctLabel: '1968',
+  curiositySeed: {
+    question: 'A punch to the ear can knock someone unconscious for hours — not a punch to the jaw or head. Why does the inner ear control consciousness?',
+    nextUrl: 'quran-inner-ear.html',
+    nextTitle: 'Inner Ear'
+  }
+});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* 39:42 Allah takes souls at death AND during sleep. Same organ (brainstem) governs both.
+   Also 6:60 "He takes you by night (sleep)" same sleep/death equivalence.
+   All three are the same claim: the brainstem is the seat of both sleep and death. */
+QuranValidator.attach('qv-brainstem',{
+  mode:'locate',
+  title:'Read the verses yourself',
+  subtitle:'39:42 links sleep and death as one event. 6:60 repeats it. The brainstem governs both confirmed by modern neuroscience.',
+  groups:[
+    {id:'death-sleep', label:'Sleep and death one event', arabic:'يَتَوَفَّى', color:'#22d3ee', occurrences:[[39,42],[6,60]]}
+  ]
+});
+</script>
+</body>
+</html>

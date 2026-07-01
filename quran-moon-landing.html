@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Moon Landing · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0b1622;
+      --surface:      #111e2e;
+      --surface2:     #182840;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2ddd4;
+      --muted:        #7a8fa3;
+      --accent:       #4338ca;
+      --accent-light: #a5b4fc;
+      --accent-dim:   rgba(67,56,202,0.12);
+      --accent-ring:  rgba(165,180,252,0.28);
+      --moon:         #c7d2fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --ok:           #22c55e;
+      --ok-bg:        #052e16;
+      --ok-border:    #166534;
+      --err-light:    #f87171;
+      --err-bg:       #2d0707;
+      --err-border:   #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .4s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Duolingo progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Common text styles ── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 28px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.used { opacity: .4; pointer-events: none; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--moon); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+
+    /* ── Stage 0: intro verse display ── */
+    .intro-verse { background: var(--surface); border: 1px solid rgba(67,56,202,0.35); border-radius: 16px; padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .iv-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .iv-ar { font-family: 'Amiri', serif; direction: rtl; font-size: clamp(22px, 5vw, 32px); line-height: 2.0; color: var(--text); }
+    .iv-ar .hl { color: var(--moon); font-weight: 700; }
+    .iv-tr { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 14px; font-style: italic; border-top: 1px solid var(--border); padding-top: 14px; }
+    .iv-tr .hl { color: var(--moon); font-style: normal; font-weight: 500; }
+    .claim-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0 8px; flex-wrap: wrap; }
+    .cr-block { text-align: center; }
+    .cr-num { font-family: 'Playfair Display', serif; font-size: clamp(40px, 9vw, 60px); font-weight: 700; line-height: 1; color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.35); }
+    .cr-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .cr-eq { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); color: var(--muted); }
+
+    /* ── Duolingo answer cards ── */
+    .answer-card {
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.28);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+    }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct {
+      border-color: var(--ok);
+      border-bottom-color: var(--ok-border);
+      background: rgba(34,197,94,0.08);
+      pointer-events: none;
+    }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter {
+      width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border);
+      flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s;
+    }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-ar { font-family: 'Amiri', serif; font-size: 17px; direction: rtl; text-align: right; color: var(--text); line-height: 1.9; }
+    .ac-ref { font-size: 10px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-top: 1px; }
+    .ac-tr { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 3px; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Stage 2: calculation ── */
+    .calc-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 22px; margin: 20px 0; }
+    .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; font-size: 15px; }
+    .calc-row.minus { color: var(--muted); }
+    .calc-row.minus::before { content: '−'; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--muted); margin-right: 8px; }
+    .calc-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+    .calc-divider { border-top: 2px solid var(--border); margin: 10px 0; }
+    .calc-row.result { font-weight: 500; }
+    .calc-result-num { font-family: 'Playfair Display', serif; font-size: clamp(28px, 7vw, 40px); font-weight: 700; color: var(--muted); transition: color .4s, text-shadow .4s; min-width: 80px; text-align: right; }
+    .calc-result-num.lit { color: var(--gold-light); text-shadow: 0 0 30px rgba(252,211,77,0.45); }
+
+    /* ── Stage 3: calendar context ── */
+    .date-banner { background: var(--surface); border: 1px solid rgba(67,56,202,0.3); border-radius: 12px; padding: 16px 20px; text-align: center; margin-bottom: 22px; }
+    .db-date { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); color: var(--text); margin-bottom: 4px; }
+    .db-sub { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+
+    /* ── Stage 4: verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .match-wrap { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .match-block { text-align: center; }
+    .match-num { font-family: 'Playfair Display', serif; font-size: clamp(42px, 10vw, 64px); font-weight: 700; line-height: 1; }
+    .match-num.mv { color: var(--moon); text-shadow: 0 0 40px rgba(165,180,252,0.4); }
+    .match-num.mh { color: var(--gold-light); text-shadow: 0 0 40px rgba(252,211,77,0.4); }
+    .match-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .match-eq { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 44px); color: var(--muted); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 22px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-v { color: var(--moon); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.06); }
+    .sci-table tr.hl .td-v { color: var(--gold); }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Fixed feedback panel (Duolingo) ── */
+    .fb-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      padding: 18px 20px 32px;
+      transform: translateY(110%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok); color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-sirius-distance.html" class="nav-back">← Sirius Distance</a>
+
+  <!-- Duolingo-style progress bar -->
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · Moon Landing</div>
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <p class="eyebrow" style="color:var(--moon)">Quranic Numerics · Moon Landing</p>
+    <h1 class="hero-title">The Quran has a verse about the moon splitting. Counting the verses that follow it reveals the Hijri year humans first walked on the moon.</h1>
+
+    <div class="intro-verse">
+      <div class="iv-ref">Quran 54:1 Surah Al-Qamar · The Moon</div>
+      <div class="iv-ar">ٱقْتَرَبَتِ ٱلسَّاعَةُ وَٱنشَقَّ <span class="hl">ٱلْقَمَرُ</span></div>
+      <div class="iv-tr">"The Hour has drawn near and <span class="hl">the moon has split.</span>"</div>
+    </div>
+
+    <div class="claim-row">
+      <div class="cr-block">
+        <div class="cr-num">1,389</div>
+        <div class="cr-lbl">verses after 54:1</div>
+      </div>
+      <div class="cr-eq">=</div>
+      <div class="cr-block">
+        <div class="cr-num">1389</div>
+        <div class="cr-lbl">AH · Apollo 11 lands</div>
+      </div>
+    </div>
+
+    <p class="body-text">The Quran's 54th surah is called Al-Qamar "The Moon." Its very first verse is the only place in the entire Quran where the moon is split. Count how many verses remain after it. That number is 1,389 and July 20, 1969 CE is 1389 AH.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--accent);color:#fff">Begin the lesson →</button>
+  </div>
+
+  <!-- ── STAGE 1: Exercise Find the moon verse ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">Which of these verses mentions the splitting of the moon?</p>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-ar">ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ</div>
+        <div class="ac-ref">2:255 · Ayat al-Kursi</div>
+        <div class="ac-tr">"Allah there is no deity except Him, the Ever-Living..."</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, true)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-ar">ٱقْتَرَبَتِ ٱلسَّاعَةُ وَٱنشَقَّ ٱلْقَمَرُ</div>
+        <div class="ac-ref">54:1 · Al-Qamar</div>
+        <div class="ac-tr">"The Hour has drawn near and the moon has split."</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx1(this, false)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-ar">لَا ٱلشَّمْسُ يَنۢبَغِى لَهَآ أَن تُدْرِكَ ٱلْقَمَرَ</div>
+        <div class="ac-ref">36:40 · Ya-Sin</div>
+        <div class="ac-tr">"It is not for the sun to catch up to the moon..."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 2: Exercise Calculate remaining verses ── -->
+  <div class="stage" id="s2">
+    <p class="prompt">How many verses remain in the Quran after verse 54:1?</p>
+
+    <div class="calc-box">
+      <div class="calc-row">
+        <span>Total Quran verses</span>
+        <span class="calc-val">6,236</span>
+      </div>
+      <div class="calc-row minus">
+        <span>Verses through position 54:1</span>
+        <span class="calc-val">4,847</span>
+      </div>
+      <div class="calc-divider"></div>
+      <div class="calc-row result">
+        <span>Verses remaining after 54:1</span>
+        <span class="calc-result-num" id="calcResult">?</span>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <strong>Counting method:</strong> Verse 54:1 sits at position 4,847 in the Quran (Ḥafṣ ʿUthmānī text). The verses remaining after it not including 54:1 itself are the verses that "follow" the moon-split moment.
+    </div>
+
+    <button class="btn" id="calcBtn" onclick="runCalc()" style="background:var(--accent);color:#fff">Calculate →</button>
+  </div>
+
+  <!-- ── STAGE 3: Exercise Calendar match ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">Apollo 11 landed on the moon on July 20, 1969 CE. What year is this in the Islamic Hijri calendar?</p>
+
+    <div class="date-banner">
+      <div class="db-date">July 20, 1969 CE</div>
+      <div class="db-sub">6 Jumada al-Awwal · year ??? AH</div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">A</div>
+      <div class="ac-body">
+        <div class="ac-big">1420 AH</div>
+        <div class="ac-sub">Corresponds to ~1999–2000 CE</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, false)" class="answer-card">
+      <div class="ac-letter">B</div>
+      <div class="ac-body">
+        <div class="ac-big">1300 AH</div>
+        <div class="ac-sub">Corresponds to ~1882–1883 CE</div>
+      </div>
+    </div>
+
+    <div onclick="pickEx3(this, true)" class="answer-card">
+      <div class="ac-letter">C</div>
+      <div class="ac-body">
+        <div class="ac-big">1389 AH</div>
+        <div class="ac-sub">Corresponds to ~1969–1970 CE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">The verse about the moon produces the year humans first landed on it.</h2>
+
+    <div class="match-wrap">
+      <div class="match-block">
+        <div class="match-num mv" id="mv0">0</div>
+        <div class="match-lbl">verses after 54:1</div>
+      </div>
+      <div class="match-eq">=</div>
+      <div class="match-block">
+        <div class="match-num mh" id="mh0">0</div>
+        <div class="match-lbl">AH · Apollo 11 moon landing</div>
+      </div>
+    </div>
+
+    <table class="sci-table" style="margin-top:28px">
+      <thead>
+        <tr><th>Fact</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total Quran verses (Ḥafṣ ʿUthmānī)</td>
+          <td class="td-v">6,236</td>
+        </tr>
+        <tr>
+          <td>Position of verse 54:1</td>
+          <td class="td-v">4,847</td>
+        </tr>
+        <tr>
+          <td>Verses remaining after 54:1</td>
+          <td class="td-v">1,389</td>
+        </tr>
+        <tr>
+          <td>Moon landing date (Gregorian)</td>
+          <td class="td-v">July 20, 1969 CE</td>
+        </tr>
+        <tr class="hl">
+          <td>Moon landing date (Hijri)</td>
+          <td class="td-v">6 Jumada al-Awwal, <strong>1389</strong> AH</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <strong>Why the Hijri calendar?</strong> The Quran's community has always measured time by the lunar Hijri calendar not the Gregorian. 1389 AH is not a "conversion trick." It is the actual year of the moon landing in the calendar the Quran was revealed into. And 1,389 is the exact verse count, requiring zero rounding.
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">The Quran's only moon-split verse sits at position 4,847. Exactly 1,389 verses follow it. Apollo 11 landed on the moon in 1389 AH. The surah is named Al-Qamar "The Moon."</div>
+      <div class="gs">The structure was fixed in the 7th century. The verse count is a fact (6,236 − 4,847 = 1,389). The Hijri date is historical (July 20, 1969 = 1389 AH). No selection, no rounding, no adjustment was made. The numbers meet exactly.</div>
+    </div>
+
+    <div class="insight-box">
+      <strong>Probability:</strong> A random verse in the Quran being followed by a count that matches a specific historical Hijri year is approximately 1 in 6,236. The thematic coherence the moon verse producing the moon-landing year makes the match structurally coherent in a way that random matches are not.
+    </div>
+
+    <div id="qv-moon"></div>
+
+        <div id="curiositySeed"></div>
+
+
+    <a href="quran-sirius-distance.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sirius Distance</a>
+    <a href="quran-carbon-creation.html" class="btn" style="background:var(--accent);color:#fff;margin-left:12px">Next · Carbon Creation →</a>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let calcDone = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = { 0: 'Lesson · Moon Landing', 1: 'Exercise 1 of 3', 2: 'Exercise 2 of 3', 3: 'Exercise 3 of 3', 4: 'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('moon-landing');
+    setTimeout(function() {
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function() {
+        animFrom(document.getElementById('mv0'), 0, 1389, 1800, null);
+        animFrom(document.getElementById('mh0'), 0, 1389, 1800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('54:1 is the only verse in the Quran where the moon splits.', function() { go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runCalc() {
+  if (calcDone) return;
+  calcDone = true;
+  document.getElementById('calcBtn').classList.add('used');
+  const el = document.getElementById('calcResult');
+  el.textContent = '0';
+  animFrom(el, 0, 1389, 2200, function() {
+    el.classList.add('lit');
+    showOk('Exactly 1,389 verses follow the moon-split verse (6,236 − 4,847 = 1,389).', function() { go(3); });
+  });
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c) {
+      if (!c.classList.contains('ac-correct')) c.classList.add('ac-disabled');
+    });
+    showOk('July 20, 1969 CE = 6 Jumada al-Awwal, 1389 AH a documented historical fact.', function() { go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function() { el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, t = 0;
+  var stars = Array.from({length:38},function(_,i){return{x:(i*137.5)%W,y:(i*89.3)%(H*0.65),ph:i*0.4};});
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#040810'; ctx.fillRect(0,0,W,H);
+    stars.forEach(function(s){
+      var a=0.2+Math.sin(t*1.2+s.ph)*0.2;
+      ctx.beginPath(); ctx.arc(s.x,s.y,0.7,0,Math.PI*2);
+      ctx.fillStyle='rgba(200,215,255,'+a+')'; ctx.fill();
+    });
+    var moonY=H*0.65;
+    ctx.beginPath(); ctx.moveTo(0,moonY);
+    for(var x=0;x<=W;x+=3){var y=moonY+Math.sin(x*0.04)*4+Math.sin(x*0.09)*2;ctx.lineTo(x,y);}
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle='#1c2230'; ctx.fill();
+    [[W*0.22,moonY+5,8],[W*0.58,moonY+7,12],[W*0.8,moonY+3,6]].forEach(function(cr){
+      ctx.beginPath(); ctx.arc(cr[0],cr[1],cr[2],Math.PI,Math.PI*2);
+      ctx.strokeStyle='rgba(100,115,135,0.28)'; ctx.lineWidth=1.5; ctx.stroke();
+    });
+    var ap=(t*0.28)%(Math.PI);
+    var rx=W*0.15+(W*0.7)*(ap/Math.PI);
+    var ry=moonY-Math.sin(ap)*H*0.58;
+    ctx.beginPath();
+    for(var i=0;i<18;i++){
+      var ap2=ap-i*0.055; if(ap2<0)break;
+      var tx=W*0.15+(W*0.7)*(ap2/Math.PI);
+      var ty=moonY-Math.sin(ap2)*H*0.58;
+      i===0?ctx.moveTo(tx,ty):ctx.lineTo(tx,ty);
+    }
+    ctx.strokeStyle='rgba(100,165,255,0.28)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(rx,ry,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(150,200,255,0.92)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(rx,ry,8,0,Math.PI*2);
+    ctx.fillStyle='rgba(150,200,255,0.1)'; ctx.fill();
+    t+=0.02; requestAnimationFrame(frame);
+  }
+  frame();
+}
+initHeroCanvas();
+</script>
+<script src="gpu.js?v=20260615h"></script>
+<script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"moon-landing");}</script>
+<script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"moon-landing","question":"In which Hijri year did Apollo 11 land on the moon?","unit":"AH","inputType":"orbit","min":1370,"max":1410,"step":1,"correct":1389,"correctLabel":"1389 AH","curiositySeed":{"question":"The word 'clay' (طين) appears in the Quran. Carbon has mass number 12. How many times does طين appear?","nextUrl":"quran-carbon-creation.html","nextTitle":"Carbon Creation"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Locate 54:1 ٱنشَقَّ ٱلْقَمَرُ "the moon has split." Surah 54 = Al-Qamar (The Moon).
+   Counting from 54:1 forward gives Hijri year 1389 = Apollo 11 moon landing year. */
+QuranValidator.attach('qv-moon',{
+  mode:'locate',
+  title:'Read it yourself in the Quran',
+  subtitle:'Find 54:1 "the moon has split." Surah 54 = Al-Qamar (The Moon). Apollo 11 landed in Hijri year 1389.',
+  groups:[
+    {id:'moon', label:'The moon has split', arabic:'ٱلْقَمَرُ', color:'#4338ca', occurrences:[[54,1],[54,2]]}
+  ]
+});
+</script>
+</body>
+</html>

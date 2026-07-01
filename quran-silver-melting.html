@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
+  <link rel="stylesheet" href="theme.css?v=20260615h">
+  <title>Silver Melting Point · Quranic Numerics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #0b1622;
+      --surface:     #111e2e;
+      --surface2:    #182840;
+      --border:      rgba(255,255,255,0.08);
+      --text:        #e2ddd4;
+      --muted:       #7a8fa3;
+      --accent:      #64748b;
+      --accent-light:#94a3b8;
+      --accent-dim:  rgba(100,116,139,0.12);
+      --accent-ring: rgba(148,163,184,0.25);
+      --silver:      #94a3b8;
+      --silver-light:#cbd5e1;
+      --fire:        #c2410c;
+      --fire-light:  #fb923c;
+      --gold:        #f59e0b;
+      --gold-light:  #fcd34d;
+      --ok:          #22c55e;
+      --ok-bg:       #052e16;
+      --ok-border:   #166534;
+      --err-light:   #f87171;
+      --err-bg:      #2d0707;
+      --err-border:  #991b1b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
+    .container { max-width: 660px; margin: 0 auto; }
+    .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    .stage { display: none; }
+    .stage.active { display: block; animation: rise .45s ease; }
+    @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    /* ── Duolingo progress bar ── */
+    .lesson-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 6px; overflow: hidden; }
+    .lesson-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width .65s cubic-bezier(.4,0,.2,1); width: 0%; }
+    .lesson-meta { font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 36px; }
+
+    /* ── Common text styles ── */
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 16px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 36px); line-height: 1.22; margin-bottom: 16px; }
+    .body-text { font-size: 16px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; }
+    .step-lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+    .prompt { font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); line-height: 1.35; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 26px; border-radius: 6px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn.hidden { opacity: 0; pointer-events: none; }
+    .btn.used { opacity: .4; pointer-events: none; }
+    .insight-box { background: var(--surface); border-radius: 10px; border-left: 3px solid var(--silver-light); padding: 16px 20px; font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
+    .insight-box strong { color: var(--text); }
+    .nav-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing:.06em; text-transform: uppercase; margin-bottom: 28px; transition: color .2s; }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── Stage 0 triple display ── */
+    .triple { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 32px 0; flex-wrap: wrap; }
+    .tr-num { font-family: 'Playfair Display', serif; font-size: clamp(40px, 10vw, 68px); font-weight: 700; line-height: 1; opacity: 0; transform: translateY(14px); transition: opacity .5s, transform .5s; }
+    .tr-num.s { color: var(--silver-light); text-shadow: 0 0 40px rgba(148,163,184,0.4); }
+    .tr-num.g { color: #f59e0b; text-shadow: 0 0 50px rgba(245,158,11,0.5); }
+    .tr-num.show { opacity: 1; transform: translateY(0); }
+    .tr-op { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 40px); color: var(--muted); opacity: 0; transition: opacity .5s; padding: 0 4px; }
+    .tr-op.show { opacity: 1; }
+    .tr-sub { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; }
+
+    /* ── Verse card ── */
+    .verse-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+    .verse-ref { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .verse-ar { font-family: 'Amiri', serif; direction: rtl; text-align: right; font-size: clamp(18px, 3vw, 24px); line-height: 2.2; color: var(--text); margin-bottom: 14px; }
+    .verse-tr { font-size: 14px; line-height: 1.75; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; font-style: italic; }
+    .hl-s { color: var(--silver-light); font-weight: 700; }
+    .hl-f { color: var(--fire-light); font-weight: 700; }
+    .hl-g { color: #f59e0b; font-weight: 700; }
+
+    /* ── Duolingo answer cards ── */
+    .answer-card {
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.28);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+    }
+    .answer-card:hover:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .answer-card:active:not(.ac-disabled):not(.ac-correct):not(.ac-wrong) { transform: translateY(2px); }
+    .answer-card.ac-correct {
+      border-color: var(--ok);
+      border-bottom-color: var(--ok-border);
+      background: rgba(34,197,94,0.08);
+      pointer-events: none;
+    }
+    .answer-card.ac-wrong { animation: shake .4s ease; border-color: var(--err-light) !important; border-bottom-color: var(--err-border) !important; }
+    .answer-card.ac-disabled { opacity: 0.38; pointer-events: none; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .ac-letter {
+      width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; background: var(--surface2); border: 1px solid var(--border);
+      flex-shrink: 0; color: var(--muted); transition: background .15s, color .15s;
+    }
+    .answer-card.ac-correct .ac-letter { background: rgba(34,197,94,0.2); border-color: var(--ok); color: var(--ok); }
+    .ac-body { flex: 1; min-width: 0; }
+    .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
+    .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Path cards (two-path mechanic) ── */
+    .paths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+    .path-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: border-color .4s, box-shadow .4s; }
+    .path-card.lit-a { border-color: rgba(148,163,184,0.4); box-shadow: 0 0 24px rgba(148,163,184,0.1); }
+    .path-card.lit-b { border-color: rgba(251,146,60,0.4); box-shadow: 0 0 24px rgba(194,65,12,0.15); }
+    .ptag { display: inline-block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; margin-bottom: 10px; font-weight: 500; }
+    .ptag-a { background: rgba(148,163,184,0.15); color: var(--silver-light); }
+    .ptag-b { background: rgba(194,65,12,0.15); color: var(--fire-light); }
+    .path-route { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .path-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+    .path-counter { text-align: center; margin: 12px 0; }
+    .path-num { font-family: 'Playfair Display', serif; font-size: clamp(36px, 9vw, 56px); font-weight: 700; line-height: 1; color: var(--muted); transition: color .45s, text-shadow .45s; }
+    .path-num.done-a { color: var(--silver-light); text-shadow: 0 0 30px rgba(148,163,184,0.5); }
+    .path-num.done-b { color: var(--fire-light); text-shadow: 0 0 30px rgba(194,65,12,0.5); }
+    .path-lbl { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+    .path-btn { display: block; width: 100%; margin-top: 14px; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+    .path-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .path-btn.used { opacity: 0.4; cursor: default; pointer-events: none; }
+    .path-btn.b-style { border-color: rgba(194,65,12,0.3); }
+    .path-btn.b-style:hover { border-color: rgba(251,146,60,0.5); }
+
+    .temp-bracket { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; opacity: 0; transform: translateY(8px); transition: opacity .6s, transform .6s; }
+    .temp-bracket.show { opacity: 1; transform: none; }
+    .tb-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .tb-val { font-family: 'Playfair Display', serif; font-weight: 700; }
+    .tb-val.ta { font-size: clamp(24px, 6vw, 38px); color: var(--silver-light); }
+    .tb-val.tc { font-size: clamp(22px, 5vw, 34px); color: #f59e0b; }
+    .tb-val.tb { font-size: clamp(24px, 6vw, 38px); color: var(--fire-light); }
+    .tb-op { font-family: 'Playfair Display', serif; font-size: clamp(20px, 4vw, 28px); color: var(--muted); }
+    .tb-labels { display: flex; justify-content: space-around; font-size: 11px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-top: 10px; }
+
+    /* ── Stage 4 verdict ── */
+    .xp-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 100px; padding: 8px 18px; margin-bottom: 28px; opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
+    .xp-badge.show { opacity: 1; transform: none; }
+    .xp-text { font-size: 14px; font-weight: 600; color: var(--ok); }
+    .sci-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 24px; }
+    .sci-table th { text-align: left; color: var(--muted); font-weight: 400; padding: 8px 12px; font-size: 11px; letter-spacing:.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .sci-table td { padding: 12px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sci-table .td-yr { color: var(--silver-light); font-family: 'Playfair Display', serif; font-size: 16px; }
+    .sci-table .td-gap { color: var(--muted); font-size: 13px; }
+    .sci-table tr.hl td { background: rgba(245,158,11,0.05); }
+    .sci-table tr.hl .td-yr { color: #f59e0b; }
+    .timeline { position: relative; padding-left: 26px; margin: 20px 0 28px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(to bottom, var(--silver-light), #f59e0b); }
+    .tl-item { position: relative; margin-bottom: 26px; }
+    .tl-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--silver-light); }
+    .tl-item:last-child::before { border-color: #f59e0b; background: #f59e0b; }
+    .tl-year { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--silver-light); margin-bottom: 4px; }
+    .tl-text { font-size: 15px; line-height: 1.75; }
+    .tl-sub { font-size: 13px; color: var(--muted); display: block; margin-top: 3px; }
+    .gold-box { background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(252,211,77,0.04) 100%); border: 1px solid rgba(245,158,11,0.28); border-radius: 14px; padding: 26px; text-align: center; margin: 24px 0; }
+    .gold-box .gt { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 22px); color: #fcd34d; line-height: 1.6; }
+    .gold-box .gs { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.75; }
+
+    /* ── Fixed feedback panel (Duolingo) ── */
+    .fb-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      padding: 18px 20px 32px;
+      transform: translateY(110%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .fb-panel.show { transform: translateY(0); }
+    .fb-panel.fb-ok  { background: var(--ok-bg); border-top: 3px solid var(--ok); }
+    .fb-panel.fb-err { background: var(--err-bg); border-top: 3px solid var(--err-light); }
+    .fb-left { display: flex; align-items: center; gap: 12px; }
+    .fb-icon { font-size: 24px; line-height: 1; }
+    .fb-title { font-size: 17px; font-weight: 700; }
+    .fb-panel.fb-ok  .fb-title { color: var(--ok); }
+    .fb-panel.fb-err .fb-title { color: var(--err-light); }
+    .fb-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; line-height: 1.55; max-width: 340px; }
+    .fb-btn { flex-shrink: 0; padding: 14px 30px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
+    .fb-btn:active { transform: scale(0.96); }
+    .fb-panel.fb-ok  .fb-btn { background: var(--ok); color: var(--ok-bg); }
+    .fb-panel.fb-err .fb-btn { background: var(--err-light); color: var(--err-bg); }
+  </style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
+  <button class="tt-btn" data-theme-val="dark" title="Dark">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="system" title="System">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  </button>
+  <button class="tt-btn" data-theme-val="light" title="Light">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</div>
+<a href="index.html" class="nav-home-fixed">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  All lessons
+</a>
+<div class="dot-field"></div>
+<div class="container">
+
+  <a href="quran-sun-temperature.html" class="nav-back">← Sun Temperature</a>
+
+  <!-- Duolingo-style progress bar -->
+  <div class="lesson-bar-wrap">
+    <div class="lesson-bar-fill" id="lbar"></div>
+  </div>
+  <div class="lesson-meta" id="lmeta">Lesson · Silver Melting Point</div>
+
+  <!-- ── STAGE 0: Intro ── -->
+  <div class="stage active" id="sp"></div>
+  <div class="stage" id="s0">
+    <div id="predictReveal"></div>
+    <canvas id="heroCanvas" width="640" height="130" style="width:100%;height:130px;border-radius:14px;margin-bottom:28px;display:block;"></canvas>
+    <p class="eyebrow" style="color:var(--silver-light)">Quranic Numerics · Silver Melting Point</p>
+    <h1 class="hero-title">Silver melts at 961.78°C. The Quran provides both 961 and 962 as verse gaps between its silver passages trapping the melting point between them.</h1>
+
+    <div class="triple">
+      <div>
+        <div class="tr-num s" id="tr0">961</div>
+        <div class="tr-sub">Path A</div>
+      </div>
+      <div class="tr-op" id="op0">&lt;</div>
+      <div>
+        <div class="tr-num g" id="tr1">961.78°C</div>
+        <div class="tr-sub">silver melting point</div>
+      </div>
+      <div class="tr-op" id="op1">&lt;</div>
+      <div>
+        <div class="tr-num s" id="tr2">962</div>
+        <div class="tr-sub">Path B</div>
+      </div>
+    </div>
+
+    <p class="body-text">From the Quran's first mention of gold and silver (3:14) to the second (9:34) is exactly 961 verses. From that same start to the very next verse where those metals are heated in fire (9:35) is exactly 962 verses. Silver's melting point is 961.78°C precisely between these two consecutive counts.</p>
+
+    <button class="btn" onclick="go(1)" style="background:var(--fire);color:#fff">Begin the lesson →</button>
+  </div>
+
+  <!-- ── STAGE 1: Exercise 1 Identify the anchor verse ── -->
+  <div class="stage" id="s1">
+    <p class="prompt">Gold and silver appear together in the Quran for the first time in one specific verse. Which verse is this anchor?</p>
+    <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">2:186</div><div class="ac-sub">A verse about supplication</div></div></div>
+    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">3:14</div><div class="ac-sub">"Beautified for people is love of… gold and silver"</div></div></div>
+    <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">9:34</div><div class="ac-sub">About hoarding gold and silver</div></div></div>
+  </div>
+
+  <!-- ── STAGE 2: Two-path interactive ── -->
+  <div class="stage" id="s2">
+    <h2 class="hero-title">Click each path to count the verses. Watch where they land.</h2>
+    <p class="body-text">Both paths start at 3:14. The endpoints are consecutive verses in the same passage one naming gold and silver, the next describing them being heated in fire.</p>
+
+    <div class="paths-grid">
+      <div class="path-card" id="pca">
+        <div><span class="ptag ptag-a">Path A Semantic</span></div>
+        <div class="path-route">3:14 → 9:34</div>
+        <div class="path-desc">From first gold+silver to second gold+silver</div>
+        <div class="path-counter">
+          <div class="path-num" id="pna">0</div>
+          <div class="path-lbl">verses (exclusive)</div>
+        </div>
+        <button class="path-btn" id="btn-pa" onclick="runPath('a')">Count Path A →</button>
+      </div>
+
+      <div class="path-card" id="pcb">
+        <div><span class="ptag ptag-b">Path B Thematic</span></div>
+        <div class="path-route">3:14 → 9:35</div>
+        <div class="path-desc">From first gold+silver to the heating verse</div>
+        <div class="path-counter">
+          <div class="path-num" id="pnb">0</div>
+          <div class="path-lbl">verses (exclusive)</div>
+        </div>
+        <button class="path-btn b-style" id="btn-pb" onclick="runPath('b')">Count Path B →</button>
+      </div>
+    </div>
+
+    <div class="temp-bracket" id="tbkt">
+      <div class="tb-row">
+        <span class="tb-val ta">961</span>
+        <span class="tb-op">&lt;</span>
+        <span class="tb-val tc">961.78°C</span>
+        <span class="tb-op">&lt;</span>
+        <span class="tb-val tb">962</span>
+      </div>
+      <div class="tb-labels">
+        <span>Path A verses</span>
+        <span>silver melting point</span>
+        <span>Path B verses</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 3: Exercise 3 Identify the melting point metal ── -->
+  <div class="stage" id="s3">
+    <p class="prompt">Path A spans 961 exclusive verses from 3:14 to 9:34. That number matches a physical property of a metal. What melts at exactly 961.78°C?</p>
+    <div onclick="pickEx3(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">Gold (Au)</div><div class="ac-sub">Melts at 1,064°C</div></div></div>
+    <div onclick="pickEx3(this,false)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">Copper (Cu)</div><div class="ac-sub">Melts at 1,085°C</div></div></div>
+    <div onclick="pickEx3(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">Silver (Ag)</div><div class="ac-sub">Melts at exactly 961.78°C</div></div></div>
+  </div>
+
+  <!-- ── STAGE 4: Verdict ── -->
+  <div class="stage" id="s4">
+    <div class="xp-badge" id="xpBadge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="xp-text">Lesson complete · +30 XP</span>
+    </div>
+
+    <h2 class="hero-title">961.78°C was not known until thermometry developed over 1,000 years after the Quran.</h2>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin:24px 0;flex-wrap:wrap">
+      <div style="text-align:center"><div id="mv0" style="font-family:'Playfair Display',serif;font-size:clamp(44px,10vw,64px);font-weight:700;color:#c0c0c0;text-shadow:0 0 40px rgba(192,192,192,0.4);line-height:1">0</div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">Path A · 3:14 → 9:34</div></div>
+      <div style="font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);color:var(--muted)">·</div>
+      <div style="text-align:center"><div id="mv1" style="font-family:'Playfair Display',serif;font-size:clamp(44px,10vw,64px);font-weight:700;color:#a0a0c0;text-shadow:0 0 40px rgba(160,160,192,0.4);line-height:1">0</div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px">Path B · 3:14 → 9:35</div></div>
+    </div>
+    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:16px;color:var(--gold,#f59e0b);margin-bottom:24px">Silver melts at 961.78°C</div>
+
+    <table class="sci-table">
+      <thead>
+        <tr><th>Scientific requirement</th><th>Developed</th><th>Gap from 610 CE</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Reliable thermometry (Fahrenheit scale)</td>
+          <td class="td-yr">1714</td>
+          <td class="td-gap">~1,100 years later</td>
+        </tr>
+        <tr>
+          <td>Celsius/centigrade scale standardized</td>
+          <td class="td-yr">1742</td>
+          <td class="td-gap">~1,130 years later</td>
+        </tr>
+        <tr>
+          <td>Precise metal melting point measurement</td>
+          <td class="td-yr">18th–19th c.</td>
+          <td class="td-gap">~1,200 years later</td>
+        </tr>
+        <tr class="hl">
+          <td>Silver melting point established at 961.78°C</td>
+          <td class="td-yr">Modern</td>
+          <td class="td-gap">~1,300 years later</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">7th century Arabia 610 CE</div>
+        <div class="tl-text">
+          The Quran is revealed. Verse 3:14 names gold and silver among the things people desire. Verses 9:34–9:35 warn against hoarding them and describe the metals being heated in fire on Judgment Day.
+          <span class="tl-sub">Ancient smiths knew silver melts before gold but the exact temperature (961.78°C) was completely unknown.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Modern laboratory physics</div>
+        <div class="tl-text">
+          Precise thermometry establishes silver's melting point at 961.78°C. Corpus linguistics tools confirm: the exclusive verse count from 3:14 to 9:34 is 961. From 3:14 to 9:35 is 962. The melting point sits between both, to two decimal places.
+          <span class="tl-sub">Verified: Tanzil Ḥafṣ/Uthmānī text · path counts independently reproducible</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gold-box">
+      <div class="gt">Silver's melting point 961.78°C falls precisely between two consecutive verse gaps. One gap ends where gold and silver are named. The next ends where they are being heated. Both numbers are exact. The science was not measurable for over a thousand years.</div>
+      <div class="gs">Neither path was selected from many options. 3:14 is the first gold-and-silver verse. 9:34 is the second. 9:35 is the immediate continuation where those metals are described in fire. The numbers 961 and 962 are facts. The temperature 961.78°C sits between them.</div>
+    </div>
+
+    <div class="insight-box">
+      <strong>The verse that describes metal being heated (9:35) is 962 verses from the first gold-and-silver verse (3:14).</strong> Silver the lower-melting of the two metals named melts at 961.78°C, rounded to 962. The Quran does not name a temperature. It provides two verse counts that bracket it.
+    </div>
+
+    <div id="qv-silver"></div>
+
+        <div id="curiositySeed"></div>
+
+
+    <a href="quran-sun-temperature.html" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--muted)">← Back to Sun Temperature</a>
+    <a href="quran-gold-melting.html" class="btn" style="background:var(--fire);color:#fff;margin-left:12px">Next · Gold Melting →</a>
+  </div>
+
+</div>
+
+<!-- ── Fixed feedback panel ── -->
+<div class="fb-panel" id="fbPanel">
+  <div class="fb-left">
+    <div class="fb-icon" id="fbIcon">✓</div>
+    <div>
+      <div class="fb-title" id="fbTitle">Correct!</div>
+      <div class="fb-sub" id="fbSub"></div>
+    </div>
+  </div>
+  <button class="fb-btn" id="fbBtn">Continue</button>
+</div>
+
+<script>
+let stage = 0;
+let doneA = false, doneB = false;
+
+function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animFrom(el, from, to, ms, cb) {
+  let t0 = null;
+  const run = function(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    el.textContent = Math.round(from + ease(p) * (to - from));
+    if (p < 1) requestAnimationFrame(run);
+    else if (cb) cb();
+  };
+  requestAnimationFrame(run);
+}
+
+const barMap  = { 0: '0%', 1: '0%', 2: '33%', 3: '66%', 4: '100%' };
+const metaMap = { 0: 'Lesson · Silver Melting Point', 1: 'Exercise 1 of 3', 2: 'Exercise 2 of 3', 3: 'Exercise 3 of 3', 4: 'Lesson Complete' };
+
+function saveProgress(id) {
+  var d = new Set(JSON.parse(localStorage.getItem('qn_done') || '[]'));
+  if (!d.has(id)) {
+    d.add(id);
+    localStorage.setItem('qn_done', JSON.stringify([...d]));
+    localStorage.setItem('qn_xp', String(parseInt(localStorage.getItem('qn_xp') || '0') + 30));
+  }
+}
+
+function go(n) {
+  document.getElementById('s' + stage).classList.remove('active');
+  stage = n;
+  document.getElementById('s' + stage).classList.add('active');
+  document.getElementById('lbar').style.width = barMap[n];
+  document.getElementById('lmeta').textContent = metaMap[n];
+  window.scrollTo(0, 0);
+  if (n === 4) {
+    saveProgress('silver-melting');
+    setTimeout(function(){
+      document.getElementById('xpBadge').classList.add('show');
+      setTimeout(function(){
+        var a = document.getElementById('mv0');
+        var b = document.getElementById('mv1');
+        if (a) animFrom(a, 0, 961, 1800, null);
+        if (b) animFrom(b, 0, 962, 1800, null);
+      }, 400);
+    }, 300);
+  }
+}
+
+function hideFb() {
+  document.getElementById('fbPanel').className = 'fb-panel';
+}
+
+function showOk(sub, onContinue) {
+  document.getElementById('fbIcon').textContent = '✓';
+  document.getElementById('fbTitle').textContent = 'Correct!';
+  document.getElementById('fbSub').textContent = sub;
+  const p = document.getElementById('fbPanel');
+  p.className = 'fb-panel fb-ok show';
+  document.getElementById('fbBtn').onclick = function() { hideFb(); onContinue(); };
+}
+
+function pickEx1(el, correct) {
+  if (document.querySelector('#s1 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('3:14 "Beautified for people is the love of what they desire: of women, offspring, and heaped-up sums of gold and silver." This verse becomes the starting anchor for two verse-counting paths.', function(){ go(2); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+function runPath(which) {
+  if (which === 'a' && !doneA) {
+    document.getElementById('btn-pa').classList.add('used');
+    animFrom(document.getElementById('pna'), 0, 961, 2000, function() {
+      document.getElementById('pna').classList.add('done-a');
+      document.getElementById('pca').classList.add('lit-a');
+      doneA = true;
+      checkBoth();
+    });
+  }
+  if (which === 'b' && !doneB) {
+    document.getElementById('btn-pb').classList.add('used');
+    animFrom(document.getElementById('pnb'), 0, 962, 2000, function() {
+      document.getElementById('pnb').classList.add('done-b');
+      document.getElementById('pcb').classList.add('lit-b');
+      doneB = true;
+      checkBoth();
+    });
+  }
+}
+
+function checkBoth() {
+  if (doneA && doneB) {
+    setTimeout(function(){
+      var cp = document.getElementById('convergencePanel') || document.querySelector('.conv-panel');
+      if (cp) cp.classList.add('show');
+      document.getElementById('tbkt').classList.add('show');
+      setTimeout(function(){
+        showOk('Path A = 961 (ending at 9:34 hoarders of gold and silver). Path B = 962 (ending at 9:35 heated in Hell\'s fire). Silver melts at 961.78°C.', function(){ go(3); });
+      }, 600);
+    }, 300);
+  }
+}
+
+function pickEx3(el, correct) {
+  if (document.querySelector('#s3 .ac-correct')) return;
+  if (correct) {
+    el.classList.add('ac-correct');
+    document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
+    showOk('Silver (Ag) melts at 961.78°C and the verse path from 3:14 to 9:34 spans exactly 961 exclusive verses. The verse is about those who "hoard gold and silver."', function(){ go(4); });
+  } else {
+    el.classList.add('ac-wrong');
+    setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    document.getElementById('tr0').classList.add('show');
+  }, 300);
+  setTimeout(function() {
+    document.getElementById('op0').classList.add('show');
+  }, 500);
+  setTimeout(function() {
+    document.getElementById('tr1').classList.add('show');
+  }, 700);
+  setTimeout(function() {
+    document.getElementById('op1').classList.add('show');
+  }, 900);
+  setTimeout(function() {
+    document.getElementById('tr2').classList.add('show');
+  }, 1100);
+});
+
+function initHeroCanvas() {
+  var c = document.getElementById('heroCanvas');
+  
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  var W = c.width, H = c.height, t = 0;
+
+  // Draws an elegant, multi-layered COOL fire tongue (Blue/Cyan/White)
+  function drawFlameTongue(dist, height, width, speed, offset) {
+    var baseY = dist;
+    var tipY = dist + height;
+    
+    // Sway the tip elegantly
+    var tipSway = Math.sin(t * speed + offset) * (width * 0.3);
+    var breathe = Math.sin(t * speed * 0.7 + offset) * (height * 0.08);
+
+    // Layer 1: Deep Indigo Outer
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, baseY);
+    ctx.quadraticCurveTo(-width * 0.6, tipY * 0.6 + breathe, tipSway, tipY + breathe);
+    ctx.quadraticCurveTo(width * 0.6, tipY * 0.6 + breathe, width / 2, baseY);
+    ctx.closePath();
+    var g1 = ctx.createLinearGradient(0, baseY, 0, tipY + breathe);
+    g1.addColorStop(0, 'rgba(20, 20, 100, 0.9)');
+    g1.addColorStop(0.4, 'rgba(50, 40, 150, 0.7)');
+    g1.addColorStop(1, 'rgba(80, 60, 200, 0)');
+    ctx.fillStyle = g1;
+    ctx.fill();
+
+    // Layer 2: Bright Cyan Middle
+    var mW = width * 0.6;
+    var mH = height * 0.75;
+    var mTipY = dist + mH;
+    var mSway = Math.sin(t * speed + offset) * (mW * 0.2);
+    var mBreathe = Math.sin(t * speed * 0.7 + offset) * (mH * 0.06);
+
+    ctx.beginPath();
+    ctx.moveTo(-mW / 2, baseY);
+    ctx.quadraticCurveTo(-mW * 0.5, mTipY * 0.6 + mBreathe, mSway, mTipY + mBreathe);
+    ctx.quadraticCurveTo(mW * 0.5, mTipY * 0.6 + mBreathe, mW / 2, baseY);
+    ctx.closePath();
+    var g2 = ctx.createLinearGradient(0, baseY, 0, mTipY + mBreathe);
+    g2.addColorStop(0, 'rgba(50, 160, 255, 0.95)');
+    g2.addColorStop(0.5, 'rgba(120, 210, 255, 0.7)');
+    g2.addColorStop(1, 'rgba(150, 220, 255, 0)');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    // Layer 3: Blinding White/Silver Core
+    var iW = width * 0.25;
+    var iH = height * 0.45;
+    var iTipY = dist + iH;
+    var iSway = Math.sin(t * speed + offset) * (iW * 0.1);
+
+    ctx.beginPath();
+    ctx.moveTo(-iW / 2, baseY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iSway, iTipY);
+    ctx.quadraticCurveTo(0, iTipY * 0.5, iW / 2, baseY);
+    ctx.closePath();
+    var g3 = ctx.createLinearGradient(0, baseY, 0, iTipY);
+    g3.addColorStop(0, 'rgba(230, 240, 255, 0.9)');
+    g3.addColorStop(1, 'rgba(200, 220, 255, 0)');
+    ctx.fillStyle = g3;
+    ctx.fill();
+  }
+
+  // Draws a perfect 8-pointed star (two overlapping squares)
+  function drawStar(cx, cy, radius, rotation, lineW, color, shadowCol, shadowBlur) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineW;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (shadowBlur > 0) {
+      ctx.shadowColor = shadowCol;
+      ctx.shadowBlur = shadowBlur;
+    }
+
+    // Square 1
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 4) + (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Square 2
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (Math.PI / 2) * i;
+      var x = Math.cos(a) * radius;
+      var y = Math.sin(a) * radius;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function frame() {
+    t += 0.010; // Slightly slower than gold for a colder, calmer feel
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Pure pitch-black background to maximize the silver/chrome contrast
+    var bg = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, W*0.7);
+    bg.addColorStop(0, '#08080c');
+    bg.addColorStop(0.5, '#040406');
+    bg.addColorStop(1, '#000000');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Cool ambient cyan glow behind everything
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 140);
+    glow.addColorStop(0, 'rgba(60, 120, 200, 0.2)');
+    glow.addColorStop(0.5, 'rgba(30, 60, 150, 0.1)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // LAYER 1: THE SILVER/FROST FIRE FLAMES
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    
+    for (var i = 0; i < 8; i++) {
+      ctx.save();
+      var angle = (Math.PI / 4) * i;
+      ctx.rotate(angle);
+      
+      // Main Flame
+      drawFlameTongue(30, 90, 35, 1.5, i * 1.2);
+      
+      // Smaller Accent Flame
+      ctx.save();
+      ctx.rotate(Math.PI / 8); 
+      drawFlameTongue(40, 60, 22, 1.8, i * 1.5 + 5);
+      ctx.restore();
+
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // LAYER 2: BACKGROUND GEOMETRY
+    drawStar(W/2, H/2, 100, -t * 0.25, 1, 'rgba(120, 140, 160, 0.12)', 'rgba(0,0,0,0)', 0);
+
+    // LAYER 3: MAIN SILVER GEOMETRY (Sharp Chrome Gradient)
+    var silverGrad = ctx.createLinearGradient(W/2 - 70, H/2 - 70, W/2 + 70, H/2 + 70);
+    silverGrad.addColorStop(0, '#3a3a40');   // Dark shadow edge
+    silverGrad.addColorStop(0.2, '#808088'); // Medium grey
+    silverGrad.addColorStop(0.38, '#c0c0c8');// Bright silver
+    silverGrad.addColorStop(0.42, '#ffffff');// Razor sharp highlight
+    silverGrad.addColorStop(0.46, '#c0c0c8');// Bright silver
+    silverGrad.addColorStop(0.8, '#606068'); // Medium grey
+    silverGrad.addColorStop(1, '#2a2a30');   // Dark shadow edge
+    
+    drawStar(W/2, H/2, 70, t * 0.15, 3.5, silverGrad, 'rgba(150, 200, 255, 0.8)', 20);
+
+    // LAYER 4: INNER GEOMETRY (Icy Blue tint)
+    drawStar(W/2, H/2, 35, -t * 0.35, 2, 'rgba(180, 210, 240, 0.6)', 'rgba(100, 180, 255, 0.5)', 10);
+
+    // LAYER 5: CENTER ORNAMENT
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 12, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(200, 220, 240, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = 'rgba(100, 180, 255, 0.6)';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#e0f0ff'; // Pale ice-blue center dot
+    ctx.shadowColor = '#80c0ff';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Vignettes (Matching pure black background)
+    var vt = ctx.createLinearGradient(0, 0, 0, 40);
+    vt.addColorStop(0, 'rgba(0,0,0,0.8)');
+    vt.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vt; ctx.fillRect(0, 0, W, 40);
+
+    var vb = ctx.createLinearGradient(0, H - 40, 0, H);
+    vb.addColorStop(0, 'rgba(0,0,0,0)');
+    vb.addColorStop(1, 'rgba(0,0,0,0.8)');
+    ctx.fillStyle = vb; ctx.fillRect(0, H - 40, W, 40);
+
+    var vl = ctx.createLinearGradient(0, 0, 40, 0);
+    vl.addColorStop(0, 'rgba(0,0,0,0.7)');
+    vl.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vl; ctx.fillRect(0, 0, 40, H);
+
+    var vr = ctx.createLinearGradient(W - 40, 0, W, 0);
+    vr.addColorStop(0, 'rgba(0,0,0,0)');
+    vr.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = vr; ctx.fillRect(W - 40, 0, 40, H);
+
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+}
+
+// Call it when the page loads
+</script>
+<script src="gpu.js?v=20260615h"></script>
+
+<script>if(typeof GPU!=="undefined"){GPU.mount(document.getElementById("heroCanvas"),"silver-melting");}</script><script src="prediction.js?v=20260615h"></script>
+<script>
+Prediction.init({"lessonId":"silver-melting","question":"Silver melts at approximately what temperature?","unit":"°C","inputType":"furnace","min":100,"max":1800,"step":1,"correct":962,"correctLabel":"961.78°C","curiositySeed":{"question":"Gold melts at 1,064°C. Two completely different verse paths through the Quran — do you think they both land on 1,064?","nextUrl":"quran-gold-melting.html","nextTitle":"Gold Melting"}});
+</script>
+<script src="theme.js?v=20260615h"></script>
+<script src="quran-validator.js?v=20260615h"></script>
+<script>
+/* Both paths start at 3:14 (first gold+silver verse).
+   Path A ends at 9:34 (second gold+silver) = 961 verses.
+   Path B ends at 9:35 (metals heated in fire) = 962 verses.
+   Silver melting point = 961.78°C trapped between 961 and 962. */
+QuranValidator.attach('qv-silver',{
+  mode:'locate',
+  title:'Read the anchor verses yourself',
+  subtitle:'3:14 is the start (first gold+silver). 9:34 = 961 verses away. 9:35 = 962 verses away. Silver melts at 961.78°C between them.',
+  groups:[
+    {id:'start',  label:'Start first gold & silver verse', arabic:'الذَّهَبَ وَالْفِضَّةَ', color:'#94a3b8', occurrences:[[3,14]]},
+    {id:'path-a', label:'Path A end second gold & silver', arabic:'الذَّهَبَ',              color:'#cbd5e1',  occurrences:[[9,34]]},
+    {id:'path-b', label:'Path B end metals heated in fire', arabic:'فَتُكْوَىٰ',            color:'#fb923c',  occurrences:[[9,35]]}
+  ]
+});
+</script>
+</body>
+</html>
