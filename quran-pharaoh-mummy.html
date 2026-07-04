@@ -231,7 +231,7 @@
     <div class="claim-box">
       <div class="claim-label">The Discovery</div>
       <div class="claim-text">
-        Pharaoh wore heavy metal scale armor copper, iron, and semi-precious stones. That armor would have sunk his corpse to the bottom of the Red Sea. The Bible says his body was never recovered. Yet in 1975, French scientist Dr. Maurice Bucaille found Ramesses II's mummy preserved inland with salt crystals still in its tissue, confirming he drowned. <strong style="color:var(--accent)">The Quran predicted this 1,400 years earlier, word for word.</strong>
+        Pharaoh wore heavy metal scale armor copper, iron, and semi-precious stones. That armor would have sunk his corpse to the bottom of the Red Sea. The Bible says his body was never recovered. Yet in 1975, French scientist Dr. Maurice Bucaille found Ramesses II's mummy preserved inland with salt crystals still in its tissue and other sea water patterns, confirming he drowned. <strong style="color:var(--accent)">The Quran predicted this 1,400 years earlier, word for word.</strong>
       </div>
     </div>
 
@@ -355,7 +355,7 @@
     <div class="verdict-text">
       Pharaoh's metal scale armor copper, iron, and semi-precious stones is <strong>denser than water</strong>. His body should have sunk irretrievably to the seabed. The Bible claims the body was simply gone. Yet the Quran alone stated in 610 AD: <em style="color:var(--accent)">"Today We will preserve your body as a sign."</em>
       <br><br>
-      In 1975, Dr. Bucaille examined the mummy of Ramesses II and found <strong>salt crystals embedded in the tissue</strong> proof of drowning. The body had been found in the Valley of the Kings, hundreds of miles from the sea. An illiterate man in 7th-century Arabia could not have known about a preserved Pharaoh's mummy. <strong>No mistakes in the Quran.</strong>
+      In 1975, Dr. Bucaille examined the mummy of Ramesses II and found <strong>salt crystals embedded in the tissue and water-damage patterns</strong> as proof of drowning. The body had been found in the Valley of the Kings, hundreds of miles from the sea. An illiterate man in 7th-century Arabia could not have known about a preserved Pharaoh's mummy. <strong>No mistakes in the Quran.</strong>
     </div>
 
     <div id="qv-pharaoh-mummy"></div>
@@ -619,7 +619,7 @@ function pickEx2(el, correct) {
 
 function pickEx3(el, correct) {
   if(document.querySelector('#s3 .ac-correct')) return;
-  if(correct){ el.classList.add('ac-correct'); document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); }); showOk('Dr. Bucaille found sea-salt crystals in Ramesses II\'s tissue proof of drowning. The mummy was perfectly preserved, confirming Quran 10:92 word for word. This discovery led Dr. Bucaille to accept Islam.', function(){ go(4); }); }
+  if(correct){ el.classList.add('ac-correct'); document.querySelectorAll('#s3 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); }); showOk('Dr. Bucaille found sea-salt crystals in Ramesses II\'s tissue and water-damage patterns proof of drowning. The mummy was perfectly preserved, confirming Quran 10:92 word for word. This discovery led Dr. Bucaille to accept Islam.', function(){ go(4); }); }
   else { el.classList.add('ac-wrong'); setTimeout(function(){ el.classList.remove('ac-wrong'); },500); }
 }
 
@@ -629,7 +629,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"pharaoh-mummy");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"pharaoh-mummy","question":"When was the mummy of Ramesses II (the likely Pharaoh of Exodus) discovered?","unit":"CE","inputType":"excavate","min":1850,"max":1960,"step":1,"correct":1881,"correctLabel":"1881","curiositySeed":{"question":"The Quran says Pharaoh used 'stakes' (أوتاد) — not crosses. Egyptian hieroglyphs were undecipherable until which year?","nextUrl":"quran-pharaoh-crucifixion.html","nextTitle":"Pharaoh's Stakes"}});
+Prediction.init({"lessonId":"pharaoh-mummy","question":"When was the mummy of Ramesses II discovered?","unit":"CE","inputType":"excavate","min":1850,"max":1960,"step":1,"correct":1881,"correctLabel":"1881","curiositySeed":{"question":"The Quran says Pharaoh used 'stakes' (أوتاد) — not crosses. Egyptian hieroglyphs were undecipherable until which year?","nextUrl":"quran-pharaoh-crucifixion.html","nextTitle":"Pharaoh's Stakes"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

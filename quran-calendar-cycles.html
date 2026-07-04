@@ -216,9 +216,9 @@
       <div class="ar">يوم</div>
       <div class="sub">yawm "day"</div>
     </div>
-    <div class="source-tag">478 occurrences · Tanzil Ḥafṣ/Uthmānī text · verified by corpus analysis</div>
+    <div class="source-tag">474 occurrences · Tanzil Ḥafṣ/Uthmānī text · verified by corpus analysis</div>
 
-    <p class="body-text">This single root word appears 478 times across the Quran. Each occurrence carries a precise grammatical form. Sorting those 478 tokens by their standard Arabic morphological categories simple, definite, tanwīn, possessive produces all three astronomical constants. No numbers are stated anywhere in the text.</p>
+    <p class="body-text">This single root word appears 474 times across the Quran. Each occurrence carries a precise grammatical form. Sorting those 474 tokens by their standard Arabic morphological categories simple, definite, tanwīn, possessive produces all three astronomical constants. No numbers are stated anywhere in the text.</p>
 
     <button class="btn" onclick="go(1)" style="background:var(--hijri);color:#fff">Show me how →</button>
   </div>
@@ -228,7 +228,7 @@
     <p class="prompt">The Arabic word يوم (yawm, meaning "day") appears throughout the Quran. How many times does it appear in total across all its forms?</p>
     <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">A</div><div class="ac-body"><div class="ac-big">354</div><div class="ac-sub">The Hijri calendar days per year</div></div></div>
     <div onclick="pickEx1(this,false)" class="answer-card"><div class="ac-letter">B</div><div class="ac-body"><div class="ac-big">365</div><div class="ac-sub">The solar calendar days per year</div></div></div>
-    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">478</div><div class="ac-sub">Total count which contains all three calendars</div></div></div>
+    <div onclick="pickEx1(this,true)" class="answer-card"><div class="ac-letter">C</div><div class="ac-body"><div class="ac-big">474</div><div class="ac-sub">Total count which contains all three calendars</div></div></div>
   </div>
 
   <!-- ── STAGE 2: Calendar Calculator ── -->
@@ -264,7 +264,7 @@
       <div class="cat-card c-solar" data-cid="def" onclick="addCat('def',75,'solar',this)">
         <div class="cat-ar">اليوم</div>
         <div class="cat-body">
-          <div class="cat-name">Definite</div>
+          <div class="cat-name">Definite (≤5 chars)</div>
           <div class="cat-meta">Solar only</div>
           <div class="cat-n">75</div>
         </div>
@@ -273,7 +273,7 @@
       <div class="cat-card c-solar" data-cid="tan" onclick="addCat('tan',16,'solar',this)">
         <div class="cat-ar">يوماً</div>
         <div class="cat-body">
-          <div class="cat-name">Tanwīn</div>
+          <div class="cat-name">Tanwīn (≤5 chars)</div>
           <div class="cat-meta">Solar only</div>
           <div class="cat-n">16</div>
         </div>
@@ -373,14 +373,14 @@
       </div>
     </div>
 
-    <p class="body-text" style="font-size:14px;margin-bottom:22px">Probability computed by bootstrap resampling: 100,000 random reshufflings of the 478 tokens, checking whether the same three constants appear. The combined result passes p &lt; 0.05 in every run. Worst case across multiple trials: <strong style="color:#fcd34d">1 in 2,500</strong>. Best case: <strong style="color:#fcd34d">1 in 7,000</strong>.</p>
+    <p class="body-text" style="font-size:14px;margin-bottom:22px">Probability computed by bootstrap resampling: 100,000 random reshufflings of the 474 tokens, checking whether the same three constants appear. The combined result passes p &lt; 0.05 in every run. Worst case across multiple trials: <strong style="color:#fcd34d">1 in 2,500</strong>. Best case: <strong style="color:#fcd34d">1 in 7,000</strong>.</p>
 
     <div class="timeline">
       <div class="tl-item">
         <div class="tl-year">610–632 CE Arabia</div>
         <div class="tl-text">
           Quranic verses are revealed over 23 years across different occasions and cities. The Hijri calendar does not exist it is established in 638 CE, six years after the Quran's completion.
-          <span class="tl-sub">No author tracking 478 word-tokens across 23 years of composition could produce this by design.</span>
+          <span class="tl-sub">No author tracking 474 word-tokens across 23 years of composition could produce this by design.</span>
         </div>
       </div>
       <div class="tl-item">
@@ -393,7 +393,7 @@
     </div>
 
     <div class="gold-box">
-      <div class="gt">Both the solar and Hijri years emerge from the same 478 tokens of one word sorted only by grammar. The two calendar systems share 274 tokens as their foundation. Neither calendar was established when those tokens were written.</div>
+      <div class="gt">Both the solar and Hijri years emerge from the same 474 tokens of one word sorted only by grammar. The two calendar systems share 274 tokens as their foundation. Neither calendar was established when those tokens were written.</div>
       <div class="gs">The 274 shared forms cannot be removed from either count without destroying both results. They are the linchpin simultaneously foundational to a solar year that existed, and a lunar calendar that had not yet been named. Probability of all three patterns by chance: 1 in 2,500 to 7,000.</div>
     </div>
 
@@ -484,7 +484,7 @@ function pickEx1(el, correct) {
   if (correct) {
     el.classList.add('ac-correct');
     document.querySelectorAll('#s1 .answer-card').forEach(function(c){ if(!c.classList.contains('ac-correct')) c.classList.add('ac-disabled'); });
-    showOk('478 total and when you categorize each form by meaning, they separate naturally into 365 (solar), 354 (Hijri), and 29 (lunar).', function(){ go(2); });
+    showOk('474 total and when you categorize each form by meaning, they separate naturally into 365 (solar), 354 (Hijri), and 29 (lunar).', function(){ go(2); });
   } else {
     el.classList.add('ac-wrong');
     setTimeout(function(){ el.classList.remove('ac-wrong'); }, 500);
