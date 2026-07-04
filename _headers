@@ -1,0 +1,41 @@
+# Security & caching headers (SEO + Core Web Vitals)
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  X-XSS-Protection: 1; mode=block
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com data:
+
+# Long-cache static assets
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML: revalidate often
+/*.html
+  Cache-Control: public, max-age=3600, must-revalidate
+/
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Sitemap & robots: short cache
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/xml
+/robots.txt
+  Cache-Control: public, max-age=3600
+  Content-Type: text/plain
+/manifest.json
+  Content-Type: application/manifest+json

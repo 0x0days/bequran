@@ -1,0 +1,17 @@
+# humanstxt.org
+# BeQuran — built by humans, for humans
+
+/* TEAM */
+Owner: 0x0days
+Project: BeQuran — Quran Scientific Miracles
+Site: https://bequran.netlify.app
+
+/* THANKS */
+Quranic text: Uthmani script (public domain)
+Fonts: Playfair Display, Amiri, DM Sans (Google Fonts)
+
+/* SITE */
+Last update: 2026-07-04
+Standards: HTML5, CSS3, vanilla JS
+Components: GSAP (animations)
+Software: Python, Netlify

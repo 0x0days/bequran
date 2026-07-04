@@ -1,0 +1,14 @@
+# Clean URL redirects (serve /quran-iron whether .html is typed or not)
+/quran-iron              /quran-iron.html            200
+/quran-big-bang          /quran-big-bang.html        200
+/quran-human-embryo      /quran-human-embryo.html    200
+/quran-mountains         /quran-mountains.html       200
+/quran-expanding-universe /quran-expanding-universe.html 200
+
+# Old paths / typos -> homepage
+/quran-miracles          /                            302
+/miracles                /                            302
+/home                    /                            302
+
+# 404 fallback
+/*                       /index.html                  404

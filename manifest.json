@@ -1,0 +1,54 @@
+{
+  "name": "BeQuran \u2014 Quran Scientific Miracles",
+  "short_name": "BeQuran",
+  "description": "53 interactive lessons exploring scientific and mathematical patterns in the Quran.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b1622",
+  "theme_color": "#0b1622",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "religion",
+    "reference"
+  ],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cosmology Miracles",
+      "url": "/#cosmology",
+      "description": "Big Bang, expanding universe, pulsars"
+    },
+    {
+      "name": "Embryology Miracles",
+      "url": "/#embryology",
+      "description": "Quran 23:14 stages of development"
+    },
+    {
+      "name": "Iron Miracle (57:25)",
+      "url": "/quran-iron.html",
+      "description": "Iron sent down from supernovae"
+    }
+  ]
+}
