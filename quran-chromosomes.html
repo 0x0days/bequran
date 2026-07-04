@@ -193,7 +193,7 @@
 
   <div class="stage" id="s2">
     <div class="kary" id="karyWidget">
-      <div class="kary-head">Count a bee's chromosomes — tap a bee</div>
+      <div class="kary-head">Count a bee's chromosomes - tap a bee</div>
       <div class="kary-tabs">
         <button class="kary-tab" type="button" onclick="qnKary(16,this)">&#128027; Drone &middot; male</button>
         <button class="kary-tab" type="button" onclick="qnKary(32,this)">&#128081; Queen &middot; female</button>
@@ -428,7 +428,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var chromos = [];
   // Left side: Female Diploid (16 pairs = 32 total). We draw 7 distinct pairs to represent density.

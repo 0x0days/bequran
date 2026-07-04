@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ╔══════════════════════════════════════════════════════════════════╗
-  ║  Quranic Numerics — PAGE TEMPLATE                               ║
+  ║  Quranic Numerics - PAGE TEMPLATE                               ║
   ║  Copy this file to quran-[topic-slug].html                      ║
   ║  Search for every [FILL: ...] comment and replace it.           ║
   ║  Do NOT rename CSS classes, JS functions, or HTML ids.          ║
@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
     /* ══════════════════════════════════════════════════════════════
-       DESIGN TOKENS — NEVER MODIFY THE CORE VARIABLES
+       DESIGN TOKENS - NEVER MODIFY THE CORE VARIABLES
        Only fill in the four --accent variables below.
     ══════════════════════════════════════════════════════════════ */
     :root {
@@ -51,7 +51,7 @@
 
     /* ── RESET & BASE ── never change ─────────────────────────── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    /* 160px bottom padding is REQUIRED — clears the fixed feedback panel */
+    /* 160px bottom padding is REQUIRED - clears the fixed feedback panel */
     body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 44px 20px 160px; }
     .container { max-width: 640px; margin: 0 auto; }
     .dot-field { position: fixed; top: 0; right: 0; width: 260px; height: 260px; opacity: .02; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
@@ -124,7 +124,7 @@
     .ac-big { font-family: 'Playfair Display', serif; font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: var(--text); }
     .ac-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-    /* ── CALCULATION BOX (stage 2 — use if mechanic is a calculation) ── */
+    /* ── CALCULATION BOX (stage 2 - use if mechanic is a calculation) ── */
     .calc-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 22px; margin: 20px 0; }
     .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; font-size: 15px; }
     .calc-row.minus { color: var(--muted); }
@@ -174,7 +174,7 @@
   </style>
 </head>
 <body>
-<!-- Theme toggle — fixed top-right; CSS handles positioning -->
+<!-- Theme toggle - fixed top-right; CSS handles positioning -->
 <div class="theme-toggle" id="themeToggle" role="group" aria-label="Color theme">
   <button class="tt-btn" data-theme-val="dark" title="Dark">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -196,7 +196,7 @@
   <!-- FILL: href = previous lesson's filename; link text = previous lesson title -->
   <a href="quran-[PREV_SLUG].html" class="nav-back">← [PREV LESSON TITLE]</a>
 
-  <!-- Progress bar — never modify the HTML, only the JS barMap/metaMap -->
+  <!-- Progress bar - never modify the HTML, only the JS barMap/metaMap -->
   <div class="lesson-bar-wrap">
     <div class="lesson-bar-fill" id="lbar"></div>
   </div>
@@ -204,22 +204,22 @@
 
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE Sp — PREDICTION (always first, always active on load)
+       STAGE Sp - PREDICTION (always first, always active on load)
        FILL: set the prediction question and input type via
              Prediction.init() at the bottom of the <script> block.
-       DO NOT add content here — prediction.js renders it automatically.
+       DO NOT add content here - prediction.js renders it automatically.
   ════════════════════════════════════════════════════════════ -->
   <div class="stage active" id="sp"></div>
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE 0 — INTRO
+       STAGE 0 - INTRO
        Contains: predictReveal (auto-filled) + heroCanvas + eyebrow
                  + hero title + intro verse + claim-row + body text
                  + Begin button → go(1)
   ════════════════════════════════════════════════════════════ -->
   <div class="stage" id="s0">
 
-    <!-- Prediction reveal — DO NOT REMOVE, auto-filled by prediction.js -->
+    <!-- Prediction reveal - DO NOT REMOVE, auto-filled by prediction.js -->
     <div id="predictReveal"></div>
 
     <!-- Hero canvas: topic-relevant animation. NEVER remove or resize. -->
@@ -230,17 +230,17 @@
     <p class="eyebrow" style="color:var(--accent-light)">Quranic Numerics · [LESSON TITLE]</p>
 
     <!-- FILL: one-sentence hook that sets up the discovery without revealing it -->
-    <h1 class="hero-title">[ONE SENTENCE HOOK — sets up the mystery without solving it]</h1>
+    <h1 class="hero-title">[ONE SENTENCE HOOK - sets up the mystery without solving it]</h1>
 
     <!-- FILL: the main verse that anchors this lesson -->
     <div class="intro-verse">
-      <div class="iv-ref">[VERSE REFERENCE] — Surah [SURAH NAME] · [SURAH TRANSLATION]</div>
+      <div class="iv-ref">[VERSE REFERENCE] - Surah [SURAH NAME] · [SURAH TRANSLATION]</div>
       <!-- Highlight the key word(s) with <span class="hl"> -->
-      <div class="iv-ar">[FULL ARABIC VERSE — highlight key word with <span class="hl">word</span>]</div>
-      <div class="iv-tr">"[ENGLISH TRANSLATION — highlight key phrase with <span class="hl">phrase</span>]"</div>
+      <div class="iv-ar">[FULL ARABIC VERSE - highlight key word with <span class="hl">word</span>]</div>
+      <div class="iv-tr">"[ENGLISH TRANSLATION - highlight key phrase with <span class="hl">phrase</span>]"</div>
     </div>
 
-    <!-- FILL: the two numbers that match (the discovery) — shown before the lesson -->
+    <!-- FILL: the two numbers that match (the discovery) - shown before the lesson -->
     <!-- Remove the cr-eq + second cr-block if only one number is relevant -->
     <div class="claim-row">
       <div class="cr-block">
@@ -262,7 +262,7 @@
 
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE 1 — EXERCISE 1 (Multiple Choice)
+       STAGE 1 - EXERCISE 1 (Multiple Choice)
        Ask a question that confirms the student understands the setup.
        Always 3 options (A/B/C). Only one is correct.
        Correct card: onclick="pickEx1(this, true)"
@@ -304,7 +304,7 @@
 
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE 2 — EXERCISE 2 (Topic-specific interactive)
+       STAGE 2 - EXERCISE 2 (Topic-specific interactive)
        Options: calculation box, verse span ruler, word counter,
                 form builder, two-path convergence, etc.
        Must end with showOk('explanation', () => go(3))
@@ -335,25 +335,25 @@
     <button class="btn" id="calcBtn" onclick="runCalc()" style="background:var(--accent);color:#fff">Calculate →</button>
     -->
 
-    <!-- ── OPTION B: Custom interactive — add your own HTML here ── -->
+    <!-- ── OPTION B: Custom interactive - add your own HTML here ── -->
     <!-- FILL: whatever interactive element fits the topic -->
     <div class="insight-box">
       <strong>[FILL: Interactive label]</strong> [FILL: explanation or instructions]
     </div>
 
-    <!-- FILL: completion trigger — call showOk then go(3) -->
+    <!-- FILL: completion trigger - call showOk then go(3) -->
     <button class="btn" id="s2Btn" onclick="completeEx2()" style="background:var(--accent);color:#fff">[ACTION BUTTON TEXT] →</button>
   </div>
 
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE 3 — EXERCISE 3 (Multiple Choice — conclusion question)
+       STAGE 3 - EXERCISE 3 (Multiple Choice - conclusion question)
        Ask something that confirms the student grasped the discovery.
        Pattern identical to stage 1 but uses pickEx3().
   ════════════════════════════════════════════════════════════ -->
   <div class="stage" id="s3">
     <p class="step-lbl">Exercise 3 of 3</p>
-    <!-- FILL: conclusion question — typically "what does [number] represent in science/history?" -->
+    <!-- FILL: conclusion question - typically "what does [number] represent in science/history?" -->
     <p class="prompt">[CONCLUSION MULTIPLE CHOICE QUESTION]</p>
 
     <!-- WRONG answer -->
@@ -386,21 +386,21 @@
 
 
   <!-- ════════════════════════════════════════════════════════════
-       STAGE 4 — VERDICT
+       STAGE 4 - VERDICT
        Contains: xpBadge + title + match-wrap counters
                  + sci-table + insight-box + gold-box
                  + nav buttons (back + next)
   ════════════════════════════════════════════════════════════ -->
   <div class="stage" id="s4">
 
-    <!-- XP badge — verbatim, never modify -->
+    <!-- XP badge - verbatim, never modify -->
     <div class="xp-badge" id="xpBadge">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       <span class="xp-text">Lesson complete · +30 XP</span>
     </div>
 
-    <!-- FILL: one-sentence verdict — states what the student just proved -->
-    <h2 class="hero-title" style="font-family:'Playfair Display',serif">[VERDICT SENTENCE — what was just discovered]</h2>
+    <!-- FILL: one-sentence verdict - states what the student just proved -->
+    <h2 class="hero-title" style="font-family:'Playfair Display',serif">[VERDICT SENTENCE - what was just discovered]</h2>
 
     <!-- FILL: animated counter(s). Use mc1 class for accent color, mc2 for gold.
          If only one number animates, remove the cr-eq and second match-block.
@@ -408,16 +408,16 @@
     <div class="match-wrap">
       <div class="match-block">
         <div class="match-num mc1" id="mv0">0</div>
-        <div class="match-lbl">[Label for counter 1 — Quran side]</div>
+        <div class="match-lbl">[Label for counter 1 - Quran side]</div>
       </div>
       <div class="match-eq">=</div>
       <div class="match-block">
         <div class="match-num mc2" id="mv1">0</div>
-        <div class="match-lbl">[Label for counter 2 — science/history side]</div>
+        <div class="match-lbl">[Label for counter 2 - science/history side]</div>
       </div>
     </div>
 
-    <!-- FILL: facts table — list the key numbers with their source -->
+    <!-- FILL: facts table - list the key numbers with their source -->
     <table class="sci-table" style="margin-top:28px">
       <thead>
         <tr><th>Fact</th><th>Value</th></tr>
@@ -444,10 +444,10 @@
       <strong>[INSIGHT LABEL]:</strong> [Explain why the match is meaningful, what makes it non-trivial, how the counting was done]
     </div>
 
-    <!-- FILL: closing gold-box summary — the most memorable 1-2 sentences -->
+    <!-- FILL: closing gold-box summary - the most memorable 1-2 sentences -->
     <div class="gold-box">
-      <div class="gt">[BOLD CLOSING STATEMENT — the single most memorable fact]</div>
-      <div class="gs">[Supporting detail — explain the data source, precision, no rounding was needed, etc.]</div>
+      <div class="gt">[BOLD CLOSING STATEMENT - the single most memorable fact]</div>
+      <div class="gs">[Supporting detail - explain the data source, precision, no rounding was needed, etc.]</div>
     </div>
 
     <!-- Navigation buttons -->
@@ -458,7 +458,7 @@
 </div><!-- /.container -->
 
 <!-- ════════════════════════════════════════════════════════════════
-     FEEDBACK PANEL — outside .container, verbatim, never modify
+     FEEDBACK PANEL - outside .container, verbatim, never modify
 ════════════════════════════════════════════════════════════════ -->
 <div class="fb-panel" id="fbPanel">
   <div class="fb-left">
@@ -473,7 +473,7 @@
 
 <script>
 /* ════════════════════════════════════════════════════════════════
-   CORE ENGINE — never modify these functions
+   CORE ENGINE - never modify these functions
 ════════════════════════════════════════════════════════════════ */
 let stage = 0;
 
@@ -548,7 +548,7 @@ function showOk(sub, onContinue) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   STAGE 1 — MC handler
+   STAGE 1 - MC handler
    FILL: the showOk() text (explain why the correct answer is right)
 ════════════════════════════════════════════════════════════════ */
 function pickEx1(el, correct) {
@@ -566,7 +566,7 @@ function pickEx1(el, correct) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   STAGE 2 — Interactive mechanic
+   STAGE 2 - Interactive mechanic
    FILL: implement the topic-specific interaction.
    Must call showOk('explanation', () => go(3)) when complete.
 
@@ -587,7 +587,7 @@ function completeEx2() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   STAGE 3 — MC handler
+   STAGE 3 - MC handler
    FILL: the showOk() text (explain the final scientific connection)
 ════════════════════════════════════════════════════════════════ */
 function pickEx3(el, correct) {
@@ -605,12 +605,12 @@ function pickEx3(el, correct) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   HERO CANVAS — initHeroCanvas()
+   HERO CANVAS - initHeroCanvas()
    FILL: implement a topic-relevant looping canvas animation.
 
    Rules:
    - Dark background: ctx.fillStyle = '#040810' (or similar near-black)
-   - Subtle, never distracting — it supports the title
+   - Subtle, never distracting - it supports the title
    - Must loop with requestAnimationFrame
    - Canvas is 640×130px logical (actual size scales with CSS)
    - Common patterns: star field, orbiting object, wave, particle field,
@@ -643,13 +643,13 @@ function initHeroCanvas() {
 initHeroCanvas();
 
 /* ════════════════════════════════════════════════════════════════
-   PREDICTION ENGINE — Prediction.init()
+   PREDICTION ENGINE - Prediction.init()
    FILL: question, unit, correct value, curiosity seed.
    This drives Stage Sp and the reveal panel at the top of S0.
 
    inputType options:
-     'slider'  — numeric range (set min, max, step, correct)
-     'choice'  — discrete options (set choices:['A','B','C'], correct:'B')
+     'slider'  - numeric range (set min, max, step, correct)
+     'choice'  - discrete options (set choices:['A','B','C'], correct:'B')
 
    curiositySeed: question that seeds the NEXT lesson's prediction.
    Leave nextUrl blank if this is the last lesson.

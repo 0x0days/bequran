@@ -1,9 +1,9 @@
 # humanstxt.org
-# BeQuran — built by humans, for humans
+# BeQuran - built by humans, for humans
 
 /* TEAM */
 Owner: 0x0days
-Project: BeQuran — Quran Scientific Miracles
+Project: BeQuran - Quran Scientific Miracles
 Site: https://bequran.netlify.app
 
 /* THANKS */

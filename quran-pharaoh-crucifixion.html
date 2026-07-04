@@ -126,7 +126,7 @@
   <div class="lesson-bar-wrap"><div id="lbar"></div></div>
   <div id="lmeta">Lesson · Pharaoh's Stakes</div>
 
-  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <!-- ══ STAGE Sp - PREDICTION ══ -->
   <div class="stage active" id="sp"></div>
 
   <!-- ══ STAGE 0 ══ -->
@@ -312,7 +312,7 @@ function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
   var ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = 640, H = 130; cv.width = W; cv.height = H;
   var t = 0;
   var rng = (function(){ var s=57; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
@@ -547,7 +547,7 @@ Prediction.init({
   correct: 1822,
   correctLabel: '1822 (Champollion)',
   curiositySeed: {
-    question: 'The name \'Haman\' appears in the Bible in Persia. The Quran places Haman in Egypt. Archaeology found his name in hieroglyphs — when?',
+    question: 'The name \'Haman\' appears in the Bible in Persia. The Quran places Haman in Egypt. Archaeology found his name in hieroglyphs - when?',
     nextUrl: 'quran-haman.html',
     nextTitle: 'Haman in Egypt'
   }

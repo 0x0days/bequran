@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="53 interactive lessons exploring mathematical and scientific patterns encoded in the Quran. Predict, reveal, verify.">
-  <meta property="og:title" content="Quranic Numerics — 53 Scientific Discoveries">
+  <meta property="og:title" content="Quranic Numerics - 53 Scientific Discoveries">
   <meta property="og:description" content="Interactive lessons exploring mathematical patterns encoded in the Quran.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#0b1622">
   <script>!function(){var t=localStorage.getItem('qn_theme')||'system';document.documentElement.setAttribute('data-theme','system'===t?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t)}();</script>
   <link rel="stylesheet" href="theme.css?v=20260615h">
   <script src="review-data.js?v=20260615h"></script>
-  <title>Quranic Miracles — Discover the Patterns</title>
+  <title>Quranic Miracles - Discover the Patterns</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Amiri:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -326,7 +326,7 @@
     .ftab.active{background:var(--gold);color:#1a0c00;border-color:var(--gold);font-weight:700;
       box-shadow:0 4px 18px rgba(245,158,11,.35);}
 
-    /* ── CARDS — collectible "discovery specimen" cards ── */
+    /* ── CARDS - collectible "discovery specimen" cards ── */
     .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
     .lcard{--wash:color-mix(in srgb,var(--accent,var(--gold)) 8%,var(--surface));
       position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
@@ -488,7 +488,7 @@
   <div class="hero-content">
     <span class="hero-eyebrow"><span class="dot"></span> 53 Discoveries · Verified by Modern Science</span>
     <h1 class="hero-hl" id="heroHl"></h1>
-    <p class="hero-sub">Mathematical and scientific patterns encoded in the Quran — each confirmed by physics, biology, or astronomy discovered centuries later. Five minutes each.</p>
+    <p class="hero-sub">Mathematical and scientific patterns encoded in the Quran - each confirmed by physics, biology, or astronomy discovered centuries later. Five minutes each.</p>
     <div class="hero-actions">
       <a href="#lessons" class="btn btn-primary" id="ctaPrimary" data-magnetic>
         <span id="ctaLabel">Begin exploring</span>
@@ -518,7 +518,7 @@
 <!-- RESUME (primary action) -->
 <div class="resume-wrap"><div id="resumeSlot"></div><div id="reviewSlot"></div></div>
 
-<!-- LESSONS (topics — reachable immediately) -->
+<!-- LESSONS (topics - reachable immediately) -->
 <main class="main" id="lessons">
   <div class="section-head">
     <h2 class="section-title">Choose your discovery</h2>
@@ -540,7 +540,7 @@
   <div class="cards-grid" id="cardsGrid"></div>
 </main>
 
-<!-- PROFILE — progress + constellation (moved below topics) -->
+<!-- PROFILE - progress + constellation (moved below topics) -->
 <section class="profile-section">
   <div class="profile-head">
     <h2 class="profile-title">Your journey</h2>
@@ -554,7 +554,7 @@
   </div>
   <div class="sky-head" id="constellation" style="scroll-margin-top:24px;">
     <h3 class="sky-title">Your constellation of discoveries</h3>
-    <span class="sky-sub">Each star is a pattern — they ignite as you learn</span>
+    <span class="sky-sub">Each star is a pattern - they ignite as you learn</span>
   </div>
   <div class="sky-wrap">
     <canvas id="skyCanvas" aria-hidden="true"></canvas>
@@ -568,7 +568,7 @@
 <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
 
 <footer class="site-footer">
-  <p>All counts use the <strong>Ḥafṣ ʿUthmānī</strong> text — the standard recitation used by 95% of Muslims worldwide. Scientific values are from peer-reviewed journals and space agencies. Verse positions follow the universal <strong>6,236-verse numbering</strong>.</p>
+  <p>All counts use the <strong>Ḥafṣ ʿUthmānī</strong> text - the standard recitation used by 95% of Muslims worldwide. Scientific values are from peer-reviewed journals and space agencies. Verse positions follow the universal <strong>6,236-verse numbering</strong>.</p>
 </footer>
 
 <script>
@@ -833,7 +833,7 @@ var lessons = [
   url:'quran-atmosphere.html' },
  
   { id:'fish',        n:4, hook:'The Fish Verse',           ar:'آية الحوت',
-    title:'50 = 50',  teaser:'The verse where two travellers forget their fish holds exactly 50 base letters — the precise chromosome count of that fish.',
+    title:'50 = 50',  teaser:'The verse where two travellers forget their fish holds exactly 50 base letters - the precise chromosome count of that fish.',
     cat:'zoology',  catLabel:'Biology',     accent:'#0d9488', url:'quran-fish.html' },
 
   /* ── CATEGORY COLORS ─ { id:'fish',        n:4, hook:'The Fish Verse',         ar:'آية السمك', title:'50',        teaser:'One verse about a fish contains exactly 50 letters matching the chromosome count of carp, goldfish, and zebrafish.', cat:'biology',  catLabel:'Biology',     accent:'#06b6d4', url:'quran-fish.html' } ───────── */
@@ -935,7 +935,7 @@ lessons.forEach(function(l, idx){
   var next = lessons.find(function(l){return !done.has(l.id);});
   var slot = document.getElementById('resumeSlot');
   if(!next){
-    slot.innerHTML = '<div class="resume in"><div class="resume-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a0c00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="resume-body"><div class="resume-kick">Journey complete</div><div class="resume-title">All 53 discoveries unlocked</div><div class="resume-sub">Revisit any lesson below — the patterns never get old.</div></div></div>';
+    slot.innerHTML = '<div class="resume in"><div class="resume-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a0c00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="resume-body"><div class="resume-kick">Journey complete</div><div class="resume-title">All 53 discoveries unlocked</div><div class="resume-sub">Revisit any lesson below - the patterns never get old.</div></div></div>';
     return;
   }
   var fresh = done.size === 0;
@@ -1092,7 +1092,7 @@ setTimeout(function(){
   if(!sky || !wrap) return;
   var ctx = sky.getContext('2d'), dpr = Math.min(window.devicePixelRatio||1, 2);
   var reduceM = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  /* per-category cluster centres (normalised) — spreads fields across the sky */
+  /* per-category cluster centres (normalised) - spreads fields across the sky */
   var CATPOS = {astronomy:[.12,.28],cosmology:[.30,.20],physics:[.50,.26],numerics:[.69,.21],chemistry:[.87,.28],
     biology:[.13,.72],zoology:[.31,.82],balance:[.50,.72],geology:[.69,.80],history:[.88,.70]};
   function seed(str){var s=0;for(var i=0;i<str.length;i++)s=(s*31+str.charCodeAt(i))&0xffffffff;return s>>>0;}
@@ -1113,7 +1113,7 @@ setTimeout(function(){
     var a = document.createElement('a'); a.href = s.l.url;
     a.className = 'sky-star'+(s.done?' done':''); a.setAttribute('role','listitem');
     a.style.left = (s.x*100)+'%'; a.style.top = (s.y*100)+'%'; a.style.setProperty('--c', s.l.accent);
-    a.setAttribute('aria-label','Discovery '+s.l.n+': '+s.l.hook+(s.done?' — completed':' — not yet unlocked'));
+    a.setAttribute('aria-label','Discovery '+s.l.n+': '+s.l.hook+(s.done?' - completed':' - not yet unlocked'));
     a.innerHTML = '<span class="sky-tip"><span class="tip-n">'+s.l.n+'</span> · '+s.l.hook+'</span>';
     wrap.appendChild(a);
   });
@@ -1291,7 +1291,7 @@ document.addEventListener('scroll', function(){
   sp.style.width = h>0 ? (window.scrollY/h*100)+'%' : '0';
 }, {passive:true});
 
-/* ── HERO BACKGROUND — aurora + Islamic girih constellation + particles ── */
+/* ── HERO BACKGROUND - aurora + Islamic girih constellation + particles ── */
 (function(){
   var c=document.getElementById('bgCanvas'); if(!c) return;
   var ctx=c.getContext('2d'); var W,H,dpr,t=0, mx=0.5, my=0.4, R;
@@ -1303,7 +1303,7 @@ document.addEventListener('scroll', function(){
     var r=c.getBoundingClientRect(); mx=(e.clientX-r.left)/r.width; my=(e.clientY-r.top)/r.height;
   },{passive:true});
 
-  /* concentric rings — points connected into star polygons (girih) */
+  /* concentric rings - points connected into star polygons (girih) */
   var RINGS=[
     {rf:.085,n:8 ,skip:3,dir: 1,spd:1.9},
     {rf:.165,n:12,skip:5,dir:-1,spd:1.25},
@@ -1322,7 +1322,7 @@ document.addEventListener('scroll', function(){
     var px=(mx-.5)*46, py=(my-.5)*46;
 
     if(light){
-      /* airy luminous cream — vertical light gradient, not muddy brown */
+      /* airy luminous cream - vertical light gradient, not muddy brown */
       var lg=ctx.createLinearGradient(0,0,0,H);
       lg.addColorStop(0,'#fbf6ec'); lg.addColorStop(.55,'#f6ecd8'); lg.addColorStop(1,'#efe0c4');
       ctx.fillStyle=lg; ctx.fillRect(0,0,W,H);

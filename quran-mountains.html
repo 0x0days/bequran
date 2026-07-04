@@ -447,7 +447,7 @@ function initPegCanvas() {
   var c = document.getElementById('pegCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height; // 640 × 210
   var midX = W / 2;
   var leftAlpha = 0, rightAlpha = 0;
@@ -1123,7 +1123,7 @@ if (document.readyState === 'loading') {
 } else {
   initHeroCanvas();
 }
-/* initHeroCanvas() replaced by gpu.js — do not call */
+/* initHeroCanvas() replaced by gpu.js - do not call */
 </script>
 <script>
 if (typeof GPU !== 'undefined') {

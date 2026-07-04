@@ -579,7 +579,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var boltTimer = 0, boltInterval = 130, bolt = null, boltAlpha = 0;
   function makeBolt() {

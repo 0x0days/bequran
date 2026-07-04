@@ -708,7 +708,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var angelPs = Array.from({length:20}, function(_,i) {
     return {x:Math.random()*W*0.44,y:H*0.5+Math.random()*H*0.5,sp:0.4+Math.random()*0.8,ph:i*0.7};

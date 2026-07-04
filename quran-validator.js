@@ -1,5 +1,5 @@
 /**
- * quran-validator.js — Portable inline Quran word validator
+ * quran-validator.js - Portable inline Quran word validator
  *
  * Usage:
  *   <div id="qv-here"></div>
@@ -115,7 +115,7 @@
 
   /* ── CSS (injected once) ──────────────────────────────────── */
   var CSS = [
-    /* ── improvement 1: section wrapper — distinct section feel with accent left-rail */
+    /* ── improvement 1: section wrapper - distinct section feel with accent left-rail */
     '.qvsec{border-top:1px solid var(--border);border-left:3px solid var(--accent,#0ea5e9);padding:18px 0 18px 16px;margin-bottom:28px;background:linear-gradient(90deg,rgba(14,165,233,.04) 0%,transparent 60%);}',
     /* improvement 1: invitation button replaces old row+toggle */
     '.qv-invite{display:flex;align-items:center;gap:14px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 18px;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s;font-family:"DM Sans",sans-serif;margin-bottom:0;}',
@@ -133,16 +133,16 @@
     '.qvload{display:flex;align-items:center;gap:10px;padding:20px;justify-content:center;background:var(--surface);border-radius:10px;font-size:13px;color:var(--muted);}',
     '.qvspin{width:18px;height:18px;border-radius:50%;border:2px solid var(--surface2);border-top-color:var(--accent,#0ea5e9);animation:qvspin .8s linear infinite;flex-shrink:0;}',
     '@keyframes qvspin{to{transform:rotate(360deg)}}',
-    /* ── improvement 2: embed card — darker, more manuscript-like */
+    /* ── improvement 2: embed card - darker, more manuscript-like */
     '.qvembed{border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:500px;background:#06080e;}',
-    /* ── improvement 2: guide — accent-tinted richer background */
+    /* ── improvement 2: guide - accent-tinted richer background */
     '.qvguide{flex-shrink:0;background:rgba(14,165,233,.06);border-bottom:1px solid rgba(14,165,233,.14);padding:12px 14px;}',
     '.qvgr1{display:flex;align-items:center;gap:8px;margin-bottom:8px;}',
     /* improvement 2: badge larger (24px) and more prominent */
     '.qvbadge{font-family:"Amiri",serif;font-size:24px;font-weight:700;padding:3px 10px;border-radius:5px;direction:rtl;flex-shrink:0;line-height:1.5;border:1px solid transparent;}',
     '.qvgi{font-size:13px;color:var(--text);flex:1;line-height:1.35;}',
     '.qvgs{font-size:11px;color:var(--muted);margin-top:2px;}',
-    /* ── improvement 3: dot arc — replaces old pills */
+    /* ── improvement 3: dot arc - replaces old pills */
     '.qv-dots{display:flex;flex-wrap:wrap;gap:3px;flex-shrink:0;align-items:center;max-width:140px;}',
     '.qv-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:transform .2s,filter .2s,background .2s;}',
     '.qv-dot.qvd-done{filter:brightness(1.4);transform:scale(1);}',
@@ -174,22 +174,22 @@
     '.qvsord{color:rgba(245,158,11,.30);font-size:8px;}',
     '.qvsar{font-family:"Amiri",serif;direction:rtl;font-size:16px;color:rgba(245,158,11,.72);}',
     '.qvsen{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}',
-    /* ── improvement 2: verse — larger Arabic (clamp 20-26px), more breathing room */
+    /* ── improvement 2: verse - larger Arabic (clamp 20-26px), more breathing room */
     '.qvv{display:flex;align-items:baseline;gap:7px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}',
     '.qvv:last-child{border-bottom:none;}',
     '.qvvt{flex:1;font-family:"Amiri",serif;direction:rtl;text-align:right;font-size:clamp(20px,4vw,26px);line-height:2.5;color:var(--text);word-break:break-word;}',
     '.qvvn{font-family:"Amiri",serif;font-size:11px;color:var(--muted);flex-shrink:0;direction:rtl;opacity:.6;}',
-    /* improvement 2: target verse — warm amber radial gradient glow, not just a border */
+    /* improvement 2: target verse - warm amber radial gradient glow, not just a border */
     '.qvv.qvtgt{border-radius:8px;padding:8px 10px;border-left:2px solid transparent;animation:qvpulse 2s ease infinite;background:radial-gradient(ellipse at 50% 50%,rgba(245,158,11,.14) 0%,rgba(245,158,11,.05) 55%,transparent 80%)!important;}',
     '@keyframes qvpulse{0%,100%{opacity:.7}50%{opacity:1}}',
-    /* ── improvement 4: word highlights — flash animation + more visible checkmark */
+    /* ── improvement 4: word highlights - flash animation + more visible checkmark */
     '.qvhl{border-radius:3px;padding:1px 2px;cursor:pointer;transition:filter .12s;}',
     '.qvhl:hover{filter:brightness(1.35);}',
     '.qvhl.qvconfirmed{opacity:.5;}',
     '.qvhl.qvconfirmed::after{content:" ✓";font-size:11px;font-weight:700;color:#22c55e;font-family:"DM Sans",sans-serif;}',
     '.qvhl.qv-flash{animation:qvFlash .5s ease forwards;}',
     '@keyframes qvFlash{0%{transform:scale(1)}35%{transform:scale(1.18);filter:brightness(2)}100%{transform:scale(1)}}',
-    /* ── improvement 5: done screen — premium cinematic completion */
+    /* ── improvement 5: done screen - premium cinematic completion */
     /* done screen sits ABOVE the verse page in the scroll area, not replacing it */
     '.qvdone{display:none;flex-direction:column;align-items:center;padding:20px 16px 18px;gap:12px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid rgba(245,158,11,.18);background:linear-gradient(to bottom,rgba(245,158,11,.06),transparent);}',
     '.qvdone.qvvis{display:flex;}',
@@ -242,7 +242,7 @@
     _instances[this.id] = this;
     this._buildComb();
     this._renderShell();
-    /* Auto-open by default — no toggle click needed */
+    /* Auto-open by default - no toggle click needed */
     var _self = this;
     setTimeout(function(){ _self.onToggle(true); }, 0);
   }
@@ -297,7 +297,7 @@
         + '</span>'
         + '<span class="qv-invite-text">'
         + '<div class="qv-invite-hl">Verify it in the Quran</div>'
-        + '<div class="qv-invite-sub">Count every occurrence yourself — not because you were told, but because you saw it.</div>'
+        + '<div class="qv-invite-sub">Count every occurrence yourself - not because you were told, but because you saw it.</div>'
         + '</span>'
         + '</button>'
         + '<div class="qvpanel" id="qv' + id + '-panel">'
@@ -311,7 +311,7 @@
         /* improvement 3: dot arc container (was .qvpills) */
         + '<div class="qv-dots" id="qv' + id + '-pills"></div>'
         + '</div>'
-        /* ── 3-element action bar: ← [confirm] → — clear 2-action workflow ── */
+        /* ── 3-element action bar: ← [confirm] → - clear 2-action workflow ── */
         + '<div class="qv-action-bar">'
         + '<button class="qv-nav-btn" id="qv' + id + '-bp" disabled onclick="QuranValidator._prev(' + id + ')" aria-label="Previous occurrence" title="Previous occurrence">←</button>'
         + '<button class="qv-confirm-btn" id="qv' + id + '-bc" onclick="QuranValidator._confirm(' + id + ')">' + confirmLabel + '</button>'
@@ -320,7 +320,7 @@
         /* content */
         + '<div class="qvcontent" id="qv' + id + '-content">'
         + '<div class="qvpage" id="qv' + id + '-page"></div>'
-        /* improvement 5: done screen — built dynamically in _checkDone */
+        /* improvement 5: done screen - built dynamically in _checkDone */
         + '<div class="qvdone" id="qv' + id + '-done">'
         + '<div class="qv-done-flash" id="qv' + id + '-dflash"></div>'
         + '<button class="qv-done-dismiss" onclick="QuranValidator._dismissDone(' + id + ')" aria-label="Close and browse verses" title="Go back to verses">×</button>'
@@ -447,7 +447,7 @@
       return n;
     },
 
-    /* Highlight a verse's text — auto-derives match from group.arabic */
+    /* Highlight a verse's text - auto-derives match from group.arabic */
     _hlVerse: function(text, s, a) {
       var self = this;
       var gmap = self._groupMap();
@@ -527,7 +527,7 @@
       }
     },
 
-    /* Scroll only inside the content div — never the main page */
+    /* Scroll only inside the content div - never the main page */
     _scrollTgt: function() {
       var self = this;
       var tgt = self.comb[self.gIdx];
@@ -569,7 +569,7 @@
       var name = SN[o.s] || ('Surah ' + o.s);
       var mode = this.config.mode || 'count';
       var info = this._q('info'), sub = this._q('sub');
-      if(info) info.textContent = (g.label || o.gid) + ' — occurrence ' + occNum + ' of ' + total + ' · ' + name + ' · ' + o.s + ':' + o.a;
+      if(info) info.textContent = (g.label || o.gid) + ' - occurrence ' + occNum + ' of ' + total + ' · ' + name + ' · ' + o.s + ':' + o.a;
       if(sub) sub.textContent = mode === 'locate'
         ? 'Navigate to this verse · tap "I found this verse" to confirm'
         : 'Find the highlighted word · tap "I verified this word" to confirm · use → to skip';
@@ -633,7 +633,7 @@
     prevPage: function() { if(this.curP > 0) this._renderPage(this.curP - 1, 'b'); },
     nextPage: function() { if(this.curP < this.totP - 1) this._renderPage(this.curP + 1, 'f'); },
 
-    /* ── improvement 4: confirm — flash animation on highlighted word ── */
+    /* ── improvement 4: confirm - flash animation on highlighted word ── */
     confirm: function() {
       var o = this.comb[this.gIdx];
       if(!o) return;
@@ -666,7 +666,7 @@
     handleWordClick: function(el) {
       var o = this.comb[this.gIdx];
       if(!o) return;
-      /* match on s:a:gid — idx not in data-key since HTML can't know which duplicate */
+      /* match on s:a:gid - idx not in data-key since HTML can't know which duplicate */
       var baseKey = o.s + ':' + o.a + ':' + o.gid;
       if(el.dataset.key === baseKey) this.confirm();
     },
@@ -680,7 +680,7 @@
       if(!allConfirmed) return;
 
       var pg = self._q('page'), done = self._q('done');
-      /* Keep pg visible — user can dismiss done and return to verses */
+      /* Keep pg visible - user can dismiss done and return to verses */
       if(done) {
         done.classList.add('qvvis');
         /* Scroll done screen into view within the content container */

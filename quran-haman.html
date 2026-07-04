@@ -131,7 +131,7 @@
   <div id="lmeta">Lesson · Haman in Egypt</div>
 
   <!-- ══ STAGE 0 ══ -->
-  <!-- ══ STAGE Sp — PREDICTION ══ -->
+  <!-- ══ STAGE Sp - PREDICTION ══ -->
   <div class="stage active" id="sp"></div>
 
   <!-- ══ STAGE 0 ══ -->
@@ -318,7 +318,7 @@ function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
   var ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = 640, H = 130; cv.width = W; cv.height = H;
   var t = 0;
   var rng = (function(){ var s=77; return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; }; })();
@@ -619,7 +619,7 @@ Prediction.init({
   correct: 1822,
   correctLabel: '1822',
   curiositySeed: {
-    question: 'The Quran uses the word \'wariq\' (وَرِق) — from the root meaning paper. The first paper money appeared where and when?',
+    question: 'The Quran uses the word \'wariq\' (وَرِق) - from the root meaning paper. The first paper money appeared where and when?',
     nextUrl: 'quran-paper-money.html',
     nextTitle: 'Paper Money'
   }

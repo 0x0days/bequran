@@ -1,5 +1,5 @@
 /**
- * prediction.js — Prediction-Violation-Curiosity Loop engine
+ * prediction.js - Prediction-Violation-Curiosity Loop engine
  * 8 input types: slider, choice, number-pad, dial, timeline, split, thermometer, magnitude, binary-chain, card-flip
  */
 (function(G) {
@@ -8,7 +8,7 @@
   var _drag = {}; /* shared drag/interaction state */
 
   /* ─────────────────────────────────────────────────────────────
-     CSS — injected once into <head>
+     CSS - injected once into <head>
   ───────────────────────────────────────────────────────────── */
   var CSS = [
     /* Wrap card */
@@ -201,7 +201,7 @@
     /* ═══════════ PREMIUM MOTION LAYER (motionsites-grade) ═══════════
        Layered AFTER base rules so later declarations win. Decorative
        infinite motion is gated behind prefers-reduced-motion. Lifts EVERY
-       input type at once — zero per-page edits. */
+       input type at once - zero per-page edits. */
     '@keyframes qnpIn{from{opacity:0;transform:translateY(16px);filter:blur(7px)}to{opacity:1;transform:none;filter:blur(0)}}',
     '@keyframes qnpPop{0%{transform:scale(1)}42%{transform:scale(1.05)}100%{transform:scale(1)}}',
     '@keyframes qnpShine{0%{background-position:175% 0}60%,100%{background-position:-75% 0}}',
@@ -221,51 +221,51 @@
     '.predict-wrap>*:nth-child(6){animation-delay:.32s}',
     '}',
 
-    /* SLIDER — floating glowing value + thumb spring */
+    /* SLIDER - floating glowing value + thumb spring */
     '@media (prefers-reduced-motion:no-preference){.predict-val{animation:qnpFloat 3.4s ease-in-out infinite,qnpValPulse 3.4s ease-in-out infinite}}',
     '.predict-slider{transition:background .12s linear}',
     '.predict-slider::-webkit-slider-thumb{transition:transform .15s cubic-bezier(.34,1.6,.64,1),box-shadow .2s}',
     '.predict-slider:active::-webkit-slider-thumb{transform:scale(1.22)}',
     '.predict-slider:active::-moz-range-thumb{transform:scale(1.22)}',
 
-    /* CHOICE — spring lift + select pop + glow */
+    /* CHOICE - spring lift + select pop + glow */
     '.predict-choice{transition:transform .2s cubic-bezier(.34,1.56,.64,1),border-color .18s,background .18s,box-shadow .25s;will-change:transform}',
     '.predict-choice:hover{transform:translateY(-3px);box-shadow:0 10px 26px color-mix(in srgb,var(--accent,var(--gold)) 16%,transparent)}',
     '.predict-choice:active{transform:translateY(0) scale(.97)}',
     '.predict-choice.selected{box-shadow:0 0 0 1px var(--accent,var(--gold)),0 0 26px color-mix(in srgb,var(--accent,var(--gold)) 30%,transparent);animation:qnpPop .42s cubic-bezier(.34,1.56,.64,1)}',
 
-    /* MAGNITUDE — slide-in hover + select pop */
+    /* MAGNITUDE - slide-in hover + select pop */
     '.pd-mag-item{transition:transform .2s cubic-bezier(.34,1.56,.64,1),border-color .15s,background .15s,box-shadow .25s}',
     '.pd-mag-item:hover{transform:translateX(5px)}',
     '.pd-mag-item.sel{animation:qnpPop .42s cubic-bezier(.34,1.56,.64,1)}',
     '.pd-mag-item.sel .pd-mag-dot{box-shadow:0 0 12px var(--accent,var(--gold))}',
 
-    /* BINARY-CHAIN — button press spring + live band glow */
+    /* BINARY-CHAIN - button press spring + live band glow */
     '.pd-bc-btn{transition:transform .16s cubic-bezier(.34,1.56,.64,1),border-color .12s,background .12s,color .12s}',
     '.pd-bc-btn:active{transform:scale(.91)}',
     '@media (prefers-reduced-motion:no-preference){.pd-bc-band{animation:qnpGlowPulse 2.8s ease-in-out infinite}}',
 
-    /* CARD-FLIP — 3D hover tilt + perpetual light shimmer on the face */
+    /* CARD-FLIP - 3D hover tilt + perpetual light shimmer on the face */
     '.pd-card:not(.flip):hover .pd-card-i{transform:translateY(-5px) rotateX(7deg) rotateY(-5deg)}',
     '.pd-card-f::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(115deg,transparent 36%,color-mix(in srgb,var(--accent,var(--gold)) 24%,transparent) 50%,transparent 64%);background-size:260% 100%;pointer-events:none}',
     '@media (prefers-reduced-motion:no-preference){.pd-card-f::after{animation:qnpShine 3.6s ease-in-out infinite}}',
 
-    /* DIAL — glowing pulsing handle */
+    /* DIAL - glowing pulsing handle */
     '#pd-dhandle{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent,var(--gold)) 70%,transparent))}',
     '@media (prefers-reduced-motion:no-preference){#pd-dhandle{animation:pdDialPulse 1.9s ease-in-out infinite}}',
 
-    /* TIMELINE — expanding pulse ring behind the pin */
+    /* TIMELINE - expanding pulse ring behind the pin */
     '.pd-tl-pin::after{content:"";position:absolute;top:50%;left:50%;width:28px;height:28px;border-radius:50%;border:2px solid var(--accent,var(--gold));pointer-events:none}',
     '@media (prefers-reduced-motion:no-preference){.pd-tl-pin::after{animation:qnpRing 2.1s ease-out infinite}}',
 
-    /* THERMOMETER — glowing bulb + liquid sheen */
+    /* THERMOMETER - glowing bulb + liquid sheen */
     '@media (prefers-reduced-motion:no-preference){.pd-therm-bulb{animation:qnpGlowPulse 2.6s ease-in-out infinite}}',
     '.pd-therm-fill::after{content:"";position:absolute;inset:0;border-radius:9px;background:linear-gradient(0deg,transparent,rgba(255,255,255,.22))}',
 
-    /* SPLIT — glowing divider line */
+    /* SPLIT - glowing divider line */
     '@media (prefers-reduced-motion:no-preference){.pd-split-div{animation:qnpGlowPulse 3s ease-in-out infinite}}',
 
-    /* SUBMIT / CONTINUE — sweeping light shimmer */
+    /* SUBMIT / CONTINUE - sweeping light shimmer */
     '.predict-submit,.pr-continue{position:relative;overflow:hidden}',
     '.predict-submit::after,.pr-continue::after{content:"";position:absolute;top:0;left:-65%;width:45%;height:100%;background:linear-gradient(110deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-20deg);pointer-events:none}',
     '@media (prefers-reduced-motion:no-preference){.predict-submit:not(:disabled)::after,.pr-continue::after{animation:qnpSweep 3.6s ease-in-out infinite}}',
@@ -1090,7 +1090,7 @@
     var t=0;
     function frame(){ if(!cv.isConnected) return; if(cv.offsetParent!==null){ t+=0.02; drawFn(ctx, cv.width/dpr, cv.height/dpr, t); } _drag[id+'Raf']=requestAnimationFrame(frame); }
     /* relative drag: from where you grabbed, drag UP (or right) to increase,
-       DOWN (or left) to decrease — feels like a camera zoom / scrub knob */
+       DOWN (or left) to decrease - feels like a camera zoom / scrub knob */
     var drag=false, sx=0, sy=0, sr=0;
     function setE(e){
       var rc=cv.getBoundingClientRect(), travel=(vert?rc.height:rc.width)||1;
@@ -1355,7 +1355,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     buildSp — assemble prediction stage HTML and init drag widgets
+     buildSp - assemble prediction stage HTML and init drag widgets
   ───────────────────────────────────────────────────────────── */
   function buildSp() {
     var sp = document.getElementById('sp');
@@ -1367,7 +1367,7 @@
       + '<p class="predict-eyebrow">Before we show you anything —</p>'
       + '<p class="predict-q">'+esc(cfg.question)+'</p>'
       + '<p class="predict-hint">Commit to your prediction. Your guess will be revealed next to the real answer.</p>'
-      + '<p class="predict-social">Most people who see this don\'t believe it at first — what do you think?</p>';
+      + '<p class="predict-social">Most people who see this don\'t believe it at first - what do you think?</p>';
 
     if (type==='slider')        inner += buildSlider();
     else if (type==='choice')   inner += buildChoice();
@@ -1437,19 +1437,19 @@
       var match = String(guess).trim().toLowerCase() === String(correct).trim().toLowerCase();
       return match
         ? 'You had a feeling. Now see the evidence behind it.'
-        : 'Now see why the answer is what it is — and why it matters.';
+        : 'Now see why the answer is what it is - and why it matters.';
     }
     var gap = Math.abs(gNum - cNum);
     var pct = cNum > 0 ? (gap/cNum*100) : gap;
     if (gap===0)   return 'You got it exactly. Now see where it comes from.';
     if (pct<=5)    return 'Remarkably close. Even that small gap tells a story.';
-    if (pct<=15)   return 'Not far off — but the precise number is what makes this extraordinary.';
+    if (pct<=15)   return 'Not far off - but the precise number is what makes this extraordinary.';
     if (pct<=35)   return 'Most people guess in that range. The real answer surprises everyone.';
     return 'That\'s what almost everyone guesses. The real answer is one of the most striking in Quranic science.';
   }
 
   /* ─────────────────────────────────────────────────────────────
-     buildReveal — inject gap panel into top of S0
+     buildReveal - inject gap panel into top of S0
   ───────────────────────────────────────────────────────────── */
   function buildReveal(fresh) {
     var container = document.getElementById('predictReveal');
@@ -1463,7 +1463,7 @@
     var isMatch = isNumeric ? gNum === cNum
                             : String(guess).trim().toLowerCase() === String(cfg.correct).trim().toLowerCase();
 
-    /* gap block — only shown for numeric types */
+    /* gap block - only shown for numeric types */
     var gapBlock = '';
     if (isNumeric) {
       var gap = Math.abs(gNum - cNum);
@@ -1496,7 +1496,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     buildSeed — curiosity teaser at end of S4
+     buildSeed - curiosity teaser at end of S4
   ───────────────────────────────────────────────────────────── */
   function buildSeed() {
     var c = document.getElementById('curiositySeed');
@@ -1607,7 +1607,7 @@
                ra: cfg.rightArabic||'', rl: cfg.rightLabel||'', rc: Number(cfg.correct), unit: cfg.unit||'' };
     },
 
-    /* Slider — live value + animated fill track */
+    /* Slider - live value + animated fill track */
     _sm: function(el) {
       var v=document.getElementById('pd-val'); if(v) v.textContent=el.value;
       var pct=((+el.value - +el.min)/((+el.max - +el.min)||1))*100;

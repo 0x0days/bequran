@@ -550,7 +550,7 @@ function initHeroCanvas() {
   c.width = Math.round(W * dpr);
   c.height = Math.round(H * dpr);
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   ctx.scale(dpr, dpr);
 
   var t = 0;

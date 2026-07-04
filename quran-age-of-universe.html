@@ -623,7 +623,7 @@ function pickEx3(el, correct) {
 function initHeroCanvas() {
   const cv = document.getElementById('heroCanvas');
   const ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   const W = cv.width, H = cv.height;
 
   /* Star field */

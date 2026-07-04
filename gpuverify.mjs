@@ -1,14 +1,14 @@
 /**
- * gpuverify.mjs — proper GPU scene verification harness
+ * gpuverify.mjs - proper GPU scene verification harness
  * Usage:  node gpuverify.mjs [sceneId|all]
  *
  * Fixes all earlier verification bugs:
- *  ✓ Runs over HTTP (not file://) — avoids WebGL software-mode restriction
- *  ✓ Isolated page per scene — no WebGL context exhaustion
- *  ✓ Canvas is visible + sized — readPixels returns real values
- *  ✓ Captures console.error — catches GLSL compile failures
- *  ✓ 9-point pixel sampling — detects flat/black renders
- *  ✓ 2.6s wait — lets animation settle before sampling
+ *  ✓ Runs over HTTP (not file://) - avoids WebGL software-mode restriction
+ *  ✓ Isolated page per scene - no WebGL context exhaustion
+ *  ✓ Canvas is visible + sized - readPixels returns real values
+ *  ✓ Captures console.error - catches GLSL compile failures
+ *  ✓ 9-point pixel sampling - detects flat/black renders
+ *  ✓ 2.6s wait - lets animation settle before sampling
  *  ✓ Generates HTML on-the-fly from the same server origin
  */
 import puppeteer from 'puppeteer-core';
@@ -142,12 +142,12 @@ for (const scene of toTest) {
   const mountErr = glErrs.filter(e => /MOUNT|error/i.test(e));
 
   const status =
-    allTransparent  ? 'FAIL — all pixels transparent (shader compile failed or canvas 0x0)' :
-    allBlack        ? 'WARN — all pixels black (check dark mode + accent)' :
-    shaderErr.length ? `FAIL — GLSL error: ${shaderErr[0].slice(0,80)}` :
-    mountErr.length  ? `FAIL — mount error: ${mountErr[0].slice(0,80)}` :
-    !hasContent      ? 'WARN — very dark, may be correct (history/forge dark bg)' :
-    !hasVariety      ? 'WARN — uniform color (flat fill?)' :
+    allTransparent  ? 'FAIL - all pixels transparent (shader compile failed or canvas 0x0)' :
+    allBlack        ? 'WARN - all pixels black (check dark mode + accent)' :
+    shaderErr.length ? `FAIL - GLSL error: ${shaderErr[0].slice(0,80)}` :
+    mountErr.length  ? `FAIL - mount error: ${mountErr[0].slice(0,80)}` :
+    !hasContent      ? 'WARN - very dark, may be correct (history/forge dark bg)' :
+    !hasVariety      ? 'WARN - uniform color (flat fill?)' :
     'OK';
 
   const bucket = status.startsWith('OK') ? 'ok' : status.startsWith('WARN') ? 'warn' : 'fail';
@@ -165,7 +165,7 @@ console.log('\n' + '─'.repeat(60));
 console.log(`RESULTS  ✓ ${results.ok.length} OK   ⚠ ${results.warn.length} WARN   ✗ ${results.fail.length} FAIL   (total ${toTest.length})`);
 
 if (results.warn.length) {
-  console.log('\nWARNINGS (usually fine — check screenshot):');
+  console.log('\nWARNINGS (usually fine - check screenshot):');
   results.warn.forEach(r => console.log(`  ${r.scene}: ${r.status}`));
 }
 if (results.fail.length) {

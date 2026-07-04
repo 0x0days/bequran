@@ -607,7 +607,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var orbits = [{r:H*0.27,speed:1,tilt:0,electrons:2},{r:H*0.42,speed:0.65,tilt:1.1,electrons:4}];
   function frame(){

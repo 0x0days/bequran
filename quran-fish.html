@@ -397,7 +397,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var fish = Array.from({length:5}, function(_, i) {
     return {x: Math.random()*W, y: H*0.3+Math.random()*H*0.45, sp: 0.5+Math.random()*0.7, sz: 5+Math.random()*7, ph: i*1.3};

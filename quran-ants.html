@@ -427,7 +427,7 @@ function pickEx3(el, correct) {
 function initHeroCanvas(){
   var c=document.getElementById('heroCanvas');
   var ctx=c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W=c.width,H=c.height,t=0;
 
   function ant(x,y,s,winged){
@@ -710,7 +710,7 @@ QuranValidator.attach('qv-ants',{
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"ants");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"ants","question":"What gender are the worker ants that forage outside the colony?","inputType":"choice","choices":["Male","Female","Mixed equally"],"correct":"Female","curiositySeed":{"question":"A dehydrated camel can drink 200 litres in 3 minutes — the fastest drinking rate of any mammal. The Quran uses them as a comparison. Did you know this?","nextUrl":"quran-camel-drink.html","nextTitle":"Camel Drink"}});
+Prediction.init({"lessonId":"ants","question":"What gender are the worker ants that forage outside the colony?","inputType":"choice","choices":["Male","Female","Mixed equally"],"correct":"Female","curiositySeed":{"question":"A dehydrated camel can drink 200 litres in 3 minutes - the fastest drinking rate of any mammal. The Quran uses them as a comparison. Did you know this?","nextUrl":"quran-camel-drink.html","nextTitle":"Camel Drink"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 </body>

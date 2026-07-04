@@ -530,7 +530,7 @@ function pickEx3(el, correct) {
 function initHeroCanvas() {
   const cv = document.getElementById('heroCanvas');
   const ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   const W = cv.width, H = cv.height;
 
   /* Timeline (60fps) */
@@ -729,7 +729,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"red-giant");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"red-giant","question":"In approximately how many years will the Sun expand to engulf Earth?","inputType":"starlife","unit":"B yrs","min":0,"max":12,"step":1,"correct":5,"correctLabel":"~5 billion years","curiositySeed":{"question":"The Quran describes 'ascending pathways' where a day equals 50,000 years. Einstein described something similar in 1935 — what is it?","nextUrl":"quran-wormholes.html","nextTitle":"Wormholes"}});
+Prediction.init({"lessonId":"red-giant","question":"In approximately how many years will the Sun expand to engulf Earth?","inputType":"starlife","unit":"B yrs","min":0,"max":12,"step":1,"correct":5,"correctLabel":"~5 billion years","curiositySeed":{"question":"The Quran describes 'ascending pathways' where a day equals 50,000 years. Einstein described something similar in 1935 - what is it?","nextUrl":"quran-wormholes.html","nextTitle":"Wormholes"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

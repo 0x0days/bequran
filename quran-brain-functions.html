@@ -471,7 +471,7 @@ function initCmpCanvas() {
   var c = document.getElementById('cmpCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height;
   var midX = W / 2;
   var leftAlpha = 0, rightAlpha = 0;
@@ -950,7 +950,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"brain-functions");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"brain-functions","question":"In what year did neuroscience confirm the prefrontal cortex (forehead) controls deception and decision-making?","unit":"CE","inputType":"era","min":1970,"max":2005,"step":1,"correct":1994,"correctLabel":"early 1990s","curiositySeed":{"question":"Iron cannot form on Earth — only inside dying stars. What is iron's atomic number in the periodic table?","nextUrl":"quran-iron.html","nextTitle":"Iron"}});
+Prediction.init({"lessonId":"brain-functions","question":"In what year did neuroscience confirm the prefrontal cortex (forehead) controls deception and decision-making?","unit":"CE","inputType":"era","min":1970,"max":2005,"step":1,"correct":1994,"correctLabel":"early 1990s","curiositySeed":{"question":"Iron cannot form on Earth - only inside dying stars. What is iron's atomic number in the periodic table?","nextUrl":"quran-iron.html","nextTitle":"Iron"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

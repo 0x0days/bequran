@@ -474,7 +474,7 @@
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"internal-mountains");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"internal-mountains","question":"How deep are the largest internal mountain ranges beneath Earth's surface?","inputType":"dprobe","unit":"km","min":0,"max":800,"step":25,"correct":400,"correctLabel":"400+ km deep","curiositySeed":{"question":"The brain's 'lying centre' is the prefrontal cortex — right behind the forehead. When was this confirmed by neuroscience?","nextUrl":"quran-brain-functions.html","nextTitle":"Brain Functions"}});
+Prediction.init({"lessonId":"internal-mountains","question":"How deep are the largest internal mountain ranges beneath Earth's surface?","inputType":"dprobe","unit":"km","min":0,"max":800,"step":25,"correct":400,"correctLabel":"400+ km deep","curiositySeed":{"question":"The brain's 'lying centre' is the prefrontal cortex - right behind the forehead. When was this confirmed by neuroscience?","nextUrl":"quran-brain-functions.html","nextTitle":"Brain Functions"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>
@@ -615,7 +615,7 @@ function pickEx3(el, correct) {
 }
 
 /* ===== CMP CANVAS (S1) ===== */
-/* ===== CMP CANVAS (S1) — Arabic Word Comparison ===== */
+/* ===== CMP CANVAS (S1) - Arabic Word Comparison ===== */
 function initCmpCanvas() {
   var cv = document.getElementById('cmpCanvas');
   if (!cv) return;
@@ -824,7 +824,7 @@ function drawCmpFrame(ctx, W, H, leftAlpha, rightAlpha) {
         ctx.fill();
       });
 
-      // Internal mountains — UPWARD pointing, glowing
+      // Internal mountains - UPWARD pointing, glowing
       var mtnBaseY = umEnd + tzH * 0.78;
 
       // Glow aura behind mountains
@@ -1155,7 +1155,7 @@ function initHeroCanvas() {
   const canvas = document.getElementById('heroCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return; /* GPU already holds a WebGL context — skip 2D init */
+  if (!ctx) return; /* GPU already holds a WebGL context - skip 2D init */
 
   // Unified layout metrics to adapt to mobile vs. desktop viewports
   let isMobile = false;

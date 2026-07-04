@@ -481,7 +481,7 @@ function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
   var ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = 640, H = 130;
   cv.width = W; cv.height = H;
   var t = 0;
@@ -1135,7 +1135,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"camel-drink");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"camel-drinking","question":"How many litres can a dehydrated camel drink in 3 minutes?","inputType":"vessel","unit":"litres","min":0,"max":300,"step":10,"correct":200,"correctLabel":"~200 litres","curiositySeed":{"question":"The Quran calls a mosquito 'Ba'udah' — a feminine noun. Only female mosquitoes bite. When was this confirmed?","nextUrl":"quran-mosquito.html","nextTitle":"The Mosquito"}});
+Prediction.init({"lessonId":"camel-drinking","question":"How many litres can a dehydrated camel drink in 3 minutes?","inputType":"vessel","unit":"litres","min":0,"max":300,"step":10,"correct":200,"correctLabel":"~200 litres","curiositySeed":{"question":"The Quran calls a mosquito 'Ba'udah' - a feminine noun. Only female mosquitoes bite. When was this confirmed?","nextUrl":"quran-mosquito.html","nextTitle":"The Mosquito"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

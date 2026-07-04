@@ -376,7 +376,7 @@ function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
   var ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = 640, H = 130;
   cv.width = W; cv.height = H;
   var t = 0;
@@ -616,7 +616,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"pharaoh-mummy");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"pharaoh-mummy","question":"When was the mummy of Ramesses II discovered?","unit":"CE","inputType":"excavate","min":1850,"max":1960,"step":1,"correct":1881,"correctLabel":"1881","curiositySeed":{"question":"The Quran says Pharaoh used 'stakes' (أوتاد) — not crosses. Egyptian hieroglyphs were undecipherable until which year?","nextUrl":"quran-pharaoh-crucifixion.html","nextTitle":"Pharaoh's Stakes"}});
+Prediction.init({"lessonId":"pharaoh-mummy","question":"When was the mummy of Ramesses II discovered?","unit":"CE","inputType":"excavate","min":1850,"max":1960,"step":1,"correct":1881,"correctLabel":"1881","curiositySeed":{"question":"The Quran says Pharaoh used 'stakes' (أوتاد) - not crosses. Egyptian hieroglyphs were undecipherable until which year?","nextUrl":"quran-pharaoh-crucifixion.html","nextTitle":"Pharaoh's Stakes"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

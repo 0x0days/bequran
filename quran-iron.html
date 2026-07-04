@@ -590,7 +590,7 @@ function initGematriaCanvas() {
   var c = document.getElementById('gematriaCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height; // 640 × 195
 
   /* حديد: ح=8, د=4, ي=10, د=4 → total 26 */

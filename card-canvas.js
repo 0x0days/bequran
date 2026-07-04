@@ -1,4 +1,4 @@
-/* card-canvas.js — per-lesson hero canvas animations for index cards */
+/* card-canvas.js - per-lesson hero canvas animations for index cards */
 var CardCanvases = {};
 
 CardCanvases['adam-jesus'] = function(cv) {
@@ -5335,7 +5335,7 @@ CardCanvases['haman'] = function(cv) {
   /* Hieroglyph marks in columns */
   var marks = [];
   for (var i = 0; i < 40; i++) marks.push({ x: 12 + rng()*(W*0.56), y: 8 + rng()*(H-16), w: 3+rng()*8, h: 2+rng()*6, t: Math.floor(rng()*4), ph: rng()*6.28 });
-  /* Haman name glyphs — glowing green band */
+  /* Haman name glyphs - glowing green band */
   var nameGlyphs = [
     { x:W*0.68, y:H*0.30, w:10, h:7 }, { x:W*0.73, y:H*0.26, w:7,  h:10 },
     { x:W*0.78, y:H*0.31, w:9,  h:6 }, { x:W*0.83, y:H*0.28, w:6,  h:9  },
@@ -5430,7 +5430,7 @@ CardCanvases['pharaoh-crucifixion'] = function(cv) {
     ctx.strokeStyle = 'rgba(232,121,249,0.90)'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(sx, stakeTop); ctx.lineTo(sx, stakeBot); ctx.stroke();
     ctx.restore();
-    // impaled figure (bent forward — matches Egyptian hieroglyph)
+    // impaled figure (bent forward - matches Egyptian hieroglyph)
     var fig = 0.5 + 0.035 * Math.sin(t * 0.9);
     ctx.save();
     ctx.globalAlpha = fig;
@@ -5756,7 +5756,7 @@ CardCanvases['brainstem'] = function(cv) {
     var bsColor = isSleep ? '#22d3ee' : '#f87171';
     var bsGlow  = isSleep ? 'rgba(34,211,238,0.55)' : 'rgba(248,113,113,0.55)';
 
-    // brain outline — simple side view
+    // brain outline - simple side view
     var bx = W * 0.30, by = H * 0.44;
     var br = H * 0.28;
     // cerebrum dome
@@ -5774,7 +5774,7 @@ CardCanvases['brainstem'] = function(cv) {
     ctx.strokeStyle = 'rgba(100,130,160,0.38)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
-    // brainstem stalk — glowing, color-coded
+    // brainstem stalk - glowing, color-coded
     var bsTop = { x: bx + br * 0.18, y: by + br * 0.60 };
     var bsBot = { x: bx + br * 0.08, y: by + br * 1.05 };
     ctx.save();
@@ -5798,7 +5798,7 @@ CardCanvases['brainstem'] = function(cv) {
     ctx.fillStyle = bsColor;
     ctx.fillText(isSleep ? 'SLEEP' : 'DEATH', bx + br * 0.1, by - br * 1.15);
 
-    // EEG wave — right panel
+    // EEG wave - right panel
     var waveVal;
     if (isSleep) {
       waveVal = Math.sin(t * 0.28) * 9 + Math.sin(t * 0.14) * 4 + Math.sin(t * 0.55) * 2;

@@ -1,4 +1,4 @@
-/* Quranic Numerics — Theme Engine
+/* Quranic Numerics - Theme Engine
    Handles: preference storage, toggle sync, system-pref listener.
    The no-flash init runs inline in <head> on each page.
    Load this file: <script src="theme.js"></script> before </body>
@@ -18,7 +18,7 @@
       html.setAttribute('data-theme', res);
       return;
     }
-    /* View Transitions API — radial reveal from stored click coords */
+    /* View Transitions API - radial reveal from stored click coords */
     if (document.startViewTransition) {
       document.startViewTransition(function () {
         html.setAttribute('data-theme', res);
@@ -66,7 +66,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   UNIVERSAL MOTION LAYER — cursor, magnetic, spotlight, scroll bar.
+   UNIVERSAL MOTION LAYER - cursor, magnetic, spotlight, scroll bar.
    Applies to every lesson page. Skips index.html (body.page-index),
    which ships its own inline motion, to avoid double-initialisation.
 ═══════════════════════════════════════════════════════════════ */
@@ -96,7 +96,7 @@
 
   if (!fine || reduce) return;
 
-  /* magnetic — primary action buttons drift toward the cursor */
+  /* magnetic - primary action buttons drift toward the cursor */
   function magnet(el, str) {
     el.addEventListener('pointermove', function (e) {
       var r = el.getBoundingClientRect();
@@ -132,7 +132,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   MOBILE FEEDBACK PANEL — never cover content.
+   MOBILE FEEDBACK PANEL - never cover content.
    The fb-panel is position:fixed at the bottom; on small screens it
    can hide the result the student just revealed. On mobile we relocate
    it into the active stage (so it flows BELOW the content) while shown,
@@ -167,7 +167,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   REWARD ENGINE — cinematic verdict peak + variable reward + SFX/haptics.
+   REWARD ENGINE - cinematic verdict peak + variable reward + SFX/haptics.
    Lesson pages only (gated on #fbPanel). DOM-hooked, so it works on
    every page regardless of that page's own JS. Zero per-page edits.
    Tune here → all 53 pages update.
@@ -304,7 +304,7 @@
     if (on && !fbWas){
       sCorrect(); vibe([12]);
       burst(lastPt.x, lastPt.y, 24);              /* from where they tapped */
-      /* second burst from the panel itself — guarantees it reads on every
+      /* second burst from the panel itself - guarantees it reads on every
          page even if the tap point was off-screen or scrolled away */
       try { var r=fbPanel.getBoundingClientRect();
         if (r.width) burst(r.left+r.width/2, Math.max(r.top+8, 48), 16); } catch(e){}
@@ -346,7 +346,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   VERDICT → CONSTELLATION TIE-IN — peak-end moment.
+   VERDICT → CONSTELLATION TIE-IN - peak-end moment.
    When the verdict (xpBadge) appears, inject a consistent "your map
    grew" panel into S4 that ties this lesson to the index Constellation.
    DOM-hooked, lesson-pages only, zero per-page edits.
@@ -394,7 +394,7 @@
     if(d.arabic){ var apx=fitFont(x,d.arabic,'700','"Amiri",serif',62,W-240); x.fillStyle=hexA(acc,0.95);
       x.font='700 '+apx+'px "Amiri",serif'; x.direction='rtl'; x.fillText(d.arabic,W/2,Math.max(yend+96,1000)); x.direction='ltr'; }
     x.strokeStyle=hexA(acc,0.3); x.lineWidth=1; x.beginPath(); x.moveTo(W/2-120,H-156); x.lineTo(W/2+120,H-156); x.stroke();
-    x.fillStyle='#7a8fa3'; x.font='500 26px "DM Sans",sans-serif'; x.fillText('Discovery '+d.n+' of '+TOTAL+'  ·  learn it yourself — BeQuran', W/2, H-104);
+    x.fillStyle='#7a8fa3'; x.font='500 26px "DM Sans",sans-serif'; x.fillText('Discovery '+d.n+' of '+TOTAL+'  ·  learn it yourself - BeQuran', W/2, H-104);
     return c;
   }
   function closeModal(){ if(modal) modal.classList.remove('show'); }
@@ -419,7 +419,7 @@
         if(act==='save'){ save(); return; }
         canvas.toBlob(function(blob){
           var file=new File([blob],'bequran-discovery.png',{type:'image/png'});
-          if(navigator.canShare && navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'A Quranic discovery',text:d.topic+' — '+d.answer}).catch(function(){}); }
+          if(navigator.canShare && navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'A Quranic discovery',text:d.topic+' - '+d.answer}).catch(function(){}); }
           else save(blob);
         });
       };
@@ -497,7 +497,7 @@
     box.innerHTML =
       '<div class="qvt-eyebrow">✦ Charted</div>'+
       (complete
-        ? '<div class="qvt-title">The map is complete.</div><div class="qvt-sub">All 53 discoveries illuminated — the whole constellation is yours.</div>'
+        ? '<div class="qvt-title">The map is complete.</div><div class="qvt-sub">All 53 discoveries illuminated - the whole constellation is yours.</div>'
         : '<div class="qvt-title">Discovery <b>'+n+'</b> of '+TOTAL+' illuminated</div><div class="qvt-sub">Your constellation just grew brighter.</div>')+
       '<div class="qvt-dots" aria-hidden="true">'+dots+'</div>'+
       '<div class="qvt-actions">'+
@@ -509,7 +509,7 @@
     box.querySelector('.qvt-share').onclick=openShare;
     requestAnimationFrame(function(){ box.classList.add('show'); });
 
-    /* peak enhancements — staggered after the box appears */
+    /* peak enhancements - staggered after the box appears */
     setTimeout(startWarmArc,  200);
     setTimeout(startTypewriter, 600);
   }
@@ -518,7 +518,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   TWIN-COUNT PROOF — for the symmetric-word-count lessons, lead S1
+   TWIN-COUNT PROOF - for the symmetric-word-count lessons, lead S1
    with a "count them yourself" demonstration: both words tally live
    and lock equal. Data-driven from the prediction config (scale-balance),
    so zero per-page edits. The platform's signature claim, made visceral.
@@ -535,7 +535,7 @@
     var box = document.createElement('div');
     box.className = 'qn-twin';
     box.innerHTML =
-      '<div class="qn-twin-head">Don’t take our word — count them yourself</div>' +
+      '<div class="qn-twin-head">Don’t take our word - count them yourself</div>' +
       '<div class="qn-twin-cols">' +
         '<div class="qn-twin-col"><div class="qn-twin-ar">'+esc(d.la)+'</div><div class="qn-twin-nm">'+esc(d.ll)+'</div>' +
           '<div class="qn-twin-n" id="qtL" aria-live="polite">0</div><div class="qn-twin-bar"><i id="qtLb"></i></div></div>' +
@@ -563,8 +563,8 @@
         if(eq){ eq.textContent = equal ? '=' : '⚖'; if(equal) eq.classList.add('locked'); }
         box.classList.add(equal?'is-equal':'is-near');
         res.innerHTML = equal
-          ? 'Both exactly <b>'+d.lc+'</b>'+(d.unit?(' '+esc(d.unit)):'')+' — across all 6,236 verses, not one more, not one less.'
-          : '<b>'+d.lc+'</b> and <b>'+d.rc+'</b> — counted across the whole Quran.';
+          ? 'Both exactly <b>'+d.lc+'</b>'+(d.unit?(' '+esc(d.unit)):'')+' - across all 6,236 verses, not one more, not one less.'
+          : '<b>'+d.lc+'</b> and <b>'+d.rc+'</b> - counted across the whole Quran.';
         res.classList.add('show'); btn.style.display='none';
       }
       if(reduce){ L.textContent=d.lc; R.textContent=d.rc; if(Lb)Lb.style.width=(d.lc/mx*100)+'%'; if(Rb)Rb.style.width=(d.rc/mx*100)+'%'; finish(); return; }
@@ -577,7 +577,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   SCENE CINEMATICS — staggered content reveal + verse light-sweep
+   SCENE CINEMATICS - staggered content reveal + verse light-sweep
    each time a lesson stage becomes active. Generic: targets standard
    content classes, skips the prediction stage, lesson-pages only.
 ═══════════════════════════════════════════════════════════════ */
@@ -617,7 +617,7 @@
 }());
 
 /* ═══════════════════════════════════════════════════════════════
-   ARABIC VERSE STROKE-DRAW — when S0 becomes active, the main
+   ARABIC VERSE STROKE-DRAW - when S0 becomes active, the main
    Arabic verse element reveals right-to-left with a glowing pen
    cursor, like calligraphy being written before your eyes.
    Covers .verse-ar (19 lessons), .iv-ar (14), .hero-verse (6).
@@ -704,7 +704,7 @@
     runPen(found, duration);
   }
 
-  /* Watch for the verse to actually enter the viewport — not just S0 becoming active.
+  /* Watch for the verse to actually enter the viewport - not just S0 becoming active.
      On mobile the verse can be far below the fold; we only play the animation
      when the user has scrolled to it (≥35% visible).
      This also handles: S0 already active but user hasn't scrolled yet. */
@@ -722,7 +722,7 @@
       }
     }, {
       threshold: [0, 0.35, 0.5, 1],
-      /* rootMargin: slightly negative top — don't fire while element is
+      /* rootMargin: slightly negative top - don't fire while element is
          still partially hidden under a sticky header */
       rootMargin: '-48px 0px 0px 0px'
     });
@@ -733,7 +733,7 @@
   function onS0Active() {
     var found = findVerse();
     if (!found) return;
-    /* If already visible right now (desktop, short page) — watch immediately */
+    /* If already visible right now (desktop, short page) - watch immediately */
     watchVerse(found);
   }
 

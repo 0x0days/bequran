@@ -478,7 +478,7 @@ function initHeroCanvas() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
   var ctx = cv.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = 640, H = 130;
   cv.width = W; cv.height = H;
 
@@ -994,7 +994,7 @@ initHeroCanvas();
 <script>if(typeof GPU!=="undefined"&&document.getElementById("heroCanvas")){GPU.mount(document.getElementById("heroCanvas"),"spider-web");}</script>
 <script src="prediction.js?v=20260615h"></script>
 <script>
-Prediction.init({"lessonId":"spider-web","question":"Which spiders spin webs?","inputType":"choice","choices":["Only males","Only females","Both males and females"],"correct":"Only females","curiositySeed":{"question":"Crows hold 'funerals' for their dead — gathering around the corpse to learn about dangers. When was this scientifically confirmed?","nextUrl":"quran-crow-funerals.html","nextTitle":"Crow Funerals"}});
+Prediction.init({"lessonId":"spider-web","question":"Which spiders spin webs?","inputType":"choice","choices":["Only males","Only females","Both males and females"],"correct":"Only females","curiositySeed":{"question":"Crows hold 'funerals' for their dead - gathering around the corpse to learn about dangers. When was this scientifically confirmed?","nextUrl":"quran-crow-funerals.html","nextTitle":"Crow Funerals"}});
 </script>
 <script src="theme.js?v=20260615h"></script>
 <script src="quran-validator.js?v=20260615h"></script>

@@ -918,7 +918,7 @@
             var c = document.getElementById('heroCanvas');
             if (!c) return;
             var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
             var W = c.width,
                 H = c.height;
             var t = 0;
@@ -1118,7 +1118,7 @@
             ctx.fillStyle = 'rgba(147,197,253,0.60)';
             ctx.font = '500 11px DM Sans, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('Sea Level — 0 m', W * 0.10, slY - 7);
+            ctx.fillText('Sea Level - 0 m', W * 0.10, slY - 7);
 
             /* Elevation labels */
             [0.05, 0.22, 0.45, 0.65, 0.85].forEach(function(f) {
@@ -1190,7 +1190,7 @@
                         ctx.fillText('أَدْنَى الْأَرْضِ', mx, my + radius + 66);
                     }
                 } else {
-                    /* Unrevealed marker — pulsing dot */
+                    /* Unrevealed marker - pulsing dot */
                     var pulse = 0.5 + 0.5 * Math.sin(Date.now() / 800 + idx * 1.7);
                     var pulseR = radius + pulse * 4;
 
@@ -1328,7 +1328,7 @@
                 ctx2.fillStyle = 'rgba(147,197,253,0.60)';
                 ctx2.font = '500 11px DM Sans, sans-serif';
                 ctx2.textAlign = 'left';
-                ctx2.fillText('Sea Level — 0 m', W2 * 0.10, slY2 - 7);
+                ctx2.fillText('Sea Level - 0 m', W2 * 0.10, slY2 - 7);
                 [0.05, 0.22, 0.45, 0.65, 0.85].forEach(function(f) {
                     var y = topM2 + totalH2 * f;
                     var ev = Math.round(100 - f * 620);
@@ -1644,7 +1644,7 @@
         QuranValidator.attach('qv-dead-sea', {
             mode: 'locate',
             title: 'Read it yourself in the Quran',
-            subtitle: 'Find 30:2–3 — أَدْنَى means "lowest." The battle site is Earth\'s lowest land at −430m.',
+            subtitle: 'Find 30:2–3 - أَدْنَى means "lowest." The battle site is Earth\'s lowest land at −430m.',
             groups: [
                 { id: 'adna', label: 'Lowest land', arabic: 'أَدْنَى', color: '#0ea5e9',
                     occurrences: [

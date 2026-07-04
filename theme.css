@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   Quranic Numerics — Shared Theme System
+   Quranic Numerics - Shared Theme System
    Load order: <link href="theme.css"> BEFORE the page's <style>
    Selector html[data-theme="light"] has specificity (0,1,1) which
-   beats per-page :root {} (0,1,0) — so overrides win regardless
+   beats per-page :root {} (0,1,0) - so overrides win regardless
    of source order.
 ═══════════════════════════════════════════════════════════════ */
 
@@ -18,7 +18,7 @@ html[data-theme="light"] { color-scheme: light; }
    and --accent-ring are overridden below.
 ──────────────────────────────────────────────────────────────── */
 html[data-theme="light"] {
-  /* Warm parchment — manuscript / Islamic book feel */
+  /* Warm parchment - manuscript / Islamic book feel */
   --bg:           #f5f1ea;
   --surface:      #ffffff;
   --surface2:     #ece8e0;
@@ -26,12 +26,12 @@ html[data-theme="light"] {
   --text:         #1c2b3a;
   --muted:        #5e6e7e;
 
-  /* Gold: deep amber — WCAG AA on parchment (#92400e = 6.2:1 on #f5f1ea) */
+  /* Gold: deep amber - WCAG AA on parchment (#92400e = 6.2:1 on #f5f1ea) */
   --gold:         #92400e;
   --gold-light:   #7c2d12;
   --gold-lt:      #92400e;   /* index page alias */
 
-  /* OK / error palettes — swap to light variants */
+  /* OK / error palettes - swap to light variants */
   --ok:           #15803d;
   --ok-bg:        #f0fdf4;
   --ok-border:    #86efac;
@@ -41,7 +41,7 @@ html[data-theme="light"] {
 
   /* Accent variants: darken per-page accent for light bg readability.
      color-mix(in oklch) gives perceptually uniform darkening across
-     any hue — even pastels like #c7d2fe become readable on parchment. */
+     any hue - even pastels like #c7d2fe become readable on parchment. */
   --accent-light: color-mix(in oklch, var(--accent) 62%, black 38%);
   --accent-ring:  color-mix(in oklch, var(--accent) 45%, white 55%);
 }
@@ -89,7 +89,7 @@ html[data-theme="light"] .gold-box {
 html[data-theme="light"] .gold-box .gt { color: #7c2d12; }
 html[data-theme="light"] .gold-box .gs { color: var(--muted); }
 
-/* ── Index page hero — light mode ──────────────────────────────
+/* ── Index page hero - light mode ──────────────────────────────
    The canvas draws a permanent dark sky. In light mode the
    .hero-overlay fades it out downward into parchment so the
    hero section blends into the page rather than staying a
@@ -112,7 +112,7 @@ html[data-theme="light"] .hero-eyebrow { color: var(--gold); }
 html[data-theme="light"] .hero-cta     { box-shadow: 0 4px 28px rgba(180,83,9,0.28); }
 
 /* Index hook numbers and card-go arrows: override inline colors
-   set by JS — see index.html CSS for the .hook + .card-go rules */
+   set by JS - see index.html CSS for the .hook + .card-go rules */
 html[data-theme="light"] .hook {
   color: color-mix(in oklch, var(--accent) 62%, black 38%) !important;
   text-shadow: none !important;
@@ -252,7 +252,7 @@ body.page-index .nav-home-fixed { display: none; }
 
 /* ═══════════════════════════════════════════════════════════════
    UNIVERSAL MOTION + GLASS LAYER  (injected by theme.js on every page)
-   Additive only — no layout/background changes, safe across all pages.
+   Additive only - no layout/background changes, safe across all pages.
 ═══════════════════════════════════════════════════════════════ */
 
 /* custom magnetic cursor */
@@ -273,7 +273,7 @@ body.qn-has-cursor,body.qn-has-cursor a,body.qn-has-cursor button,body.qn-has-cu
   box-shadow:0 0 12px color-mix(in srgb,var(--accent,var(--gold,#f59e0b)) 55%,transparent);
   transition:width .12s linear;}
 
-/* answer cards — spotlight glow + lift (additive; states keep priority) */
+/* answer cards - spotlight glow + lift (additive; states keep priority) */
 html[data-theme="dark"] .answer-card,html[data-theme="light"] .answer-card{
   position:relative;transition:transform .22s cubic-bezier(.16,1,.3,1),border-color .22s,box-shadow .25s;}
 .answer-card::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
@@ -292,7 +292,7 @@ html[data-theme="light"] .answer-card:hover:not(.ac-correct):not(.ac-wrong):not(
 .btn,.fb-btn,.predict-submit,.pr-continue,.calc-btn,.hero-cta{
   transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .25s,filter .2s,opacity .2s !important;}
 
-/* prediction choices + curiosity buttons — same spotlight treatment */
+/* prediction choices + curiosity buttons - same spotlight treatment */
 .predict-choice,.cs-btn{position:relative;}
 .predict-choice::after,.cs-btn::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   opacity:0;transition:opacity .3s;
@@ -307,7 +307,7 @@ html[data-theme="light"] .answer-card:hover:not(.ac-correct):not(.ac-wrong):not(
 
 
 /* ═══════════════════════════════════════════════════════════════
-   SCENE CINEMATICS — verse reveal + light-sweep on stage activation.
+   SCENE CINEMATICS - verse reveal + light-sweep on stage activation.
    Applied generically by theme.js to standard content classes.
 ═══════════════════════════════════════════════════════════════ */
 .qn-reveal{animation:qnReveal .85s cubic-bezier(.16,1,.3,1) both !important;}

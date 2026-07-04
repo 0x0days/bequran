@@ -514,7 +514,7 @@ function initHeroCanvas() {
   var c = document.getElementById('heroCanvas');
   if (!c) return;
   var ctx = c.getContext('2d');
-  if (!ctx) return; /* GPU owns this canvas — skip 2D init */
+  if (!ctx) return; /* GPU owns this canvas - skip 2D init */
   var W = c.width, H = c.height, t = 0;
   var stars = Array.from({length:38},function(_,i){return{x:(i*137.5)%W,y:(i*89.3)%(H*0.65),ph:i*0.4};});
   function frame(){

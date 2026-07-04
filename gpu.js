@@ -1,4 +1,4 @@
-/* gpu.js — GPU Fragment Shader Scene Engine
+/* gpu.js - GPU Fragment Shader Scene Engine
    API:
      GPU.mount(canvas, scene, opts)  → { stop, resize }
      GPU.Scenes = {}                 (scene registry)
@@ -14,7 +14,7 @@
 'use strict';
 
 /* ─────────────────────────────────────────────────
-   VERTEX SHADER — fullscreen quad
+   VERTEX SHADER - fullscreen quad
 ───────────────────────────────────────────────── */
 var VERT = [
   'attribute vec2 a_pos;',
@@ -22,7 +22,7 @@ var VERT = [
 ].join('\n');
 
 /* ─────────────────────────────────────────────────
-   FRAGMENT PRELUDE — uniforms + GLSL utility library
+   FRAGMENT PRELUDE - uniforms + GLSL utility library
    (prepended to every scene; render body follows)
 ───────────────────────────────────────────────── */
 var FRAG_HEAD = [
@@ -367,7 +367,7 @@ ARCHETYPES['terrain'] = function(p) {
 '  vec3  mCol = mix(vec3(0.90,0.84,0.72)*0.9, vec3(0.30,0.36,0.52)*0.8, u_dark);',
 '  col = mix(col, col + mCol * 0.18, mM * 0.7);',
 '',
-'  /* ── Mountain layers — far to near, strong atmospheric depth ── */',
+'  /* ── Mountain layers - far to near, strong atmospheric depth ── */',
 '  //                  sc    dr    by    am    seed',
 '  // Layer0 = farthest, nearly invisible through haze',
 '  // Layer3 = nearest, bold dark rock with accent',
@@ -387,7 +387,7 @@ ARCHETYPES['terrain'] = function(p) {
 '  vec3 snowC     = mix(snowColL, snowColD, u_dark);',
 '  float snowT    = ' + SNOW + ';',
 '',
-'  /* Layer 0 — farthest, most hazy */',
+'  /* Layer 0 - farthest, most hazy */',
 '  { float sx=uv.x*asp*1.95+t*0.22; float h=0.64+0.22*ridgeFbm(vec2(sx,0.0));',
 '    float fog=1.0;',
 '    vec3 rc = mix(rockNear, rockFar, 0.92);',
@@ -395,14 +395,14 @@ ARCHETYPES['terrain'] = function(p) {
 '    float inM = smoothstep(h+0.006,h-0.008,uv.y);',
 '    col = mix(col, rc, inM); }',
 '',
-'  /* Layer 1 — far, still quite hazy */',
+'  /* Layer 1 - far, still quite hazy */',
 '  { float sx=uv.x*asp*2.80+t*0.40; float h=0.52+0.25*ridgeFbm(vec2(sx,13.3));',
 '    vec3 rc = mix(rockNear, rockFar, 0.64);',
 '    rc = mix(rc, col, 0.48);',
 '    float inM = smoothstep(h+0.006,h-0.009,uv.y);',
 '    col = mix(col, rc, inM); }',
 '',
-'  /* Layer 2 — mid-ground, clearer */',
+'  /* Layer 2 - mid-ground, clearer */',
 '  { float sx=uv.x*asp*3.90+t*0.65; float h=0.40+0.28*ridgeFbm(vec2(sx,26.7));',
 '    h += 0.020*vnoise(vec2(sx*2.8+1.1, 31.4));',
 '    vec3 rc = mix(rockNear, rockFar, 0.30);',
@@ -417,7 +417,7 @@ ARCHETYPES['terrain'] = function(p) {
 '    float inM = smoothstep(h+0.006,h-0.010,uv.y);',
 '    col = mix(col, rc, inM); }',
 '',
-'  /* Layer 3 — nearest, full drama */',
+'  /* Layer 3 - nearest, full drama */',
 '  { float sx=uv.x*asp*5.30+t*0.95; float h=0.27+0.31*ridgeFbm(vec2(sx,40.1));',
 '    h += 0.030*vnoise(vec2(sx*3.1+2.3, 45.9));',
 '    vec3 rc = rockNear;',
@@ -567,7 +567,7 @@ ARCHETYPES['forge'] = function(p) {
 };
 
 /* ─────────────────────────────────────────────────
-   SCENE REGISTRY — terrain scenes
+   SCENE REGISTRY - terrain scenes
 ───────────────────────────────────────────────── */
 var GPU = {
   Scenes: {},
@@ -600,7 +600,7 @@ GPU.Scenes['mountains'] = [
 '  /* Ground line */',
 '  float glDist=abs(uv.y-GROUND);',
 '  col=mix(col,mix(vec3(0.72,0.58,0.38),vec3(0.55,0.42,0.26),u_dark),smoothstep(0.008,0.0,glDist));',
-'  /* Rock layers underground — parallel bands */',
+'  /* Rock layers underground - parallel bands */',
 '  if(uv.y<GROUND){',
 '    float layers=floor((GROUND-uv.y)*12.0);',
 '    float layerN=fract((GROUND-uv.y)*12.0);',
@@ -622,7 +622,7 @@ GPU.Scenes['mountains'] = [
 '  float snowLine=0.72;',
 '  vec3 snowC=mix(vec3(0.96,0.97,0.99),vec3(0.82,0.88,0.95),u_dark);',
 '  col=mix(col,mix(rockC,snowC,smoothstep(snowLine-0.06,snowLine+0.02,mtnH)),inMtn);',
-'  /* PEG ROOT below ground — tapers to point, glows with accent */',
+'  /* PEG ROOT below ground - tapers to point, glows with accent */',
 '  float rootDepth=pkH*3.8; float rootTopW=pkW*0.38;',
 '  vec2 rp=vec2(uv.x*asp-cx,GROUND-uv.y);',
 '  float rootTaper=clamp(1.0-rp.y/rootDepth,0.0,1.0);',
@@ -681,12 +681,12 @@ GPU.Scenes['moving-mountains'] = [
 '    float snow=smoothstep(0.55,0.75,mp.y/mh);',
 '    col=mix(col,mix(crustC*1.2,vec3(0.92,0.94,0.98),snow),inM);',
 '  }',
-'  /* FAULT LINE — glowing accent seam at plate boundary */',
+'  /* FAULT LINE - glowing accent seam at plate boundary */',
 '  float faultX=split*asp;',
 '  float faultDist=abs(uv.x*asp-faultX);',
 '  float faultGlow=exp(-faultDist*28.0)*(0.6+0.4*sin(u_time*3.2+uv.y*12.0));',
 '  col+=u_accent*faultGlow*(0.7+0.3*u_dark);',
-'  /* Motion arrows — faint drift indicators */',
+'  /* Motion arrows - faint drift indicators */',
 '  float arrowY=0.20;',
 '  for(int a=0;a<2;a++){',
 '    float ax=(a==0?0.25:0.75)*asp;',
@@ -702,12 +702,12 @@ GPU.Scenes['moving-mountains'] = [
 /* ── INTERNAL MOUNTAINS ──────────────────────────────────────────
    Claim: 400 miles underground there are inverted mountain ranges.
    Visual: Earth cross-section, surface at top, depth layers, then
-   inverted stalactite-peaks pointing DOWN — glowing pink accent.
+   inverted stalactite-peaks pointing DOWN - glowing pink accent.
 ──────────────────────────────────────────────────────────────────── */
 GPU.Scenes['internal-mountains'] = [
 'vec3 render(vec2 uv, vec2 res){',
 '  float asp=res.x/res.y, t=u_time*0.015;',
-'  /* Depth layers — lighter near surface, hotter/darker deeper */',
+'  /* Depth layers - lighter near surface, hotter/darker deeper */',
 '  float depth=1.0-uv.y;',
 '  vec3 crustD=vec3(0.18,0.14,0.10);',
 '  vec3 mantleD=vec3(0.32,0.10,0.04);',
@@ -730,7 +730,7 @@ GPU.Scenes['internal-mountains'] = [
 '  float b2=abs(uv.y-(1.0-0.65));',
 '  col=mix(col,col*0.6+u_accent*0.15,smoothstep(0.008,0.0,b1)*0.5);',
 '  col=mix(col,col*0.6+u_accent*0.25,smoothstep(0.008,0.0,b2)*0.5);',
-'  /* INVERTED MOUNTAINS — roots of surface mountains pointing DOWN */',
+'  /* INVERTED MOUNTAINS - roots of surface mountains pointing DOWN */',
 '  float zoneTop=0.32, zoneBot=0.05;',
 '  for(int i=0;i<6;i++){',
 '    float fi=float(i);',
@@ -741,14 +741,14 @@ GPU.Scenes['internal-mountains'] = [
 '    vec2 mp=vec2(uv.x*asp-mx, zoneTop-uv.y);',
 '    float sl=min((mp.x+mw)/mw,(-mp.x+mw)/mw);',
 '    float inM=smoothstep(-0.01,0.0,min(sl-mp.y/mh,0.0))*step(0.0,mp.y)*step(uv.y,zoneTop);',
-'    /* glow — brightest at tip */',
+'    /* glow - brightest at tip */',
 '    float tipDist=length(vec2(mp.x,mp.y-mh));',
 '    float tipGlow=exp(-tipDist*16.0)*inM;',
 '    vec3 mtnC=mix(u_accent*0.7+vec3(0.08,0.02,0.04), u_accent*0.55, u_dark);',
 '    col=mix(col,mtnC,inM*0.75);',
 '    col+=u_accent*(tipGlow*0.6+inM*0.12)*(0.7+0.3*sin(u_time*1.5+fi*1.1));',
 '  }',
-'  /* Depth annotation — faint horizontal lines at key depths */',
+'  /* Depth annotation - faint horizontal lines at key depths */',
 '  float depthLine=abs(uv.y-0.32);',
 '  col+=u_accent*0.18*exp(-depthLine*80.0)*(0.4+0.6*u_dark);',
 '  return col;',
@@ -788,7 +788,7 @@ ARCHETYPES['cosmos'] = function(p) {
 '  float twink=0.55+0.45*sin(u_time*2.1+sv*9.4);',
 '  float star=(1.0-smoothstep(0.0,0.055,length(slp)))*step(0.80,sh)*twink*u_dark;',
 '  col+=vec3(0.80+sv*0.18,0.88+sv*0.10,1.0)*star*(sh*0.7+0.3);',
-'  /* nebula — two fbm colour clouds */',
+'  /* nebula - two fbm colour clouds */',
 '  float ns='+f(p.nebulaScale,'1.2')+';',
 '  vec2 np=vec2(uv.x*asp*ns-t*0.8, uv.y*ns+t*0.3);',
 '  float nA=fbm(np+vec2(0.0,0.0)), nB=fbm(np+vec2(3.7,2.1));',
@@ -880,7 +880,7 @@ ARCHETYPES['cell'] = function(p) {
 '  vec3 bgD=mix(vec3(0.02,0.04,0.06),vec3(0.04,0.08,0.10),uv.y);',
 '  vec3 bgL=mix(vec3(0.88,0.92,0.96),vec3(0.70,0.80,0.88),uv.y);',
 '  vec3 col=mix(bgL,bgD,u_dark);',
-'  /* 3 drifting organic blobs — positions in [0,1]x[0,1] */',
+'  /* 3 drifting organic blobs - positions in [0,1]x[0,1] */',
 '  float m='+f(p.membrane,'0.50')+';',
 '  vec2 c0=vec2(0.50+0.20*sin(t*1.1),0.50+0.18*cos(t*0.9));',
 '  vec2 c1=vec2(0.50+0.28*cos(t*0.7+1.5),0.50+0.20*sin(t*1.3+0.8));',
@@ -978,7 +978,7 @@ ARCHETYPES['history'] = function(p) {
 '  vec3 skyD=mix(vec3(0.06,0.04,0.03),vec3(0.16,0.10,0.05),pow(1.0-uv.y,1.5));',
 '  vec3 skyL=mix(vec3(0.96,0.82,0.50),vec3(0.64,0.78,0.94),pow(uv.y,0.55));',
 '  vec3 col=mix(skyL,skyD,u_dark);',
-'  /* slight accent in sky — kept subtle so sky stays warm-toned */',
+'  /* slight accent in sky - kept subtle so sky stays warm-toned */',
 '  col+=u_accent*0.05*(1.0-uv.y*0.8);',
 '  /* sun / moon */',
 '  float sx='+f(p.sunX,'0.72')+';',
